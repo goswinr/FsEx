@@ -18,18 +18,21 @@
     <Copyright>Copyright: Goswin Rothenthal 2019 </Copyright>
   </PropertyGroup>
   
-  <ItemGroup>    
-    <Compile Include="00_ResizeArrayModule.fs" />    
-    <Compile Include="03_StringModule.fs" />    
-    <Compile Include="01_Util.fs" />    
+  <ItemGroup>
+    <Compile Include="01_Util.fs" />
+    <Compile Include="02_NiceString.fs" />
+
+    <Compile Include="TypeExtensions/ResizeArray.fs" />    
+    <Compile Include="TypeExtensions/String.fs" />
+    <Compile Include="TypeExtensions/Structs.fs" />
+    <Compile Include="TypeExtensions/Collections.fs" />
+    <Compile Include="TypeExtensions/Seq.fs" />
+    <Compile Include="Types/DefaultDict.fs" />
+    <Compile Include="Types/StuctTuples.fs" />
+
     <Compile Include="05_UtilMath.fs" />    
-    <Compile Include="02_NiceString.fs" />    
-    <Compile Include="02_ComputationalExpressions.fs" />
-    <Compile Include="11_StructTypeExtensions.fs" />
-    <Compile Include="12_CollectionTypeExtensions.fs" />  
-    <Compile Include="03_SeqModule.fs" />
-    <Compile Include="25_DefaultDict.fs" />
-    <Compile Include="26_StuctTuples.fs" />
+    <Compile Include="20_ComputationalExpressions.fs" />
+
     <Compile Include="30_MinMaxSortCompare.fs" />
     <Compile Include="31_DynamicOperator.fs" />
     <Compile Include="32_PrintDistribution.fs" />

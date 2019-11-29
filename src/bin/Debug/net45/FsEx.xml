@@ -18,6 +18,65 @@
  Like defaultdict in Python</summary>    
 <param name="defaultFun">(unit->'V): The function to create a default Value</param>
 </member>
+<member name="M:FsEx.IntRef.op_BangPlusPlus(Microsoft.FSharp.Core.FSharpRef{System.Int32})">
+<summary>
+Increment ref cell and return new incremented integer value
+</summary>
+</member>
+<member name="M:FsEx.Util.t3``3(``0,``1,``2)">
+<summary>
+Get third element of triple (tuple of three element)
+</summary>
+</member>
+<member name="M:FsEx.Util.t2``3(``0,``1,``2)">
+<summary>
+Get second element of triple (tuple of three element)
+</summary>
+</member>
+<member name="M:FsEx.Util.t1``3(``0,``1,``2)">
+<summary>
+Get first element of triple (tuple of three element)
+</summary>
+</member>
+<member name="M:FsEx.Util.op_BarGreaterGreater``2(``0,Microsoft.FSharp.Core.FSharpFunc{``0,``1})">
+<summary>
+Apply function ( like |&gt; ) but ignore result. return original input
+</summary>
+</member>
+<member name="M:FsEx.Util.op_BarQmark``1(``0,``0)">
+<summary>
+Returns the value on the left unless it is null, then it returns the value on the right.
+</summary>
+</member>
+<member name="M:FsEx.NiceString.toNiceStringFull``1(``0)">
+<summary>
+ Nice formating for floats , some Rhino Objects and sequences of any kind, all items including nested items are printed out.
+</summary>
+</member>
+<member name="M:FsEx.NiceString.toNiceString``1(``0)">
+<summary>
+ Nice formating for floats , some Rhino Objects and sequences of any kind, first four items are printed out.
+ set NiceString.toNiceStringMaxItemsPerSeq to other value if more or less shall be shown (default is 4)
+ set NiceString.toNiceStringMaxDepth to change how deep nested lists are printed (default is 2)
+</summary>
+</member>
+<member name="P:FsEx.NiceString.sb">
+<summary>
+ the internal stringbuilder for recursive function
+</summary>
+</member>
+<member name="M:FsEx.NiceString.singleToString(System.Single)">
+<summary>
+Formating with automatic precision 
+e.g.: 0 digits behind comma if above 1000
+</summary>
+</member>
+<member name="M:FsEx.NiceString.floatToString(System.Double)">
+<summary>
+Formating with automatic precision 
+e.g.: 0 digits behind comma if above 1000 
+</summary>
+</member>
 <member name="M:FsEx.ResizeArrayModule.rotate``1(System.Int32,System.Collections.Generic.List{``0})">
 <summary>
 Shift items poistion  towards the end of ResizeArray. refilling at start from end.
@@ -406,192 +465,6 @@ Returns everytrhing before a given splitting string.
 Or full string if splitter not present
 </summary>
 </member>
-<member name="M:FsEx.IntRef.op_BangPlusPlus(Microsoft.FSharp.Core.FSharpRef{System.Int32})">
-<summary>
-Increment ref cell and return new incremented integer value
-</summary>
-</member>
-<member name="M:FsEx.Util.t3``3(``0,``1,``2)">
-<summary>
-Get third element of triple (tuple of three element)
-</summary>
-</member>
-<member name="M:FsEx.Util.t2``3(``0,``1,``2)">
-<summary>
-Get second element of triple (tuple of three element)
-</summary>
-</member>
-<member name="M:FsEx.Util.t1``3(``0,``1,``2)">
-<summary>
-Get first element of triple (tuple of three element)
-</summary>
-</member>
-<member name="M:FsEx.Util.op_BarGreaterGreater``2(``0,Microsoft.FSharp.Core.FSharpFunc{``0,``1})">
-<summary>
-Apply function ( like |&gt; ) but ignore result. return original input
-</summary>
-</member>
-<member name="M:FsEx.Util.op_BarQmark``1(``0,``0)">
-<summary>
-Returns the value on the left unless it is null, then it returns the value on the right.
-</summary>
-</member>
-<member name="M:FsEx.NumericSteping.stepedFloat(System.Double,System.Double)">
-<summary>
-Converts floats to floats within defined float step sizes, (always rounding down like the int function)
-</summary>
-</member>
-<member name="M:FsEx.NumericSteping.stepedInt(System.Int32,System.Double)">
-<summary>
-Converts floats to ints within defined integer step sizes, (always rounding down like the int function)
-</summary>
-</member>
-<member name="M:FsEx.NumericSteping.precInt(System.Double,System.Double)">
-<summary>
-Converts floats to ints, devides by precicion
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.asBinaryString(System.Int32)">
-<summary>
-Converts an Int32 to a string of 32 characters of &apos;1&apos; or &apos;0&apos;.
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.roundDownToNextLogSteps(System.Int32,System.Double)">
-<summary>
-Rounds to the next smaller (closer to zero) number on logaritmic scale
-Define scale by giving amount of steps(int) to double or half a value.
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.roundUpToNextLogSteps(System.Int32,System.Double)">
-<summary>
-Rounds to the next biggest (away from zero) number on logaritmic scale.
-Define scale by giving amount of steps(int) to double or half a value.
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.normalize``6(``0,``4,``1)">
-<summary>
-Given the min and max value and a test value,  (val-min) / (max-min)
-Returns the relative  position  of the test value between min (= 0.0) and (max = 1.0),
-can also be bigger than 1.0
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.toDegrees(System.Double)">
-<summary>
-converts Angels from Radians to Degrees
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.toRadians(System.Double)">
-<summary>
-converts Angels from Degrees to Radians
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.areSame(System.Double,System.Double,System.Double)">
-<summary>
-Compares two floating point numbers to be within a tolerance for equality
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.areSameRel(System.Double,System.Double,System.Double)">
-<summary>
-Compares two floating point numbers within a relative tolerance for equality. 
-The comparing tolerance is calculated as:  relativeTolerance * (the smaller of the two float arguments).
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.randomStandardDeviation(System.Double,System.Double)">
-<summary>
-given mean  and standardDeviation returns a random value from this Gaussian distribution
-if mean is 0 and stDev is 1 then 99% of values are  are within -2.3 to +2.3 ; 70% within -1 to +1
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.isNanOrInf(System.Double)">
-<summary>
-Test is a floating point value is Infinity or Not a Number
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.ifZero2(System.Double,System.Double)">
-<summary>
-if second value is 0.0 return first else second
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.ifZero1(System.Double,System.Double)">
-<summary>
-if first value is 0.0 return second else first
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.op_DivideDot(System.Int32,System.Int32)">
-<summary>
-Gives a float from int / int division
-&lt;c&gt;(float(i)) / (float(j))&lt;/c&gt; 
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.op_MultiplyDot(System.Int32,System.Double)">
-<summary>
-Allows ints to be multiplied by floats
-&lt;c&gt;int(round(float(i) * f))&lt;/c&gt; 
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.floatOfObj``1(``0)">
-<summary>
-Get Float from any input. This helper enables more generic code in parsing sequences
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.parseFloatEnDe(System.String)">
-<summary>
-First tries to parses english float (period as decimal separator),
-if this fails tries to parse german floats,(comma as decimal separator)
-</summary>
-</member>
-<member name="M:FsEx.NiceString.toNiceStringFull``1(``0)">
-<summary>
- Nice formating for floats , some Rhino Objects and sequences of any kind, all items including nested items are printed out.
-</summary>
-</member>
-<member name="M:FsEx.NiceString.toNiceString``1(``0)">
-<summary>
- Nice formating for floats , some Rhino Objects and sequences of any kind, first four items are printed out.
- set NiceString.toNiceStringMaxItemsPerSeq to other value if more or less shall be shown (default is 4)
- set NiceString.toNiceStringMaxDepth to change how deep nested lists are printed (default is 2)
-</summary>
-</member>
-<member name="P:FsEx.NiceString.sb">
-<summary>
- the internal stringbuilder for recursive function
-</summary>
-</member>
-<member name="M:FsEx.NiceString.singleToString(System.Single)">
-<summary>
-Formating with automatic precision 
-e.g.: 0 digits behind comma if above 1000
-</summary>
-</member>
-<member name="M:FsEx.NiceString.floatToString(System.Double)">
-<summary>
-Formating with automatic precision 
-e.g.: 0 digits behind comma if above 1000 
-</summary>
-</member>
-<member name="M:FsEx.ResizeArrayBuilder.resizeArray``1">
-<summary>
- Computational Expression:  use &apos;yield&apos; to add alements to a ResizeArray (= Collections.Generic.List).
-</summary>
-</member>
-<member name="P:FsEx.StringBufferBuilder.stringBuffer">
-<summary>
-Computational Expression:  
-use &apos;yield&apos; to append text
-and &apos;yield!&apos; (with an exclamation mark)  to append text followed by a new line character.
-accepts ints and floats too. (including nice Formating)
-</summary>
-</member>
-<member name="T:FsEx.MaybeBuilder.MaybeBuilder">
-<summary>
- The maybe monad. 
-</summary>
-</member>
-<member name="P:FsEx.MaybeBuilder.maybe">
-<summary>
- A maybe monad. 
-</summary>
-</member>
 <member name="M:FsEx.TypeExtensionsStructs.DateTime.get_nowStrLong.Static">
 <summary>
 * UTC time, inludes 3 digits of miliseconds
@@ -767,6 +640,133 @@ Allows for negtive slice index too ( -1 = last element), returns a shallow copy 
 <member name="M:FsEx.EquatableModule.eq``1(``0,``0)">
 <summary>
  high performance comparison for non core Struct types
+</summary>
+</member>
+<member name="M:FsEx.NumericSteping.stepedFloat(System.Double,System.Double)">
+<summary>
+Converts floats to floats within defined float step sizes, (always rounding down like the int function)
+</summary>
+</member>
+<member name="M:FsEx.NumericSteping.stepedInt(System.Int32,System.Double)">
+<summary>
+Converts floats to ints within defined integer step sizes, (always rounding down like the int function)
+</summary>
+</member>
+<member name="M:FsEx.NumericSteping.precInt(System.Double,System.Double)">
+<summary>
+Converts floats to ints, devides by precicion
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.asBinaryString(System.Int32)">
+<summary>
+Converts an Int32 to a string of 32 characters of &apos;1&apos; or &apos;0&apos;.
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.roundDownToNextLogSteps(System.Int32,System.Double)">
+<summary>
+Rounds to the next smaller (closer to zero) number on logaritmic scale
+Define scale by giving amount of steps(int) to double or half a value.
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.roundUpToNextLogSteps(System.Int32,System.Double)">
+<summary>
+Rounds to the next biggest (away from zero) number on logaritmic scale.
+Define scale by giving amount of steps(int) to double or half a value.
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.normalize``6(``0,``4,``1)">
+<summary>
+Given the min and max value and a test value,  (val-min) / (max-min)
+Returns the relative  position  of the test value between min (= 0.0) and (max = 1.0),
+can also be bigger than 1.0
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.toDegrees(System.Double)">
+<summary>
+converts Angels from Radians to Degrees
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.toRadians(System.Double)">
+<summary>
+converts Angels from Degrees to Radians
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.areSame(System.Double,System.Double,System.Double)">
+<summary>
+Compares two floating point numbers to be within a tolerance for equality
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.areSameRel(System.Double,System.Double,System.Double)">
+<summary>
+Compares two floating point numbers within a relative tolerance for equality. 
+The comparing tolerance is calculated as:  relativeTolerance * (the smaller of the two float arguments).
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.randomStandardDeviation(System.Double,System.Double)">
+<summary>
+given mean  and standardDeviation returns a random value from this Gaussian distribution
+if mean is 0 and stDev is 1 then 99% of values are  are within -2.3 to +2.3 ; 70% within -1 to +1
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.isNanOrInf(System.Double)">
+<summary>
+Test is a floating point value is Infinity or Not a Number
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.ifZero2(System.Double,System.Double)">
+<summary>
+if second value is 0.0 return first else second
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.ifZero1(System.Double,System.Double)">
+<summary>
+if first value is 0.0 return second else first
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.op_DivideDot(System.Int32,System.Int32)">
+<summary>
+Gives a float from int / int division
+&lt;c&gt;(float(i)) / (float(j))&lt;/c&gt; 
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.op_MultiplyDot(System.Int32,System.Double)">
+<summary>
+Allows ints to be multiplied by floats
+&lt;c&gt;int(round(float(i) * f))&lt;/c&gt; 
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.floatOfObj``1(``0)">
+<summary>
+Get Float from any input. This helper enables more generic code in parsing sequences
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.parseFloatEnDe(System.String)">
+<summary>
+First tries to parses english float (period as decimal separator),
+if this fails tries to parse german floats,(comma as decimal separator)
+</summary>
+</member>
+<member name="M:FsEx.ResizeArrayBuilder.resizeArray``1">
+<summary>
+ Computational Expression:  use &apos;yield&apos; to add alements to a ResizeArray (= Collections.Generic.List).
+</summary>
+</member>
+<member name="P:FsEx.StringBufferBuilder.stringBuffer">
+<summary>
+Computational Expression:  
+use &apos;yield&apos; to append text
+and &apos;yield!&apos; (with an exclamation mark)  to append text followed by a new line character.
+accepts ints and floats too. (including nice Formating)
+</summary>
+</member>
+<member name="T:FsEx.MaybeBuilder.MaybeBuilder">
+<summary>
+ The maybe monad. 
+</summary>
+</member>
+<member name="P:FsEx.MaybeBuilder.maybe">
+<summary>
+ A maybe monad. 
 </summary>
 </member>
 <member name="M:FsEx.CompareOperators.op_DotGreaterDot``1(System.Boolean,``0,``0)">

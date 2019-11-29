@@ -5,8 +5,9 @@ open System.Globalization
 
 
 module  Util = 
-    
-    let inline notNull (value : 'T) = match value with | null -> false   | _ -> true// Fsharp core does it like this too. dont use RefrenceEquals
+    let fail() = failwith "Generic fail (inner exception should show more helpful message)"   
+
+    let inline notNull (value : 'T) = match value with | null -> false   | _ -> true// Fsharp core does it like this too. dont use Obejct.RefrenceEquals
     
     ///Returns the value on the left unless it is null, then it returns the value on the right.
     let inline (|?) a b = if Object.ReferenceEquals(a, null) then b else a // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs
@@ -14,7 +15,7 @@ module  Util =
     ///Apply function ( like |> ) but ignore result. return original input
     let inline (|>>) a f =  f a |> ignore ; a
 
-    let fail() = failwith "Generic fail (inner exception should show more helpful message)"   
+     
  
     ///Get first element of triple (tuple of three element)
     let inline t1 (a, _,_) = a
@@ -22,10 +23,7 @@ module  Util =
     let inline t2 (_, b, _) = b
     ///Get third element of triple (tuple of three element)
     let inline t3 (_,_, c) = c    
-     
-
-
-
+    
 
 module IntRef = 
     let inline incr2 i = i := !i+2
