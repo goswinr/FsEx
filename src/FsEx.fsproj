@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net45</TargetFramework> 
+    <LangVersion>preview</LangVersion>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages> <!--to only have the english resources--> 
+    <AssemblyName>FsEx</AssemblyName>   
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    
+    <!--assembly info -->
+    <Version>0.0.0.1</Version>
+    <Authors>Goswin Rothenthal</Authors>
+    <Product>FsEx</Product>
+    <AssemblyVersion>0.1.0.1</AssemblyVersion>
+    <FileVersion>0.1.0.1</FileVersion>
+    <NeutralLanguage>en</NeutralLanguage>
+    <Description>a FSharp extension and utility library</Description>
+    <Copyright>Copyright: Goswin Rothenthal 2019 </Copyright>
+  </PropertyGroup>
+  
+  <ItemGroup>    
+    <Compile Include="00_ResizeArrayModule.fs" />    
+    <Compile Include="01_Util.fs" />    
+    <Compile Include="05_UtilMath.fs" />    
+    <Compile Include="02_NiceString.fs" />    
+    <Compile Include="02_ComputationalExpressions.fs" />
+    <Compile Include="11_StructTypeExtensions.fs" />
+    <Compile Include="12_CollectionTypeExtensions.fs" />
+    <Compile Include="03_StringModule.fs" />  
+    <Compile Include="03_SeqModuleExtensions.fs" />
+    <Compile Include="25_DefaultDict.fs" />
+    <Compile Include="30_MinMaxSortCompare.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="4.7.0" />
+  </ItemGroup>
+
+
+</Project>
