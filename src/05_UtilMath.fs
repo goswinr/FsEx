@@ -33,7 +33,7 @@ module UtilMath =
             with _ -> 
                 failwithf "Could not convert %s '%A' into a floating point number" (o.GetType().Name) o   
     
-    let internal rand = System.Random () 
+    
 
     ///Allows ints to be multiplied by floats
     ///<c>int(round(float(i) * f))</c> 
@@ -43,12 +43,6 @@ module UtilMath =
     ///<c>(float(i)) / (float(j))</c> 
     let inline ( /. ) (i:int) (j:int) = (float(i)) / (float(j)) // or do it like this:https://stackoverflow.com/questions/2812084/overload-operator-in-f/2812306#2812306
 
-    ///if first value is 0.0 return second else first
-    let internal ifZero1 a b = if a = 0.0 then b else a
-    
-    ///if second value is 0.0 return first else second
-    let internal ifZero2 a b = if b = 0.0 then a else b
-
     //gives a int from int / float division
     //int(round( float(i) / j ))
     //let inline ( /| ) (i:int) (j:float) = int(round( float(i) / j ))
@@ -56,6 +50,7 @@ module UtilMath =
     ///Test is a floating point value is Infinity or Not a Number
     let inline isNanOrInf f = Double.IsInfinity f || Double.IsNaN f
 
+    let internal rand = System.Random () 
     ///given mean  and standardDeviation returns a random value from this Gaussian distribution
     ///if mean is 0 and stDev is 1 then 99% of values are  are within -2.3 to +2.3 ; 70% within -1 to +1
     let randomStandardDeviation mean standardDeviation =
@@ -138,15 +133,13 @@ module UtilMath =
 
 
 
-
-module NumericSteping = 
-    ///Converts floats to ints, devides by precicion
+    ///NumericSteping: Converts floats to ints, devides by precicion
     let inline precInt (prec:float) (v:float) : int = int (v / prec)
     
-    ///Converts floats to ints within defined integer step sizes, (always rounding down like the int function)
+    ///NumericSteping:Converts floats to ints within defined integer step sizes, (always rounding down like the int function)
     let inline stepedInt (prec:int) (v:float) : int = int (v / float prec) * prec
     
-    ///Converts floats to floats within defined float step sizes, (always rounding down like the int function)
+    ///NumericSteping:Converts floats to floats within defined float step sizes, (always rounding down like the int function)
     let inline stepedFloat (prec:float) (v:float) : float = float (int (v / prec)) * prec
     
 
