@@ -1,6 +1,7 @@
 ﻿namespace FsEx
 
 open System
+open System.Collections.Generic
 
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module Seq =   
@@ -149,9 +150,9 @@ module Seq =
                     yield !prev, !this, first
                     yield !this, first, second
                 else
-                    failwithf "thisNextNextaftertLooped: Input Sequence %A only had two elements" xs
+                    failwithf "thisNextNextaftertLooped: Input Sequence only had two elements: %s" xs.ToNiceString
             else
-                failwithf "thisNextNextaftertLooped: Input Sequence %A only had one element" xs
+                failwithf "thisNextNextaftertLooped: Input Sequence only had one element: %s" xs.ToNiceString
         else
             failwithf "thisNextNextaftertLooped: Empty Input Sequence %A" xs}
     
@@ -177,11 +178,39 @@ module Seq =
                     yield !kk, !prev, !this, first
                     yield 0, !this, first, second
                 else
-                    failwithf "thisNextNextaftertLooped: Input Sequence %A only had two elements" xs
+                    failwithf "thisNextNextaftertLooped: Input Sequence only had two elements: %s" xs.ToNiceString
             else
-                failwithf "thisNextNextaftertLooped: Input Sequence %A only had one element" xs
+                failwithf "thisNextNextaftertLooped: Input Sequence only had one element: %s" xs.ToNiceString
         else
             failwithf "thisNextNextaftertLooped: Empty Input Sequence %A" xs}    
+    
+    let rec private listlast (list: 'T list) =     
+        match list with            
+        | [x] -> x            
+        | _ :: tail -> listlast tail          
+        | [] -> invalidArg "list" "ListWasEmpty"    
+    
+    /// faster implemetation of Seq.last till F# 4.8 is out
+    let fastLast (source : seq<_>) = // keep this until https://github.com/dotnet/fsharp/pull/7765/files is part of fsharp core
+        match source with
+        | :? ('T[]) as a -> 
+            if a.Length = 0 then invalidArg "source" "sourceWasEmpty"
+            else a.[a.Length - 1]
+
+        | :? ('T IList) as a -> //ResizeArray and other collections
+            if a.Count = 0 then invalidArg "source" "sourceWasEmpty"
+            else a.[a.Count - 1]
+
+        | :? ('T list) as a -> listlast a 
+
+        | _ -> 
+            use e = source.GetEnumerator()
+            if e.MoveNext() then
+                let mutable res = e.Current
+                while (e.MoveNext()) do res <- e.Current
+                res
+            else
+                invalidArg "source" "sourceWasEmpty" 
 
     ///Yields looped Seq of (previous, this, next): from (last, first, second)  upto (second-last, last, first)
     ///Consider "thisNextNextafterLooped" as faster since the last element is not required from the start on.
@@ -192,8 +221,8 @@ module Seq =
             let first = e.Current
             if e.MoveNext() then
                 let this = ref e.Current
-                if e.MoveNext() then
-                    yield Seq.last xs ,!prev, !this
+                if e.MoveNext() then                    
+                    yield fastLast xs ,!prev, !this //yield Seq.last xs ,!prev, !this
                     yield !prev, !this, e.Current
                     prev := !this  
                     this := e.Current
@@ -203,9 +232,9 @@ module Seq =
                         this := e.Current                            
                     yield !prev, !this, first
                 else                     
-                    failwithf "prevThisNextLooped: Input Sequence %A only had two elements" xs
+                    failwithf "prevThisNextLooped: Input Sequence only had two elements: %s" xs.ToNiceString
             else
-                failwithf "prevThisNextLooped: Input Sequence %A only had one element" xs
+                failwithf "prevThisNextLooped: Input Sequence only had one element: %s" xs.ToNiceString
         else
             failwithf "prevThisNextLooped: Empty Input Sequence %A" xs} 
 
@@ -220,7 +249,7 @@ module Seq =
             if e.MoveNext() then
                 let this = ref e.Current
                 if e.MoveNext() then
-                    yield  0, Seq.last xs ,!prev, !this
+                    yield  0, fastLast xs ,!prev, !this //     yield  0, Seq.last xs ,!prev, !this
                     yield  1, !prev, !this, e.Current
                     prev := !this  
                     this := e.Current
@@ -231,9 +260,9 @@ module Seq =
                         this := e.Current                            
                     yield !kk, !prev, !this, first
                 else                     
-                    failwithf "prevThisNextLooped: Input Sequence %A only had two elements" xs
+                    failwithf "prevThisNextLooped: Input Sequence %s only had two elements" xs.ToNiceString
             else
-                failwithf "prevThisNextLooped: Input Sequence %A only had one element" xs
+                failwithf "prevThisNextLooped: Input Sequence %s only had one element" xs.ToNiceString
         else
             failwithf "prevThisNextLooped: Empty Input Sequence %A" xs} 
 

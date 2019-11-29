@@ -6,8 +6,8 @@ open System
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module String =
 
-    /// Returns everytrhing before a given splitting string
-    /// Full strring if splitter not present
+    ///Returns everytrhing before a given splitting string.
+    ///Or full string if splitter not present
     let before (splitter:string) (s:string) = 
         let start = s.IndexOf(splitter) 
         if start = -1 then s
@@ -47,7 +47,7 @@ module String =
                 s.Substring(start + startChar.Length, ende - start - startChar.Length),// finds text betwween two chars
                 s.Substring(ende + endChar.Length)
     
-    /// finds text betwween two strings including delimiters on middle string 
+    ///Finds text betwween two strings including delimiters on middle string 
     ///betweenIncl "((" "))" "c((ab))d" = "c", "((ab))", "d"
     let betweenIncl (startChar:string) (endChar:string) (s:string) = 
         

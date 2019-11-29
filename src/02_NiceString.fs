@@ -30,7 +30,8 @@ module NiceString =
                     add s.[i]
         sb.ToString() 
     
-    /// with automatic formationg of precision
+    ///Formating with automatic precision 
+    ///e.g.: 0 digits behind comma if above 1000 
     let floatToString  (x:float) =
         if   Double.IsNaN x then "NaN"
         elif Double.IsInfinity x then "Infinity"
@@ -44,7 +45,8 @@ module NiceString =
             elif a > 1.     then sprintf "%.3f" x 
             else                 sprintf "%g"   x  
 
-    /// with automatic formationg of precision
+    ///Formating with automatic precision 
+    ///e.g.: 0 digits behind comma if above 1000
     let singleToString  (x:float32) =
         if   Single.IsNaN x then "NaN"
         elif Single.IsInfinity x then "Infinity"

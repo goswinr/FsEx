@@ -65,6 +65,16 @@ module UtilMath =
         //random normal(mean, stdDev^2)
         mean + standardDeviation * randStdNormal 
 
+      
+    ///Compares two floating point numbers within a relative tolerance for equality. 
+    ///The comparing tolerance is calculated as:  relativeTolerance * (the smaller of the two float arguments).
+    let inline areSameRel relativeTolerance (a:float) (b:float)  = 
+        let mi = min (abs a) (abs b)
+        abs(a-b) < relativeTolerance*mi
+    
+    ///Compares two floating point numbers to be within a tolerance for equality
+    let inline areSame absoluteTolerance a (b:float)  = 
+        abs(a-b) < absoluteTolerance
 
     let private piOne80 = Math.PI / 180.   // precompute division
 
@@ -75,6 +85,69 @@ module UtilMath =
 
     ///converts Angels from Radians to Degrees
     let toDegrees radians = one80Pi * radians
+
+    let inline interpolate start ende (rel:float) = start + ((ende-start)*rel)
+
+    ///Given the min and max value and a test value,  (val-min) / (max-min)
+    ///Returns the relative  position  of the test value between min (= 0.0) and (max = 1.0),
+    ///can also be bigger than 1.0
+    let inline normalize rangeStart rangeStop valueAt =  (rangeStart-valueAt)/(rangeStart-rangeStop) // div 0 ?
+    
+    ///Rounds to the next biggest (away from zero) number on logaritmic scale.
+    ///Define scale by giving amount of steps(int) to double or half a value.
+    let roundUpToNextLogSteps (stepsToDouble:int) x =
+        if isNanOrInf x then failwithf "*** roundUpToNextLogSteps failed on: %f" x
+        elif stepsToDouble < 0 then failwithf "*** roundUpToNextLogSteps failed on: int stepsToDouble must be bigger than 0" 
+        elif x = 0.0 then 0.0
+        else
+            let logBase =  2. ** (1./float stepsToDouble) 
+            if x > 0.0 then   logBase ** (Math.Ceiling (Math.Log (    x, logBase)))
+            else            -(logBase ** (Math.Ceiling (Math.Log (abs x, logBase)))) // with negative sign, (log fails on negative numbers)
+
+    ///Rounds to the next smaller (closer to zero) number on logaritmic scale
+    ///Define scale by giving amount of steps(int) to double or half a value.
+    let roundDownToNextLogSteps (stepsToDouble:int) x =
+        if isNanOrInf x then failwithf "*** roundDownToNextLogSteps failed on: %f" x
+        elif stepsToDouble < 0 then failwithf "*** roundDownToNextLogSteps failed on: int stepsToDouble must be bigger than 0" 
+        elif x = 0.0 then 0.0
+        else
+            let logBase =  2. ** (1./float stepsToDouble) 
+            if x > 0.0 then   logBase ** (Math.Floor (Math.Log (    x, logBase)))
+            else            -(logBase ** (Math.Floor (Math.Log (abs x, logBase)))) // with negative sign, (log fails on negative numbers)
+    
+    ///Converts an Int32 to a string of 32 characters of '1' or '0'.
+    let asBinaryString (n:int) =  
+        // or System.Convert.ToString (n,2)
+        let b = Array.zeroCreate 32
+        let mutable pos = 31
+        let mutable i = 0
+        while i < 32 do  
+            if ((n &&& (1 <<< i)) <> 0) then  b.[pos] <- '█' //'1'                
+            else                              b.[pos] <- '0'                
+            pos <- pos - 1
+            i   <- i + 1        
+        (* // testing :
+        for i = 0 to 100 do
+            //printfn "%08d: %s" i <| asBinaryString i
+            //printfn "%08d: %s" i <| asBinaryString -i
+            printfn "%08d: %s" i <| asBinaryString (i <<< 16)
+            printfn "%08d: %s" i <| asBinaryString (-i <<< 16)
+            
+            *)
+        new System.String(b)
+
+
+
+
+module NumericSteping = 
+    ///Converts floats to ints, devides by precicion
+    let inline precInt (prec:float) (v:float) : int = int (v / prec)
+    
+    ///Converts floats to ints within defined integer step sizes, (always rounding down like the int function)
+    let inline stepedInt (prec:int) (v:float) : int = int (v / float prec) * prec
+    
+    ///Converts floats to floats within defined float step sizes, (always rounding down like the int function)
+    let inline stepedFloat (prec:float) (v:float) : float = float (int (v / prec)) * prec
     
 
         

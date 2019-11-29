@@ -1,16 +1,16 @@
 ﻿namespace FsEx
 open System
 
-[<AutoOpen>]
-module OptionBuilder =
 
-    
+[<AutoOpen>]
+module MaybeBuilder =    
     
     /// The maybe monad. 
     type MaybeBuilder() =
-        // This monad is my own and uses an 'T option. Others generally make their own Maybe<'T> type from Option<'T>.
-        // The builder approach is from Matthew Podwysocki's excellent Creating Extended Builders series http://codebetter.com/blogs/matthew.podwysocki/archive/2010/01/18/much-ado-about-monads-creating-extended-builders.aspx.
         // from https://github.com/fsprojects/FSharpx.Extras/blob/master/src/FSharpx.Extras/ComputationExpressions/Option.fs
+        // This monad is my own and uses an 'T option. Others generally make their own Maybe<'T> type from Option<'T>.
+        // The builder approach is from Matthew Podwysocki's excellent Creating Extended Builders series 
+        // http://codebetter.com/blogs/matthew.podwysocki/archive/2010/01/18/much-ado-about-monads-creating-extended-builders.aspx.        
         
         member this.Return(x) = Some x
 
@@ -55,15 +55,13 @@ module StringBufferBuilder =
 
     open System.Text
 
-    type StringBufferBuilder () =
- 
+    type StringBufferBuilder () = 
         
         member inline _.Yield (txt: string) =  fun (b: StringBuilder) -> b.Append  txt |> ignore
         member inline _.Yield (c: char) =      fun (b: StringBuilder) -> b.Append  c   |> ignore
         member inline _.Yield (f: float) =     fun (b: StringBuilder) -> f |> NiceString.floatToString |> b.Append  |> ignore
         member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> b.Append (i.ToString())  |> ignore
         //member inline _.Yield (x: 'T) =        fun (b: StringBuilder)  -> b.Append (x.ToString())  |> ignore
-
 
         member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> b.AppendLine txt |> ignore // 
         member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> b.AppendLine  (c.ToString())   |> ignore
@@ -74,8 +72,7 @@ module StringBufferBuilder =
         member inline _.Yield (strings: seq<string>) =
             fun (b: StringBuilder) -> 
                 for s in strings do 
-                    Printf.bprintf b "%s%s" s Environment.NewLine 
-        
+                    Printf.bprintf b "%s%s" s Environment.NewLine         
         
         member _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
         
@@ -102,7 +99,7 @@ module StringBufferBuilder =
     ///Computational Expression:  
     ///use 'yield' to append text
     ///and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
-    ///accepts ints and floats too.(including nice Formating)
+    ///accepts ints and floats too. (including nice Formating)
     let stringBuffer = StringBufferBuilder ()
 
 

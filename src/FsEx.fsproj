@@ -20,16 +20,19 @@
   
   <ItemGroup>    
     <Compile Include="00_ResizeArrayModule.fs" />    
+    <Compile Include="03_StringModule.fs" />    
     <Compile Include="01_Util.fs" />    
     <Compile Include="05_UtilMath.fs" />    
     <Compile Include="02_NiceString.fs" />    
     <Compile Include="02_ComputationalExpressions.fs" />
     <Compile Include="11_StructTypeExtensions.fs" />
-    <Compile Include="12_CollectionTypeExtensions.fs" />
-    <Compile Include="03_StringModule.fs" />  
-    <Compile Include="03_SeqModuleExtensions.fs" />
+    <Compile Include="12_CollectionTypeExtensions.fs" />  
+    <Compile Include="03_SeqModule.fs" />
     <Compile Include="25_DefaultDict.fs" />
+    <Compile Include="26_StuctTuples.fs" />
     <Compile Include="30_MinMaxSortCompare.fs" />
+    <Compile Include="31_DynamicOperator.fs" />
+    <Compile Include="32_PrintDistribution.fs" />
   </ItemGroup>
 
   <ItemGroup>
