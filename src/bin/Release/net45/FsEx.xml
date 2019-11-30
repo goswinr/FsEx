@@ -18,6 +18,42 @@
  Like defaultdict in Python</summary>    
 <param name="defaultFun">(unit->'V): The function to create a default Value</param>
 </member>
+<member name="M:FsEx.IntTrip.#ctor(System.Double,System.Double,System.Double,System.Double,System.Double,System.Double,System.Double)">
+<summary>
+ multiplies x, y and z with precMult  then adds shiftX, shiftY and shiftZ respectively before casting to three integers
+</summary>
+</member>
+<member name="M:FsEx.IntTrip.#ctor(System.Double,System.Double,System.Double,System.Double)">
+<summary>
+ multiplies x, y and z with precMult before casting to three integers
+</summary>
+</member>
+<member name="T:FsEx.IntTrip">
+<summary>
+A struct of three integers
+use operator (===) for fast equality test
+Avoid using this struct in Fsharp.Core functions like: List.contains value. boxing will ocure
+Better: List.exists (fun v -&gt; v === value)
+</summary>
+</member>
+<member name="M:FsEx.IntTup.#ctor(System.Double,System.Double,System.Double,System.Double,System.Double)">
+<summary>
+ multiplies x and y with precMult  then adds shiftX and shiftY respectively before casting to two integers
+</summary>
+</member>
+<member name="M:FsEx.IntTup.#ctor(System.Double,System.Double,System.Double)">
+<summary>
+ multiplies x and y with precMult before casting to two integers
+</summary>
+</member>
+<member name="T:FsEx.IntTup">
+<summary>
+A struct of two integers
+use operator (===) for fast equality test
+Avoid using this struct in Fsharp.Core functions like: List.contains value. boxing will ocure
+Better: List.exists (fun v -&gt; v === value)
+</summary>
+</member>
 <member name="M:FsEx.IntRef.op_BangPlusPlus(Microsoft.FSharp.Core.FSharpRef{System.Int32})">
 <summary>
 Increment ref cell and return new incremented integer value
@@ -40,7 +76,8 @@ Get first element of triple (tuple of three element)
 </member>
 <member name="M:FsEx.Util.op_BarGreaterGreater``2(``0,Microsoft.FSharp.Core.FSharpFunc{``0,``1})">
 <summary>
-Apply function ( like |&gt; ) but ignore result. return original input
+Apply function, like |&gt; , but ignore result. 
+Return original input
 </summary>
 </member>
 <member name="M:FsEx.Util.op_BarQmark``1(``0,``0)">
@@ -617,29 +654,51 @@ Considers sequence cirular and move elements up or down
 Allows for negtive slice index too ( -1 = last element), returns a shallow copy including the end index.
 </summary>
 </member>
-<member name="T:FsEx.StructTuples.IntTrip">
+<member name="M:FsEx.NonBoxingEqualityOperators.op_EqualsBangEquals``1(``0,``0)">
 <summary>
- Use &apos;==&apos; operater for fast equality (EquatableModule)
+This NotEquals operator (=!=) is overloaded to always use the generic System.IEquatable&lt;&apos;T&gt;
+This avoids boxing of custom structs when comparing with (&lt;&gt;). A significant performance improvement.
 </summary>
 </member>
-<member name="T:FsEx.StructTuples.IntTup">
+<member name="M:FsEx.NonBoxingEqualityOperators.op_EqualsEqualsEquals``1(``0,``0)">
 <summary>
- Use &apos;==&apos; operater for fast equality (EquatableModule)
+This Equals operator (===) always uses the generic System.IEquatable&lt;&apos;T&gt;
+This avoids boxing of custom structs when comparing with (=). A significant performance improvement.
 </summary>
 </member>
-<member name="M:FsEx.EquatableModule.op_BangEquals``1(``0,``0)">
+<member name="M:FsEx.NonBoxingEqualityOperatorOverloads.op_BangEquals``1(``0,``0)">
 <summary>
- high performance comparison for non core Struct types
+The original NotEquals operator (&lt;&gt;) is overloaded to always use the generic System.IEquatable&lt;&apos;T&gt;
+This avoids boxing of custom structs when comparing. A significant performance improvement.
+Use (!=) for types that don&apos;t have System.IEquatable&lt;&apos;T&gt; implemented or any type if you dont mind performance.
 </summary>
 </member>
-<member name="M:FsEx.EquatableModule.op_EqualsEquals``1(``0,``0)">
+<member name="M:FsEx.NonBoxingEqualityOperatorOverloads.op_EqualsEquals``1(``0,``0)">
 <summary>
- high performance comparison for non core Struct types
+The orignal Equals operator (=) is overloaded to always use the generic System.IEquatable&lt;&apos;T&gt;
+This avoids boxing of custom structs when comparing. A significant performance improvement.
+Use this operator (==) for types that don&apos;t have System.IEquatable&lt;&apos;T&gt; implemented or any type if you dont mind performance.
 </summary>
 </member>
-<member name="M:FsEx.EquatableModule.eq``1(``0,``0)">
+<member name="M:FsEx.NonBoxingEqualityOperatorOverloads.op_Inequality``1(``0,``0)">
 <summary>
- high performance comparison for non core Struct types
+The NotEquals operator (&lt;&gt;) is overloaded to always use the generic System.IEquatable&lt;&apos;T&gt;
+This avoids boxing of custom structs when comparing. A significant performance improvement.
+Use (!=) for types that don&apos;t have System.IEquatable&lt;&apos;T&gt; implemented.
+</summary>
+</member>
+<member name="M:FsEx.NonBoxingEqualityOperatorOverloads.op_Equality``1(``0,``0)">
+<summary>
+The Equals operator (=) is overloaded to always use the generic System.IEquatable&lt;&apos;T&gt;
+This avoids boxing of custom structs when comparing. A significant performance improvement.
+Use (==) for types that don&apos;t have System.IEquatable&lt;&apos;T&gt; implemented.
+</summary>
+</member>
+<member name="T:FsEx.NonBoxingEqualityOperatorOverloads">
+<summary>
+Opening this module improves the performance of equality tests (=) and (&lt;&gt;) on custom structs significantly.
+But for types that don&apos;t have System.IEquatable&lt;&apos;T&gt; implemented you will now have to use (==) and (!=).
+Use #nowarn &quot;86&quot;to disable warnings
 </summary>
 </member>
 <member name="M:FsEx.UtilMath.stepedFloat(System.Double,System.Double)">

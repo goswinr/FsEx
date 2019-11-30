@@ -1,21 +1,19 @@
 ﻿namespace FsEx
 
 open System
-open System.Globalization
 
-
+[<AutoOpen>]
 module  Util = 
     let fail() = failwith "Generic fail (inner exception should show more helpful message)"   
 
-    let inline notNull (value : 'T) = match value with | null -> false   | _ -> true// Fsharp core does it like this too. dont use Obejct.RefrenceEquals
+    let inline notNull (value : 'T) = match value with | null -> false  | _ -> true// Fsharp core does it like this too. dont use Obejct.RefrenceEquals
     
     ///Returns the value on the left unless it is null, then it returns the value on the right.
     let inline (|?) a b = if Object.ReferenceEquals(a, null) then b else a // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs
 
-    ///Apply function ( like |> ) but ignore result. return original input
-    let inline (|>>) a f =  f a |> ignore ; a
-
-     
+    ///Apply function, like |> , but ignore result. 
+    ///Return original input
+    let inline (|>>) x f =  f x |> ignore ; x     
  
     ///Get first element of triple (tuple of three element)
     let inline t1 (a, _,_) = a

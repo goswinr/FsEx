@@ -19,7 +19,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <Compile Include="01_Util.fs" />
+    <Compile Include="01_TopLevelFunctions.fs" />
     <Compile Include="02_NiceString.fs" />
 
     <Compile Include="TypeExtensions/ResizeArray.fs" />    
