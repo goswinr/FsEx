@@ -3,7 +3,7 @@
 open System
 open System.Collections.Generic
 
-//[<AutoOpen>]
+[<AutoOpen>]
 module TypeExtensionsIList =  
 
     [<EXT>]
