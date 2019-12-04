@@ -18,51 +18,38 @@ module TypeExtensionsSeq =
     /// e.g.: -1 is  last item .
     let inline negIdx i len =
         let ii =  if i<0 then len+i else i
-        if ii<0 || ii >= len then failwithf "Cannot get index %d of Seq with %d items" i len
+        if ii<0 || ii >= len then failwithf "Cannot get index %d of seq, array or IList with %d items" i len
         ii
 
-    let private get i (xs:seq<'T>) : 'T =        
-        match xs with
-        //| :? ('T[])             as xs -> xs.[negIdx i xs.Length] // covered by IList
-        //| :? ('T ResizeArray)   as xs -> xs.[negIdx i xs.Count] // covered by IList
-        | :? ('T IList)         as xs -> xs.[negIdx i xs.Count]
-        | :? ('T list)          as xs -> List.item (negIdx i (List.length xs)) xs
-        | _ -> Seq.item  (negIdx i (Seq.length xs)) xs
-
-    let private set i x (xs:seq<_>) :unit =
-        match xs with
-        | :? ('T[])             as xs -> xs.[negIdx i xs.Length]<- x // why not covered by IList? cast fails
-        | :? ('T ResizeArray)   as xs -> xs.[negIdx i xs.Count] <- x // why not covered by IList? cast fails
-        | :? ('T IList)         as xs -> xs.[negIdx i xs.Count] <- x
-        | _ -> failwithf "Cannot set items on this Seq (is it a dict, lazy or immutable ?)"
 
     let rec private listlast (list: 'T list) =     
         match list with            
         | [x] -> x            
         | _ :: tail -> listlast tail          
-        | [] -> invalidArg "list" "ListWasEmpty"    
+        | [] -> invalidArg "list" "F# ListWasEmpty"    
         
     /// faster implemetation of Seq.last , keep till F# 4.8 is out
     let internal fastLast (source : seq<_>) = // keep this until https://github.com/dotnet/fsharp/pull/7765/files is part of fsharp core
         match source with
         | :? ('T[]) as a -> 
-            if a.Length = 0 then invalidArg "source" "sourceWasEmpty"
+            if a.Length = 0 then invalidArg "source" "array sourceWasEmpty"
             else a.[a.Length - 1]
 
         | :? ('T IList) as a -> //ResizeArray and other collections
-            if a.Count = 0 then invalidArg "source" "sourceWasEmpty"
+            if a.Count = 0 then invalidArg "source" "IList sourceWasEmpty"
             else a.[a.Count - 1]
 
         | :? ('T list) as a -> listlast a 
 
         | _ -> 
+            //printfn "fastlast on seq"
             use e = source.GetEnumerator()
             if e.MoveNext() then
                 let mutable res = e.Current
                 while (e.MoveNext()) do res <- e.Current
                 res
             else
-                invalidArg "source" "sourceWasEmpty" 
+                invalidArg "source" "seq sourceWasEmpty" 
     
 
     [<Extension>]
@@ -74,41 +61,53 @@ module TypeExtensionsSeq =
 
         /// Last item in Seq
         [<Extension>]
-        member this.Last = fastLast this
-    
+        member this.Last = fastLast this    
+
+        ///Allows for negative indices too, like Python, -1 is the last element.
         [<Extension>] 
-        ///Allows for negtive indices too (like Python)
         member this.Item 
-            with get i   = get i this
-            and  set i x = set i x this
+            with get i   = 
+                match this with
+                | :? ('T IList)         as xs -> xs.[negIdx i xs.Count] //covers Array too
+                | :? ('T list)          as xs -> 
+                    try
+                        if i<0 then List.item ((List.length xs)+i) xs
+                        else List.item  i xs
+                    with _ -> 
+                        raise (IndexOutOfRangeException(sprintf "Cannot get index %d from F# list of length %d" i (List.length xs)))
+                | _ ->  
+                    try
+                        if i<0 then Seq.item ((Seq.length this)+i) this
+                        else Seq.item  i this
+                    with _ -> 
+                        raise (IndexOutOfRangeException(sprintf "Cannot get index %d from seq of length %d" i (Seq.length this)))
 
+            and  set i (x:'T)  = 
+                match this with // matching need to be inline here otherwise cast from array to IList fails
+                | :? ('T IList)   as xs -> xs.[negIdx i xs.Count] <- x
+                | _ -> failwithf "Cannot set items on this Seq (is it a dict, lazy or immutable ?)"
 
-        ///Allows for negative indices too.
+        
+        ///Allows for negative indices too, like Python, -1 is the last element.
         ///The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
         [<Extension>]
         member this.GetSlice(startIdx,endIdx) : 'T seq = // to use slicing notation e.g. : xs.[ 1 .. -2]
-            let count = Seq.length this
-            let st  = match startIdx with None -> 0        | Some i -> if i<0 then count+i      else i
-            let len = match endIdx   with None -> count-st | Some i -> if i<0 then count+i-st+1 else i-st+1
-
-            if st < 0 || st > count-1 then 
-                let err = sprintf "GetSlice: Start index %d is out of range. Allowed values are -%d up to %d for Seq of %d items" startIdx.Value count (count-1) count
+            let count = lazy(Seq.length this)
+            let st  = match startIdx with None -> 0              | Some i -> if i<0 then count.Value+i      else i
+            let len = match endIdx   with None -> count.Value-st | Some i -> if i<0 then count.Value+i-st+1 else i-st+1
+            try 
+                this|> Seq.skip st |> Seq.take len
+            with _ ->
+                let en =  match endIdx  with None -> count.Value-1 | Some i -> if i<0 then count.Value+i else i
+                let err = sprintf "GetSlice: Start index '%A' (= %d) and end index '%A'(= %d) for Seq of %d items failed" startIdx st endIdx en  count.Value
                 raise (IndexOutOfRangeException(err))
 
-            if st+len > count then 
-                let err = sprintf "GetSlice: End index %d is out of range. Allowed values are -%d up to %d for Seq of %d items" endIdx.Value count (count-1) count
-                raise (IndexOutOfRangeException(err)) 
-
-            if len < 0 then
-                let en =  match endIdx  with None -> count-1 | Some i -> if i<0 then count+i else i
-                let err = sprintf "GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for Seq of %d items" startIdx st endIdx en  count
-                raise (IndexOutOfRangeException(err)) 
-
-            this|> Seq.skip st |> Seq.take len
+            
 
 module Seq =   
     
-    ///Allows for negtive slice index too ( -1 = last element), returns a shallow copy including the end index.
+    ///Allows for negative indices too, -1 is the last element.
+    ///The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
     let slice startIdx endIdx (xs:seq<_>) =    
         let count = Seq.length xs
         let st  = if startIdx < 0 then count + startIdx        else startIdx
