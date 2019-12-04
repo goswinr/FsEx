@@ -2,6 +2,11 @@
 
 open System
 
+type EXT = Runtime.CompilerServices.ExtensionAttribute
+
+[<assembly:EXT>] do() //http://www.latkin.org/blog/2014/04/30/f-extension-methods-in-roslyn/
+
+
 [<AutoOpen>]
 module  Util = 
     let fail() = failwith "Generic fail (inner exception should show more helpful message)"   

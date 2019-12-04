@@ -36,6 +36,7 @@ module NiceString =
         if   Double.IsNaN x then "NaN"
         elif Double.IsInfinity x then "Infinity"
         elif x = -1.23432101234321e+308 then "-1.234321e+308 (=RhinoMath.UnsetValue)" // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetValue.htm
+        elif x = 0.0 then "0.0" // not "0" as in sprintf "%g"
         else
             let  a = abs x
             if   a > 10000. then sprintf "%.0f" x |> formatThousands
@@ -51,6 +52,7 @@ module NiceString =
         if   Single.IsNaN x then "NaN"
         elif Single.IsInfinity x then "Infinity"
         elif x = -1.234321e+38f then "-1.2343e+38 (=RhinoMath.UnsetSingle)" // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetSingle.htm
+        elif x = 0.0f then "0.0" // not "0" as in sprintf "%g"
         else
             let  a = abs x
             if   a > 10000.f then sprintf "%.0f" x |> formatThousands
@@ -108,13 +110,13 @@ module NiceString =
                         rs.Add (box enum.Current)
                         k <- k+1
                     if k= toNiceStringMaxItemsPerSeq && enum.MoveNext() then                         
-                        Some (MoreThan k, rs:>IEnumerable<_>, name, elName)   // the retuened seq is trimmed!  to a length of maxItemsPerSeq
+                        Some (MoreThan k, rs:>IEnumerable<_>, name, elName)   // the retuened seq is trimmed!  to a count of maxItemsPerSeq
                     else 
-                        Some (Length k, rs:>IEnumerable<_>, name, elName)
+                        Some (Count k, rs:>IEnumerable<_>, name, elName)
                 else                
                     let ics = xs :?> IEnumerable<_> 
                     if count > 0 then 
-                        Some (Length count, ics, name, elName)
+                        Some (Count count, ics, name, elName)
                     else
                         let enum = ics.GetEnumerator()
                         let mutable k = 0
@@ -123,14 +125,15 @@ module NiceString =
                         if k= toNiceStringMaxItemsPerSeq && enum.MoveNext() then                         
                             Some (MoreThan k, ics, name, elName)  
                         else 
-                            Some (Length k, ics, name, elName)
+                            Some (Count k, ics, name, elName)
             else
                 None
         |None -> None
-
-    let private (|StructToNiceString|_|) (x : obj) = // for structs that hav a ToNiceString property
+    
+    //reflection fails for extension members?
+    let private (|StructToNiceString|_|) (x : obj) = // for structs that hav a ToNiceString property 
         let typ = x.GetType() 
-        if typ.IsValueType then
+        if typ.IsValueType then            
             let prop = typ.GetProperty("ToNiceString")
             if isNull prop then None
             else
@@ -164,66 +167,76 @@ module NiceString =
             else None
         | _ -> failwith "toNiceStringRec: the UC pattern can only be used against simple union cases"
     
-    /// the internal stringbuilder for recursive function
+    /// The internal stringbuilder for recursive function
     let private sb = Text.StringBuilder()
 
 
-    let rec private toNiceStringRec (x:obj, indent:int) : unit =
+    let rec private toNiceStringRec (x:obj, externalFormater: obj-> option<string> , indent:int) : unit =
         
         let add  (s:string) =  sb.Append(String(' ', 4 *  indent )).Append(s)     |> ignore
         let adn  (s:string) =  sb.AppendLine(s) |> ignore
-   
-        match x with // boxed already
-        | null -> "'null' (or Option.None)" |> add
-        | :? float      as v   -> v |> floatToString    |> add
-        | :? single     as v   -> v |> singleToString   |> add        
-        | :? Char       as c   -> c.ToString()          |> add // "'" + c.ToString() + "'" // or add qotes?
-        | :? string     as s   -> s                     |> add // to not have it in quotes, s.ToString() adds a " at start and end
-        | :? Guid       as g   -> sprintf "Guid[%O]" g  |> add
-        | StructToNiceString s -> add s
-        | UC <@ Some @> [v]    -> adn "Option.Some: ";  toNiceStringRec (v, indent+1)
-        //| UC <@ None @> [] -> add "Option.None or 'null'" caught above
-        | IsSeq (leng, xs, name, elName) ->  
-                match leng with
-                |Length count -> sprintf "%s with %d items of %s" name count elName |> add // new line added below at    adn ":" 
-                |MoreThan _ ->   sprintf "%s of %s" name elName  |> add 
-                
-                if indent < toNiceStringMaxDepth  then 
-                    adn ":"
-                    for i, x in xs  |> Seq.truncate toNiceStringMaxItemsPerSeq |> Seq.indexed do  
-                        if i > 0 then adn ""
-                        toNiceStringRec (x, indent+1)                            
-                    
+        
+        match externalFormater x with
+        | Some s -> add s
+        | None ->
+            match x with // boxed already
+            | null -> "'null' (or Option.None)" |> add
+            | :? float      as v   -> v |> floatToString    |> add
+            | :? single     as v   -> v |> singleToString   |> add        
+            | :? Char       as c   -> c.ToString()          |> add // "'" + c.ToString() + "'" // or add qotes?
+            | :? string     as s   -> s                     |> add // to not have it in quotes, s.ToString() adds a " at start and end
+            | :? Guid       as g   -> sprintf "Guid[%O]" g  |> add
+            //| StructToNiceString s -> add s //reflection fails for extension members?
+            | UC <@ Some @> [v]    -> adn "Option.Some: ";  toNiceStringRec (v, externalFormater, indent+1)
+            //| UC <@ None @> [] -> add "Option.None or 'null'" caught above
+            | IsSeq (leng, xs, name, elName) ->  
                     match leng with
-                    |Length count -> 
-                        if count > toNiceStringMaxItemsPerSeq then
+                    |Count count -> sprintf "%s with %d items of %s" name count elName |> add // new line added below at    adn ":" 
+                    |MoreThan _ ->   sprintf "%s of %s" name elName  |> add 
+                
+                    if indent < toNiceStringMaxDepth  then 
+                        adn ":"
+                        for i, x in xs  |> Seq.truncate toNiceStringMaxItemsPerSeq |> Seq.indexed do  
+                            if i > 0 then adn ""
+                            toNiceStringRec (x, externalFormater, indent+1)                            
+                    
+                        match leng with
+                        |Count count -> 
+                            if count > toNiceStringMaxItemsPerSeq then
+                                adn ""
+                                toNiceStringRec ("...", externalFormater, indent+1)                                
+                        |MoreThan _ ->  
                             adn ""
-                            toNiceStringRec ("...", indent+1)                                
-                    |MoreThan _ ->  
-                        adn ""
-                        toNiceStringRec ("...", indent+1)                            
-                else 
-                    adn ""                
-        | _ ->  x.ToString() |> add
+                            toNiceStringRec ("...", externalFormater, indent+1)                            
+                    else 
+                        adn ""                
+            | _ ->  x.ToString() |> add
+    
+    /// Nice formating for floats  and sequences of any kind, first four items are printed out.
+    /// use externalFormater for types defined in other assemblies alowed
+    /// set NiceString.toNiceStringMaxItemsPerSeq to other value if more or less shall be shown (default is 4)
+    /// set NiceString.toNiceStringMaxDepth to change how deep nested lists are printed (default is 2)
+    let toNiceStringWithFormater (x:'T, externalFormater: obj-> option<string>) = 
+        sb.Clear() |> ignore
+        toNiceStringRec(box x, externalFormater , 0 ) //0 indent for start
+        sb.ToString()
 
     /// Nice formating for floats , some Rhino Objects and sequences of any kind, first four items are printed out.
     /// set NiceString.toNiceStringMaxItemsPerSeq to other value if more or less shall be shown (default is 4)
     /// set NiceString.toNiceStringMaxDepth to change how deep nested lists are printed (default is 2)
-    let toNiceString (x:'T) = 
-        sb.Clear() |> ignore
-        toNiceStringRec(box x , 0 ) //0 indent for start
-        sb.ToString()
+    let toNiceString (x:'T) = toNiceStringWithFormater(x, (fun _ -> None) ) 
        
 
     /// Nice formating for floats , some Rhino Objects and sequences of any kind, all items including nested items are printed out.
-    let toNiceStringFull (x:'T) = 
+    /// use externalFormater for types defined in other assemblies alowed
+    let toNiceStringFullWithFormater (x:'T, externalFormater: obj-> option<string>) = 
         let maxDepthP = toNiceStringMaxDepth  
         let maxItemsPerSeqP = toNiceStringMaxItemsPerSeq 
         toNiceStringMaxDepth <- Int32.MaxValue
         toNiceStringMaxItemsPerSeq  <- Int32.MaxValue
 
         sb.Clear() |> ignore
-        toNiceStringRec(box x, 0)
+        toNiceStringRec(box x, externalFormater, 0)
 
         toNiceStringMaxDepth <- maxDepthP 
         toNiceStringMaxItemsPerSeq  <- maxItemsPerSeqP 
@@ -231,6 +244,20 @@ module NiceString =
         let st = s.Trim()
         if st.Contains (Environment.NewLine) then s else st // trim new line on one line strings
 
-    
+    /// Nice formating for floats , some Rhino Objects and sequences of any kind, all items including nested items are printed out.
+    let toNiceStringFull (x:'T) = toNiceStringFullWithFormater(x, (fun _ -> None))
 
+[<AutoOpen>]
+module TypeExtensionsObject =   
+    
+    /// prints toNiceStringFull
+    let print x = printfn "%s" (NiceString.toNiceStringFull x)
+
+   
+    [<EXT>]
+    type Object with 
+        [<EXT>]  
+        ///A property like the ToString() method, 
+        ///But with richer formationg for collections
+        member obj.ToNiceString = NiceString.toNiceString obj
 

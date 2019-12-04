@@ -43,9 +43,6 @@ module UtilMath =
     ///<c>(float(i)) / (float(j))</c> 
     let inline ( /. ) (i:int) (j:int) = (float(i)) / (float(j)) // or do it like this:https://stackoverflow.com/questions/2812084/overload-operator-in-f/2812306#2812306
 
-    //gives a int from int / float division
-    //int(round( float(i) / j ))
-    //let inline ( /| ) (i:int) (j:float) = int(round( float(i) / j ))
     
     ///Test is a floating point value is Infinity or Not a Number
     let inline isNanOrInf f = Double.IsInfinity f || Double.IsNaN f
@@ -71,17 +68,14 @@ module UtilMath =
     let inline areSame absoluteTolerance a (b:float)  = 
         abs(a-b) < absoluteTolerance
 
-    let private piOne80 = Math.PI / 180.   // precompute division
-
-    let private one80Pi = 180. / Math.PI // precompute division
 
     ///converts Angels from Degrees to Radians
-    let toRadians degrees = piOne80 * degrees
+    let inline toRadians degrees = 0.0174532925199433 * degrees // 0.0174532925199433 = Math.PI / 180. 
 
     ///converts Angels from Radians to Degrees
-    let toDegrees radians = one80Pi * radians
+    let inline toDegrees radians = 57.2957795130823 * radians // 57.2957795130823 = 180. / Math.PI
 
-    let inline interpolate start ende (rel:float) = start + ((ende-start)*rel)
+    let inline interpolate start ende (rel:float) = start + ( (ende-start) * rel )
 
     ///Given the min and max value and a test value,  (val-min) / (max-min)
     ///Returns the relative  position  of the test value between min (= 0.0) and (max = 1.0),

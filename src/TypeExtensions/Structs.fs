@@ -3,10 +3,7 @@
 open System
 
 
-type EXT = Runtime.CompilerServices.ExtensionAttribute
 
-[<assembly:EXT>] //http://www.latkin.org/blog/2014/04/30/f-extension-methods-in-roslyn/
-do()
 
 [<AutoOpen>]
 module TypeExtensionsStructs =      
