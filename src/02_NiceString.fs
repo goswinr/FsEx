@@ -82,7 +82,7 @@ module NiceString =
         else 
             fullPath
     
-    type private Count = Length of int | MoreThan of int
+    type private Count = Count of int | MoreThan of int
 
     let private (|IsSeq|_|) (xs : obj) =
         let typ = xs.GetType() 
