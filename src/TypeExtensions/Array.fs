@@ -29,8 +29,7 @@ module TypeExtensionsArray =
         ///Allows for negtive index too (like Python)
         member this.SetItem index value = if index<0 then this.[this.Length+index]<-value   else this.[index]<-value 
 
-        //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfurtrunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
-                
+        //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfurtrunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164                
 
         ///Allows for negative indices too.
         ///The resulting array includes the end index.

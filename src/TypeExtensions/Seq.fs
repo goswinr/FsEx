@@ -6,6 +6,7 @@ open System.Collections.Generic
 
 [<AutoOpen>]
 module TypeExtensionsSeq = 
+    
     /// Any int will give a valid index for given collection size.
     // e.g.: -1 is  last item 
     let inline saveIdx i len =
