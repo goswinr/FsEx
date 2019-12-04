@@ -67,11 +67,11 @@ module TypeExtensionsSeq =
 
         /// Like Seq.length - 1
         [<EXT>]
-        member inline this.LastIndex = (Seq.length this) - 1
+        member this.LastIndex = (Seq.length this) - 1
 
         /// Last item in Seq
         [<EXT>]
-        member inline this.Last = fastLast this
+        member this.Last = fastLast this
     
         [<EXT>] 
         ///Allows for negtive indices too (like Python)
