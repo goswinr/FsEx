@@ -2,11 +2,54 @@
 
 namespace FsEx
 
+open System
 open Microsoft.FSharp.Core
 open Microsoft.FSharp.Core.OptimizedClosures
 
+[<AutoOpen>]
+module TypeExtensionsResizeArray =   
 
-[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+
+    [<EXT>]
+    type Collections.Generic.List<'T>  with        
+        [<EXT>]
+        member inline this.LastIndex = this.Count - 1
+
+        [<EXT>]
+        member inline this.Last = this.[this.Count - 1]
+
+        [<EXT>] 
+        ///Allows for negtive slice index too ( -1 = last element), 
+        ///returns a shallow copy including the end index.
+        member this.GetSlice(startIdx, endIdx) =    // maps onto slicing operator .[1..3]
+            let count = this.Count
+            let st  = match startIdx with None -> 0        | Some i -> if i<0 then count+i      else i
+            let len = match endIdx   with None -> count-st | Some i -> if i<0 then count+i-st+1 else i-st+1
+    
+            if st < 0 || st > count-1 then 
+                let err = sprintf "GetSlice: Start index %d is out of range. Allowed values are -%d upto %d for List of %d items" startIdx.Value count (count-1) count
+                raise (IndexOutOfRangeException(err))
+    
+            if st+len > count then 
+                let err = sprintf "GetSlice: End index %d is out of range. Allowed values are -%d upto %d for List of %d items" endIdx.Value count (count-1) count
+                raise (IndexOutOfRangeException(err)) 
+                
+            if len < 0 then
+                let en =  match endIdx  with None -> count-1 | Some i -> if i<0 then count+i else i
+                let err = sprintf "GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for List of %d items" startIdx st endIdx en  count
+                raise (IndexOutOfRangeException(err)) 
+                
+            this.GetRange(st, len)
+        
+        [<EXT>] 
+        ///Allows for negtive index too (like Python)
+        member this.GetItem index = if index<0 then this.[this.Count+index]   else this.[index]
+        
+        [<EXT>] 
+        ///Allows for negtive index too (like Python)
+        member this.SetItem index value = if index<0 then this.[this.Count+index]<-value   else this.[index]<-value 
+
+
 ///Generic operations on the type System.Collections.Generic.List, which is called ResizeArray in the F# libraries.
 module ResizeArray =
 
@@ -14,12 +57,12 @@ module ResizeArray =
     let length (arr: ResizeArray<'T>) =  arr.Count
 
     ///Fetch an element from the collection.  You can also use the syntax <c>arr.[idx]</c>.
-    ///However this function allows for negtive index too (like python)
+    ///However this function allows for negtive index too (like Python)
     let get (arr: ResizeArray<'T>) (index: int) =  
         if index<0 then arr.[arr.Count+index]  else arr.[index]
 
     ///Set the value of an element in the collection. You can also use the syntax <c>arr.[idx] <- e</c>.
-    ///However this function allows for negtive index too (like python)
+    ///However this function allows for negtive index too (like Python)
     let set (arr: ResizeArray<'T>) (index: int) (x:'T) =  
         if index<0 then arr.[arr.Count+index] <- x  else arr.[index] <- x
 
@@ -27,14 +70,14 @@ module ResizeArray =
     let create  (n: int) x = 
         let r = new ResizeArray<'T>(n)
         for i = 0 to n-1 do
-            r.[i] <- x 
+            r.Add x 
         r       
      
     ///Create an array by calling the given generator on each index.
     let init (n: int) (f: int -> 'T) =  
         let r = new ResizeArray<'T>(n)
         for i = 0 to n-1 do
-            r.[i] <- f i 
+            r.Add (f i )
         r
 
     ///Read a range of elements from the first array and write them into the second.
@@ -48,7 +91,12 @@ module ResizeArray =
             arr2.[start2+i] <- arr1.[start1 + i]
 
     ///Build a new array that contains the elements of each of the given list of arrays.
-    let concat (arrs: ResizeArray<'T> list) = new ResizeArray<_> (seq { for arr in arrs do for x in arr do yield x })
+    let concat (arrs: ResizeArray<'T> seq) = 
+        let len = arrs |> Seq.sumBy (fun r -> r.Count)
+        let r = ResizeArray(len)
+        for arr in arrs do 
+            r.AddRange arr
+        r
 
     ///Build a new array that contains the elements of the first array followed by the elements of the second array.
     let append (arr1: ResizeArray<'T>) (arr2: ResizeArray<'T>) = concat [arr1; arr2]
@@ -59,7 +107,7 @@ module ResizeArray =
         if start < 0 then invalidArg "start" "index must be positive"
         if len < 0 then invalidArg "len" "length must be positive"
         if start + len > length arr then invalidArg "len" "length must be positive"
-        new ResizeArray<_> (seq { for i in start .. start+len-1 -> arr.[i] })
+        arr.GetRange(start, len)
 
     ///Fill a range of the collection with the given element.
     let fill (arr: ResizeArray<'T>) (start: int) (len: int) (x:'T) =
@@ -324,7 +372,7 @@ module ResizeArray =
     ///through the computation.  The two input
     ///arrays must have the same lengths, otherwise an <c>ArgumentException</c> is
     ///raised.
-    let fold2 f (acc: 'T) (arr1: ResizeArray<'T1>) (arr2: ResizeArray<'T2>) =
+    let fold2 f (acc: 'T) (arr1: ResizeArray<'T>) (arr2: ResizeArray<'U>) =
         let f = FSharpFunc<_,_,_,_>.Adapt(f)
         let mutable res = acc 
         let len = length arr1
@@ -371,7 +419,7 @@ module ResizeArray =
     ///to the corresponding elements of the two collections pairwise.  The two input
     ///arrays must have the same lengths, otherwise an <c>ArgumentException</c> is
     ///raised.
-    let mapi2 (f: int -> 'T -> 'b -> 'c) (arr1: ResizeArray<'T>) (arr2: ResizeArray<'b>) = 
+    let mapi2 (f: int -> 'T -> 'U -> 'c) (arr1: ResizeArray<'T>) (arr2: ResizeArray<'U>) = 
         let f = FSharpFunc<_,_,_,_>.Adapt(f)
         let len1 = length arr1
         if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
@@ -445,9 +493,12 @@ module ResizeArray =
     // extensions added  by Goswin:
     //----------------------------------------------------
     
-    ///Shift items poistion  towards the end of ResizeArray. refilling at start from end.
+    ///Considers List cirular and move elements up or down
+    /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
+    /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a]
     let rotate k (xs: ResizeArray<_>)  =  init xs.Count (fun i -> xs.[if i-k < 0 then xs.Count+i-k  else i-k])
 
+    /// for finding 
     module private MinMax =
         let inline simple cmpF (xs:ResizeArray<'T>) =
             if xs.Count < 1 then failwithf "*** Empty %A in ResizeArray max / min" xs
@@ -468,10 +519,9 @@ module ResizeArray =
                 elif cmpF this m2 then
                     m2 <- this
             m1,m2  
-        
-        
+                
 
-        ///* if any are equal then the the order is kept
+        ///If any are equal then the the order is kept
         let inline sort3f f a b c  = 
             if f a b then 
                 if f b c then a,b,c
@@ -521,7 +571,7 @@ module ResizeArray =
             let mutable i2 = 1 
             let mutable mf1 = func xs.[i1]
             let mutable mf2 = func xs.[i2]
-            let mutable f = mf1 // placeolder
+            let mutable f = mf1 // placeholder
             for i=1 to xs.Count-1 do
                 f <- func xs.[i] 
                 if cmpF f mf1 then
@@ -534,7 +584,7 @@ module ResizeArray =
                     mf2 <- f 
             i1,i2
 
-        // fails on ResizeArray([5;6;3;1;2;0])|> ResizeArray.max3
+        
         let inline index3ByFun cmpF func (xs:ResizeArray<'T>) =
             if xs.Count < 3 then failwithf "*** Only %d elements in %A, for ResizeArray index3ByFun max / min" xs.Count xs          
             let ie1 = 0
