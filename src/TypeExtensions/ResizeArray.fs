@@ -5,20 +5,21 @@ namespace FsEx
 open System
 open Microsoft.FSharp.Core
 open Microsoft.FSharp.Core.OptimizedClosures
+open System.Runtime.CompilerServices
 
 [<AutoOpen>]
 module TypeExtensionsResizeArray =   
 
 
-    [<EXT>]
+    [<Extension>]
     type Collections.Generic.List<'T>  with        
-        [<EXT>]
+        [<Extension>]
         member inline this.LastIndex = this.Count - 1
 
-        [<EXT>]
+        [<Extension>]
         member inline this.Last = this.[this.Count - 1]
 
-        [<EXT>] 
+        [<Extension>] 
         ///Allows for negtive slice index too ( -1 = last element), 
         ///returns a shallow copy including the end index.
         member this.GetSlice(startIdx, endIdx) =    // maps onto slicing operator .[1..3]
@@ -41,11 +42,11 @@ module TypeExtensionsResizeArray =
                 
             this.GetRange(st, len)
         
-        [<EXT>] 
+        [<Extension>] 
         ///Allows for negtive index too (like Python)
         member this.GetItem index = if index<0 then this.[this.Count+index]   else this.[index]
         
-        [<EXT>] 
+        [<Extension>] 
         ///Allows for negtive index too (like Python)
         member this.SetItem index value = if index<0 then this.[this.Count+index]<-value   else this.[index]<-value 
 

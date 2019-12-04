@@ -254,9 +254,9 @@ module TypeExtensionsObject =
     let print x = printfn "%s" (NiceString.toNiceStringFull x)
 
    
-    [<EXT>]
+    [<Extension>]
     type Object with 
-        [<EXT>]  
+        [<Extension>]  
         ///A property like the ToString() method, 
         ///But with richer formationg for collections
         member obj.ToNiceString = NiceString.toNiceString obj

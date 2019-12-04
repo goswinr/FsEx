@@ -2,33 +2,34 @@
 
 open System
 open System.Collections.Generic
+open System.Runtime.CompilerServices
 
 [<AutoOpen>]
 module TypeExtensionsIList =  
 
-    [<EXT>]
+    [<Extension>]
     type Collections.Generic.IList<'T>  with 
 
         /// like this.Count - 1
-        [<EXT>]
+        [<Extension>]
         member inline this.LastIndex = this.Count - 1
 
         /// last item in Array
-        [<EXT>]
+        [<Extension>]
         member inline this.Last = this.[this.Count - 1]
     
-        [<EXT>] 
+        [<Extension>] 
         ///Allows for negtive index too (like Python)
         member this.GetItem index = if index<0 then this.[this.Count+index]   else this.[index]
     
-        [<EXT>] 
+        [<Extension>] 
         ///Allows for negtive index too (like Python)
         member this.SetItem index value = if index<0 then this.[this.Count+index]<-value   else this.[index]<-value  // only on IList
 
 
         ///Allows for negative indices too.
         ///The resulting List includes the item at slice ending index.
-        [<EXT>]
+        [<Extension>]
         member this.GetSlice(startIdx,endIdx) : 'T ResizeArray = // to use slicing notation e.g. : xs.[ 1 .. -1]
             let count = this.Count
             let st  = match startIdx with None -> 0        | Some i -> if i<0 then count+i      else i

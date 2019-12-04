@@ -1,27 +1,27 @@
 namespace FsEx
 
 open System
-
+open System.Runtime.CompilerServices
 
 [<AutoOpen>]
 module TypeExtensionsString =   
     
-    [<EXT>]
+    [<Extension>]
     type System.String with
-        [<EXT>]
+        [<Extension>]
         member inline s.Last = s.[s.Length - 1] 
         
-        [<EXT>]
+        [<Extension>]
         member s.LastX i = s.Substring(s.Length-i,i) 
         
         ///Allows for negtive index too (like Python)
-        [<EXT>]         
+        [<Extension>]         
         member this.GetItem index = if index<0 then this.[this.Length+index]   else this.[index]          
         
         //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfurtrunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
 
         ///Allows for negative indices too.
-        [<EXT>]
+        [<Extension>]
         member s.Slice(startIdx,endIdx) =
             let count = s.Length
             let st  = if startIdx<0 then count+startIdx else startIdx

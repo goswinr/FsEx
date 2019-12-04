@@ -1,31 +1,28 @@
 ﻿namespace FsEx
 
 open System
-
-
-
-
+open System.Runtime.CompilerServices
 
 
 [<AutoOpen>]
 module TypeExtensionsArray =  
 
-    [<EXT>]
+    [<Extension>]
     type ``[]``<'T>  with //Generic Array
         
         /// like this.Length - 1
-        [<EXT>]
+        [<Extension>]
         member inline this.LastIndex = this.Length - 1
 
         /// last item in Array
-        [<EXT>]
+        [<Extension>]
         member inline this.Last = this.[this.Length - 1]
     
-        [<EXT>] 
+        [<Extension>] 
         ///Allows for negtive index too (like Python)
         member this.GetItem index = if index<0 then this.[this.Length+index]   else this.[index]
     
-        [<EXT>] 
+        [<Extension>] 
         ///Allows for negtive index too (like Python)
         member this.SetItem index value = if index<0 then this.[this.Length+index]<-value   else this.[index]<-value 
 
@@ -33,7 +30,7 @@ module TypeExtensionsArray =
 
         ///Allows for negative indices too.
         ///The resulting array includes the end index.
-        [<EXT>]
+        [<Extension>]
         member this.Slice(startIdx,endIdx) =
             let count = this.Length
             let st  = if startIdx<0 then count+startIdx else startIdx

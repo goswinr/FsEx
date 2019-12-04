@@ -2,7 +2,7 @@
 
 open System
 open System.Collections.Generic
-
+open System.Runtime.CompilerServices
 
 [<AutoOpen>]
 module TypeExtensionsSeq = 
@@ -23,15 +23,17 @@ module TypeExtensionsSeq =
 
     let private get i (xs:seq<'T>) : 'T =        
         match xs with
-        //| :? ('T[])  as xs -> xs.[negIdx i xs.Length] // covered by IList
-        | :? ('T IList)  as xs -> xs.[negIdx i xs.Count]
-        | :? ('T list)   as xs -> List.item (negIdx i (List.length xs)) xs
+        //| :? ('T[])             as xs -> xs.[negIdx i xs.Length] // covered by IList
+        //| :? ('T ResizeArray)   as xs -> xs.[negIdx i xs.Count] // covered by IList
+        | :? ('T IList)         as xs -> xs.[negIdx i xs.Count]
+        | :? ('T list)          as xs -> List.item (negIdx i (List.length xs)) xs
         | _ -> Seq.item  (negIdx i (Seq.length xs)) xs
 
     let private set i x (xs:seq<_>) :unit =
         match xs with
-        | :? ('T[])       as xs -> xs.[negIdx i xs.Length]<- x // why not covered by IList?
-        | :? ('T IList)   as xs -> xs.[negIdx i xs.Count] <- x
+        | :? ('T[])             as xs -> xs.[negIdx i xs.Length]<- x // why not covered by IList? cast fails
+        | :? ('T ResizeArray)   as xs -> xs.[negIdx i xs.Count] <- x // why not covered by IList? cast fails
+        | :? ('T IList)         as xs -> xs.[negIdx i xs.Count] <- x
         | _ -> failwithf "Cannot set items on this Seq (is it a dict, lazy or immutable ?)"
 
     let rec private listlast (list: 'T list) =     
@@ -63,18 +65,18 @@ module TypeExtensionsSeq =
                 invalidArg "source" "sourceWasEmpty" 
     
 
-    [<EXT>]
+    [<Extension>]
     type Collections.Generic.IEnumerable<'T>  with 
 
         /// Like Seq.length - 1
-        [<EXT>]
+        [<Extension>]
         member this.LastIndex = (Seq.length this) - 1
 
         /// Last item in Seq
-        [<EXT>]
+        [<Extension>]
         member this.Last = fastLast this
     
-        [<EXT>] 
+        [<Extension>] 
         ///Allows for negtive indices too (like Python)
         member this.Item 
             with get i   = get i this
@@ -83,7 +85,7 @@ module TypeExtensionsSeq =
 
         ///Allows for negative indices too.
         ///The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
-        [<EXT>]
+        [<Extension>]
         member this.GetSlice(startIdx,endIdx) : 'T seq = // to use slicing notation e.g. : xs.[ 1 .. -2]
             let count = Seq.length this
             let st  = match startIdx with None -> 0        | Some i -> if i<0 then count+i      else i
