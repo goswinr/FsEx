@@ -85,15 +85,221 @@ Return original input
 Returns the value on the left unless it is null, then it returns the value on the right.
 </summary>
 </member>
+<member name="M:FsEx.UtilMath.stepedFloat(System.Double,System.Double)">
+<summary>
+NumericSteping:Converts floats to floats within defined float step sizes, (always rounding down like the int function)
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.stepedInt(System.Int32,System.Double)">
+<summary>
+NumericSteping:Converts floats to ints within defined integer step sizes, (always rounding down like the int function)
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.precInt(System.Double,System.Double)">
+<summary>
+NumericSteping: Converts floats to ints, devides by precicion
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.asBinaryString(System.Int32)">
+<summary>
+Converts an Int32 to a string of 32 characters of &apos;1&apos; or &apos;0&apos;.
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.roundDownToNextLogSteps(System.Int32,System.Double)">
+<summary>
+Rounds to the next smaller (closer to zero) number on logaritmic scale
+Define scale by giving amount of steps(int) to double or half a value.
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.roundUpToNextLogSteps(System.Int32,System.Double)">
+<summary>
+Rounds to the next biggest (away from zero) number on logaritmic scale.
+Define scale by giving amount of steps(int) to double or half a value.
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.normalize``6(``0,``4,``1)">
+<summary>
+Given the min and max value and a test value,  (val-min) / (max-min)
+Returns the relative  position  of the test value between min (= 0.0) and (max = 1.0),
+can also be bigger than 1.0
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.clamp``1(``0,``0,``0)">
+<summary>
+* min -&gt; max -&gt; value -&gt; clamped value.  to make sure a value is within a given range
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.toDegrees(System.Double)">
+<summary>
+converts Angels from Radians to Degrees
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.toRadians(System.Double)">
+<summary>
+converts Angels from Degrees to Radians
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.areSame(System.Double,System.Double,System.Double)">
+<summary>
+Compares two floating point numbers to be within a tolerance for equality
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.areSameRel(System.Double,System.Double,System.Double)">
+<summary>
+Compares two floating point numbers within a relative tolerance for equality. 
+The comparing tolerance is calculated as:  relativeTolerance * (the smaller of the two float arguments).
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.randomStandardDeviation(System.Double,System.Double)">
+<summary>
+given mean  and standardDeviation returns a random value from this Gaussian distribution
+if mean is 0 and stDev is 1 then 99% of values are  are within -2.3 to +2.3 ; 70% within -1 to +1
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.isNanOrInf(System.Double)">
+<summary>
+Test is a floating point value is Infinity or Not a Number
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.op_DivideDot(System.Int32,System.Int32)">
+<summary>
+Gives a float from int / int division
+&lt;c&gt;(float(i)) / (float(j))&lt;/c&gt; 
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.op_MultiplyDot(System.Int32,System.Double)">
+<summary>
+Allows ints to be multiplied by floats
+&lt;c&gt;int(round(float(i) * f))&lt;/c&gt; 
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.floatOfObj``1(``0)">
+<summary>
+Get Float from any input. This helper enables more generic code in parsing sequences
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.parseFloatEnDe(System.String)">
+<summary>
+First tries to parses english float (period as decimal separator),
+if this fails tries to parse german floats,(comma as decimal separator)
+</summary>
+</member>
+<member name="M:FsEx.CompareOperators.op_DotGreaterDot``1(System.Boolean,``0,``0)">
+<summary>
+For inner expressions: like this: min &lt;. x .&lt;. y .&lt; max
+</summary>
+</member>
+<member name="M:FsEx.CompareOperators.op_DotLessDot``1(System.Boolean,``0,``0)">
+<summary>
+For inner expressions: like this: min &lt;. x .&lt;. y .&lt; max
+</summary>
+</member>
+<member name="M:FsEx.CompareOperators.op_DotGreater``1(System.Boolean,``0,``0)">
+<summary>
+Point must be at middle of expression: like this: min &lt;. x .&lt; max
+</summary>
+</member>
+<member name="M:FsEx.CompareOperators.op_DotLess``1(System.Boolean,``0,``0)">
+<summary>
+Point must be at middle of expression: like this: min &lt;. x .&lt; max
+</summary>
+</member>
+<member name="M:FsEx.CompareOperators.op_GreaterDot``1(``0,``0)">
+<summary>
+Point must be at middle of expression: like this: min &lt;. x .&lt; max
+</summary>
+</member>
+<member name="M:FsEx.CompareOperators.op_LessDot``1(``0,``0)">
+<summary>
+Point must be at middle of expression: like this: min &lt;. x .&lt; max
+</summary>
+</member>
+<member name="M:FsEx.CompareOperators.op_DotGreaterEqualsDot``1(System.Boolean,``0,``0)">
+<summary>
+for inner expressions: like this: min &lt;. x .&lt;. y .&lt; max
+</summary>
+</member>
+<member name="M:FsEx.CompareOperators.op_DotLessEqualsDot``1(System.Boolean,``0,``0)">
+<summary>
+for inner expressions: like this: min &lt;. x .&lt;. y .&lt; max
+</summary>
+</member>
+<member name="M:FsEx.CompareOperators.op_DotGreaterEquals``1(System.Boolean,``0,``0)">
+<summary>
+Point must be at middle of expression: like this: min &lt;=. x .&lt;= max
+</summary>
+</member>
+<member name="M:FsEx.CompareOperators.op_DotLessEquals``1(System.Boolean,``0,``0)">
+<summary>
+Point must be at middle of expression: like this: min &lt;=. x .&lt;= max
+</summary>
+</member>
+<member name="M:FsEx.CompareOperators.op_GreaterEqualsDot``1(``0,``0)">
+<summary>
+Point must be at middle of expression: like this: min &lt;=. x .&lt;= max
+</summary>
+</member>
+<member name="M:FsEx.CompareOperators.op_LessEqualsDot``1(``0,``0)">
+<summary>
+Point must be at middle of expression: like this: min &lt;=. x .&lt;= max
+</summary>
+</member>
+<member name="T:FsEx.CompareOperators">
+<summary>
+Operators for chaining compare operations like: &lt;c&gt; 1 &lt;. x .&lt; 9 &lt;/c&gt;
+or &lt;c&gt; 0 &lt;. x .&lt;. y .&lt; 99 &lt;/c&gt;
+</summary>
+</member>
+<member name="M:FsEx.MinMaxSort.diff``2(``0,``0)">
+<summary>
+Gets the positiv differnce between 2 numbers. 
+Avoids the integer( or byte) overflow and underflow risk of &quot;abs(a-b)&quot;
+</summary>
+</member>
+<member name="M:FsEx.MinMaxSort.sort3By``2(Microsoft.FSharp.Core.FSharpFunc{``0,``1},``0,``0,``0)">
+<summary>
+If any are equal after Function is applied then the the order is kept
+</summary>
+</member>
+<member name="M:FsEx.MinMaxSort.sort3``1(``0,``0,``0)">
+<summary>
+If any are equal then the the order is kept
+</summary>
+</member>
+<member name="M:FsEx.MinMaxSort.sort2By``2(Microsoft.FSharp.Core.FSharpFunc{``0,``1},``0,``0)">
+<summary>
+If they are equal then the the order is kept
+</summary>
+</member>
+<member name="M:FsEx.MinMaxSort.sort2``1(``0,``0)">
+<summary>
+If they are equal then the the order is kept
+</summary>
+</member>
+<member name="M:FsEx.MinMaxSort.maxBy``2(Microsoft.FSharp.Core.FSharpFunc{``0,``1},``0,``0)">
+<summary>
+If both are equal then the first is returned
+</summary>
+</member>
+<member name="M:FsEx.MinMaxSort.minBy``2(Microsoft.FSharp.Core.FSharpFunc{``0,``1},``0,``0)">
+<summary>
+If both are equal then the first is returned
+</summary>
+</member>
 <member name="M:FsEx.TypeExtensionsObject.Object.get_ToNiceString(System.Object)">
 <summary>
 A property like the ToString() method, 
 But with richer formationg for collections
 </summary>
 </member>
+<member name="M:FsEx.TypeExtensionsObject.printFull``1(``0)">
+<summary>
+ prints FsEx.NiceString.toNiceStringFull
+</summary>
+</member>
 <member name="M:FsEx.TypeExtensionsObject.print``1(``0)">
 <summary>
- prints toNiceStringFull
+ prints FsEx.NiceString.toNiceString
 </summary>
 </member>
 <member name="M:FsEx.NiceString.toNiceStringFull``1(``0)">
@@ -137,6 +343,88 @@ e.g.: 0 digits behind comma if above 1000
 <summary>
 Formating with automatic precision 
 e.g.: 0 digits behind comma if above 1000 
+</summary>
+</member>
+<member name="M:FsEx.TypeExtensionsStructs.DateTime.get_nowStrLong.Static">
+<summary>
+Current UTC date and time as yyyy-MM-dd_HH-mm-fff. inludes 3 digits of miliseconds
+</summary>
+</member>
+<member name="M:FsEx.TypeExtensionsStructs.DateTime.get_nowStrUtc.Static">
+<summary>
+Current UTC date and time as yyyy-MM-dd_HH-mm_UTC
+</summary>
+</member>
+<member name="M:FsEx.TypeExtensionsStructs.DateTime.get_nowStr.Static">
+<summary>
+Current local date and time as yyyy-MM-dd_HH-mm
+</summary>
+</member>
+<member name="M:FsEx.TypeExtensionsStructs.DateTime.get_todayStr.Static">
+<summary>
+Current date as yyyy-MM-dd
+</summary>
+</member>
+<member name="M:FsEx.TypeExtensionsStructs.Single.get_ToNiceString(System.Single)">
+<summary>
+ with automatic formating of display precision depending on float size
+</summary>
+</member>
+<member name="M:FsEx.TypeExtensionsStructs.Double.get_ToNiceString(System.Double)">
+<summary>
+ with automatic formating of display precision depending on float size
+</summary>
+</member>
+<member name="M:FsEx.TypeExtensionsStructs.Double.get_ToInt(System.Double)">
+<summary>
+converts int to float including rounding: 
+int(round(x))
+</summary>
+</member>
+<member name="M:FsEx.Color.makeDarker(System.Double,System.Drawing.Color)">
+<summary>
+ * make a color darker by perecentage (value between 0.0 to 1.0) (1.0 = black, 0.0 = current color) 
+</summary>
+</member>
+<member name="M:FsEx.Color.makeLighter(System.Double,System.Drawing.Color)">
+<summary>
+ * make a color lighter by perecentage (value between 0.0 to 1.0) (1.0 = white, 0.0 = current color) 
+</summary>
+</member>
+<member name="M:FsEx.Color.randomColorForRhino">
+<summary>
+ *generates a Random color with high saturation probability, exluding yellow colors
+</summary>
+</member>
+<member name="M:FsEx.Color.randomColor">
+<summary>
+ *generates a Random color 
+</summary>
+</member>
+<member name="M:FsEx.Color.HSLfromColor(System.Drawing.Color)">
+<summary>
+ *Given a Drawing.Color , returns Hue,Saturation,Luminance in range of 0.0-1.0
+</summary>
+</member>
+<member name="M:FsEx.Color.colorFromInterval(System.Double)">
+<summary>
+ val = value between 0.0 to 1.0, will get clamped
+ returns color value from gradient blue to green  to yellow to red, excludes purple        
+</summary>
+</member>
+<member name="M:FsEx.Color.colorFromHSL(System.Double,System.Double,System.Double)">
+<summary>
+ *Given Hue,Saturation,Luminance in range of 0.0 to 1.0, returns a Drawing.Color 
+</summary>
+</member>
+<member name="M:FsEx.TypeExtensionsColor.Color.AreEqualARGB.Static(System.Drawing.Color,System.Drawing.Color)">
+<summary>
+Compare two colors only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor
+</summary>
+</member>
+<member name="M:FsEx.TypeExtensionsColor.Color.EqualsARGB(System.Drawing.Color,System.Drawing.Color)">
+<summary>
+Compare to another color only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor        
 </summary>
 </member>
 <member name="M:FsEx.String.low1(System.String)">
@@ -603,37 +891,6 @@ Allows for negtive slice index too ( -1 = last element),
 returns a shallow copy including the end index.
 </summary>
 </member>
-<member name="M:FsEx.TypeExtensionsStructs.DateTime.get_nowStrLong.Static">
-<summary>
-* UTC time, inludes 3 digits of miliseconds
-</summary>
-</member>
-<member name="M:FsEx.TypeExtensionsStructs.Color.AreEqualARGB.Static(System.Drawing.Color,System.Drawing.Color)">
-<summary>
-Compare two colors only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor
-</summary>
-</member>
-<member name="M:FsEx.TypeExtensionsStructs.Color.EqualsARGB(System.Drawing.Color,System.Drawing.Color)">
-<summary>
-Compare to another color only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor        
-</summary>
-</member>
-<member name="M:FsEx.TypeExtensionsStructs.Single.get_ToNiceString(System.Single)">
-<summary>
- with automatic formating of display precision depending on float size
-</summary>
-</member>
-<member name="M:FsEx.TypeExtensionsStructs.Double.get_ToNiceString(System.Double)">
-<summary>
- with automatic formating of display precision depending on float size
-</summary>
-</member>
-<member name="M:FsEx.TypeExtensionsStructs.Double.get_ToInt(System.Double)">
-<summary>
-converts int to float including rounding: 
-int(round(x))
-</summary>
-</member>
 <member name="M:FsEx.TypeExtensionsCollections.Dictionary`2.get_Items``2(System.Collections.Generic.Dictionary{``0,``1})">
 <summary>
 Returns a lazy seq of key and value tuples
@@ -691,23 +948,24 @@ Considers sequence cirular and move elements up or down
 </member>
 <member name="M:FsEx.Seq.slice``1(System.Int32,System.Int32,System.Collections.Generic.IEnumerable{``0})">
 <summary>
-Allows for negtive slice index too ( -1 = last element), returns a shallow copy including the end index.
+Allows for negative indices too, -1 is the last element.
+The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
 </summary>
 </member>
 <member name="M:FsEx.TypeExtensionsSeq.IEnumerable`1.GetSlice``1(System.Collections.Generic.IEnumerable{``0},Microsoft.FSharp.Core.FSharpOption{System.Int32},Microsoft.FSharp.Core.FSharpOption{System.Int32})">
 <summary>
-Allows for negative indices too.
+Allows for negative indices too, like Python, -1 is the last element.
 The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
 </summary>
 </member>
 <member name="M:FsEx.TypeExtensionsSeq.IEnumerable`1.set_Item``1(System.Collections.Generic.IEnumerable{``0},System.Int32,``0)">
 <summary>
-Allows for negtive indices too (like Python)
+Allows for negative indices too, like Python, -1 is the last element.
 </summary>
 </member>
 <member name="M:FsEx.TypeExtensionsSeq.IEnumerable`1.get_Item``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
 <summary>
-Allows for negtive indices too (like Python)
+Allows for negative indices too, like Python, -1 is the last element.
 </summary>
 </member>
 <member name="M:FsEx.TypeExtensionsSeq.IEnumerable`1.get_Last``1(System.Collections.Generic.IEnumerable{``0})">
@@ -809,100 +1067,6 @@ But for types that don&apos;t have System.IEquatable&lt;&apos;T&gt; implemented 
 Use #nowarn &quot;86&quot;to disable warnings
 </summary>
 </member>
-<member name="M:FsEx.UtilMath.stepedFloat(System.Double,System.Double)">
-<summary>
-NumericSteping:Converts floats to floats within defined float step sizes, (always rounding down like the int function)
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.stepedInt(System.Int32,System.Double)">
-<summary>
-NumericSteping:Converts floats to ints within defined integer step sizes, (always rounding down like the int function)
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.precInt(System.Double,System.Double)">
-<summary>
-NumericSteping: Converts floats to ints, devides by precicion
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.asBinaryString(System.Int32)">
-<summary>
-Converts an Int32 to a string of 32 characters of &apos;1&apos; or &apos;0&apos;.
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.roundDownToNextLogSteps(System.Int32,System.Double)">
-<summary>
-Rounds to the next smaller (closer to zero) number on logaritmic scale
-Define scale by giving amount of steps(int) to double or half a value.
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.roundUpToNextLogSteps(System.Int32,System.Double)">
-<summary>
-Rounds to the next biggest (away from zero) number on logaritmic scale.
-Define scale by giving amount of steps(int) to double or half a value.
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.normalize``6(``0,``4,``1)">
-<summary>
-Given the min and max value and a test value,  (val-min) / (max-min)
-Returns the relative  position  of the test value between min (= 0.0) and (max = 1.0),
-can also be bigger than 1.0
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.toDegrees(System.Double)">
-<summary>
-converts Angels from Radians to Degrees
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.toRadians(System.Double)">
-<summary>
-converts Angels from Degrees to Radians
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.areSame(System.Double,System.Double,System.Double)">
-<summary>
-Compares two floating point numbers to be within a tolerance for equality
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.areSameRel(System.Double,System.Double,System.Double)">
-<summary>
-Compares two floating point numbers within a relative tolerance for equality. 
-The comparing tolerance is calculated as:  relativeTolerance * (the smaller of the two float arguments).
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.randomStandardDeviation(System.Double,System.Double)">
-<summary>
-given mean  and standardDeviation returns a random value from this Gaussian distribution
-if mean is 0 and stDev is 1 then 99% of values are  are within -2.3 to +2.3 ; 70% within -1 to +1
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.isNanOrInf(System.Double)">
-<summary>
-Test is a floating point value is Infinity or Not a Number
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.op_DivideDot(System.Int32,System.Int32)">
-<summary>
-Gives a float from int / int division
-&lt;c&gt;(float(i)) / (float(j))&lt;/c&gt; 
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.op_MultiplyDot(System.Int32,System.Double)">
-<summary>
-Allows ints to be multiplied by floats
-&lt;c&gt;int(round(float(i) * f))&lt;/c&gt; 
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.floatOfObj``1(``0)">
-<summary>
-Get Float from any input. This helper enables more generic code in parsing sequences
-</summary>
-</member>
-<member name="M:FsEx.UtilMath.parseFloatEnDe(System.String)">
-<summary>
-First tries to parses english float (period as decimal separator),
-if this fails tries to parse german floats,(comma as decimal separator)
-</summary>
-</member>
 <member name="M:FsEx.ResizeArrayBuilder.resizeArray``1">
 <summary>
  Computational Expression:  use &apos;yield&apos; to add alements to a ResizeArray (= Collections.Generic.List).
@@ -924,108 +1088,6 @@ accepts ints and floats too. (including nice Formating)
 <member name="P:FsEx.MaybeBuilder.maybe">
 <summary>
  A maybe monad. 
-</summary>
-</member>
-<member name="M:FsEx.CompareOperators.op_DotGreaterDot``1(System.Boolean,``0,``0)">
-<summary>
-For inner expressions: like this: min &lt;. x .&lt;. y .&lt; max
-</summary>
-</member>
-<member name="M:FsEx.CompareOperators.op_DotLessDot``1(System.Boolean,``0,``0)">
-<summary>
-For inner expressions: like this: min &lt;. x .&lt;. y .&lt; max
-</summary>
-</member>
-<member name="M:FsEx.CompareOperators.op_DotGreater``1(System.Boolean,``0,``0)">
-<summary>
-Point must be at middle of expression: like this: min &lt;. x .&lt; max
-</summary>
-</member>
-<member name="M:FsEx.CompareOperators.op_DotLess``1(System.Boolean,``0,``0)">
-<summary>
-Point must be at middle of expression: like this: min &lt;. x .&lt; max
-</summary>
-</member>
-<member name="M:FsEx.CompareOperators.op_GreaterDot``1(``0,``0)">
-<summary>
-Point must be at middle of expression: like this: min &lt;. x .&lt; max
-</summary>
-</member>
-<member name="M:FsEx.CompareOperators.op_LessDot``1(``0,``0)">
-<summary>
-Point must be at middle of expression: like this: min &lt;. x .&lt; max
-</summary>
-</member>
-<member name="M:FsEx.CompareOperators.op_DotGreaterEqualsDot``1(System.Boolean,``0,``0)">
-<summary>
-for inner expressions: like this: min &lt;. x .&lt;. y .&lt; max
-</summary>
-</member>
-<member name="M:FsEx.CompareOperators.op_DotLessEqualsDot``1(System.Boolean,``0,``0)">
-<summary>
-for inner expressions: like this: min &lt;. x .&lt;. y .&lt; max
-</summary>
-</member>
-<member name="M:FsEx.CompareOperators.op_DotGreaterEquals``1(System.Boolean,``0,``0)">
-<summary>
-Point must be at middle of expression: like this: min &lt;=. x .&lt;= max
-</summary>
-</member>
-<member name="M:FsEx.CompareOperators.op_DotLessEquals``1(System.Boolean,``0,``0)">
-<summary>
-Point must be at middle of expression: like this: min &lt;=. x .&lt;= max
-</summary>
-</member>
-<member name="M:FsEx.CompareOperators.op_GreaterEqualsDot``1(``0,``0)">
-<summary>
-Point must be at middle of expression: like this: min &lt;=. x .&lt;= max
-</summary>
-</member>
-<member name="M:FsEx.CompareOperators.op_LessEqualsDot``1(``0,``0)">
-<summary>
-Point must be at middle of expression: like this: min &lt;=. x .&lt;= max
-</summary>
-</member>
-<member name="T:FsEx.CompareOperators">
-<summary>
-Operators for chaining compare operations like: &lt;c&gt; 1 &lt;. x .&lt; 9 &lt;/c&gt;
-or &lt;c&gt; 0 &lt;. x .&lt;. y .&lt; 99 &lt;/c&gt;
-</summary>
-</member>
-<member name="M:FsEx.MinMaxSort.diff``2(``0,``0)">
-<summary>
-Gets the positiv differnce between 2 numbers. 
-Avoids the integer( or byte) overflow and underflow risk of &quot;abs(a-b)&quot;
-</summary>
-</member>
-<member name="M:FsEx.MinMaxSort.sort3By``2(Microsoft.FSharp.Core.FSharpFunc{``0,``1},``0,``0,``0)">
-<summary>
-If any are equal after Function is applied then the the order is kept
-</summary>
-</member>
-<member name="M:FsEx.MinMaxSort.sort3``1(``0,``0,``0)">
-<summary>
-If any are equal then the the order is kept
-</summary>
-</member>
-<member name="M:FsEx.MinMaxSort.sort2By``2(Microsoft.FSharp.Core.FSharpFunc{``0,``1},``0,``0)">
-<summary>
-If they are equal then the the order is kept
-</summary>
-</member>
-<member name="M:FsEx.MinMaxSort.sort2``1(``0,``0)">
-<summary>
-If they are equal then the the order is kept
-</summary>
-</member>
-<member name="M:FsEx.MinMaxSort.maxBy``2(Microsoft.FSharp.Core.FSharpFunc{``0,``1},``0,``0)">
-<summary>
-If both are equal then the first is returned
-</summary>
-</member>
-<member name="M:FsEx.MinMaxSort.minBy``2(Microsoft.FSharp.Core.FSharpFunc{``0,``1},``0,``0)">
-<summary>
-If both are equal then the first is returned
 </summary>
 </member>
 <member name="M:FsEx.PrintDistribution.sprintDistributionByStepSizeOffset(System.String,System.Double,System.Double,System.Double,System.Collections.Generic.IEnumerable{System.Double})">
