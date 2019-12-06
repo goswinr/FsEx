@@ -28,6 +28,7 @@ module UtilMath =
         | :? decimal as x -> float (x)
         | :? string  as x -> parseFloatEnDe (x)
         | _               -> 
+
             try 
                 float(o)
             with _ -> 
@@ -76,6 +77,11 @@ module UtilMath =
     let inline toDegrees radians = 57.2957795130823 * radians // 57.2957795130823 = 180. / Math.PI
 
     let inline interpolate start ende (rel:float) = start + ( (ende-start) * rel )
+
+    ///* min -> max -> value -> clamped value.  to make sure a value is within a given range
+    let inline clamp min max value = 
+        if max<min then failwithf "*** Math.clamp: max %A must be bigger than min %A" max min
+        if value>max then max elif value<min then min else value
 
     ///Given the min and max value and a test value,  (val-min) / (max-min)
     ///Returns the relative  position  of the test value between min (= 0.0) and (max = 1.0),
