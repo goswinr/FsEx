@@ -250,9 +250,11 @@ module NiceString =
 [<AutoOpen>]
 module TypeExtensionsObject =   
     
-    /// prints toNiceStringFull
-    let print x = printfn "%s" (NiceString.toNiceStringFull x)
+    /// prints FsEx.NiceString.toNiceString
+    let print x = printfn "%s" (NiceString.toNiceString x)
 
+    /// prints FsEx.NiceString.toNiceStringFull
+    let printFull x = printfn "%s" (NiceString.toNiceStringFull x)
    
     [<Extension>]
     type Object with 
