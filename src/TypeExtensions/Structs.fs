@@ -10,12 +10,12 @@ module TypeExtensionsStructs =
 
     [<Extension>]
     type Int32 with  
-        [<Extension>] member inline x.ToDouble = float(x)
+        [<Extension>] member inline x.ToFloat = float(x)
         [<Extension>] member inline x.ToByte = byte(x)
 
     [<Extension>]
     type Byte with  
-        [<Extension>] member inline x.ToDouble = float(x)
+        [<Extension>] member inline x.ToFloat = float(x)
         [<Extension>] member inline x.ToInt = int(x)
     
     
@@ -33,26 +33,18 @@ module TypeExtensionsStructs =
         /// with automatic formating of display precision depending on float size
         [<Extension>] member x.ToNiceString = NiceString.singleToString x
 
-    [<Extension>]
-    type Drawing.Color with        
-        ///Compare to another color only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor        
-        [<Extension>] 
-        member inline this.EqualsARGB(other:Drawing.Color)=
-            this.A = other.A && 
-            this.R = other.R && 
-            this.G = other.G && 
-            this.B = other.B        
-        
-        ///Compare two colors only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor
-        [<Extension>]
-        static member inline AreEqualARGB (this:Drawing.Color)(other:Drawing.Color)=
-            this.EqualsARGB(other)
     
     [<Extension>]
     type DateTime with
-        [<Extension>]static member todayStr = DateTime.Now.ToString("yyyy-MM-dd")
-        [<Extension>]static member nowStr =   DateTime.Now.ToString("yyyy-MM-dd_HH-mm")
+        
+        ///Current date as yyyy-MM-dd
+        [<Extension>]static member todayStr =    DateTime.Now.ToString("yyyy-MM-dd")
+        
+        ///Current local date and time as yyyy-MM-dd_HH-mm
+        [<Extension>]static member nowStr =      DateTime.Now.ToString("yyyy-MM-dd_HH-mm")
+        
+        ///Current UTC date and time as yyyy-MM-dd_HH-mm_UTC
         [<Extension>]static member nowStrUtc =   DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm_UTC")
         
-        ///* UTC time, inludes 3 digits of miliseconds
+        ///Current UTC date and time as yyyy-MM-dd_HH-mm-fff. inludes 3 digits of miliseconds
         [<Extension>]static member nowStrLong =   DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss-fff")
