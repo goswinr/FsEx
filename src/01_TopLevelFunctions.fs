@@ -19,14 +19,33 @@ module  Util =
     ///Apply function, like |> , but ignore result. 
     ///Return original input
     let inline (|>>) x f =  f x |> ignore ; x     
- 
+
+    ///this ignore only work on Value types, 
+    ///Objects and functions need to be ignored with ignoreObj
+    ///This is to prevent accidetially ignoreing partially aplied functions tha would returna struct
+    let ignore (x:'T when ' T:struct)=()
+
+    let ignoreObj (x:obj)=()
+
     ///Get first element of triple (tuple of three element)
     let inline t1 (a, _,_) = a
     ///Get second element of triple (tuple of three element)
     let inline t2 (_, b, _) = b
     ///Get third element of triple (tuple of three element)
     let inline t3 (_,_, c) = c    
-    
+
+///Shadows the ignore function to only accept sturucts
+///This is to prevent accidetially ignoring partially aplied functions that would return struct
+module SaveIgnore = 
+    ///this ignore only work on Value types, 
+    ///Objects and functions need to be ignored with ignoreObj
+    ///This is to prevent accidetially ignoring partially aplied functions that would return struct
+    let ignore (x:'T when ' T:struct)=()
+
+    /// ignores any object 
+    /// for structs use ignore
+    let ignoreObj (x:obj)=()
+
 
 module IntRef = 
     let inline incr2 i = i := !i+2
