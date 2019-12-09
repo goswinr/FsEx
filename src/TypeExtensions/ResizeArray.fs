@@ -11,7 +11,7 @@ open System.Runtime.CompilerServices
 module TypeExtensionsResizeArray =   
 
 
-    [<Extension>]
+    //[<Extension>] //Error 3246
     type Collections.Generic.List<'T>  with        
         [<Extension>]
         member inline this.LastIndex = this.Count - 1
@@ -498,6 +498,11 @@ module ResizeArray =
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
     /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a]
     let rotate k (xs: ResizeArray<_>)  =  init xs.Count (fun i -> xs.[if i-k < 0 then xs.Count+i-k  else i-k])
+
+
+    ///Returns a ResizeArray of the index and the item. (like enumerate in Python)
+    let indexed (xs: ResizeArray<_>)  =  init xs.Count (fun i -> i,xs.[i])
+
 
     /// for finding 
     module private MinMax =

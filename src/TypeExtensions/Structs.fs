@@ -8,18 +8,18 @@ open System.Runtime.CompilerServices
 [<AutoOpen>]
 module TypeExtensionsStructs =      
 
-    [<Extension>]
+    //[<Extension>] //Error 3246
     type Int32 with  
         [<Extension>] member inline x.ToFloat = float(x)
         [<Extension>] member inline x.ToByte = byte(x)
 
-    [<Extension>]
+    //[<Extension>] //Error 3246
     type Byte with  
         [<Extension>] member inline x.ToFloat = float(x)
         [<Extension>] member inline x.ToInt = int(x)
     
     
-    [<Extension>]
+    //[<Extension>] //Error 3246
     type Double with  
         ///converts int to float including rounding: 
         ///int(round(x))
@@ -28,13 +28,13 @@ module TypeExtensionsStructs =
         /// with automatic formating of display precision depending on float size
         [<Extension>] member x.ToNiceString = NiceString.floatToString x        
         
-    [<Extension>]
+    //[<Extension>] //Error 3246
     type Single with  
         /// with automatic formating of display precision depending on float size
         [<Extension>] member x.ToNiceString = NiceString.singleToString x
 
     
-    [<Extension>]
+    //[<Extension>] //Error 3246
     type DateTime with
         
         ///Current date as yyyy-MM-dd

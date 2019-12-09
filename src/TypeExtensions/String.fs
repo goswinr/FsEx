@@ -6,7 +6,7 @@ open System.Runtime.CompilerServices
 [<AutoOpen>]
 module TypeExtensionsString =   
     
-    [<Extension>]
+    //[<Extension>] //Error 3246
     type System.String with
         [<Extension>]
         member inline s.Last = s.[s.Length - 1] 

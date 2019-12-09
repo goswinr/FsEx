@@ -7,7 +7,7 @@ open System.Runtime.CompilerServices
 [<AutoOpen>]
 module TypeExtensionsArray =  
 
-    [<Extension>]
+    //[<Extension>] //Error 3246
     type ``[]``<'T>  with //Generic Array
         
         /// like this.Length - 1

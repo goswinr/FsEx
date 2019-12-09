@@ -8,7 +8,7 @@ type dict<'K,'V> = Collections.Generic.Dictionary<'K,'V> // type alias
 [<AutoOpen>]
 module TypeExtensionsCollections =   
 
-    [<Extension>]
+    //[<Extension>] //Error 3246
     type Collections.Generic.Dictionary<'K,'V> with           
         
         [<Extension>]

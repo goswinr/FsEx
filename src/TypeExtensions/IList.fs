@@ -7,7 +7,7 @@ open System.Runtime.CompilerServices
 [<AutoOpen>]
 module TypeExtensionsIList =  
 
-    [<Extension>]
+    //[<Extension>] //Error 3246
     type Collections.Generic.IList<'T>  with 
 
         /// like this.Count - 1

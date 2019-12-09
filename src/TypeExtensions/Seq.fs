@@ -52,7 +52,7 @@ module TypeExtensionsSeq =
                 invalidArg "source" "seq sourceWasEmpty" 
     
 
-    [<Extension>]
+    //[<Extension>] //Error 3246
     type Collections.Generic.IEnumerable<'T>  with 
 
         /// Like Seq.length - 1
@@ -101,7 +101,11 @@ module TypeExtensionsSeq =
                 let en =  match endIdx  with None -> count.Value-1 | Some i -> if i<0 then count.Value+i else i
                 let err = sprintf "GetSlice: Start index '%A' (= %d) and end index '%A'(= %d) for Seq of %d items failed" startIdx st endIdx en  count.Value
                 raise (IndexOutOfRangeException(err))
-
+        
+        [<Extension>]  
+        ///A property like the ToString() method, 
+        ///But with richer formationg for collections
+        member obj.ToNiceString = NiceString.toNiceString obj
             
 
 module Seq =   

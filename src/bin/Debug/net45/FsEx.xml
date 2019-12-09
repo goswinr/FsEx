@@ -286,41 +286,35 @@ If both are equal then the first is returned
 If both are equal then the first is returned
 </summary>
 </member>
-<member name="M:FsEx.TypeExtensionsObject.Object.get_ToNiceString(System.Object)">
-<summary>
-A property like the ToString() method, 
-But with richer formationg for collections
-</summary>
-</member>
-<member name="M:FsEx.TypeExtensionsObject.printFull``1(``0)">
+<member name="M:FsEx.NiceString.printFull``1(``0)">
 <summary>
  prints FsEx.NiceString.toNiceStringFull
 </summary>
 </member>
-<member name="M:FsEx.TypeExtensionsObject.print``1(``0)">
+<member name="M:FsEx.NiceString.print``1(``0)">
 <summary>
  prints FsEx.NiceString.toNiceString
 </summary>
 </member>
-<member name="M:FsEx.NiceString.toNiceStringFull``1(``0)">
+<member name="M:FsEx.NiceString.NiceString.toNiceStringFull``1(``0)">
 <summary>
  Nice formating for floats , some Rhino Objects and sequences of any kind, all items including nested items are printed out.
 </summary>
 </member>
-<member name="M:FsEx.NiceString.toNiceStringFullWithFormater``1(``0,Microsoft.FSharp.Core.FSharpFunc{System.Object,Microsoft.FSharp.Core.FSharpOption{System.String}})">
+<member name="M:FsEx.NiceString.NiceString.toNiceStringFullWithFormater``1(``0,Microsoft.FSharp.Core.FSharpFunc{System.Object,Microsoft.FSharp.Core.FSharpOption{System.String}})">
 <summary>
  Nice formating for floats , some Rhino Objects and sequences of any kind, all items including nested items are printed out.
  use externalFormater for types defined in other assemblies alowed
 </summary>
 </member>
-<member name="M:FsEx.NiceString.toNiceString``1(``0)">
+<member name="M:FsEx.NiceString.NiceString.toNiceString``1(``0)">
 <summary>
  Nice formating for floats , some Rhino Objects and sequences of any kind, first four items are printed out.
  set NiceString.toNiceStringMaxItemsPerSeq to other value if more or less shall be shown (default is 4)
  set NiceString.toNiceStringMaxDepth to change how deep nested lists are printed (default is 2)
 </summary>
 </member>
-<member name="M:FsEx.NiceString.toNiceStringWithFormater``1(``0,Microsoft.FSharp.Core.FSharpFunc{System.Object,Microsoft.FSharp.Core.FSharpOption{System.String}})">
+<member name="M:FsEx.NiceString.NiceString.toNiceStringWithFormater``1(``0,Microsoft.FSharp.Core.FSharpFunc{System.Object,Microsoft.FSharp.Core.FSharpOption{System.String}})">
 <summary>
  Nice formating for floats  and sequences of any kind, first four items are printed out.
  use externalFormater for types defined in other assemblies alowed
@@ -328,21 +322,36 @@ But with richer formationg for collections
  set NiceString.toNiceStringMaxDepth to change how deep nested lists are printed (default is 2)
 </summary>
 </member>
-<member name="P:FsEx.NiceString.sb">
+<member name="P:FsEx.NiceString.NiceString.sb">
 <summary>
  The internal stringbuilder for recursive function
 </summary>
 </member>
-<member name="M:FsEx.NiceString.singleToString(System.Single)">
+<member name="P:FsEx.NiceString.NiceString.toNiceStringMaxItemsPerSeq">
+<summary>
+ set this to change how how many items per seq are printed (printFull ignores this)
+</summary>
+</member>
+<member name="P:FsEx.NiceString.NiceString.toNiceStringMaxDepth">
+<summary>
+ set this to change how deep the content of nested sq is printed (printFull ignores this)
+</summary>
+</member>
+<member name="M:FsEx.NiceString.NiceString.singleToString(System.Single)">
 <summary>
 Formating with automatic precision 
 e.g.: 0 digits behind comma if above 1000
 </summary>
 </member>
-<member name="M:FsEx.NiceString.floatToString(System.Double)">
+<member name="M:FsEx.NiceString.NiceString.floatToString(System.Double)">
 <summary>
 Formating with automatic precision 
 e.g.: 0 digits behind comma if above 1000 
+</summary>
+</member>
+<member name="P:FsEx.NiceString.NiceString.thousandSeparator">
+<summary>
+ set this to change the printing of floats larger than 10&apos;000
 </summary>
 </member>
 <member name="M:FsEx.TypeExtensionsStructs.DateTime.get_nowStrLong.Static">
@@ -529,6 +538,11 @@ Allows for negtive index too (like Python)
 <member name="M:FsEx.TypeExtensionsArray.[]`1.get_LastIndex``1(``0[])">
 <summary>
  like this.Length - 1
+</summary>
+</member>
+<member name="M:FsEx.ResizeArray.indexed``1(System.Collections.Generic.List{``0})">
+<summary>
+Returns a ResizeArray of the index and the item. (like enumerate in Python)
 </summary>
 </member>
 <member name="M:FsEx.ResizeArray.rotate``1(System.Int32,System.Collections.Generic.List{``0})">
@@ -950,6 +964,12 @@ Considers sequence cirular and move elements up or down
 <summary>
 Allows for negative indices too, -1 is the last element.
 The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
+</summary>
+</member>
+<member name="M:FsEx.TypeExtensionsSeq.IEnumerable`1.get_ToNiceString``1(System.Collections.Generic.IEnumerable{``0})">
+<summary>
+A property like the ToString() method, 
+But with richer formationg for collections
 </summary>
 </member>
 <member name="M:FsEx.TypeExtensionsSeq.IEnumerable`1.GetSlice``1(System.Collections.Generic.IEnumerable{``0},Microsoft.FSharp.Core.FSharpOption{System.Int32},Microsoft.FSharp.Core.FSharpOption{System.Int32})">
