@@ -7,6 +7,11 @@
  Returns a seq of key and value tuples
 </summary>
 </member>
+<member name="M:FsEx.DefaultDict`2.get(`0)">
+<summary>
+ get value for given key
+</summary>
+</member>
 <member name="M:FsEx.DefaultDict`2.Pop(`0)">
 <summary>
  Get a value and remove it from Dictionary, like *.pop() in Python 
@@ -59,19 +64,57 @@ Better: List.exists (fun v -&gt; v === value)
 Increment ref cell and return new incremented integer value
 </summary>
 </member>
+<member name="M:FsEx.SaveIgnore.ignoreObj(System.Object)">
+<summary>
+ Ignores any object (and struct)
+ For structs use &apos;ignore&apos;
+</summary>
+</member>
+<member name="M:FsEx.SaveIgnore.ignore``1(``0)">
+<summary>
+This ignore only work on Value types, 
+Objects and functions need to be ignored with ignoreObj
+This is to prevent accidetially ignoring partially aplied functions that would return struct
+</summary>
+</member>
+<member name="T:FsEx.SaveIgnore">
+<summary>
+Shadows the ignore function to only accept sturucts
+This is to prevent accidetially ignoring partially aplied functions that would return struct
+</summary>
+</member>
+<member name="M:FsEx.Util.ifDo``1(System.Boolean,Microsoft.FSharp.Core.FSharpFunc{``0,``0},``0)">
+<summary>
+If condition is true return f(x) else just x
+</summary>
+</member>
+<member name="M:FsEx.Util.negIdx(System.Int32,System.Int32)">
+<summary>
+ Converts negative indices to positive ones
+ correctet results from -len up to len-1
+ e.g.: -1 is  last item .
+</summary>
+</member>
+<member name="M:FsEx.Util.saveIdx(System.Int32,System.Int32)">
+<summary>
+ Any int will give a valid index for given collection size.
+ division remainder will be used i % len
+ e.g.: -1 is  last item 
+</summary>
+</member>
 <member name="M:FsEx.Util.t3``3(``0,``1,``2)">
 <summary>
-Get third element of triple (tuple of three element)
+Get third element of Triple (Tuple of three elements)
 </summary>
 </member>
 <member name="M:FsEx.Util.t2``3(``0,``1,``2)">
 <summary>
-Get second element of triple (tuple of three element)
+Get second element of Triple (Tuple of three elements)
 </summary>
 </member>
 <member name="M:FsEx.Util.t1``3(``0,``1,``2)">
 <summary>
-Get first element of triple (tuple of three element)
+Get first element of Triple (Tuple of three elements)
 </summary>
 </member>
 <member name="M:FsEx.Util.op_BarGreaterGreater``2(``0,Microsoft.FSharp.Core.FSharpFunc{``0,``1})">
@@ -124,19 +167,20 @@ Returns the relative  position  of the test value between min (= 0.0) and (max =
 can also be bigger than 1.0
 </summary>
 </member>
-<member name="M:FsEx.UtilMath.clamp``1(``0,``0,``0)">
-<summary>
-* min -&gt; max -&gt; value -&gt; clamped value.  to make sure a value is within a given range
-</summary>
-</member>
 <member name="M:FsEx.UtilMath.toDegrees(System.Double)">
 <summary>
-converts Angels from Radians to Degrees
+Converts Angels from Radians to Degrees
 </summary>
 </member>
 <member name="M:FsEx.UtilMath.toRadians(System.Double)">
 <summary>
-converts Angels from Degrees to Radians
+Converts Angels from Degrees to Radians
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.acos(System.Double)">
+<summary>
+Shadowing the built in acos operator to include claming if values are slightly above -1 or 1.
+This is useful on  dot product from unit vectors
 </summary>
 </member>
 <member name="M:FsEx.UtilMath.areSame(System.Double,System.Double,System.Double)">
@@ -154,6 +198,12 @@ The comparing tolerance is calculated as:  relativeTolerance * (the smaller of t
 <summary>
 given mean  and standardDeviation returns a random value from this Gaussian distribution
 if mean is 0 and stDev is 1 then 99% of values are  are within -2.3 to +2.3 ; 70% within -1 to +1
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.clamp``1(``0,``0,``0)">
+<summary>
+To make sure a value is within a given range
+min -&gt; max -&gt; value -&gt; clamped value.  
 </summary>
 </member>
 <member name="M:FsEx.UtilMath.isNanOrInf(System.Double)">
@@ -286,41 +336,35 @@ If both are equal then the first is returned
 If both are equal then the first is returned
 </summary>
 </member>
-<member name="M:FsEx.TypeExtensionsObject.Object.get_ToNiceString(System.Object)">
-<summary>
-A property like the ToString() method, 
-But with richer formationg for collections
-</summary>
-</member>
-<member name="M:FsEx.TypeExtensionsObject.printFull``1(``0)">
+<member name="M:FsEx.NiceString.printFull``1(``0)">
 <summary>
  prints FsEx.NiceString.toNiceStringFull
 </summary>
 </member>
-<member name="M:FsEx.TypeExtensionsObject.print``1(``0)">
+<member name="M:FsEx.NiceString.print``1(``0)">
 <summary>
  prints FsEx.NiceString.toNiceString
 </summary>
 </member>
-<member name="M:FsEx.NiceString.toNiceStringFull``1(``0)">
+<member name="M:FsEx.NiceString.NiceString.toNiceStringFull``1(``0)">
 <summary>
  Nice formating for floats , some Rhino Objects and sequences of any kind, all items including nested items are printed out.
 </summary>
 </member>
-<member name="M:FsEx.NiceString.toNiceStringFullWithFormater``1(``0,Microsoft.FSharp.Core.FSharpFunc{System.Object,Microsoft.FSharp.Core.FSharpOption{System.String}})">
+<member name="M:FsEx.NiceString.NiceString.toNiceStringFullWithFormater``1(``0,Microsoft.FSharp.Core.FSharpFunc{System.Object,Microsoft.FSharp.Core.FSharpOption{System.String}})">
 <summary>
  Nice formating for floats , some Rhino Objects and sequences of any kind, all items including nested items are printed out.
  use externalFormater for types defined in other assemblies alowed
 </summary>
 </member>
-<member name="M:FsEx.NiceString.toNiceString``1(``0)">
+<member name="M:FsEx.NiceString.NiceString.toNiceString``1(``0)">
 <summary>
  Nice formating for floats , some Rhino Objects and sequences of any kind, first four items are printed out.
  set NiceString.toNiceStringMaxItemsPerSeq to other value if more or less shall be shown (default is 4)
  set NiceString.toNiceStringMaxDepth to change how deep nested lists are printed (default is 2)
 </summary>
 </member>
-<member name="M:FsEx.NiceString.toNiceStringWithFormater``1(``0,Microsoft.FSharp.Core.FSharpFunc{System.Object,Microsoft.FSharp.Core.FSharpOption{System.String}})">
+<member name="M:FsEx.NiceString.NiceString.toNiceStringWithFormater``1(``0,Microsoft.FSharp.Core.FSharpFunc{System.Object,Microsoft.FSharp.Core.FSharpOption{System.String}})">
 <summary>
  Nice formating for floats  and sequences of any kind, first four items are printed out.
  use externalFormater for types defined in other assemblies alowed
@@ -328,21 +372,36 @@ But with richer formationg for collections
  set NiceString.toNiceStringMaxDepth to change how deep nested lists are printed (default is 2)
 </summary>
 </member>
-<member name="P:FsEx.NiceString.sb">
+<member name="P:FsEx.NiceString.NiceString.sb">
 <summary>
  The internal stringbuilder for recursive function
 </summary>
 </member>
-<member name="M:FsEx.NiceString.singleToString(System.Single)">
+<member name="P:FsEx.NiceString.NiceString.toNiceStringMaxItemsPerSeq">
+<summary>
+ set this to change how how many items per seq are printed (printFull ignores this)
+</summary>
+</member>
+<member name="P:FsEx.NiceString.NiceString.toNiceStringMaxDepth">
+<summary>
+ set this to change how deep the content of nested sq is printed (printFull ignores this)
+</summary>
+</member>
+<member name="M:FsEx.NiceString.NiceString.singleToString(System.Single)">
 <summary>
 Formating with automatic precision 
 e.g.: 0 digits behind comma if above 1000
 </summary>
 </member>
-<member name="M:FsEx.NiceString.floatToString(System.Double)">
+<member name="M:FsEx.NiceString.NiceString.floatToString(System.Double)">
 <summary>
 Formating with automatic precision 
 e.g.: 0 digits behind comma if above 1000 
+</summary>
+</member>
+<member name="P:FsEx.NiceString.NiceString.thousandSeparator">
+<summary>
+ set this to change the printing of floats larger than 10&apos;000
 </summary>
 </member>
 <member name="M:FsEx.TypeExtensionsStructs.DateTime.get_nowStrLong.Static">
@@ -529,6 +588,11 @@ Allows for negtive index too (like Python)
 <member name="M:FsEx.TypeExtensionsArray.[]`1.get_LastIndex``1(``0[])">
 <summary>
  like this.Length - 1
+</summary>
+</member>
+<member name="M:FsEx.ResizeArray.indexed``1(System.Collections.Generic.List{``0})">
+<summary>
+Returns a ResizeArray of the index and the item. (like enumerate in Python)
 </summary>
 </member>
 <member name="M:FsEx.ResizeArray.rotate``1(System.Int32,System.Collections.Generic.List{``0})">
@@ -952,6 +1016,12 @@ Allows for negative indices too, -1 is the last element.
 The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
 </summary>
 </member>
+<member name="M:FsEx.TypeExtensionsSeq.IEnumerable`1.get_ToNiceString``1(System.Collections.Generic.IEnumerable{``0})">
+<summary>
+A property like the ToString() method, 
+But with richer formationg for collections
+</summary>
+</member>
 <member name="M:FsEx.TypeExtensionsSeq.IEnumerable`1.GetSlice``1(System.Collections.Generic.IEnumerable{``0},Microsoft.FSharp.Core.FSharpOption{System.Int32},Microsoft.FSharp.Core.FSharpOption{System.Int32})">
 <summary>
 Allows for negative indices too, like Python, -1 is the last element.
@@ -981,17 +1051,6 @@ Allows for negative indices too, like Python, -1 is the last element.
 <member name="M:FsEx.TypeExtensionsSeq.fastLast``1(System.Collections.Generic.IEnumerable{``0})">
 <summary>
  faster implemetation of Seq.last , keep till F# 4.8 is out
-</summary>
-</member>
-<member name="M:FsEx.TypeExtensionsSeq.negIdx(System.Int32,System.Int32)">
-<summary>
- Converts negative indices to positive ones 
- e.g.: -1 is  last item .
-</summary>
-</member>
-<member name="M:FsEx.TypeExtensionsSeq.saveIdx(System.Int32,System.Int32)">
-<summary>
- Any int will give a valid index for given collection size.
 </summary>
 </member>
 <member name="M:FsEx.TypeExtensionsIList.IList`1.GetSlice``1(System.Collections.Generic.IList{``0},Microsoft.FSharp.Core.FSharpOption{System.Int32},Microsoft.FSharp.Core.FSharpOption{System.Int32})">

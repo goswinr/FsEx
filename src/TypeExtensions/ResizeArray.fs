@@ -494,6 +494,8 @@ module ResizeArray =
     // extensions added  by Goswin:
     //----------------------------------------------------
     
+    let empty() = ResizeArray<_>()
+
     ///Considers List cirular and move elements up or down
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
     /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a]

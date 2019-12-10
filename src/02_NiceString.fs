@@ -8,6 +8,7 @@ open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.DerivedPatterns
 open Microsoft.FSharp.Quotations.Patterns
 open System.Runtime.CompilerServices
+open FsEx.SaveIgnore
 
 
 [<AutoOpen>] // to have print function auto opened at end
@@ -22,7 +23,7 @@ module NiceString =
         let internal formatThousands (s:string) =
             let last = s.Length - 1         
             let sb= Text.StringBuilder()
-            let inline add (c:char) = sb.Append(c) |> ignore
+            let inline add (c:char) = sb.Append(c) |> ignoreObj
             for i = 0 to last do
                 if i = 0 || i = last then 
                     add s.[i]
@@ -30,7 +31,7 @@ module NiceString =
                     add s.[i]
                 else
                     if (last - i + 1) % 3 = 0 then 
-                        sb.Append(thousandSeparator) |> ignore
+                        sb.Append(thousandSeparator) |> ignoreObj
                         add s.[i]
                     else                
                         add s.[i]
@@ -182,8 +183,8 @@ module NiceString =
 
         let rec private toNiceStringRec (x:obj, externalFormater: obj-> option<string> , indent:int) : unit =
         
-            let add  (s:string) =  sb.Append(String(' ', 4 *  indent )).Append(s)     |> ignore
-            let adn  (s:string) =  sb.AppendLine(s) |> ignore
+            let add  (s:string) =  sb.Append(String(' ', 4 *  indent )).Append(s)     |> ignoreObj
+            let adn  (s:string) =  sb.AppendLine(s) |> ignoreObj
         
             match externalFormater x with
             | Some s -> add s
@@ -226,7 +227,7 @@ module NiceString =
         /// set NiceString.toNiceStringMaxItemsPerSeq to other value if more or less shall be shown (default is 4)
         /// set NiceString.toNiceStringMaxDepth to change how deep nested lists are printed (default is 2)
         let toNiceStringWithFormater (x:'T, externalFormater: obj-> option<string>) = 
-            sb.Clear() |> ignore
+            sb.Clear() |> ignoreObj
             toNiceStringRec(box x, externalFormater , 0 ) //0 indent for start
             sb.ToString()
 
@@ -244,7 +245,7 @@ module NiceString =
             toNiceStringMaxDepth <- Int32.MaxValue
             toNiceStringMaxItemsPerSeq  <- Int32.MaxValue
 
-            sb.Clear() |> ignore
+            sb.Clear() |> ignoreObj
             toNiceStringRec(box x, externalFormater, 0)
 
             toNiceStringMaxDepth <- maxDepthP 

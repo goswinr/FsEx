@@ -7,6 +7,11 @@
  Returns a seq of key and value tuples
 </summary>
 </member>
+<member name="M:FsEx.DefaultDict`2.get(`0)">
+<summary>
+ get value for given key
+</summary>
+</member>
 <member name="M:FsEx.DefaultDict`2.Pop(`0)">
 <summary>
  Get a value and remove it from Dictionary, like *.pop() in Python 
@@ -59,19 +64,57 @@ Better: List.exists (fun v -&gt; v === value)
 Increment ref cell and return new incremented integer value
 </summary>
 </member>
+<member name="M:FsEx.SaveIgnore.ignoreObj(System.Object)">
+<summary>
+ Ignores any object (and struct)
+ For structs use &apos;ignore&apos;
+</summary>
+</member>
+<member name="M:FsEx.SaveIgnore.ignore``1(``0)">
+<summary>
+This ignore only work on Value types, 
+Objects and functions need to be ignored with ignoreObj
+This is to prevent accidetially ignoring partially aplied functions that would return struct
+</summary>
+</member>
+<member name="T:FsEx.SaveIgnore">
+<summary>
+Shadows the ignore function to only accept sturucts
+This is to prevent accidetially ignoring partially aplied functions that would return struct
+</summary>
+</member>
+<member name="M:FsEx.Util.ifDo``1(System.Boolean,Microsoft.FSharp.Core.FSharpFunc{``0,``0},``0)">
+<summary>
+If condition is true return f(x) else just x
+</summary>
+</member>
+<member name="M:FsEx.Util.negIdx(System.Int32,System.Int32)">
+<summary>
+ Converts negative indices to positive ones
+ correctet results from -len up to len-1
+ e.g.: -1 is  last item .
+</summary>
+</member>
+<member name="M:FsEx.Util.saveIdx(System.Int32,System.Int32)">
+<summary>
+ Any int will give a valid index for given collection size.
+ division remainder will be used i % len
+ e.g.: -1 is  last item 
+</summary>
+</member>
 <member name="M:FsEx.Util.t3``3(``0,``1,``2)">
 <summary>
-Get third element of triple (tuple of three element)
+Get third element of Triple (Tuple of three elements)
 </summary>
 </member>
 <member name="M:FsEx.Util.t2``3(``0,``1,``2)">
 <summary>
-Get second element of triple (tuple of three element)
+Get second element of Triple (Tuple of three elements)
 </summary>
 </member>
 <member name="M:FsEx.Util.t1``3(``0,``1,``2)">
 <summary>
-Get first element of triple (tuple of three element)
+Get first element of Triple (Tuple of three elements)
 </summary>
 </member>
 <member name="M:FsEx.Util.op_BarGreaterGreater``2(``0,Microsoft.FSharp.Core.FSharpFunc{``0,``1})">
@@ -124,19 +167,20 @@ Returns the relative  position  of the test value between min (= 0.0) and (max =
 can also be bigger than 1.0
 </summary>
 </member>
-<member name="M:FsEx.UtilMath.clamp``1(``0,``0,``0)">
-<summary>
-* min -&gt; max -&gt; value -&gt; clamped value.  to make sure a value is within a given range
-</summary>
-</member>
 <member name="M:FsEx.UtilMath.toDegrees(System.Double)">
 <summary>
-converts Angels from Radians to Degrees
+Converts Angels from Radians to Degrees
 </summary>
 </member>
 <member name="M:FsEx.UtilMath.toRadians(System.Double)">
 <summary>
-converts Angels from Degrees to Radians
+Converts Angels from Degrees to Radians
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.acos(System.Double)">
+<summary>
+Shadowing the built in acos operator to include claming if values are slightly above -1 or 1.
+This is useful on  dot product from unit vectors
 </summary>
 </member>
 <member name="M:FsEx.UtilMath.areSame(System.Double,System.Double,System.Double)">
@@ -154,6 +198,12 @@ The comparing tolerance is calculated as:  relativeTolerance * (the smaller of t
 <summary>
 given mean  and standardDeviation returns a random value from this Gaussian distribution
 if mean is 0 and stDev is 1 then 99% of values are  are within -2.3 to +2.3 ; 70% within -1 to +1
+</summary>
+</member>
+<member name="M:FsEx.UtilMath.clamp``1(``0,``0,``0)">
+<summary>
+To make sure a value is within a given range
+min -&gt; max -&gt; value -&gt; clamped value.  
 </summary>
 </member>
 <member name="M:FsEx.UtilMath.isNanOrInf(System.Double)">
@@ -1001,17 +1051,6 @@ Allows for negative indices too, like Python, -1 is the last element.
 <member name="M:FsEx.TypeExtensionsSeq.fastLast``1(System.Collections.Generic.IEnumerable{``0})">
 <summary>
  faster implemetation of Seq.last , keep till F# 4.8 is out
-</summary>
-</member>
-<member name="M:FsEx.TypeExtensionsSeq.negIdx(System.Int32,System.Int32)">
-<summary>
- Converts negative indices to positive ones 
- e.g.: -1 is  last item .
-</summary>
-</member>
-<member name="M:FsEx.TypeExtensionsSeq.saveIdx(System.Int32,System.Int32)">
-<summary>
- Any int will give a valid index for given collection size.
 </summary>
 </member>
 <member name="M:FsEx.TypeExtensionsIList.IList`1.GetSlice``1(System.Collections.Generic.IList{``0},Microsoft.FSharp.Core.FSharpOption{System.Int32},Microsoft.FSharp.Core.FSharpOption{System.Int32})">

@@ -1,6 +1,6 @@
 ﻿namespace FsEx
 open System
-
+open FsEx.SaveIgnore
 
 [<AutoOpen>]
 module MaybeBuilder =    
@@ -39,7 +39,7 @@ module MaybeBuilder =
 
         member this.While(guard, f) =
             if not (guard()) then Some () else
-            do f() |> ignore
+            do f() |> ignoreObj
             this.While(guard, f)
 
         member this.For(sequence:seq<_>, body) =
@@ -57,16 +57,16 @@ module StringBufferBuilder =
 
     type StringBufferBuilder () = 
         
-        member inline _.Yield (txt: string) =  fun (b: StringBuilder) -> b.Append  txt |> ignore
-        member inline _.Yield (c: char) =      fun (b: StringBuilder) -> b.Append  c   |> ignore
-        member inline _.Yield (f: float) =     fun (b: StringBuilder) -> f |> NiceString.floatToString |> b.Append  |> ignore
-        member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> b.Append (i.ToString())  |> ignore
+        member inline _.Yield (txt: string) =  fun (b: StringBuilder) -> b.Append  txt |> ignoreObj
+        member inline _.Yield (c: char) =      fun (b: StringBuilder) -> b.Append  c   |> ignoreObj
+        member inline _.Yield (f: float) =     fun (b: StringBuilder) -> f |> NiceString.floatToString |> b.Append  |> ignoreObj
+        member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> b.Append (i.ToString())  |> ignoreObj
         //member inline _.Yield (x: 'T) =        fun (b: StringBuilder)  -> b.Append (x.ToString())  |> ignore
 
-        member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> b.AppendLine txt |> ignore // 
-        member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> b.AppendLine  (c.ToString())   |> ignore
-        member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> f |> NiceString.floatToString |> b.AppendLine  |> ignore
-        member inline _.YieldFrom (i: int) =       fun (b: StringBuilder)  -> b.AppendLine (i.ToString())  |> ignore
+        member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> b.AppendLine txt |> ignoreObj // 
+        member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> b.AppendLine  (c.ToString())   |> ignoreObj
+        member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> f |> NiceString.floatToString |> b.AppendLine  |> ignoreObj
+        member inline _.YieldFrom (i: int) =       fun (b: StringBuilder)  -> b.AppendLine (i.ToString())  |> ignoreObj
         //member inline _.YieldFrom (f: StringBuffer) = f // use for new line instead
         
         member inline _.Yield (strings: seq<string>) =
@@ -78,7 +78,7 @@ module StringBufferBuilder =
         
         member _.Delay f = fun (b: StringBuilder) -> (f()) b
         
-        member _.Zero () = ignore
+        member _.Zero () = ignoreObj
         
         member _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) =
             fun (b: StringBuilder) ->
@@ -120,7 +120,7 @@ module ResizeArrayBuilder =
         member _.Delay f = 
             fun (r: ResizeArray<'T>) -> (f()) r
         
-        member _.Zero () =  ignore
+        member _.Zero () =  ignoreObj
         
         member _.For (xs: 'U seq, f: 'U -> ResizeArray<'T> -> unit) =
             fun (r: ResizeArray<'T>) ->

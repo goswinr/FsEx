@@ -7,20 +7,6 @@ open System.Runtime.CompilerServices
 [<AutoOpen>]
 module TypeExtensionsSeq = 
     
-    /// Any int will give a valid index for given collection size.
-    // e.g.: -1 is  last item 
-    let inline saveIdx i len =
-        let rest = i % len
-        if rest >= 0 then rest // does not fail on -4 for len 4
-        else len + rest
-
-    /// Converts negative indices to positive ones 
-    /// e.g.: -1 is  last item .
-    let inline negIdx i len =
-        let ii =  if i<0 then len+i else i
-        if ii<0 || ii >= len then failwithf "Cannot get index %d of seq, array or IList with %d items" i len
-        ii
-
 
     let rec private listlast (list: 'T list) =     
         match list with            

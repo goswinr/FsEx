@@ -11,40 +11,56 @@ type EXT = Runtime.CompilerServices.ExtensionAttribute
 module  Util = 
     let fail() = failwith "Generic fail (inner exception should show more helpful message)"   
 
-    let inline notNull (value : 'T) = match value with | null -> false  | _ -> true// Fsharp core does it like this too. dont use Obejct.RefrenceEquals
+    let inline notNull (value :'T) = match value with | null -> false  | _ -> true// Fsharp core does it like this too. dont use Obejct.RefrenceEquals
     
     ///Returns the value on the left unless it is null, then it returns the value on the right.
-    let inline (|?) a b = if Object.ReferenceEquals(a, null) then b else a // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs
+    let inline (|?) a b = if Object.ReferenceEquals(a, null) then b else a
+    //let inline (|?) (a:'T) (b:'T)  = match a with | null -> b  | _ -> a // if Object.ReferenceEquals(a, null) then b else a // or make generic using match ?  // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs
 
     ///Apply function, like |> , but ignore result. 
     ///Return original input
-    let inline (|>>) x f =  f x |> ignore ; x     
+    let inline (|>>) x f =  f x |> ignore ; x 
 
-    ///this ignore only work on Value types, 
-    ///Objects and functions need to be ignored with ignoreObj
-    ///This is to prevent accidetially ignoreing partially aplied functions tha would returna struct
-    let ignore (x:'T when ' T:struct)=()
+    ///Get first element of Triple (Tuple of three elements)
+    let inline t1 (a,_,_) = a
+    ///Get second element of Triple (Tuple of three elements)
+    let inline t2 (_,b,_) = b
+    ///Get third element of Triple (Tuple of three elements)
+    let inline t3 (_,_,c) = c    
 
-    let ignoreObj (x:obj)=()
 
-    ///Get first element of triple (tuple of three element)
-    let inline t1 (a, _,_) = a
-    ///Get second element of triple (tuple of three element)
-    let inline t2 (_, b, _) = b
-    ///Get third element of triple (tuple of three element)
-    let inline t3 (_,_, c) = c    
+    /// Any int will give a valid index for given collection size.
+    /// division remainder will be used i % len
+    /// e.g.: -1 is  last item 
+    let inline saveIdx i len =
+        let rest = i % len
+        if rest >= 0 then rest // does not fail on -4 for len 4
+        else len + rest
+
+    /// Converts negative indices to positive ones
+    /// correctet results from -len up to len-1
+    /// e.g.: -1 is  last item .
+    let inline negIdx i len =
+        let ii =  if i<0 then len+i else i
+        if ii<0 || ii >= len then failwithf "Cannot get index %d of seq, array or IList with %d items" i len
+        ii
+    
+    ///If condition is true return f(x) else just x
+    let inline ifDo condition (f:'T->'T)  (x:'T) = if condition then f x else x
+
 
 ///Shadows the ignore function to only accept sturucts
 ///This is to prevent accidetially ignoring partially aplied functions that would return struct
 module SaveIgnore = 
-    ///this ignore only work on Value types, 
+    
+    ///This ignore only work on Value types, 
     ///Objects and functions need to be ignored with ignoreObj
     ///This is to prevent accidetially ignoring partially aplied functions that would return struct
-    let ignore (x:'T when ' T:struct)=()
+    let inline ignore (x:'T when ' T:struct)=()
 
-    /// ignores any object 
-    /// for structs use ignore
-    let ignoreObj (x:obj)=()
+    /// Ignores any object (and struct)
+    /// For structs use 'ignore'
+    let inline ignoreObj (x:obj)=()
 
 
 module IntRef = 

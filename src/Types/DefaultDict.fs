@@ -25,6 +25,9 @@ type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V) =
         with get k   = dGet k        
         and  set k v = dd.[k] <- v
     
+    /// get value for given key
+    member _.get k = dGet k 
+    
     /// Get a value and remove it from Dictionary, like *.pop() in Python 
     member dd.Pop(k:'K) =
         let ok, v = dd.TryGetValue(k)

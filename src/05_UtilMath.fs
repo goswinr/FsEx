@@ -47,8 +47,15 @@ module UtilMath =
     
     ///Test is a floating point value is Infinity or Not a Number
     let inline isNanOrInf f = Double.IsInfinity f || Double.IsNaN f
+    
+    ///To make sure a value is within a given range
+    ///min -> max -> value -> clamped value.  
+    let inline clamp min max value = 
+        if max < min then failwithf "clamp: max value %g must be bigger than min %g" max min
+        if value > max then max elif value < min then min else value
 
     let internal rand = System.Random () 
+
     ///given mean  and standardDeviation returns a random value from this Gaussian distribution
     ///if mean is 0 and stDev is 1 then 99% of values are  are within -2.3 to +2.3 ; 70% within -1 to +1
     let randomStandardDeviation mean standardDeviation =
@@ -68,20 +75,22 @@ module UtilMath =
     ///Compares two floating point numbers to be within a tolerance for equality
     let inline areSame absoluteTolerance a (b:float)  = 
         abs(a-b) < absoluteTolerance
+    
+    ///Shadowing the built in acos operator to include claming if values are slightly above -1 or 1.
+    ///This is useful on  dot product from unit vectors
+    let acos x =
+        if x < -1.00001 then failwithf "acos failed on %g" x
+        if x >  1.00001 then failwithf "acos failed on %g" x
+        else x |> clamp -1. 1. |> acos 
 
-
-    ///converts Angels from Degrees to Radians
+    ///Converts Angels from Degrees to Radians
     let inline toRadians degrees = 0.0174532925199433 * degrees // 0.0174532925199433 = Math.PI / 180. 
 
-    ///converts Angels from Radians to Degrees
+    ///Converts Angels from Radians to Degrees
     let inline toDegrees radians = 57.2957795130823 * radians // 57.2957795130823 = 180. / Math.PI
 
     let inline interpolate start ende (rel:float) = start + ( (ende-start) * rel )
 
-    ///* min -> max -> value -> clamped value.  to make sure a value is within a given range
-    let inline clamp min max value = 
-        if max<min then failwithf "*** Math.clamp: max %A must be bigger than min %A" max min
-        if value>max then max elif value<min then min else value
 
     ///Given the min and max value and a test value,  (val-min) / (max-min)
     ///Returns the relative  position  of the test value between min (= 0.0) and (max = 1.0),

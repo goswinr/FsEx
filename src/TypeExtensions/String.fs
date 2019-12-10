@@ -2,6 +2,7 @@ namespace FsEx
 
 open System
 open System.Runtime.CompilerServices
+open FsEx.SaveIgnore
 
 [<AutoOpen>]
 module TypeExtensionsString =   
