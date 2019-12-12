@@ -11,12 +11,20 @@ module UtilMath =
     
     ///First tries to parses english float (period as decimal separator),
     ///if this fails tries to parse german floats,(comma as decimal separator)
-    let parseFloatEnDe (x:string) =
+    let tryParseFloatEnDe (x:string) : float option=
         match Double.TryParse(x, NumberStyles.Float, enUs) with
-        | true, f -> f
+        | true, f -> Some f
         | _ ->  match Double.TryParse(x, NumberStyles.Any, deAt) with
-                | true, f -> f
-                | _ -> failwithf "Could not parse '%s' into a floating point number using englisch and german culture settings" x
+                | true, f -> Some f
+                | _ -> None
+    
+    ///First tries to parses english float (period as decimal separator),
+    ///if this fails tries to parse german floats,(comma as decimal separator)
+    let parseFloatEnDe (x:string) : float =
+        match tryParseFloatEnDe x  with
+        | Some f -> f
+        | None ->   failwithf "Could not parse '%s' into a floating point number using englisch and german culture settings" x
+
         
     ///Get Float from any input. This helper enables more generic code in parsing sequences
     let inline floatOfObj (o:^T) = 
