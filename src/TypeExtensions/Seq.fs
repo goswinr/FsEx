@@ -135,7 +135,16 @@ module Seq =
                 prev := e.Current
         else
             failwith "skipLast: Empty Input Sequence"}
-
+    
+    ///splits seq in two, like filter but returning the others too
+    let splitBy filter (xs:seq<_>) =  
+        let t=ResizeArray()
+        let f=ResizeArray()
+        for x in xs do
+            if filter x then t.Add(x)
+            else             f.Add(x)
+        t,f
+                
 
     ///Yields looped Seq of (this, next) from (first, second)  upto (last, first)
     ///The length of the resulting seq is the same as the input seq.
