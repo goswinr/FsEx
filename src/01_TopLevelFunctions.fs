@@ -10,6 +10,7 @@ type EXT = Runtime.CompilerServices.ExtensionAttribute
 [<AutoOpen>]
 module  Util = 
     let fail() = failwith "Generic fail (inner exception should show more helpful message)"   
+    let failIfFalse msg x = if not x then failwithf "failIfFalse: %s " msg 
 
     let inline notNull (value :'T) = match value with | null -> false  | _ -> true// Fsharp core does it like this too. dont use Obejct.RefrenceEquals
     
