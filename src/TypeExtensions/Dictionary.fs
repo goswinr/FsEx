@@ -2,14 +2,15 @@
 
 open System
 open System.Runtime.CompilerServices
+open System.Collections.Generic
 
-type dict<'K,'V> = Collections.Generic.Dictionary<'K,'V> // type alias
+type dict<'K,'V> = Dictionary<'K,'V> // type alias
 
 [<AutoOpen>]
-module TypeExtensionsCollections =   
+module TypeExtensionsDictionary =   
 
     //[<Extension>] //Error 3246
-    type Collections.Generic.Dictionary<'K,'V> with           
+    type IDictionary<'K,'V> with           
         
         [<Extension>]
         member inline  d.SetValue k v =
@@ -31,4 +32,12 @@ module TypeExtensionsCollections =
         member inline d.Items =
             seq { for KeyValue(k, v) in d -> k, v}
 
- 
+/// static functions on IDictionary Interface
+module Dict = 
+    
+    let get (k:'K) (d:IDictionary<'K,'V>) : 'V = 
+        let ok, v = d.TryGetValue(k)
+        if ok then  v
+        else failwithf "Dict.get faild to find key %A in %A of %d items" k d d.Count
+    
+    
