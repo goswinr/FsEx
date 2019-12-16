@@ -53,6 +53,7 @@ module String =
         if start = -1 then s
         else s.Substring(0, start )
 
+
     
     ///split string, Remove Empty Entries
     ///like: string.Split([| spliter |], StringSplitOptions.RemoveEmptyEntries)
@@ -118,3 +119,20 @@ module String =
         if s="" || Char.IsLower s.[0] then s 
         elif Char.IsLetter s.[0] then  Char.ToLower(s.[0]).ToString() + s.Substring(1) 
         else s
+    
+    ///Allows for negative indices too.
+    let slice startIdx endIdx (s:string) =
+        let count = s.Length
+        let st  = if startIdx<0 then count+startIdx    else startIdx
+        let len = if endIdx<0   then count+endIdx-st+1 else endIdx-st+1    
+        if st < 0 || st > count-1 then 
+            let err = sprintf "String.slice: Start index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
+            raise (IndexOutOfRangeException(err))    
+        if st+len > count then 
+            let err = sprintf "String.slice: End index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
+            raise (IndexOutOfRangeException(err))         
+        if len < 0 then
+            let en = if endIdx<0 then count+endIdx else endIdx
+            let err = sprintf "String.slice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for String '%s' of %d items" startIdx st endIdx en s count
+            raise (IndexOutOfRangeException(err))         
+        s.Substring(st,len) 
