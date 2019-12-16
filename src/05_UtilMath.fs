@@ -81,7 +81,7 @@ module UtilMath =
         abs(a-b) < relativeTolerance*mi
     
     ///Compares two floating point numbers to be within a tolerance for equality
-    let inline areSame absoluteTolerance a (b:float)  = 
+    let inline areSame absoluteTolerance (a:float) (b:float)  = 
         abs(a-b) < absoluteTolerance
     
     ///Shadowing the built in acos operator to include claming if values are slightly above -1 or 1.
@@ -159,6 +159,22 @@ module UtilMath =
     ///NumericSteping:Converts floats to floats within defined float step sizes, (always rounding down like the int function)
     let inline stepedFloat (prec:float) (v:float) : float = float (int (v / prec)) * prec
     
+    ///This float range function ensures that the end is always included
+    /// because [0.0 .. 0.1 .. 0.2 ] equals [0.0 .. 0.1 .. 0.3 ]
+    /// it increases the stop value by the smallest step possible 5 times
+    let floatRange (start, step, stop) =
+        if step = 0.0 then  failwithf "UtilMath.floatRange:stepsize cannot be zero: start: %g step: %g stop: %g " start step stop
+        let range = stop - start 
+                    |> BitConverter.DoubleToInt64Bits 
+                    |> (+) 5L 
+                    |> BitConverter.Int64BitsToDouble
+        let steps = range/step
+        if steps < 0.0 then failwithf "UtilMath.floatRange:stop value cannot be reached: start: %g step: %g stop: %g " start step stop
+        let rec frange (start, i, steps) =
+            seq { if i <= steps then 
+                    yield start + i*step
+                    yield! frange (start, (i + 1.0), steps) }
+        frange (start, 0.0, steps)   
 
         
 
