@@ -14,10 +14,14 @@ module TypeExtensionsResizeArray =
     //[<Extension>] //Error 3246
     type Collections.Generic.List<'T>  with        
         [<Extension>]
-        member inline this.LastIndex = this.Count - 1
+        member inline this.LastIndex = 
+            if this.Count = 0 then failwithf "this.LastIndex: Cannot get LastIndex of empty List"
+            this.Count - 1
 
         [<Extension>]
-        member inline this.Last = this.[this.Count - 1]
+        member inline this.Last = 
+            if this.Count = 0 then failwithf "this.Last: Cannot get Last item of empty List"
+            this.[this.Count - 1]
 
         [<Extension>] 
         ///Allows for negtive slice index too ( -1 = last element), 
@@ -44,11 +48,16 @@ module TypeExtensionsResizeArray =
         
         [<Extension>] 
         ///Allows for negtive index too (like Python)
-        member this.GetItem index = if index<0 then this.[this.Count+index]   else this.[index]
+        member this.GetItem index = 
+            let i = negIdx index this.Count
+            this.[i]
         
         [<Extension>] 
         ///Allows for negtive index too (like Python)
-        member this.SetItem index value = if index<0 then this.[this.Count+index]<-value   else this.[index]<-value 
+        member this.SetItem index value = 
+            let i = negIdx index this.Count
+            this.[i] <- value 
+        
 
 
 ///Generic operations on the type System.Collections.Generic.List, which is called ResizeArray in the F# libraries.

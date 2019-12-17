@@ -12,19 +12,27 @@ module TypeExtensionsArray =
         
         /// like this.Length - 1
         [<Extension>]
-        member inline this.LastIndex = this.Length - 1
+        member inline this.LastIndex = 
+            if this.Length = 0 then failwithf "this.LastIndex: Cannot get LastIndex of empty Array"
+            this.Length - 1
 
         /// last item in Array
         [<Extension>]
-        member inline this.Last = this.[this.Length - 1]
+        member inline this.Last = 
+            if this.Length = 0 then failwithf "this.Last: Cannot get Last item of empty Array"
+            this.[this.Length - 1]
     
         [<Extension>] 
         ///Allows for negtive index too (like Python)
-        member this.GetItem index = if index<0 then this.[this.Length+index]   else this.[index]
+        member this.GetItem index = 
+            let i = negIdx index this.Length
+            this.[i]
     
         [<Extension>] 
         ///Allows for negtive index too (like Python)
-        member this.SetItem index value = if index<0 then this.[this.Length+index]<-value   else this.[index]<-value 
+        member this.SetItem index value = 
+            let i = negIdx index this.Length
+            this.[i] <- value 
 
         //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfurtrunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164                
 

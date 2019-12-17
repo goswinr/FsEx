@@ -43,7 +43,7 @@ module  Util =
     /// e.g.: -1 is  last item .
     let inline negIdx i len =
         let ii =  if i<0 then len+i else i
-        if ii<0 || ii >= len then failwithf "Cannot get index %d of seq, array or IList with %d items" i len
+        if ii<0 || ii >= len then failwithf "Cannot get (or set) index %d of %d items in array, List, string or seq." i len
         ii
     
     ///If condition is true return f(x) else just x

@@ -10,14 +10,21 @@ module TypeExtensionsString =
     //[<Extension>] //Error 3246
     type System.String with
         [<Extension>]
-        member inline s.Last = s.[s.Length - 1] 
+        member inline s.Last = 
+            if s.Length = 0 then failwithf "this.Last: Cannot get Last item of empty String"
+            s.[s.Length - 1] 
         
         [<Extension>]
-        member s.LastX i = s.Substring(s.Length-i,i) 
+        /// get last x characters of string
+        member s.LastX x = 
+            if s.Length < x then failwithf "this.LastX: Cannot get last %d item of empty String" x
+            s.Substring(s.Length-x,x) 
         
         ///Allows for negtive index too (like Python)
         [<Extension>]         
-        member this.GetItem index = if index<0 then this.[this.Length+index]   else this.[index]          
+        member this.GetItem index =
+            let i = negIdx index this.Length
+            this.[i]       
         
         //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfurtrunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
 
