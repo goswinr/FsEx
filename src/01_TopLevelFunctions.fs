@@ -14,6 +14,8 @@ module  Util =
 
     let inline notNull (value :'T) = match value with | null -> false  | _ -> true// Fsharp core does it like this too. dont use Obejct.RefrenceEquals
     
+    let inline ifNullFail (msg:string) (value :'T) = match value with | null -> failwithf " -*null*- in %s" msg  | _ -> ()
+
     ///Returns the value on the left unless it is null, then it returns the value on the right.
     let inline (|?) a b = if Object.ReferenceEquals(a, null) then b else a
     //let inline (|?) (a:'T) (b:'T)  = match a with | null -> b  | _ -> a // if Object.ReferenceEquals(a, null) then b else a // or make generic using match ?  // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs
