@@ -58,6 +58,13 @@ module TypeExtensionsResizeArray =
             let i = negIdx index this.Count
             this.[i] <- value 
         
+        [<Extension>] 
+        ///Get and remove last item 
+        member  this.Pop()  =
+            let i = this.Count - 1
+            let v = this.[i]
+            this.RemoveAt(i)
+            v
 
 
 ///Generic operations on the type System.Collections.Generic.List, which is called ResizeArray in the F# libraries.
