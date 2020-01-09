@@ -4,7 +4,7 @@ open FsEx.SaveIgnore
 
 [<AutoOpen>]
 module MaybeBuilder =    
-    
+
     /// The maybe monad. 
     type MaybeBuilder() =
         // from https://github.com/fsprojects/FSharpx.Extras/blob/master/src/FSharpx.Extras/ComputationExpressions/Option.fs
@@ -74,24 +74,24 @@ module StringBufferBuilder =
                 for s in strings do 
                     Printf.bprintf b "%s%s" s Environment.NewLine         
         
-        member _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
+        member inline _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
         
-        member _.Delay f = fun (b: StringBuilder) -> (f()) b
+        member inline _.Delay f = fun (b: StringBuilder) -> (f()) b
         
-        member _.Zero () = ignoreObj
+        member inline _.Zero () = ignoreObj
         
-        member _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) =
+        member inline _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) =
             fun (b: StringBuilder) ->
                 use e = xs.GetEnumerator ()
                 while e.MoveNext() do
                     (f e.Current) b
         
-        member _.While (p: unit -> bool, f: StringBuilder -> unit) =
+        member inline _.While (p: unit -> bool, f: StringBuilder -> unit) =
             fun (b: StringBuilder) -> 
                 while p () do 
                     f b
             
-        member _.Run (f: StringBuilder -> unit) =
+        member inline _.Run (f: StringBuilder -> unit) =
             let b = StringBuilder()
             do f b
             b.ToString()
@@ -114,24 +114,24 @@ module ResizeArrayBuilder =
         member inline _.YieldFrom (xs: #seq<'T>) =
             fun (r: ResizeArray<'T>) -> r.AddRange(xs) 
         
-        member _.Combine (f, g) = 
+        member inline _.Combine (f, g) = 
             fun (r: ResizeArray<'T>) -> f r; g r
         
-        member _.Delay f = 
+        member inline _.Delay f = 
             fun (r: ResizeArray<'T>) -> (f()) r
         
-        member _.Zero () =  ignoreObj
+        member inline _.Zero () =  ignoreObj
         
-        member _.For (xs: 'U seq, f: 'U -> ResizeArray<'T> -> unit) =
+        member inline _.For (xs: 'U seq, f: 'U -> ResizeArray<'T> -> unit) =
             fun (r: ResizeArray<'T>) ->
                 use e = xs.GetEnumerator()
                 while e.MoveNext() do
                     (f e.Current) r
         
-        member _.While (p: unit -> bool, f: ResizeArray<'T> -> unit) =
+        member inline _.While (p: unit -> bool, f: ResizeArray<'T> -> unit) =
             fun (r: ResizeArray<'T>) -> while p () do  f r
             
-        member _.Run (f: ResizeArray<'T> -> unit) =
+        member inline _.Run (f: ResizeArray<'T> -> unit) =
             let r = ResizeArray<'T>()
             do f r
             r  
