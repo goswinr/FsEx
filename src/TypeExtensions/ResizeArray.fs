@@ -12,16 +12,44 @@ module TypeExtensionsResizeArray =
 
 
     //[<Extension>] //Error 3246
-    type Collections.Generic.List<'T>  with        
+    type Collections.Generic.List<'T>  with 
+    
         [<Extension>]
         member inline this.LastIndex = 
-            if this.Count = 0 then failwithf "this.LastIndex: Cannot get LastIndex of empty List"
+            if this.Count = 0 then failwithf "this.LastIndex: Can not get LastIndex of empty List"
             this.Count - 1
 
         [<Extension>]
         member inline this.Last = 
-            if this.Count = 0 then failwithf "this.Last: Cannot get Last item of empty List"
+            if this.Count = 0 then failwithf "this.Last: Can not get Last item of empty List"
             this.[this.Count - 1]
+        
+        [<Extension>]
+        member inline this.SecondLast = 
+            if this.Count < 2 then failwithf "this.SecondLast: Can not get SecondLast item of %s"  (NiceString.toNiceStringFull this)
+            this.[this.Count - 2]
+
+        [<Extension>]
+        member inline this.ThirdLast = 
+            if this.Count < 3 then failwithf "this.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
+            this.[this.Count - 3]
+
+        
+        [<Extension>]
+        member inline this.First = 
+            if this.Count = 0 then failwithf "this.First: Can not get First item of empty List"
+            this.[0]
+
+        [<Extension>]
+        member inline this.Second = 
+            if this.Count < 2 then failwithf "this.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
+            this.[1]
+
+        [<Extension>]
+        member inline this.Third = 
+            if this.Count < 3 then failwithf "this.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
+            this.[2]
+
 
         [<Extension>] 
         ///Allows for negtive slice index too ( -1 = last element), 
@@ -65,6 +93,11 @@ module TypeExtensionsResizeArray =
             let v = this.[i]
             this.RemoveAt(i)
             v
+        
+        [<Extension>]  
+        ///A property like the ToString() method, 
+        ///But with richer formationg for collections
+        member this.ToNiceString = NiceString.toNiceString this
 
 
 ///Generic operations on the type System.Collections.Generic.List, which is called ResizeArray in the F# libraries.

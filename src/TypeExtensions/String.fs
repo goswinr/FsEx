@@ -9,28 +9,62 @@ module TypeExtensionsString =
     
     //[<Extension>] //Error 3246
     type System.String with
+        
+        /// like this.Length - 1
+        [<Extension>]
+        member inline this.LastIndex = 
+            if this.Length = 0 then failwithf "this.LastIndex: Cannot get LastIndex of empty String"
+            this.Length - 1
+        
+        
         [<Extension>]
         member inline s.Last = 
             if s.Length = 0 then failwithf "this.Last: Cannot get Last item of empty String"
-            s.[s.Length - 1] 
-        
+            s.[s.Length - 1]  
+
+        [<Extension>]
+        member inline this.SecondLast = 
+            if this.Length < 2 then failwithf "this.SecondLast: Can not get SecondLast item of '%s'" this
+            this.[this.Length - 2]
+
+        [<Extension>]
+        member inline this.ThirdLast = 
+            if this.Length < 3 then failwithf "this.ThirdLast: Can not get ThirdLast item of '%s'" this
+            this.[this.Length - 3]
+
         [<Extension>]
         /// get last x characters of string
         member s.LastX x = 
-            if s.Length < x then failwithf "this.LastX: Cannot get last %d item of empty String" x
+            if s.Length < x then failwithf "this.LastX: Cannot get last %d item of too short String '%s' " x s
             s.Substring(s.Length-x,x) 
+            
+        [<Extension>]
+        member inline this.First = 
+            if this.Length = 0 then failwithf "this.First: Can not get First item of empty String"
+            this.[0]
+
+        [<Extension>]
+        member inline this.Second = 
+            if this.Length < 2 then failwithf "this.Second: Can not get Second item of '%s'" this
+            this.[1]
+
+        [<Extension>]
+        member inline this.Third = 
+            if this.Length < 3 then failwithf "this.Third: Can not get Third item of '%s'" this
+            this.[2]
         
+        [<Extension>] 
         ///Allows for negtive index too (like Python)
-        [<Extension>]         
-        member this.GetItem index =
+        member this.GetItem index = 
             let i = negIdx index this.Length
-            this.[i]       
+            this.[i]
+    
         
         //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfurtrunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
 
         ///Allows for negative indices too.
         [<Extension>]
-        member s.Slice(startIdx,endIdx) =
+        member s.Slice(startIdx:int , endIdx:int):string =
             let count = s.Length
             let st  = if startIdx<0 then count+startIdx else startIdx
             let len = if endIdx<0 then count+endIdx-st+1 else endIdx-st+1
@@ -45,7 +79,7 @@ module TypeExtensionsString =
             
             if len < 0 then
                 let en = if endIdx<0 then count+endIdx else endIdx
-                let err = sprintf "GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for String '%s' of %d items" startIdx st endIdx en s count
+                let err = sprintf "GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for String '%s' of %d chars" startIdx st endIdx en s count
                 raise (IndexOutOfRangeException(err)) 
             
             s.Substring(st,len) 

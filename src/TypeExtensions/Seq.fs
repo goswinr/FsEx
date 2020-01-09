@@ -40,21 +40,59 @@ module TypeExtensionsSeq =
 
     //[<Extension>] //Error 3246
     type Collections.Generic.IEnumerable<'T>  with 
-
+        
         /// Like Seq.length - 1
-        [<Extension>]
-        member this.LastIndex = (Seq.length this) - 1
-
+        member this.LastIndex = 
+            if Seq.isEmpty this then failwithf "this.LastIndex: Can not get LastIndex of empty Seq"
+            (Seq.length this) - 1
+        
         /// Last item in Seq
         [<Extension>]
-        member this.Last = fastLast this    
+        member this.Last = 
+            fastLast this
+
+        //[<Extension>] member inline this.SecondLast = 
+
+        //[<Extension>] member inline this.ThirdLast = 
+
+        [<Extension>]
+        member this.First = 
+            if Seq.isEmpty this then failwithf "this.First: Can not get LastIndex of empty Seq"
+            Seq.head this
+
+        [<Extension>]
+        member this.Second = 
+            try 
+                this|> Seq.skip 1 |> Seq.head
+            with _ ->
+                failwithf "this.Second: Can not get Second item of %s" (NiceString.toNiceStringFull this)
+
+
+        [<Extension>]
+        member this.Third = 
+            try 
+                this|> Seq.skip 2 |> Seq.head
+            with _ ->
+                failwithf "this.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
+            
+
+        
+        [<Extension>] 
+        ///Allows for negtive index too (like Python)
+        member this.GetItem index =             
+            let i = if index < 0 then Seq.length this + index        else index
+            try 
+                this|> Seq.skip i |> Seq.head
+            with _ ->
+                failwithf "seq.GetItem(%d): Can not get %dth item of %s"  index i (NiceString.toNiceStringFull this)
+
 
         ///Allows for negative indices too, like Python, -1 is the last element.
         [<Extension>] 
-        member this.Item 
+        member this.GetItem  // don't overload item getter .Item directly, this would be a casting horror for Lists and arrays wher neg indices dont work
             with get i   = 
                 match this with
-                | :? ('T IList)         as xs -> xs.[negIdx i xs.Count] //covers Array too
+                | :? ('T IList)         as xs -> xs.[negIdx i xs.Count] //covers Array too ?? TODO check
                 | :? ('T list)          as xs -> 
                     try
                         if i<0 then List.item ((List.length xs)+i) xs
@@ -77,14 +115,14 @@ module TypeExtensionsSeq =
         ///Allows for negative indices too, like Python, -1 is the last element.
         ///The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
         [<Extension>]
-        member this.GetSlice(startIdx,endIdx) : 'T seq = // to use slicing notation e.g. : xs.[ 1 .. -2]
+        member this.Slice(startIdx:int , endIdx: int) : 'T seq = // don't overload .GetSlice .[ x ... y] directly, this would be a casting horror for Lists and arrays wher neg indices dont work
             let count = lazy(Seq.length this)
-            let st  = match startIdx with None -> 0              | Some i -> if i<0 then count.Value+i      else i
-            let len = match endIdx   with None -> count.Value-st | Some i -> if i<0 then count.Value+i-st+1 else i-st+1
+            let st  = if startIdx< 0 then count.Value + startIdx        else startIdx
+            let len = if endIdx  < 0 then count.Value + endIdx - st + 1 else endIdx - st + 1
             try 
                 this|> Seq.skip st |> Seq.take len
             with _ ->
-                let en =  match endIdx  with None -> count.Value-1 | Some i -> if i<0 then count.Value+i else i
+                let en =  if endIdx < 0 then count.Value + endIdx else endIdx
                 let err = sprintf "GetSlice: Start index '%A' (= %d) and end index '%A'(= %d) for Seq of %d items failed" startIdx st endIdx en  count.Value
                 raise (IndexOutOfRangeException(err))
         
