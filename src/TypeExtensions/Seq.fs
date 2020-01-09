@@ -75,7 +75,6 @@ module TypeExtensionsSeq =
             with _ ->
                 failwithf "this.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
             
-
         
         [<Extension>] 
         ///Allows for negtive index too (like Python)

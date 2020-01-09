@@ -9,15 +9,16 @@ type EXT = Runtime.CompilerServices.ExtensionAttribute
 
 [<AutoOpen>]
 module  Util = 
-    let fail() = failwith "Generic fail (inner exception should show more helpful message)"   
+    let fail() = failwith "Quick fail (inner exception should show more helpful message)"   
     let failIfFalse msg x = if not x then failwithf "failIfFalse: %s " msg 
 
-    let inline notNull (value :'T) = match value with | null -> false  | _ -> true// Fsharp core does it like this too. dont use Obejct.RefrenceEquals
+    let inline notNull (value :'T when 'T: null) = match value with | null -> false  | _ -> true // Fsharp core does it like this too. don't use Obejct.RefrenceEquals (because of Generics)
     
     let inline ifNullFail (msg:string) (value :'T) = match value with | null -> failwithf " -*null*- in %s" msg  | _ -> ()
 
     ///Returns the value on the left unless it is null, then it returns the value on the right.
     let inline (|?) a b = if Object.ReferenceEquals(a, null) then b else a
+    
     //let inline (|?) (a:'T) (b:'T)  = match a with | null -> b  | _ -> a // if Object.ReferenceEquals(a, null) then b else a // or make generic using match ?  // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs
 
     ///Apply function, like |> , but ignore result. 
@@ -26,8 +27,10 @@ module  Util =
 
     ///Get first element of Triple (Tuple of three elements)
     let inline t1 (a,_,_) = a
+
     ///Get second element of Triple (Tuple of three elements)
     let inline t2 (_,b,_) = b
+
     ///Get third element of Triple (Tuple of three elements)
     let inline t3 (_,_,c) = c    
 
@@ -45,28 +48,32 @@ module  Util =
     /// e.g.: -1 is  last item .
     let inline negIdx i len =
         let ii =  if i<0 then len+i else i
-        if ii<0 || ii >= len then failwithf "Cannot get (or set) index %d of %d items in array, List, string or seq." i len
+        if ii<0 || ii >= len then failwithf "Util.negIdx: Cannot find right index for %d (for items count %d)" i len
         ii
     
     ///If condition is true return f(x) else just x
     let inline ifDo condition (f:'T->'T)  (x:'T) = if condition then f x else x
 
 
-///Shadows the ignore function to only accept sturucts
+///Shadows the ignore function to only accept structs
 ///This is to prevent accidetially ignoring partially aplied functions that would return struct
 module SaveIgnore = 
     
     ///This ignore only work on Value types, 
     ///Objects and functions need to be ignored with ignoreObj
     ///This is to prevent accidetially ignoring partially aplied functions that would return struct
-    let inline ignore (x:'T when ' T:struct)=()
+    let inline ignore (x:'T when 'T: struct)=()
 
     /// Ignores any object (and struct)
     /// For structs use 'ignore'
     let inline ignoreObj (x:obj)=()
 
-
+///Functions and operator !++ to deal with integer ref objects
 module IntRef = 
+
+    ///Increment ref cell and return new incremented integer value
+    let inline (!++)  i = incr i; !i 
+
     let inline incr2 i = i := !i+2
     let inline incr3 i = i := !i+3
     let inline incr4 i = i := !i+4
@@ -81,8 +88,7 @@ module IntRef =
     let inline decr5 i = i := !i-5
     let inline decrBy i x = i := !i - x
     let inline decrByR x i = i := !i - x                
-    ///Increment ref cell and return new incremented integer value
-    let inline (!++)  i = incr i; !i 
+    
     let inline setMax i x = if x > !i then i := x
     let inline setMin i x = if x < !i then i := x
 

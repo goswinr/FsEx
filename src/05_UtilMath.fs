@@ -50,7 +50,7 @@ module UtilMath =
     
     ///Gives a float from int / int division
     ///<c>(float(i)) / (float(j))</c> 
-    let inline ( /. ) (i:int) (j:int) = (float(i)) / (float(j)) // or do it like this:https://stackoverflow.com/questions/2812084/overload-operator-in-f/2812306#2812306
+    let inline ( ./. ) (i:int) (j:int) = (float(i)) / (float(j)) // or do it like this:https://stackoverflow.com/questions/2812084/overload-operator-in-f/2812306#2812306
 
     
     ///Test is a floating point value is Infinity or Not a Number
@@ -84,12 +84,12 @@ module UtilMath =
     let inline areSame absoluteTolerance (a:float) (b:float)  = 
         abs(a-b) < absoluteTolerance
     
-    ///Shadowing the built in acos operator to include claming if values are slightly above -1 or 1.
-    ///This is useful on  dot product from unit vectors
+    ///Shadows the built in acos function to include clamping if values are slightly above -1.0 or 1.0
+    ///This is useful on dot products from unit vectors
     let acos x =
         if x < -1.00001 then failwithf "acos failed on %g" x
         if x >  1.00001 then failwithf "acos failed on %g" x
-        else x |> clamp -1. 1. |> acos 
+        else x |> clamp -1.0 1.0 |> System.Math.Acos
 
     ///Converts Angels from Degrees to Radians
     let inline toRadians degrees = 0.0174532925199433 * degrees // 0.0174532925199433 = Math.PI / 180. 
