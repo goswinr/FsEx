@@ -13,39 +13,39 @@ module TypeExtensionsArray =
         /// like this.Length - 1
         [<Extension>]
         member inline this.LastIndex = 
-            if this.Length = 0 then failwithf "this.LastIndex: Cannot get LastIndex of empty Array"
+            if this.Length = 0 then failwithf "array.LastIndex: Cannot get LastIndex of empty Array"
             this.Length - 1
        
         /// last item in Array
         [<Extension>]
         member inline this.Last = 
-            if this.Length = 0 then failwithf "this.Last: Cannot get Last item of empty Array"
+            if this.Length = 0 then failwithf "array.Last: Cannot get Last item of empty Array"
             this.[this.Length - 1]
 
         [<Extension>]
         member inline this.SecondLast = 
-            if this.Length < 2 then failwithf "this.SecondLast: Can not get SecondLast item of %s"  (NiceString.toNiceStringFull this)
+            if this.Length < 2 then failwithf "array.SecondLast: Can not get SecondLast item of %s"  (NiceString.toNiceStringFull this)
             this.[this.Length - 2]
 
         [<Extension>]
         member inline this.ThirdLast = 
-            if this.Length < 3 then failwithf "this.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
+            if this.Length < 3 then failwithf "array.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
             this.[this.Length - 3]
 
             
         [<Extension>]
         member inline this.First = 
-            if this.Length = 0 then failwithf "this.First: Can not get First item of empty Array"
+            if this.Length = 0 then failwithf "array.First: Can not get First item of empty Array"
             this.[0]
 
         [<Extension>]
         member inline this.Second = 
-            if this.Length < 2 then failwithf "this.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
+            if this.Length < 2 then failwithf "array.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
             this.[1]
 
         [<Extension>]
         member inline this.Third = 
-            if this.Length < 3 then failwithf "this.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
+            if this.Length < 3 then failwithf "array.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
             this.[2]
         
         [<Extension>] 
@@ -71,16 +71,16 @@ module TypeExtensionsArray =
             let len = if endIdx  < 0 then count + endIdx - st + 1 else endIdx - st + 1
 
             if st < 0 || st > count - 1 then 
-                let err = sprintf "Slice: Start index %d is out of range. Allowed values are -%d upto %d for Array of %d items" startIdx count (count-1)  count
+                let err = sprintf "array.Slice: Start index %d is out of range. Allowed values are -%d upto %d for Array of %d items" startIdx count (count-1)  count
                 raise (IndexOutOfRangeException(err))
 
             if st+len > count then 
-                let err = sprintf "Slice: End index %d is out of range. Allowed values are -%d upto %d for Array of %d items" startIdx count (count-1)  count
+                let err = sprintf "array.Slice: End index %d is out of range. Allowed values are -%d upto %d for Array of %d items" startIdx count (count-1)  count
                 raise (IndexOutOfRangeException(err)) 
         
             if len < 0 then
                 let en = if endIdx<0 then count+endIdx else endIdx
-                let err = sprintf "Slice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for Array of %d items" startIdx st endIdx en  count
+                let err = sprintf "array.Slice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for Array of %d items" startIdx st endIdx en  count
                 raise (IndexOutOfRangeException(err)) 
         
             Array.init len (fun i -> this.[st+i])
