@@ -32,6 +32,11 @@ module TypeExtensionsDictionary =
         [<Extension>] 
         member inline d.Items =
             seq { for KeyValue(k, v) in d -> k, v}
+        
+        [<Extension>]  
+        ///A property like the ToString() method, 
+        ///But with richer formationg for collections
+        member obj.ToNiceString = NiceString.toNiceString obj
 
 /// static functions on IDictionary Interface
 module Dict = 
