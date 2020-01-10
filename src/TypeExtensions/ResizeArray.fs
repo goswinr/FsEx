@@ -16,38 +16,38 @@ module TypeExtensionsResizeArray =
     
         [<Extension>]
         member inline this.LastIndex = 
-            if this.Count = 0 then failwithf "this.LastIndex: Can not get LastIndex of empty List"
+            if this.Count = 0 then failwithf "resizeArray.LastIndex: Can not get LastIndex of empty List"
             this.Count - 1
 
         [<Extension>]
         member inline this.Last = 
-            if this.Count = 0 then failwithf "this.Last: Can not get Last item of empty List"
+            if this.Count = 0 then failwithf "resizeArray.Last: Can not get Last item of empty List"
             this.[this.Count - 1]
         
         [<Extension>]
         member inline this.SecondLast = 
-            if this.Count < 2 then failwithf "this.SecondLast: Can not get SecondLast item of %s"  (NiceString.toNiceStringFull this)
+            if this.Count < 2 then failwithf "resizeArray.SecondLast: Can not get SecondLast item of %s"  (NiceString.toNiceStringFull this)
             this.[this.Count - 2]
 
         [<Extension>]
         member inline this.ThirdLast = 
-            if this.Count < 3 then failwithf "this.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
+            if this.Count < 3 then failwithf "resizeArray.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
             this.[this.Count - 3]
 
         
         [<Extension>]
         member inline this.First = 
-            if this.Count = 0 then failwithf "this.First: Can not get First item of empty List"
+            if this.Count = 0 then failwithf "resizeArray.First: Can not get First item of empty List"
             this.[0]
 
         [<Extension>]
         member inline this.Second = 
-            if this.Count < 2 then failwithf "this.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
+            if this.Count < 2 then failwithf "resizeArray.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
             this.[1]
 
         [<Extension>]
         member inline this.Third = 
-            if this.Count < 3 then failwithf "this.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
+            if this.Count < 3 then failwithf "resizeArray.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
             this.[2]
 
 
@@ -60,16 +60,16 @@ module TypeExtensionsResizeArray =
             let len = match endIdx   with None -> count-st | Some i -> if i<0 then count+i-st+1 else i-st+1
     
             if st < 0 || st > count-1 then 
-                let err = sprintf "GetSlice: Start index %d is out of range. Allowed values are -%d upto %d for List of %d items" startIdx.Value count (count-1) count
+                let err = sprintf "resizeArray.GetSlice: Start index %d is out of range. Allowed values are -%d upto %d for List of %d items" startIdx.Value count (count-1) count
                 raise (IndexOutOfRangeException(err))
     
             if st+len > count then 
-                let err = sprintf "GetSlice: End index %d is out of range. Allowed values are -%d upto %d for List of %d items" endIdx.Value count (count-1) count
+                let err = sprintf "resizeArray.GetSlice: End index %d is out of range. Allowed values are -%d upto %d for List of %d items" endIdx.Value count (count-1) count
                 raise (IndexOutOfRangeException(err)) 
                 
             if len < 0 then
                 let en =  match endIdx  with None -> count-1 | Some i -> if i<0 then count+i else i
-                let err = sprintf "GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for List of %d items" startIdx st endIdx en  count
+                let err = sprintf "resizeArray.GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for List of %d items" startIdx st endIdx en  count
                 raise (IndexOutOfRangeException(err)) 
                 
             this.GetRange(st, len)
@@ -132,11 +132,11 @@ module ResizeArray =
 
     ///Read a range of elements from the first array and write them into the second.
     let blit (arr1: ResizeArray<'T>) start1 (arr2: ResizeArray<'T>) start2 len =
-        if start1 < 0 then invalidArg "start1" "index must be positive"
-        if start2 < 0 then invalidArg "start2" "index must be positive"
-        if len < 0 then invalidArg "len" "length must be positive"
-        if start1 + len > length arr1 then invalidArg "start1" "(start1+len) out of range"
-        if start2 + len > length arr2 then invalidArg "start2" "(start2+len) out of range"
+        if start1 < 0 then invalidArg "ResizeArray: start1" "index must be positive"
+        if start2 < 0 then invalidArg "ResizeArray: start2" "index must be positive"
+        if len < 0 then invalidArg "ResizeArray: len" "length must be positive"
+        if start1 + len > length arr1 then invalidArg "ResizeArray: start1" "(start1+len) out of range"
+        if start2 + len > length arr2 then invalidArg "ResizeArray: start2" "(start2+len) out of range"
         for i = 0 to len - 1 do 
             arr2.[start2+i] <- arr1.[start1 + i]
 
@@ -154,16 +154,16 @@ module ResizeArray =
     ///Build a new array that contains the given subrange specified by
     ///starting index and length.
     let sub (arr: ResizeArray<'T>) start len =
-        if start < 0 then invalidArg "start" "index must be positive"
-        if len < 0 then invalidArg "len" "length must be positive"
-        if start + len > length arr then invalidArg "len" "length must be positive"
+        if start < 0 then invalidArg "ResizeArray: start" "index must be positive"
+        if len < 0 then invalidArg "ResizeArray: len" "length must be positive"
+        if start + len > length arr then invalidArg "ResizeArray: len" "length must be positive"
         arr.GetRange(start, len)
 
     ///Fill a range of the collection with the given element.
     let fill (arr: ResizeArray<'T>) (start: int) (len: int) (x:'T) =
-        if start < 0 then invalidArg "start" "index must be positive"
-        if len < 0 then invalidArg "len" "length must be positive"
-        if start + len > length arr then invalidArg "len" "length must be positive"
+        if start < 0 then invalidArg "ResizeArray: start" "index must be positive"
+        if len < 0 then invalidArg "ResizeArray: len" "length must be positive"
+        if start + len > length arr then invalidArg "ResizeArray: len" "length must be positive"
         for i = start to start + len - 1 do 
             arr.[i] <- x
 
@@ -271,7 +271,7 @@ module ResizeArray =
     let iter2 f (arr1: ResizeArray<'T>) (arr2: ResizeArray<'b>) = 
         let f = FSharpFunc<_,_,_>.Adapt(f)
         let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
+        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
         for i = 0 to len1 - 1 do 
             f.Invoke(arr1.[i], arr2.[i])
 
@@ -281,7 +281,7 @@ module ResizeArray =
     let map2 f (arr1: ResizeArray<'T>) (arr2: ResizeArray<'b>) = 
         let f = FSharpFunc<_,_,_>.Adapt(f)
         let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
+        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
         let res = new ResizeArray<_>(len1)
         for i = 0 to len1 - 1 do
             res.Add(f.Invoke(arr1.[i], arr2.[i]))
@@ -371,7 +371,7 @@ module ResizeArray =
     ///Raise ArgumentException if the arrays have different lengths.
     let exists2 f (arr1: ResizeArray<_>) (arr2: ResizeArray<_>) =
         let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
+        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
         let rec loop i = i < len1 && (f arr1.[i] arr2.[i] || loop (i+1))
         loop 0
 
@@ -406,7 +406,7 @@ module ResizeArray =
     ///then computes <c>f (... (f i0 i1)...) iN</c>. Raises ArgumentException if the array has size zero.
     let reduce f (arr : ResizeArray<_>) =
         let arrn = length arr
-        if arrn = 0 then invalidArg "arr" "the input array may not be empty"
+        if arrn = 0 then invalidArg "ResizeArray: arr" "the input array may not be empty"
         else foldSub f arr.[0] arr 1 (arrn - 1)
 
     ///Apply a function to each element of the array, threading an accumulator argument
@@ -414,7 +414,7 @@ module ResizeArray =
     ///computes <c>f i0 (...(f iN-1 iN))</c>. Raises ArgumentException if the array has size zero.        
     let reduceBack f (arr: ResizeArray<_>) = 
         let arrn = length arr
-        if arrn = 0 then invalidArg "arr" "the input array may not be empty"
+        if arrn = 0 then invalidArg "ResizeArray: arr" "the input array may not be empty"
         else foldBackSub f arr 0 (arrn - 2) arr.[arrn - 1]
 
     ///Apply a function to pairs of elements drawn from the two collections, 
@@ -426,7 +426,7 @@ module ResizeArray =
         let f = FSharpFunc<_,_,_,_>.Adapt(f)
         let mutable res = acc 
         let len = length arr1
-        if len <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
+        if len <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
         for i = 0 to len - 1 do
             res <- f.Invoke(res, arr1.[i],arr2.[i])
         res
@@ -439,7 +439,7 @@ module ResizeArray =
         let f = FSharpFunc<_,_,_,_>.Adapt(f)
         let mutable res = acc 
         let len = length arr1
-        if len <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
+        if len <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
         for i = len - 1 downto 0 do 
             res <- f.Invoke(arr1.[i],arr2.[i],res)
         res
@@ -448,7 +448,7 @@ module ResizeArray =
     ///Raise <c>ArgumentException</c> if the arrays have different lengths.
     let forall2 f (arr1: ResizeArray<_>) (arr2: ResizeArray<_>) = 
         let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
+        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
         let rec loop i = i >= len1 || (f arr1.[i] arr2.[i] && loop (i+1))
         loop 0
 
@@ -461,7 +461,7 @@ module ResizeArray =
     let iteri2 f (arr1: ResizeArray<'T>) (arr2: ResizeArray<'b>) =
         let f = FSharpFunc<_,_,_,_>.Adapt(f)
         let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
+        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
         for i = 0 to len1 - 1 do 
             f.Invoke(i, arr1.[i], arr2.[i])
 
@@ -472,7 +472,7 @@ module ResizeArray =
     let mapi2 (f: int -> 'T -> 'U -> 'c) (arr1: ResizeArray<'T>) (arr2: ResizeArray<'U>) = 
         let f = FSharpFunc<_,_,_,_>.Adapt(f)
         let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "arr2" "the arrays have different lengths"
+        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
         init len1 (fun i -> f.Invoke(i, arr1.[i], arr2.[i]))
 
     let private scanBackSub f (arr: ResizeArray<'T>) start fin acc = 
@@ -525,7 +525,7 @@ module ResizeArray =
     ///otherwise an <c>ArgumentException</c> is raised..
     let zip (arr1: ResizeArray<_>) (arr2: ResizeArray<_>) = 
         let len1 = length arr1 
-        if len1 <> length arr2 then invalidArg "arr2" "the Lists have different lengths"
+        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the Lists have different lengths"
         init len1 (fun i -> arr1.[i], arr2.[i])
 
     ///Split an array of pairs into two arrays.
