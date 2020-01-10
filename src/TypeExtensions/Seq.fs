@@ -43,7 +43,7 @@ module TypeExtensionsSeq =
         
         /// Like Seq.length - 1
         member this.LastIndex = 
-            if Seq.isEmpty this then failwithf "this.LastIndex: Can not get LastIndex of empty Seq"
+            if Seq.isEmpty this then failwithf "seq.LastIndex: Can not get LastIndex of empty Seq"
             (Seq.length this) - 1
         
         /// Last item in Seq
@@ -57,24 +57,24 @@ module TypeExtensionsSeq =
 
         [<Extension>]
         member this.First = 
-            if Seq.isEmpty this then failwithf "this.First: Can not get LastIndex of empty Seq"
+            if Seq.isEmpty this then failwithf "seq.First: Can not get LastIndex of empty Seq"
             Seq.head this
 
         [<Extension>]
         member this.Second = 
             try 
                 this|> Seq.skip 1 |> Seq.head
-            with _ ->
-                failwithf "this.Second: Can not get Second item of %s" (NiceString.toNiceStringFull this)
-
+            with 
+            | :? InvalidOperationException  as ex -> failwithf "seq.Second: Can not get Second item of %s : %s"  (NiceString.toNiceStringFull this) ex.Message
+            | ex -> raise ex  //some other error raised while constructing lazy seq          
 
         [<Extension>]
         member this.Third = 
             try 
                 this|> Seq.skip 2 |> Seq.head
-            with _ ->
-                failwithf "this.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
-            
+            with 
+            | :? InvalidOperationException  as ex -> failwithf "seq.Third: Can not get Third item of %s : %s"  (NiceString.toNiceStringFull this) ex.Message
+            | ex -> raise ex   //some other error raised while constructing lazy seq         
         
         [<Extension>] 
         ///Allows for negtive index too (like Python)
@@ -82,34 +82,10 @@ module TypeExtensionsSeq =
             let i = if index < 0 then Seq.length this + index        else index
             try 
                 this|> Seq.skip i |> Seq.head
-            with _ ->
-                failwithf "seq.GetItem(%d): Can not get %dth item of %s"  index i (NiceString.toNiceStringFull this)
-
-
-        ///Allows for negative indices too, like Python, -1 is the last element.
-        [<Extension>] 
-        member this.GetItem  // don't overload item getter .Item directly, this would be a casting horror for Lists and arrays wher neg indices dont work
-            with get i   = 
-                match this with
-                | :? ('T IList)         as xs -> xs.[negIdx i xs.Count] //covers Array too ?? TODO check
-                | :? ('T list)          as xs -> 
-                    try
-                        if i<0 then List.item ((List.length xs)+i) xs
-                        else List.item  i xs
-                    with _ -> 
-                        raise (IndexOutOfRangeException(sprintf "Cannot get index %d from F# list of length %d" i (List.length xs)))
-                | _ ->  
-                    try
-                        if i<0 then Seq.item ((Seq.length this)+i) this
-                        else Seq.item  i this
-                    with _ -> 
-                        raise (IndexOutOfRangeException(sprintf "Cannot get index %d from seq of length %d" i (Seq.length this)))
-
-            and  set i (x:'T)  = 
-                match this with // matching need to be inline here otherwise cast from array to IList fails
-                | :? ('T IList)   as xs -> xs.[negIdx i xs.Count] <- x
-                | _ -> failwithf "Cannot set items on this Seq (is it a dict, lazy or immutable ?)"
-
+            with 
+            | :? InvalidOperationException  as ex -> failwithf "seq.GetItem(%d): Can not get %dth item of %s : %s" index i (NiceString.toNiceStringFull this) ex.Message
+            | ex -> raise ex //some other error raised while constructing lazy seq
+                    
         
         ///Allows for negative indices too, like Python, -1 is the last element.
         ///The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
@@ -120,10 +96,12 @@ module TypeExtensionsSeq =
             let len = if endIdx  < 0 then count.Value + endIdx - st + 1 else endIdx - st + 1
             try 
                 this|> Seq.skip st |> Seq.take len
-            with _ ->
+            with 
+            | :? InvalidOperationException  as ex -> 
                 let en =  if endIdx < 0 then count.Value + endIdx else endIdx
-                let err = sprintf "GetSlice: Start index '%A' (= %d) and end index '%A'(= %d) for Seq of %d items failed" startIdx st endIdx en  count.Value
-                raise (IndexOutOfRangeException(err))
+                failwithf "seq.GetSlice: Start index '%A' (= %d) and end index '%A'(= %d) for Seq of %d items failed for %s : %s" startIdx st endIdx en  count.Value (NiceString.toNiceStringFull this) ex.Message
+            | ex -> raise ex //some other error raised while constructing lazy seq
+            
         
         [<Extension>]  
         ///A property like the ToString() method, 
