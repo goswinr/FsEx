@@ -108,7 +108,7 @@ module TypeExtensionsSeq =
         ///But with richer formationg for collections
         member obj.ToNiceString = NiceString.toNiceString obj
             
-
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies (should consider for other extension modules as well)
 module Seq =   
     
     ///Allows for negative indices too, -1 is the last element.
