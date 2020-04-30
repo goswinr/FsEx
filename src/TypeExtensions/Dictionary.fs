@@ -5,7 +5,7 @@ open System.Runtime.CompilerServices
 open System.Collections.Generic
 
 /// A type alias for System.Collections.Generic.Dictionary<'K,'V> 
-type Dict<'K,'V> = Dictionary<'K,'V> // type alias avoids the need to open System.Collections.Generic  if FsEx is open // dont use lowercase "dict"
+type Dict<'K,'V> = Dictionary<'K,'V> // type alias avoids the need to open System.Collections.Generic if FsEx namespace is open // dont use lowercase "dict"
 
 [<AutoOpen>]
 module TypeExtensionsDictionary =   
@@ -13,10 +13,12 @@ module TypeExtensionsDictionary =
     //[<Extension>] //Error 3246
     type IDictionary<'K,'V> with           
         
+        /// Set value at key
         [<Extension>]
         member inline  d.SetValue k v =
             d.[k] <-v        
-       
+        
+        /// Get value at key
         [<Extension>] 
         member inline d.GetValue k  =
              d.[k]
@@ -41,6 +43,7 @@ module TypeExtensionsDictionary =
 /// static functions on IDictionary Interface
 module Dict = 
     
+    /// Get value at key from IDictionary
     let get (k:'K) (d:IDictionary<'K,'V>) : 'V = 
         let ok, v = d.TryGetValue(k)
         if ok then  v
