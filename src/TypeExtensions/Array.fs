@@ -60,7 +60,7 @@ module TypeExtensionsArray =
             this.[2]
         
         
-        /// Gets item in the array by index.
+        /// Gets an item in the array by index.
         /// Allows for negtive index too ( -1 is last item,  like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         [<Extension>] 
@@ -69,7 +69,7 @@ module TypeExtensionsArray =
             this.[i]
     
         
-        /// Sets item in the array by index.
+        /// Sets an item in the array by index.
         /// Allows for negtive index too ( -1 is last item, like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         [<Extension>]
