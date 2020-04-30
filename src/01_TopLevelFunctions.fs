@@ -92,25 +92,44 @@ module SaveIgnore =
 /// Functions and operator !++ to deal with integer ref objects
 module IntRef = 
 
-    /// Increment ref cell and return new incremented integer value
+    /// Increment a ref cell and return new incremented integer value
     let inline (!++)  i = incr i; !i 
 
+    /// Increment a ref cell by two 
     let inline incr2 i = i := !i+2
-    let inline incr3 i = i := !i+3
-    let inline incr4 i = i := !i+4
-    let inline incr5 i = i := !i+5
-    let inline incrBy i x = i := !i + x
-    let inline incrByR x i = i := !i + x
 
-    let inline decr  i = i := !i-1 
-    let inline decr2 i = i := !i-2
-    let inline decr3 i = i := !i-3
-    let inline decr4 i = i := !i-4
-    let inline decr5 i = i := !i-5
-    let inline decrBy i x = i := !i - x
-    let inline decrByR x i = i := !i - x                
+    /// Increment a ref cell by three 
+    let inline incr3 i = i := !i+3
+
+    /// Increment a ref cell by four
+    let inline incr4 i = i := !i+4
+
+    /// Increment a ref cell by a given int
+    let inline incrBy i (x:int) = i := !i + x
+
+    //let inline incrByR (x:int) i = i := !i + x // useful ?
     
-    let inline setMax i x = if x > !i then i := x
-    let inline setMin i x = if x < !i then i := x
+    /// Decrement a ref cell by one
+    let inline decr  i = i := !i-1 
+    
+    /// Decrement a ref cell by two
+    let inline decr2 i = i := !i-2
+    
+    /// Decrement a ref cell by three
+    let inline decr3 i = i := !i-3
+    
+    /// Decrement a ref cell by four
+    let inline decr4 i = i := !i-4
+    
+    /// Decrement a ref cell by a given int
+    let inline decrBy i (x:int) = i := !i - x    
+    
+    //let inline decrByR (x:int) i = i := !i - x           // useful ?
+    
+    /// set ref cell to given int if it is bigger than current value
+    let inline setMax i (x:int) = if x > !i then i := x
+
+    /// set ref cell to given int if it is smaller than current value
+    let inline setMin i (x:int) = if x < !i then i := x
 
 
