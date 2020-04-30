@@ -2,26 +2,38 @@
 
 module MinMaxSort = 
     
-    /// If both are equal then the first is returned
+    /// Returns the smallest element.
+    /// Elements are compared by applying the predicate function first.
+    /// If both are equal then the first element is returned.
     let inline minBy f a b =  if f a > f b then b else a
 
-    /// If both are equal then the first is returned
+    /// Returns the biggest element.
+    /// Elements are compared by applying the predicate function first.
+    /// If both are equal then the first element is returned.
     let inline maxBy f a b =  if f a < f b then b else a
 
+    /// Returns the smallest of three elements.
     let inline min3 (a, b, c) = min a b |> min c
-
+    
+    /// Returns the biggest of three elements.
     let inline max3 (a, b, c) = max a b |> max c
-
+    
+    /// Returns the smallest of four elements.
     let inline min4 (a, b, c, d) = min a b |> min c |> min d  
     
+    /// Returns the biggest of four elements.
     let inline max4 (a, b, c, d) = max a b |> max c |> max d
 
+    /// Sort two elements.
     /// If they are equal then the the order is kept
     let inline sort2 (a, b)  = if a <= b  then a, b else b, a
 
+    /// Sort two elements.
+    /// Elements are compared by applying the predicate function first.
     /// If they are equal then the the order is kept
     let inline sort2By f (a, b) = if f a <= f b  then a, b else b, a
         
+    /// Sort three elements.
     /// If any are equal then the the order is kept
     let inline sort3 (a, b, c) = 
         if a<=b then 
@@ -34,7 +46,9 @@ module MinMaxSort =
             else //c<a
                 if b<=c then b, c, a 
                 else         c, b, a
-        
+    
+    /// Sort three elements.
+    /// Elements are compared by applying the predicate function first.   
     /// If any are equal after Function is applied then the the order is kept
     let inline sort3By f (a, b, c) = 
         if f a <= f b then 
@@ -47,7 +61,11 @@ module MinMaxSort =
             else //c<a
                 if f b <= f c then b, c, a 
                 else               c, b, a
-
+    
+    /// Compare two elements. Returns -1, 0 or 1
+    /// if   a= b then  0
+    /// elif a<b  then -1
+    /// else            1 
     let inline cmp a b =
         if   a= b then  0
         elif a<b then -1
