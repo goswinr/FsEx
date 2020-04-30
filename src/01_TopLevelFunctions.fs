@@ -4,7 +4,7 @@ open System
 
 type EXT = Runtime.CompilerServices.ExtensionAttribute
 
-[<assembly:EXT>] do() //http://www.latkin.org/blog/2014/04/30/f-extension-methods-in-roslyn/
+[<assembly:EXT>] do() // mark this assembly as extension assembly http://www.latkin.org/blog/2014/04/30/f-extension-methods-in-roslyn/
 
 /// General Utility functions
 /// module is set to auto open

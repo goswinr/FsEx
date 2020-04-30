@@ -1,16 +1,18 @@
 namespace FsEx
 
+open System
 open System.Collections.Generic
 
 
 
-///<summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
+/// <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
 /// If accessing a non exiting key , the default function is called to create and set it. 
 /// Like defaultdict in Python</summary>    
-///<param name="defaultFun">(unit->'V): The function to create a default Value</param>
+/// <param name="defaultFun">(unit->'V): The function to create a default value</param>
 type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V) =
     
-    let dd = Dictionary<'K,'V>() // the internal Dictionary
+    /// the internal dictionary
+    let dd = Dictionary<'K,'V>() 
 
     let dGet(k) =
         let ok, v = dd.TryGetValue(k)
@@ -20,15 +22,21 @@ type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V) =
             let v = defaultFun()
             dd.[k] <- v
             v
-
+    
+    /// For Index operator: get or set the value for given key
     member _.Item 
         with get k   = dGet k        
         and  set k v = dd.[k] <- v
     
-    /// get value for given key
-    member _.get k = dGet k 
+    /// Get value for given key. 
+    /// Calls defaultFun to get value if key not found.
+    /// Also sets key to retuned value.
+    /// use .TryGetValue(k) if you dont want a missing key to be created
+    member _.Get k = dGet k 
     
-    /// Get a value and remove it from Dictionary, like *.pop() in Python 
+    /// Get a value and remove key and value it from dictionary, like *.pop() in Python 
+    /// Will fail if key does not exist
+    /// Does not set any new key if key is missing
     member dd.Pop(k:'K) =
         let ok, v = dd.TryGetValue(k)
         if ok then
@@ -37,7 +45,7 @@ type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V) =
         else 
             failwithf "DefaultDict: Cannot pop key '%A' from %s " k (NiceString.toNiceString dd)
 
-    /// Returns a seq of key and value tuples
+    /// Returns a (lazy) sequence of key and value tuples
     member _.Items =
         seq { for KeyValue(k, v) in dd -> k, v}
         
@@ -54,44 +62,63 @@ type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V) =
         //    }
             
 
-    // TODO add XML doc str
 
-    // properties
+    // -------------------- properties: --------------------------------------
 
+    /// Gets the IEqualityComparer<T> that is used to determine equality of keys for the dictionary.
     member _.Comparer with get() = dd.Comparer
 
+    /// Gets the number of key/value pairs contained in the dictionary
     member _.Count with get() = dd.Count
 
+    /// Gets a collection containing the keys in the dictionary
     member _.Keys with get() = dd.Keys
 
+    /// Gets a collection containing the values in the dictionary
     member _.Values with get() = dd.Values
 
-    // methods
+    // -------------------------------------methods:-------------------------------
 
+    /// Adds the specified key and value to the dictionary.
     member _.Add(k, v) = dd.Add(k, v)
 
+    /// Removes all keys and values from the dictionary
     member _.Clear() = dd.Clear()
 
+    /// Determines whether the dictionary contains the specified key.
     member _.ContainsKey(k) = dd.ContainsKey(k)
 
+    /// Determines whether the dictionary contains a specific value.
     member _.ContainsValue(v) = dd.ContainsValue(v)    
 
+    /// Removes the value with the specified key from the dictionary
+    /// see also .Pop(key) method to get the contained value too.
     member _.Remove(k) = dd.Remove(k)
 
+    ///Gets the value associated with the specified key.
+    ///As oppsed to Get(key) this does not creat a key if it is missing.
     member _.TryGetValue(k) = dd.TryGetValue(k)
 
+    /// Returns an enumerator that iterates through the dictionary.
     member _.GetEnumerator() = dd.GetEnumerator()
 
-    //interfaces
+    //---------------------------------------interfaces:-------------------------------------
+    // TODO add XML doc str
 
     interface IEnumerable<KeyValuePair<'K ,'V>> with
         member _.GetEnumerator() = (dd:>IDictionary<'K,'V>).GetEnumerator()
 
-    interface System.Collections.IEnumerable with // Non generic needed too ? 
+    interface Collections.IEnumerable with // Non generic needed too ? 
         member __.GetEnumerator() = dd.GetEnumerator():> System.Collections.IEnumerator
     
-    //interface System.Collections.ICollection with // Non generic needed too ? 
+    interface Collections.ICollection with // Non generic needed too ? 
+        member _.Count = dd.Count
         
+        member _.CopyTo(arr, i) = (dd:>Collections.ICollection).CopyTo(arr, i)
+
+        member _.IsSynchronized= (dd:>Collections.ICollection).IsSynchronized
+
+        member _.SyncRoot= (dd:>Collections.ICollection).SyncRoot
     
     interface ICollection<KeyValuePair<'K,'V>> with 
         member _.Add(x) = (dd:>ICollection<KeyValuePair<'K,'V>>).Add(x)
@@ -153,26 +180,8 @@ type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V) =
 
     //member _.GetType() = dd.GetType()
 
-    //
-
 
     (*
-    interface _.IDictionary`2() = dd.IDictionary`2()
-
-    interface _.ICollection`1() = dd.ICollection`1()
-
-    interface _.IEnumerable`1() = dd.IEnumerable`1()
-
-    interface _.IEnumerable() = dd.IEnumerable()
-
-    interface _.IDictionary() = dd.IDictionary()
-
-    interface _.ICollection() = dd.ICollection()
-
-    interface _.IReadOnlyDictionary`2() = dd.IReadOnlyDictionary`2()
-
-    interface _.IReadOnlyCollection`1() = dd.IReadOnlyCollection`1()
-
     interface _.ISerializable() = dd.ISerializable()
 
     interface _.IDeserializationCallback() = dd.IDeserializationCallback()
