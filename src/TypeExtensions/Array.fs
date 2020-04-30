@@ -10,60 +10,78 @@ module TypeExtensionsArray =
     //[<Extension>] //Error 3246
     type ``[]``<'T>  with //Generic Array
         
-        /// like this.Length - 1
+        /// Gets the index of the last item in the array.
+        /// equal to this.Length - 1
         [<Extension>]
         member inline this.LastIndex = 
             if this.Length = 0 then failwithf "array.LastIndex: Cannot get LastIndex of empty Array"
             this.Length - 1
        
-        /// last item in Array
+        /// Gets the last item in the array.
+        /// equal to this.[this.Length - 1]
         [<Extension>]
         member inline this.Last = 
             if this.Length = 0 then failwithf "array.Last: Cannot get Last item of empty Array"
             this.[this.Length - 1]
-
+        
+        /// Gets the second last item in the array.
+        /// equal to this.[this.Length - 2]
         [<Extension>]
         member inline this.SecondLast = 
             if this.Length < 2 then failwithf "array.SecondLast: Can not get SecondLast item of %s"  (NiceString.toNiceStringFull this)
             this.[this.Length - 2]
-
+        
+        /// Gets the third last item in the array.
+        /// equal to this.[this.Length - 2]
         [<Extension>]
         member inline this.ThirdLast = 
             if this.Length < 3 then failwithf "array.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
             this.[this.Length - 3]
 
-            
+        
+        /// Gets the first item in the array.
+        /// equal to this.[0]
         [<Extension>]
         member inline this.First = 
             if this.Length = 0 then failwithf "array.First: Can not get First item of empty Array"
             this.[0]
+        
 
+        /// Gets the second item in the array.
+        /// equal to this.[1]
         [<Extension>]
         member inline this.Second = 
             if this.Length < 2 then failwithf "array.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
             this.[1]
-
+        
+        /// Gets the third item in the array.
+        /// equal to this.[2]
         [<Extension>]
         member inline this.Third = 
             if this.Length < 3 then failwithf "array.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
             this.[2]
         
         [<Extension>] 
-        /// Allows for negtive index too (like Python)
+        /// Gets item in the array by index.
+        /// Allows for negtive index too ( -1 is last item,  like Python)
+        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         member this.GetItem index = 
             let i = negIdx index this.Length
             this.[i]
     
-        [<Extension>] 
-        /// Allows for negtive index too (like Python)
+        [<Extension>]
+        /// Sets item in the array by index.
+        /// Allows for negtive index too ( -1 is last item, like Python)
+        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         member this.SetItem index value = 
             let i = negIdx index this.Length
             this.[i] <- value 
 
         //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164                
 
-        /// Allows for negative indices too.
+        /// Allows for negative indices too. ( -1 is last item, like Python)
         /// The resulting array includes the end index.
+        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         [<Extension>]
         member this.Slice(startIdx:int , endIdx: int ) : 'T array=
             let count = this.Length
