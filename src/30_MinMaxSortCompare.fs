@@ -1,5 +1,7 @@
 ﻿namespace FsEx
 
+/// Small functions for sorting and finding minimum or maximum values
+/// of tuple ,triples and quadruples
 module MinMaxSort = 
     
     /// Returns the smallest element.
@@ -30,37 +32,40 @@ module MinMaxSort =
 
     /// Sort two elements.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal then the the order is kept
+    /// If they are equal after function is applied then the the order is kept
     let inline sort2By f (a, b) = if f a <= f b  then a, b else b, a
         
     /// Sort three elements.
     /// If any are equal then the the order is kept
     let inline sort3 (a, b, c) = 
-        if a<=b then 
-            if b<=c then a, b, c
-            else // c<b
-                if a <= c then a, c, b
-                else           c, a, b
-        else // b<a
-            if a<=c then b, a, c
-            else //c<a
-                if b<=c then b, c, a 
-                else         c, b, a
+        if a <= b then           
+            if b <= c then      a, b, c
+            else // c<b        
+                if a <= c then  a, c, b
+                else            c, a, b
+        else // b<a            
+            if a <= c then      b, a, c
+            else //c<a         
+                if b <= c then  b, c, a 
+                else            c, b, a
     
     /// Sort three elements.
     /// Elements are compared by applying the predicate function first.   
-    /// If any are equal after Function is applied then the the order is kept
-    let inline sort3By f (a, b, c) = 
-        if f a <= f b then 
-            if f b <= f c then a, b, c
+    /// If any are equal after function is applied then the the order is kept
+    let inline sort3By f (aa, bb, cc) = 
+        let a = f aa
+        let b = f bb
+        let c = f cc        
+        if a <= b then 
+            if b <= c then      aa, bb, cc
             else // c<b
-                if f a <= f c then a, c, b
-                else               c, a, b
+                if a <= c then  aa, cc, bb
+                else            cc, aa, bb
         else // b<a
-            if f a <= f c then b, a, c
+            if a <= c then      bb, aa, cc
             else //c<a
-                if f b <= f c then b, c, a 
-                else               c, b, a
+                if b <= c then  bb, cc, aa 
+                else            cc, bb, aa
     
     /// Compare two elements. Returns -1, 0 or 1
     /// if   a= b then  0
@@ -68,8 +73,8 @@ module MinMaxSort =
     /// else            1 
     let inline cmp a b =
         if   a= b then  0
-        elif a<b then -1
-        else           1 
+        elif a<b  then -1
+        else            1 
         
     /// Gets the positiv differnce between 2 numbers. 
     /// Avoids the integer( or byte) overflow and underflow risk of "abs(a-b)"
