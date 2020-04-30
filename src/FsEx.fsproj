@@ -30,8 +30,9 @@
                                     
     <Compile Include="TypeExtensions/ResizeArray.fs" />
     <Compile Include="TypeExtensions/Dictionary.fs" />
-    <Compile Include="TypeExtensions/Seq.fs" />
+    <Compile Include="TypeExtensions\List.fs" />
     <Compile Include="TypeExtensions/IList.fs" />
+    <Compile Include="TypeExtensions/Seq.fs" />
     <Compile Include="Types/DefaultDict.fs" />
     <Compile Include="Types/StuctTuples.fs" />    
     <Compile Include="20_ComputationalExpressions.fs" />
