@@ -37,8 +37,8 @@ module NiceString =
                         add s.[i]
             sb.ToString() 
     
-        ///Formating with automatic precision 
-        ///e.g.: 0 digits behind comma if above 1000 
+        /// Formating with automatic precision 
+        /// e.g.: 0 digits behind comma if above 1000 
         let floatToString  (x:float) =
             if   Double.IsNaN x then "NaN"
             elif Double.IsInfinity x then "Infinity"
@@ -53,8 +53,8 @@ module NiceString =
                 elif a > 1.     then sprintf "%.3f" x 
                 else                 sprintf "%g"   x  
 
-        ///Formating with automatic precision 
-        ///e.g.: 0 digits behind comma if above 1000
+        /// Formating with automatic precision 
+        /// e.g.: 0 digits behind comma if above 1000
         let singleToString  (x:float32) =
             if   Single.IsNaN x then "NaN"
             elif Single.IsInfinity x then "Infinity"
@@ -156,7 +156,7 @@ module NiceString =
 
 
         let private (|UC|_|) e o =
-            match e with ///https://stackoverflow.com/questions/3151099/is-there-a-way-in-f-to-type-test-against-a-generic-type-without-specifying-the
+            match e with /// https://stackoverflow.com/questions/3151099/is-there-a-way-in-f-to-type-test-against-a-generic-type-without-specifying-the
             | Lambdas(_,NewUnionCase(uc,_)) | NewUnionCase(uc,[]) ->
               if isNull (box o) then
                 // Need special case logic in case null is a valid value (e.g. Option.None)

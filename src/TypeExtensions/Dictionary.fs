@@ -4,7 +4,7 @@ open System
 open System.Runtime.CompilerServices
 open System.Collections.Generic
 
-///A type alias for System.Collections.Generic.Dictionary<'K,'V> 
+/// A type alias for System.Collections.Generic.Dictionary<'K,'V> 
 type Dict<'K,'V> = Dictionary<'K,'V> // type alias avoids the need to open System.Collections.Generic  if FsEx is open // dont use lowercase "dict"
 
 [<AutoOpen>]
@@ -21,21 +21,21 @@ module TypeExtensionsDictionary =
         member inline d.GetValue k  =
              d.[k]
         
-        ///Get a value and remove it from Dictionary, like *.pop() in Python         
+        /// Get a value and remove it from Dictionary, like *.pop() in Python         
         [<Extension>] 
         member inline d.Pop k  =
             let v= d.[k]
             d.Remove(k)|> ignore
             v
 
-        ///Returns a lazy seq of key and value tuples
+        /// Returns a lazy seq of key and value tuples
         [<Extension>] 
         member inline d.Items =
             seq { for KeyValue(k, v) in d -> k, v}
         
         [<Extension>]  
-        ///A property like the ToString() method, 
-        ///But with richer formationg for collections
+        /// A property like the ToString() method, 
+        /// But with richer formationg for collections
         member obj.ToNiceString = NiceString.toNiceString obj
 
 /// static functions on IDictionary Interface

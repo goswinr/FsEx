@@ -47,16 +47,16 @@ module TypeExtensionsIList =
 
             
         [<Extension>] 
-        ///Allows for negtive index too (like Python)
+        /// Allows for negtive index too (like Python)
         member this.GetItem index = if index<0 then this.[this.Count+index]   else this.[index]
     
         [<Extension>] 
-        ///Allows for negtive index too (like Python)
+        /// Allows for negtive index too (like Python)
         member this.SetItem index value = if index<0 then this.[this.Count+index]<-value   else this.[index]<-value  // only on IList
 
 
-        ///Allows for negative indices too.
-        ///The resulting List includes the item at slice ending index.
+        /// Allows for negative indices too.
+        /// The resulting List includes the item at slice ending index.
         [<Extension>]
         member this.Slice(startIdx:int, endIdx:int) : 'T ResizeArray = // to use slicing notation e.g. : xs.[ 1 .. -1] // don't overload .GetSlive .[ x ... y] directly, this would be a casting horror for Lists and arrays wher neg indices  Slices dont work
             let count = this.Count

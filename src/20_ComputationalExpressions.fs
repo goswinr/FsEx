@@ -96,10 +96,10 @@ module StringBufferBuilder =
             do f b
             b.ToString()
     
-    ///Computational Expression:  
-    ///use 'yield' to append text
-    ///and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
-    ///accepts ints and floats too. (including nice Formating)
+    /// Computational Expression:  
+    /// use 'yield' to append text
+    /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
+    /// accepts ints and floats too. (including nice Formating)
     let stringBuffer = StringBufferBuilder ()
 
 

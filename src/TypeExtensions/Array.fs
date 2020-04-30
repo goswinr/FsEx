@@ -49,21 +49,21 @@ module TypeExtensionsArray =
             this.[2]
         
         [<Extension>] 
-        ///Allows for negtive index too (like Python)
+        /// Allows for negtive index too (like Python)
         member this.GetItem index = 
             let i = negIdx index this.Length
             this.[i]
     
         [<Extension>] 
-        ///Allows for negtive index too (like Python)
+        /// Allows for negtive index too (like Python)
         member this.SetItem index value = 
             let i = negIdx index this.Length
             this.[i] <- value 
 
         //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164                
 
-        ///Allows for negative indices too.
-        ///The resulting array includes the end index.
+        /// Allows for negative indices too.
+        /// The resulting array includes the end index.
         [<Extension>]
         member this.Slice(startIdx:int , endIdx: int ) : 'T array=
             let count = this.Length
@@ -87,6 +87,6 @@ module TypeExtensionsArray =
         
 
         [<Extension>]  
-        ///A property like the ToString() method, 
-        ///But with richer formationg for collections
+        /// A property like the ToString() method, 
+        /// But with richer formationg for collections
         member this.ToNiceString = NiceString.toNiceString this

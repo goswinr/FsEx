@@ -54,7 +54,7 @@ module TypeExtensionsString =
             this.[2]
         
         [<Extension>] 
-        ///Allows for negtive index too (like Python)
+        /// Allows for negtive index too (like Python)
         member this.GetItem index = 
             let i = negIdx index this.Length
             this.[i]
@@ -62,7 +62,7 @@ module TypeExtensionsString =
         
         //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfurtrunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
 
-        ///Allows for negative indices too.
+        /// Allows for negative indices too.
         [<Extension>]
         member s.Slice(startIdx:int , endIdx:int):string =
             let count = s.Length
@@ -87,28 +87,28 @@ module TypeExtensionsString =
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide String class in C# assemblies (should consider for other extension modules as well)
 module String =
 
-    ///Returns everytrhing before a given splitting string.
-    ///Or full string if splitter not present
+    /// Returns everytrhing before a given splitting string.
+    /// Or full string if splitter not present
     let inline before (splitter:string) (s:string) = 
         let start = s.IndexOf(splitter) 
         if start = -1 then s
         else s.Substring(0, start )
     
-    ///split string, Remove Empty Entries
-    ///like: string.Split([| spliter |], StringSplitOptions.RemoveEmptyEntries)
+    /// split string, Remove Empty Entries
+    /// like: string.Split([| spliter |], StringSplitOptions.RemoveEmptyEntries)
     let inline split (spliter:string) (s:string) = s.Split([|spliter|], StringSplitOptions.RemoveEmptyEntries)
     
-    ///split string, Keep Empty Entries
-    ///like : string.Split([| spliter |], StringSplitOptions.None)  
+    /// split string, Keep Empty Entries
+    /// like : string.Split([| spliter |], StringSplitOptions.None)  
     let inline splitKeep (spliter:string) (s:string) = s.Split([|spliter|], StringSplitOptions.None)    
     
-    ///split string into two elements, if splitter not found first string is same , second string is empty 
-    ///like : string.Split( [| spliter |],2, StringSplitOptions.RemoveEmptyEntries) in if xs.Length > 1 then xs.[0],xs.[1] else s,""
+    /// split string into two elements, if splitter not found first string is same , second string is empty 
+    /// like : string.Split( [| spliter |],2, StringSplitOptions.RemoveEmptyEntries) in if xs.Length > 1 then xs.[0],xs.[1] else s,""
     let inline split2 (spliter:string) (s:string) = let xs = s.Split( [|spliter|],2, StringSplitOptions.None) in if xs.Length > 1 then xs.[0],xs.[1] else s,""
     
-    ///finds text betwween two strings
-    ///between "X" "T" "cXabTk" = "c", "ab", "k"
-    ///returns three empty strings if not both found 
+    /// finds text betwween two strings
+    /// between "X" "T" "cXabTk" = "c", "ab", "k"
+    /// returns three empty strings if not both found 
     let between (startChar:string) (endChar:string) (s:string) =         
         let start = s.IndexOf(startChar) 
         if start = -1 then "","",""
@@ -120,9 +120,9 @@ module String =
                 s.Substring(start + startChar.Length, ende - start - startChar.Length),// finds text betwween two chars
                 s.Substring(ende + endChar.Length)
     
-    ///Finds text betwween two strings, includes delimiters on middle string 
-    ///betweenIncl between "X" "T" "cXabTk" = "c", "XabT", "k"
-    ///returns three empty strings if not both found 
+    /// Finds text betwween two strings, includes delimiters on middle string 
+    /// betweenIncl between "X" "T" "cXabTk" = "c", "XabT", "k"
+    /// returns three empty strings if not both found 
     let betweenIncl (startChar:string) (endChar:string) (s:string) =         
         let start = s.IndexOf(startChar) 
         if start = -1 then "","","" 
@@ -135,20 +135,20 @@ module String =
                 s.Substring(ende + endChar.Length)
     
   
-    ///First letter of string to Uppercase
+    /// First letter of string to Uppercase
     let inline up1 (s:String)  = 
         if s="" || Char.IsUpper s.[0] then s 
         elif Char.IsLetter s.[0] then  Char.ToUpper(s.[0]).ToString() + s.Substring(1) 
         else s
     
-    ///First letter of string to Lowercase
+    /// First letter of string to Lowercase
     let inline low1 (s:String) = 
         if s="" || Char.IsLower s.[0] then s 
         elif Char.IsLetter s.[0] then  Char.ToLower(s.[0]).ToString() + s.Substring(1) 
         else s
     
-    ///Allows for negative indices too. -1 is last character
-    ///The resulting string includes the end index.
+    /// Allows for negative indices too. -1 is last character
+    /// The resulting string includes the end index.
     let slice startIdx endIdx (s:string) =
         let count = s.Length
         let st  = if startIdx<0 then count+startIdx    else startIdx

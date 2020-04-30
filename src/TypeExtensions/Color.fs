@@ -12,7 +12,7 @@ module TypeExtensionsColor =
 
     //[<Extension>] //Error 3246
     type Drawing.Color with        
-        ///Compare to another color only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor        
+        /// Compare to another color only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor        
         [<Extension>] 
         member inline this.EqualsARGB(other:Drawing.Color)=
             this.A = other.A && 
@@ -20,7 +20,7 @@ module TypeExtensionsColor =
             this.G = other.G && 
             this.B = other.B        
         
-        ///Compare two colors only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor
+        /// Compare two colors only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor
         [<Extension>]
         static member inline AreEqualARGB (this:Drawing.Color)(other:Drawing.Color)=
             this.EqualsARGB(other)

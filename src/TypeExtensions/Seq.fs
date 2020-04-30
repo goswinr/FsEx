@@ -77,7 +77,7 @@ module TypeExtensionsSeq =
             | ex -> raise ex   //some other error raised while constructing lazy seq         
         
         [<Extension>] 
-        ///Allows for negtive index too (like Python)
+        /// Allows for negtive index too (like Python)
         member this.GetItem index =             
             let i = if index < 0 then Seq.length this + index        else index
             try 
@@ -87,8 +87,8 @@ module TypeExtensionsSeq =
             | ex -> raise ex //some other error raised while constructing lazy seq
                     
         
-        ///Allows for negative indices too, like Python, -1 is the last element.
-        ///The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
+        /// Allows for negative indices too, like Python, -1 is the last element.
+        /// The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
         [<Extension>]
         member this.Slice(startIdx:int , endIdx: int) : 'T seq = // don't overload .GetSlice .[ x ... y] directly, this would be a casting horror for Lists and arrays wher neg indices dont work
             let count = lazy(Seq.length this)
@@ -104,15 +104,15 @@ module TypeExtensionsSeq =
             
         
         [<Extension>]  
-        ///A property like the ToString() method, 
-        ///But with richer formationg for collections
+        /// A property like the ToString() method, 
+        /// But with richer formationg for collections
         member obj.ToNiceString = NiceString.toNiceString obj
             
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies (should consider for other extension modules as well)
 module Seq =   
     
-    ///Allows for negative indices too, -1 is the last element.
-    ///The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
+    /// Allows for negative indices too, -1 is the last element.
+    /// The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
     let slice startIdx endIdx (xs:seq<_>) =    
         let count = Seq.length xs
         let st  = if startIdx < 0 then count + startIdx        else startIdx
@@ -134,13 +134,13 @@ module Seq =
         xs |> Seq.skip st |> Seq.take len        
 
 
-    ///Considers sequence cirular and move elements up or down
+    /// Considers sequence cirular and move elements up or down
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
     /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a]
     let rotate r (xs:seq<_>) = xs |> ResizeArray.ofSeq |> ResizeArray.rotate r
 
     
-    ///Yields the Seq without the last element
+    /// Yields the Seq without the last element
     let skipLast (xs:seq<_>) =  seq{ 
         use e = xs.GetEnumerator() 
         if e.MoveNext() then
@@ -151,7 +151,7 @@ module Seq =
         else
             failwith "skipLast: Empty Input Sequence"}
     
-    ///splits seq in two, like filter but returning the others too
+    /// splits seq in two, like filter but returning the others too
     let splitBy filter (xs:seq<_>) =  
         let t=ResizeArray()
         let f=ResizeArray()
@@ -161,9 +161,9 @@ module Seq =
         t,f
                 
 
-    ///Yields looped Seq of (this, next) from (first, second)  upto (last, first)
-    ///The length of the resulting seq is the same as the input seq.
-    ///Use Seq.skip.Last afterwerds or Seq.windowed if you don't want a looped seqence.
+    /// Yields looped Seq of (this, next) from (first, second)  upto (last, first)
+    /// The length of the resulting seq is the same as the input seq.
+    /// Use Seq.skip.Last afterwerds or Seq.windowed if you don't want a looped seqence.
     let thisNext(xs:seq<_>) =  seq{ 
         use e = xs.GetEnumerator()
         if e.MoveNext() then
@@ -181,9 +181,9 @@ module Seq =
         else
             failwith "thisNextLooped: Empty Input Sequence"}
     
-    ///Yields looped Seq of (index,this, next) from (0,first, second)  upto (lastIndex, last, first)
-    ///The length of the resulting seq is the same as the input seq.
-    ///Use Seq.skip.Last afterwerds or Seq.windowed if you don't want a looped seqence.
+    /// Yields looped Seq of (index,this, next) from (0,first, second)  upto (lastIndex, last, first)
+    /// The length of the resulting seq is the same as the input seq.
+    /// Use Seq.skip.Last afterwerds or Seq.windowed if you don't want a looped seqence.
     let iThisNext (xs:seq<_>) =  seq{ 
         use e = xs.GetEnumerator()
         let kk = ref 0  
@@ -209,9 +209,9 @@ module Seq =
     /// faster implemetation of Seq.last till F# 4.8 is out
     let lastFast (source : seq<_>) = TypeExtensionsSeq.fastLast source // keep this until https://github.com/dotnet/fsharp/pull/7765/files is part of fsharp core
 
-    ///Yields looped Seq of (previous, this, next): from (last, first, second)  upto (second-last, last, first)
-    ///The length of the resulting seq is the same as the input seq.
-    ///Use Seq.skip.Last afterwerds or Seq.windowed if you don't want a looped seqence.
+    /// Yields looped Seq of (previous, this, next): from (last, first, second)  upto (second-last, last, first)
+    /// The length of the resulting seq is the same as the input seq.
+    /// Use Seq.skip.Last afterwerds or Seq.windowed if you don't want a looped seqence.
     let prevThisNext (xs:seq<_>) =  seq { 
         use e = xs.GetEnumerator()
         if e.MoveNext() then
@@ -236,9 +236,9 @@ module Seq =
         else
             failwithf "prevThisNextLooped: Empty Input Sequence %A" xs} 
 
-    ///Yields looped Seq of (index, previous, this, next): from (0, last, first, second)  upto (lastIndex, second-last, last, first)
-    ///The length of the resulting seq is the same as the input seq.
-    ///Use Seq.skip.Last afterwerds or Seq.windowed if you don't want a looped seqence.
+    /// Yields looped Seq of (index, previous, this, next): from (0, last, first, second)  upto (lastIndex, second-last, last, first)
+    /// The length of the resulting seq is the same as the input seq.
+    /// Use Seq.skip.Last afterwerds or Seq.windowed if you don't want a looped seqence.
     let iPrevThisNext (xs:seq<_>) =  seq { 
         use e = xs.GetEnumerator()
         let kk = ref 2

@@ -10,32 +10,32 @@ open System
 //But any collection defined in F# that uses this operator will run into boxing issues apparently.
 //https://stackoverflow.com/questions/28142655/iequatable-in-f-operator-performance-and-structural-equality/31283508#31283508
 
-///Opening this module improves the performance of equality tests (=) and (<>) on custom structs significantly.
-///But for types that don't have System.IEquatable<'T> implemented you will now have to use (==) and (!=).
-///Use #nowarn "86"to disable warnings
+/// Opening this module improves the performance of equality tests (=) and (<>) on custom structs significantly.
+/// But for types that don't have System.IEquatable<'T> implemented you will now have to use (==) and (!=).
+/// Use #nowarn "86"to disable warnings
 module  NonBoxingEqualityOperatorOverloads =    
     //https://github.com/dotnet/fsharp/issues/526#issuecomment-119755563
     //https://zeckul.wordpress.com/2015/07/09/how-to-avoid-boxing-value-types-in-f-equality-comparisons/
     let inline private eq<'T when 'T :> System.IEquatable<'T>> (x:'T) (y:'T) = x.Equals y    
         
-    ///The Equals operator (=) is overloaded to always use the generic System.IEquatable<'T>
-    ///This avoids boxing of custom structs when comparing. A significant performance improvement.
-    ///Use (==) for types that don't have System.IEquatable<'T> implemented.
+    /// The Equals operator (=) is overloaded to always use the generic System.IEquatable<'T>
+    /// This avoids boxing of custom structs when comparing. A significant performance improvement.
+    /// Use (==) for types that don't have System.IEquatable<'T> implemented.
     let inline (=) x y = eq x y
         
-    ///The NotEquals operator (<>) is overloaded to always use the generic System.IEquatable<'T>
-    ///This avoids boxing of custom structs when comparing. A significant performance improvement.
-    ///Use (!=) for types that don't have System.IEquatable<'T> implemented.
+    /// The NotEquals operator (<>) is overloaded to always use the generic System.IEquatable<'T>
+    /// This avoids boxing of custom structs when comparing. A significant performance improvement.
+    /// Use (!=) for types that don't have System.IEquatable<'T> implemented.
     let inline (<>) x y = not (eq x y)
         
-    ///The orignal Equals operator (=) is overloaded to always use the generic System.IEquatable<'T>
-    ///This avoids boxing of custom structs when comparing. A significant performance improvement.
-    ///Use this operator (==) for types that don't have System.IEquatable<'T> implemented or any type if you dont mind performance.
+    /// The orignal Equals operator (=) is overloaded to always use the generic System.IEquatable<'T>
+    /// This avoids boxing of custom structs when comparing. A significant performance improvement.
+    /// Use this operator (==) for types that don't have System.IEquatable<'T> implemented or any type if you dont mind performance.
     let inline (==) x y = Microsoft.FSharp.Core.Operators.(=) x y
     
-    ///The original NotEquals operator (<>) is overloaded to always use the generic System.IEquatable<'T>
-    ///This avoids boxing of custom structs when comparing. A significant performance improvement.
-    ///Use (!=) for types that don't have System.IEquatable<'T> implemented or any type if you dont mind performance.
+    /// The original NotEquals operator (<>) is overloaded to always use the generic System.IEquatable<'T>
+    /// This avoids boxing of custom structs when comparing. A significant performance improvement.
+    /// Use (!=) for types that don't have System.IEquatable<'T> implemented or any type if you dont mind performance.
     let inline (!=) x y = Microsoft.FSharp.Core.Operators.(<>) x y   
 
 [<AutoOpen>]
@@ -44,19 +44,19 @@ module NonBoxingEqualityOperators =
     //https://zeckul.wordpress.com/2015/07/09/how-to-avoid-boxing-value-types-in-f-equality-comparisons/
     let inline private eq<'T when 'T :> System.IEquatable<'T>> (x:'T) (y:'T) = x.Equals y 
 
-    ///This Equals operator (===) always uses the generic System.IEquatable<'T>
-    ///This avoids boxing of custom structs when comparing with (=). A significant performance improvement.
+    /// This Equals operator (===) always uses the generic System.IEquatable<'T>
+    /// This avoids boxing of custom structs when comparing with (=). A significant performance improvement.
     let inline (===) x y = eq x y
         
-    ///This NotEquals operator (=!=) is overloaded to always use the generic System.IEquatable<'T>
-    ///This avoids boxing of custom structs when comparing with (<>). A significant performance improvement.
+    /// This NotEquals operator (=!=) is overloaded to always use the generic System.IEquatable<'T>
+    /// This avoids boxing of custom structs when comparing with (<>). A significant performance improvement.
     let inline (=!=) x y = not (eq x y)
     
                   
-///A struct of two integers
-///use operator (===) for fast equality test
-///Avoid using this struct in Fsharp.Core functions like: List.contains value. boxing will ocure
-///Better: List.exists (fun v -> v === value)
+/// A struct of two integers
+/// use operator (===) for fast equality test
+/// Avoid using this struct in Fsharp.Core functions like: List.contains value. boxing will ocure
+/// Better: List.exists (fun v -> v === value)
 [<Struct; CustomEquality; NoComparison>]
 type  IntTup =      
     val a :int
@@ -99,10 +99,10 @@ type  IntTup =
         
     override t.ToString() = sprintf "IntTup(a = %d, b = %d)" t.a t.b 
        
-///A struct of three integers
-///use operator (===) for fast equality test
-///Avoid using this struct in Fsharp.Core functions like: List.contains value. boxing will ocure
-///Better: List.exists (fun v -> v === value)
+/// A struct of three integers
+/// use operator (===) for fast equality test
+/// Avoid using this struct in Fsharp.Core functions like: List.contains value. boxing will ocure
+/// Better: List.exists (fun v -> v === value)
 type [<Struct; CustomEquality; NoComparison>] IntTrip =        
     val a :int
     val b :int
