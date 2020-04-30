@@ -37,8 +37,7 @@ module TypeExtensionsArray =
         member inline this.ThirdLast = 
             if this.Length < 3 then failwithf "array.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
             this.[this.Length - 3]
-
-        
+                    
         /// Gets the first item in the array.
         /// equal to this.[0]
         [<Extension>]
@@ -46,7 +45,6 @@ module TypeExtensionsArray =
             if this.Length = 0 then failwithf "array.First: Can not get First item of empty Array"
             this.[0]
         
-
         /// Gets the second item in the array.
         /// equal to this.[1]
         [<Extension>]
@@ -61,18 +59,20 @@ module TypeExtensionsArray =
             if this.Length < 3 then failwithf "array.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
             this.[2]
         
-        [<Extension>] 
+        
         /// Gets item in the array by index.
         /// Allows for negtive index too ( -1 is last item,  like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        [<Extension>] 
         member this.GetItem index = 
             let i = negIdx index this.Length
             this.[i]
     
-        [<Extension>]
+        
         /// Sets item in the array by index.
         /// Allows for negtive index too ( -1 is last item, like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        [<Extension>]
         member this.SetItem index value = 
             let i = negIdx index this.Length
             this.[i] <- value 
@@ -81,6 +81,7 @@ module TypeExtensionsArray =
 
         /// Allows for negative indices too. ( -1 is last item, like Python)
         /// The resulting array includes the end index.
+        /// The built in slicing notaion (e.g. a.[1..3]) for arrays does not allow for negative indices.
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         [<Extension>]
         member this.Slice(startIdx:int , endIdx: int ) : 'T array=
@@ -104,7 +105,8 @@ module TypeExtensionsArray =
             Array.init len (fun i -> this.[st+i])
         
 
-        [<Extension>]  
+         
         /// A property like the ToString() method, 
         /// But with richer formationg for collections
+        [<Extension>] 
         member this.ToNiceString = NiceString.toNiceString this
