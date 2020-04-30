@@ -37,11 +37,11 @@ module TypeExtensionsSeq =
         
         /// Gets the second last item in the Seq
         [<Extension>] 
-        member inline this.SecondLast = indexFromBack 1 this
+        member this.SecondLast = indexFromBack 1 this
         
         /// Gets the third last item in the Seq
         [<Extension>] 
-        member inline this.ThirdLast = indexFromBack 2 this
+        member this.ThirdLast = indexFromBack 2 this
 
         /// Gets the first item in the Seq
         [<Extension>]
