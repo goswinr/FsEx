@@ -62,7 +62,7 @@ module TypeExtensionsResizeArray =
 
         
         
-        /// Gets item in the ResizeArray by index.
+        /// Gets an item in the ResizeArray by index.
         /// Allows for negtive index too ( -1 is last item,  like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         [<Extension>] 
@@ -71,7 +71,7 @@ module TypeExtensionsResizeArray =
             this.[i]
         
         
-        /// Sets item in the ResizeArray by index.
+        /// Sets an item in the ResizeArray by index.
         /// Allows for negtive index too ( -1 is last item, like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         [<Extension>] 
@@ -721,6 +721,7 @@ module ResizeArray =
                     e3 <- f 
             i1,i2,i3 
     
+    //TODO test keeping of order !
 
     /// Returns the smallest element of the ResizeArray.
     let min xs =     xs |> MinMax.simple (<)  // why inline? type specialisation ?
