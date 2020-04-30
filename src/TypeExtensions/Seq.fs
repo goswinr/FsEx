@@ -7,59 +7,49 @@ open System.Runtime.CompilerServices
 [<AutoOpen>]
 module TypeExtensionsSeq = 
     
-
-    let rec private listlast (list: 'T list) =     
-        match list with            
-        | [x] -> x            
-        | _ :: tail -> listlast tail          
-        | [] -> invalidArg "list" "F# ListWasEmpty"    
-        
-    /// faster implemetation of Seq.last , keep till F# 4.8 is out
-    let internal fastLast (source : seq<_>) = // keep this until https://github.com/dotnet/fsharp/pull/7765/files is part of fsharp core
-        match source with
-        | :? ('T[]) as a -> 
-            if a.Length = 0 then invalidArg "source" "array sourceWasEmpty"
-            else a.[a.Length - 1]
-
-        | :? ('T IList) as a -> //ResizeArray and other collections
-            if a.Count = 0 then invalidArg "source" "IList sourceWasEmpty"
-            else a.[a.Count - 1]
-
-        | :? ('T list) as a -> listlast a 
-
-        | _ -> 
-            //printfn "fastlast on seq"
-            use e = source.GetEnumerator()
-            if e.MoveNext() then
-                let mutable res = e.Current
-                while (e.MoveNext()) do res <- e.Current
-                res
-            else
-                invalidArg "source" "seq sourceWasEmpty" 
+    let internal indexFromBack ix (xs: 'T seq) =     
+        use e = xs.GetEnumerator()
+        if e.MoveNext() then        
+            let ar = Array.zeroCreate (ix+1) // use array for buffer
+            let mutable i = 0
+            let mutable k = 0 
+            while (e.MoveNext()) do 
+                k <-i % (ix+1)//loop index
+                ar.[k]<- e.Current 
+                i <- i+1
+            if ix > i then failwithf "can't get index from back %d from  seq of %d items" ix (i+1)
+            ar.GetItem(k-ix) 
+        else
+            failwithf "can't get index from back %d from empty seq" ix
     
 
     //[<Extension>] //Error 3246
     type Collections.Generic.IEnumerable<'T>  with 
         
-        /// Like Seq.length - 1
+        ///Returns Seq.length - 1
         member this.LastIndex = 
             if Seq.isEmpty this then failwithf "seq.LastIndex: Can not get LastIndex of empty Seq"
             (Seq.length this) - 1
         
-        /// Last item in Seq
+        /// Gets the last item in the Seq
         [<Extension>]
-        member this.Last = 
-            fastLast this
+        member this.Last = indexFromBack 0 this            
+        
+        /// Gets the second last item in the Seq
+        [<Extension>] 
+        member inline this.SecondLast = indexFromBack 1 this
+        
+        /// Gets the third last item in the Seq
+        [<Extension>] 
+        member inline this.ThirdLast = indexFromBack 2 this
 
-        //[<Extension>] member inline this.SecondLast = 
-
-        //[<Extension>] member inline this.ThirdLast = 
-
+        /// Gets the first item in the Seq
         [<Extension>]
         member this.First = 
             if Seq.isEmpty this then failwithf "seq.First: Can not get LastIndex of empty Seq"
             Seq.head this
-
+        
+        /// Gets the second item in the Seq
         [<Extension>]
         member this.Second = 
             try 
@@ -67,7 +57,8 @@ module TypeExtensionsSeq =
             with 
             | :? InvalidOperationException  as ex -> failwithf "seq.Second: Can not get Second item of %s : %s"  (NiceString.toNiceStringFull this) ex.Message
             | ex -> raise ex  //some other error raised while constructing lazy seq          
-
+        
+        /// Gets the third item in the Seq
         [<Extension>]
         member this.Third = 
             try 
@@ -76,14 +67,16 @@ module TypeExtensionsSeq =
             | :? InvalidOperationException  as ex -> failwithf "seq.Third: Can not get Third item of %s : %s"  (NiceString.toNiceStringFull this) ex.Message
             | ex -> raise ex   //some other error raised while constructing lazy seq         
         
-        [<Extension>] 
+ 
+        /// Gets an item by index position in the Seq
         /// Allows for negtive index too (like Python)
-        member this.GetItem index =             
-            let i = if index < 0 then Seq.length this + index        else index
+        [<Extension>] 
+        member this.GetItem (index) = 
             try 
-                this|> Seq.skip i |> Seq.head
+                if index >= 0 then Seq.item index this
+                else indexFromBack ( 1 - index ) this
             with 
-            | :? InvalidOperationException  as ex -> failwithf "seq.GetItem(%d): Can not get %dth item of %s : %s" index i (NiceString.toNiceStringFull this) ex.Message
+            | :? InvalidOperationException  as ex -> failwithf "seq.GetItem(%d): Can not get %dth item of %s : %s" index index (NiceString.toNiceStringFull this) ex.Message
             | ex -> raise ex //some other error raised while constructing lazy seq
                     
         
@@ -111,28 +104,16 @@ module TypeExtensionsSeq =
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies (should consider for other extension modules as well)
 module Seq =   
     
+    /// faster implemetation of Seq.last till F# 4.8 is out
+    let lastFast (source : seq<_>) = TypeExtensionsSeq.indexFromBack 0  source // TODO keep this until https://github.com/dotnet/fsharp/pull/7765/files is part of fsharp core
+
     /// Allows for negative indices too, -1 is the last element.
     /// The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
-    let slice startIdx endIdx (xs:seq<_>) =    
-        let count = Seq.length xs
-        let st  = if startIdx < 0 then count + startIdx        else startIdx
-        let len = if endIdx   < 0 then count + endIdx - st + 1 else endIdx - st + 1
+    let slice startIdx endIdx (xs:seq<_>) =  xs.Slice(startIdx,endIdx) 
 
-        if st < 0 || st > count-1 then 
-            let err = sprintf "Seq.slice: Start Index %d is out of Range. Allowed values are -%d upto %d for Seq of %d items" startIdx count (count-1) count
-            raise (IndexOutOfRangeException(err))
-        
-        if st+len > count then 
-            let err = sprintf "Seq.slice: End Index %d is out of Range. Allowed values are -%d upto %d for Seq of %d items" endIdx count (count-1) count
-            raise (IndexOutOfRangeException(err)) 
-            
-        if len < 0 then
-            let en =  if endIdx<0 then count + endIdx else endIdx
-            let err = sprintf "Seq.slice: Start Index '%d' (= %d) is bigger than End Index '%d'(= %d) for Seq of %d items" startIdx st endIdx en  count
-            raise (IndexOutOfRangeException(err))
-            
-        xs |> Seq.skip st |> Seq.take len        
-
+    /// Gets an item by index position in the Seq
+    /// Allows for negtive index too (like Python)  
+    let getItem index  (xs:seq<_>) = xs.GetItem(index)
 
     /// Considers sequence cirular and move elements up or down
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
@@ -151,7 +132,8 @@ module Seq =
         else
             failwith "skipLast: Empty Input Sequence"}
     
-    /// splits seq in two, like filter but returning the others too
+    /// splits seq in two, like Seq.filter but returning both
+    /// the first ResizeArray has all elements where the filter function returned 'true'
     let splitBy filter (xs:seq<_>) =  
         let t=ResizeArray()
         let f=ResizeArray()
@@ -206,8 +188,7 @@ module Seq =
 
     
     
-    /// faster implemetation of Seq.last till F# 4.8 is out
-    let lastFast (source : seq<_>) = TypeExtensionsSeq.fastLast source // keep this until https://github.com/dotnet/fsharp/pull/7765/files is part of fsharp core
+
 
     /// Yields looped Seq of (previous, this, next): from (last, first, second)  upto (second-last, last, first)
     /// The length of the resulting seq is the same as the input seq.
