@@ -1,59 +1,98 @@
-// taken from https://github.com/dotnet/fsharp/tree/master/src/utils
-
 namespace FsEx
 
-open System
-open Microsoft.FSharp.Core
-open Microsoft.FSharp.Core.OptimizedClosures
-open System.Runtime.CompilerServices
 
 [<AutoOpen>]
 module TypeExtensionsResizeArray =   
-
+    open System
+    open Microsoft.FSharp.Core
+    open System.Runtime.CompilerServices
 
     //[<Extension>] //Error 3246
     type Collections.Generic.List<'T>  with 
     
+        /// Gets the index of the last item in the ResizeArray.
+        /// equal to this.Length - 1    
         [<Extension>]
         member inline this.LastIndex = 
             if this.Count = 0 then failwithf "resizeArray.LastIndex: Can not get LastIndex of empty List"
             this.Count - 1
 
+        /// Gets the last item in the ResizeArray.
+        /// equal to this.[this.Length - 1]
         [<Extension>]
         member inline this.Last = 
             if this.Count = 0 then failwithf "resizeArray.Last: Can not get Last item of empty List"
             this.[this.Count - 1]
         
+        /// Gets the second last item in the ResizeArray.
+        /// equal to this.[this.Length - 2]
         [<Extension>]
         member inline this.SecondLast = 
             if this.Count < 2 then failwithf "resizeArray.SecondLast: Can not get SecondLast item of %s"  (NiceString.toNiceStringFull this)
             this.[this.Count - 2]
 
+        /// Gets the third last item in the ResizeArray.
+        /// equal to this.[this.Length - 2]
         [<Extension>]
         member inline this.ThirdLast = 
             if this.Count < 3 then failwithf "resizeArray.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
             this.[this.Count - 3]
 
         
+        /// Gets the first item in the ResizeArray.
+        /// equal to this.[0]
         [<Extension>]
         member inline this.First = 
             if this.Count = 0 then failwithf "resizeArray.First: Can not get First item of empty List"
             this.[0]
 
+        /// Gets the second item in the ResizeArray.
+        /// equal to this.[1]
         [<Extension>]
         member inline this.Second = 
             if this.Count < 2 then failwithf "resizeArray.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
             this.[1]
 
+        /// Gets the third item in the ResizeArray.
+        /// equal to this.[2]
         [<Extension>]
         member inline this.Third = 
             if this.Count < 3 then failwithf "resizeArray.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
             this.[2]
 
-
+        
+        
+        /// Gets item in the ResizeArray by index.
+        /// Allows for negtive index too ( -1 is last item,  like Python)
+        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         [<Extension>] 
-        /// Allows for negtive slice index too ( -1 = last element), 
-        /// returns a shallow copy including the end index.
+        member this.GetItem index = 
+            let i = negIdx index this.Count
+            this.[i]
+        
+        
+        /// Sets item in the ResizeArray by index.
+        /// Allows for negtive index too ( -1 is last item, like Python)
+        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        [<Extension>] 
+        member this.SetItem index value = 
+            let i = negIdx index this.Count
+            this.[i] <- value 
+        
+        
+        /// Gets and remove last item from ResizeArray
+        [<Extension>] 
+        member  this.Pop()  =
+            let i = this.Count - 1
+            let v = this.[i]
+            this.RemoveAt(i)
+            v
+
+        
+        /// Defines F# slicing notation operator use including negative indices. ( -1 is last item, like Python)
+        /// The resulting ResizeArray includes the end index.
+        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        [<Extension>]
         member this.GetSlice(startIdx, endIdx) =    // maps onto slicing operator .[1..3]
             let count = this.Count
             let st  = match startIdx with None -> 0        | Some i -> if i<0 then count+i      else i
@@ -72,37 +111,31 @@ module TypeExtensionsResizeArray =
                 let err = sprintf "resizeArray.GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for List of %d items" startIdx st endIdx en  count
                 raise (IndexOutOfRangeException(err)) 
                 
-            this.GetRange(st, len)
+            this.GetRange(st, len) 
+         
+         
+         /// Allows for negative indices too. ( -1 is last item, like Python)
+         /// This method only exist to be consisten with other collections extensions in FsEx. like array. 
+         /// You might prefer to use the F# slicing notation on ResizeArrays.
+         /// For ResizeArrays this behaves the same way as the F# slicing notation defind in FsEx too, 
+         /// (Only arrays need to use this method if they want to use negative indices since the GetSlice operators cant be overwritten.) 
+         /// The resulting array includes the end index.
+         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+         [<Extension>]
+         member this.Slice(startIdx, endIdx) = this.GetSlice(startIdx, endIdx)    
         
-        [<Extension>] 
-        /// Allows for negtive index too (like Python)
-        member this.GetItem index = 
-            let i = negIdx index this.Count
-            this.[i]
-        
-        [<Extension>] 
-        /// Allows for negtive index too (like Python)
-        member this.SetItem index value = 
-            let i = negIdx index this.Count
-            this.[i] <- value 
-        
-        [<Extension>] 
-        /// Get and remove last item 
-        member  this.Pop()  =
-            let i = this.Count - 1
-            let v = this.[i]
-            this.RemoveAt(i)
-            v
-        
-        [<Extension>]  
         /// A property like the ToString() method, 
         /// But with richer formationg for collections
+        [<Extension>]  
         member this.ToNiceString = NiceString.toNiceString this
 
 
 /// Generic operations on the type System.Collections.Generic.List, which is called ResizeArray in the F# libraries.
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide ResizeArray class in C# assemblies (should consider for other extension modules as well)
 module ResizeArray =
+    // taken and extended from https://github.com/dotnet/fsharp/tree/master/src/utils    
+    open Microsoft.FSharp.Core
+    open Microsoft.FSharp.Core.OptimizedClosures
 
     /// Return the length of the collection.  You can also use property <c>arr.Length</c>.
     let length (arr: ResizeArray<'T>) =  arr.Count
@@ -541,7 +574,7 @@ module ResizeArray =
         res1, res2
 
     //---------------------------------------------------
-    // extensions added  by Goswin:
+    // extensions added only in FsEx:
     //----------------------------------------------------
     
     let empty() = ResizeArray<_>()
@@ -556,7 +589,7 @@ module ResizeArray =
     let indexed (xs: ResizeArray<_>)  =  init xs.Count (fun i -> i,xs.[i])
 
 
-    /// for finding 
+    /// internal only for finding 
     module private MinMax =
         let inline simple cmpF (xs:ResizeArray<'T>) =
             if xs.Count < 1 then failwithf "*** Empty %A in ResizeArray max / min" xs
@@ -568,7 +601,7 @@ module ResizeArray =
         let inline simple2 cmpF (xs:ResizeArray<'T>) =
             if xs.Count < 2 then failwithf "*** Only %d elements in %A, for ResizeArray first+second max / min" xs.Count xs
             let mutable m1 = xs.[0]
-            let mutable m2 = xs.[1]
+            let mutable m2 = xs.[1] 
             for i=1 to xs.Count-1 do
                 let this = xs.[i]
                 if cmpF this m1 then 
@@ -579,25 +612,43 @@ module ResizeArray =
             m1,m2  
                 
 
-        /// If any are equal then the the order is kept
-        let inline sort3f f a b c  = 
-            if f a b then 
-                if f b c then a,b,c
+        /// If any are equal then the the order is kept by using ( a=b || ) since the comare operate does not include the equal test
+        let inline sort3 cmp a b c  = 
+            if a=b || cmp a b then 
+                if  cmp b c then a,b,c
                 else 
-                    if f a c then a,c,b
-                    else          c,a,b
+                    if  cmp a c then a,c,b
+                    else             c,a,b
             else 
-                if f a c then b,a,c
+                if a=c || cmp a c then b,a,c
                 else 
-                    if f b c then b,c,a 
-                    else          c,b,a
+                    if b=c || cmp b c then b,c,a 
+                    else                   c,b,a
+
+
+        /// If any are equal then the the order is kept by using ( a=b || ) since the comare operate does not include the equal test
+        let inline indexOfSort3By f cmp aa bb cc  = 
+            let a = f aa
+            let b = f bb
+            let c = f cc
+            if a=b || cmp a b then 
+                if  cmp b c then 0,1,2
+                else 
+                    if  cmp a c then 0,2,1
+                    else             2,0,1
+            else 
+                if a=c || cmp a c then 1,0,2
+                else 
+                    if b=c || cmp b c then 1,2,0
+                    else                   2,1,0
 
         let inline simple3 cmpF (xs:ResizeArray<'T>) =
             if xs.Count < 3 then failwithf "*** Only %d elements in %A, for ResizeArray first+second+third max / min" xs.Count xs
             let e1 = xs.[0]
             let e2 = xs.[1]
             let e3 = xs.[2]
-            let mutable m1, m2, m3 =  sort3f cmpF e1 e2 e3   // otherwise would fail on  on ResizeArray([5;6;3;1;2;0])|> ResizeArray.max3 
+            // sort first 3
+            let mutable m1, m2, m3 =  sort3 cmpF e1 e2 e3   // otherwise would fail on sorting first 3, test on ResizeArray([5;6;3;1;2;0])|> ResizeArray.max3 
             for i=3 to xs.Count-1 do
                 let this = xs.[i]
                 if cmpF this m1 then
@@ -642,54 +693,109 @@ module ResizeArray =
                     mf2 <- f 
             i1,i2
 
-        
-        let inline index3ByFun cmpF func (xs:ResizeArray<'T>) =
-            if xs.Count < 3 then failwithf "*** Only %d elements in %A, for ResizeArray index3ByFun max / min" xs.Count xs          
-            let ie1 = 0
-            let ie2 = 1 
-            let ie3 = 2 
-            let e1 = func xs.[ie1]
-            let e2 = func xs.[ie2]
-            let e3 = func xs.[ie3]
-            let mutable (mf1,i1), (mf2,i2) , (mf3,i3) =  sort3f (fun (a,_) (b,_) -> cmpF a b) (e1,ie1) (e2,ie2) (e3,ie3) // otherwise would fail on on ResizeArray([5;6;3;1;2;0])|> ResizeArray.max3 
-            let mutable f = mf1 // placeholder
+
+        let inline index3ByFun (cmpOp:'U->'U->bool)  (byFun:'T->'U) (xs:ResizeArray<'T>) =
+            if xs.Count < 3 then failwithf "*** Only %d elements in %A, for ResizeArray index3ByFun max / min" xs.Count xs 
+            // sort first 3
+            let mutable i1,i2,i3 =  indexOfSort3By byFun cmpOp xs.[0] xs.[1] xs.[2] // otherwise would fail on sorting first 3, test on ResizeArray([5;6;3;1;2;0])|> ResizeArray.max3 
+            let mutable e1 =  byFun xs.[i1]
+            let mutable e2 =  byFun xs.[i2]
+            let mutable e3 =  byFun xs.[i3] 
+            let mutable f = e1 // placeholder
             for i=3 to xs.Count-1 do
-                f <- func xs.[i] 
-                if cmpF f mf1 then
+                f <- byFun xs.[i] 
+                if cmpOp f e1 then
                     i3 <- i2 
                     i2 <- i1 
                     i1 <- i
-                    mf3 <- mf2 
-                    mf2 <- mf1 
-                    mf1 <- f 
-                elif cmpF f mf2 then
+                    e3 <- e2 
+                    e2 <- e1 
+                    e1 <- f 
+                elif cmpOp f e2 then
                     i3 <- i2 
                     i2 <- i
-                    mf3 <- mf2 
-                    mf2 <- f 
-                elif cmpF f mf3 then
+                    e3 <- e2 
+                    e2 <- f 
+                elif cmpOp f e3 then
                     i3 <- i
-                    mf3 <- f 
+                    e3 <- f 
             i1,i2,i3 
+    
 
+    /// Returns the smallest element of the ResizeArray.
+    let min xs =     xs |> MinMax.simple (<)  // why inline? type specialisation ?
 
-    let inline min xs =     xs |> MinMax.simple (<)  // why inline? type specialisation ?
-    let inline max xs =     xs |> MinMax.simple (>)
-    let inline minBy f xs = let i = xs |> MinMax.indexByFun (<) f in xs.[i]
-    let inline maxBy f xs = let i = xs |> MinMax.indexByFun (>) f in xs.[i]
-    let inline minIndBy f xs = xs |> MinMax.indexByFun (<) f
-    let inline maxIndBy f xs = xs |> MinMax.indexByFun (>) f
+    /// Returns the biggest element of the ResizeArray.
+    let max xs =     xs |> MinMax.simple (>)
 
-    let inline min2 xs =     xs |> MinMax.simple2 (<=)
-    let inline max2 xs =     xs |> MinMax.simple2 (>=)
-    let inline min2By f xs = let i,ii = xs |> MinMax.index2ByFun (<=) f in xs.[i],xs.[ii]
-    let inline max2By f xs = let i,ii = xs |> MinMax.index2ByFun (>=) f in xs.[i],xs.[ii]
-    let inline min2IndBy f xs = xs |> MinMax.index2ByFun (<=) f
-    let inline max2IndBy f xs = xs |> MinMax.index2ByFun (>=) f
+    /// Returns the smallest element of the ResizeArray.
+    /// Elements are compared by applying the predicate function first.
+    let minBy f xs = let i = xs |> MinMax.indexByFun (<) f in xs.[i]
 
-    let inline min3 xs =     xs |> MinMax.simple3 (<=)
-    let inline max3 xs =     xs |> MinMax.simple3 (>=)
-    let inline min3By f xs = let i,ii,iii = xs |> MinMax.index3ByFun (<=) f in xs.[i],xs.[ii],xs.[iii]
-    let inline max3By f xs = let i,ii,iii = xs |> MinMax.index3ByFun (>=) f in xs.[i],xs.[ii],xs.[iii]
-    let inline min3IndBy f xs = xs |> MinMax.index3ByFun(<=) f
-    let inline max3IndBy f xs = xs |> MinMax.index3ByFun (>=) f
+    /// Returns the biggest element of the ResizeArray.
+    /// Elements are compared by applying the predicate function first.
+    let maxBy f xs = let i = xs |> MinMax.indexByFun (>) f in xs.[i]
+
+    /// Returns the Index of the smallest element of the ResizeArray.
+    /// Elements are compared by applying the predicate function first.
+    let minIndBy f xs = xs |> MinMax.indexByFun (<) f
+
+    /// Returns the Index of the biggest element of the ResizeArray.
+    /// Elements are compared by applying the predicate function first.
+    let maxIndBy f xs = xs |> MinMax.indexByFun (>) f
+
+    /// Returns the smallest two elements of the ResizeArray.
+    /// If they are equal then the the order is kept
+    let min2 xs =     xs |> MinMax.simple2 (<)
+
+    /// Returns the biggest two elements of the ResizeArray.
+    /// If they are equal then the the order is kept
+    let max2 xs =     xs |> MinMax.simple2 (>)
+    
+    /// Returns the smallest two elements of the ResizeArray.
+    /// Elements are compared by applying the predicate function first.
+    /// If they are equal after function is applied then the the order is kept
+    let min2By f xs = let i,ii = xs |> MinMax.index2ByFun (<) f in xs.[i],xs.[ii]
+    
+    /// Returns the biggest two elements of the ResizeArray.
+    /// Elements are compared by applying the predicate function first.
+    /// If they are equal after function is applied then the the order is kept
+    let max2By f xs = let i,ii = xs |> MinMax.index2ByFun (>) f in xs.[i],xs.[ii]
+
+    /// Returns the indices of the two smallest elements of the ResizeArray.
+    /// Elements are compared by applying the predicate function first.
+    /// If they are equal after function is applied then the the order is kept
+    let min2IndBy f xs = xs |> MinMax.index2ByFun (<) f
+
+    /// Returns the indices of the two biggest elements of the ResizeArray.
+    /// Elements are compared by applying the predicate function first.
+    /// If they are equal after function is applied then the the order is kept
+    let max2IndBy f xs = xs |> MinMax.index2ByFun (>) f
+
+    /// Returns the smallest three elements of the ResizeArray.
+    /// If they are equal then the the order is kept
+    let min3 xs =  xs |> MinMax.simple3 (<)
+
+    /// Returns the biggest three elements of the ResizeArray.
+    /// If they are equal then the the order is kept
+    let max3 xs =  xs |> MinMax.simple3 (>)
+
+    /// Returns the smallest three elements of the ResizeArray.
+    /// Elements are compared by applying the predicate function first.
+    /// If they are equal after function is applied then the the order is kept
+    let min3By f xs = let i,ii,iii = xs |> MinMax.index3ByFun (<) f in xs.[i],xs.[ii],xs.[iii]
+
+    /// Returns the biggest three elements of the ResizeArray.
+    /// Elements are compared by applying the predicate function first.
+    /// If they are equal after function is applied then the the order is kept
+    let max3By f xs = let i,ii,iii = xs |> MinMax.index3ByFun (>) f in xs.[i],xs.[ii],xs.[iii]
+
+    /// Returns the indices of the three smallest elements of the ResizeArray.
+    /// Elements are compared by applying the predicate function first.
+    /// If they are equal after function is applied then the the order is kept
+    let min3IndBy f xs = xs |> MinMax.index3ByFun(<) f
+
+    /// Returns the indices of the three biggest elements of the ResizeArray.
+    /// Elements are compared by applying the predicate function first.
+    /// If they are equal after function is applied then the the order is kept
+    let max3IndBy f xs = xs |> MinMax.index3ByFun (>) f
