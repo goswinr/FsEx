@@ -2,7 +2,15 @@
 
 open System
 
+
+/// For getting a formated string that has bars to show the ditribution
+/// of given float values.
+[<RequireQualifiedAccess>]
 module PrintDistribution = 
+    
+    /// The separator of printed values, 
+    /// Set this to ',' or ';' if you want a CSV file as output.
+    let mutable separator = ""
 
     let private sprintDistributionMain units scaleBars steps (vs:seq<float>) stepSize stepShift =
         if Seq.isEmpty vs then "No Items, No Data\r\n"
@@ -22,9 +30,9 @@ module PrintDistribution =
                 //let nl = Environment.NewLine
 
                 let sprintfunc = // for formating floats
-                    if abs ma < 0.05 then                   sprintf "<= %9.8f;%s < ;%9.8f;%s; %5.2f;%%;%7d;items "
-                    elif abs mi < 360. && abs ma <360. then sprintf "<= %7.3f;%s < ;%7.3f;%s; %5.2f;%%;%7d;items "            
-                    else                                    sprintf "<= %9.0f;%s < ;%9.0f;%s; %5.2f;%%;%7d;items "
+                    if abs ma < 0.05 then                   sprintf "<= %9.8f;%s < ;%9.8f;%s; %5.2f; %%;%7d; items "
+                    elif abs mi < 360. && abs ma <360. then sprintf "<= %7.3f;%s < ;%7.3f;%s; %5.2f; %%;%7d; items "            
+                    else                                    sprintf "<= %9.0f;%s < ;%9.0f;%s; %5.2f; %%;%7d; items "
             
                 let last, aRange, aSteps, aMin, aMax  = // switch between type of call
                     if  steps > 0 && stepSize = 0.0 then // do steps by divison 
@@ -57,7 +65,7 @@ module PrintDistribution =
                 
                     // sprintf bars:
                     if kk > 0 then txt <- txt + sprintf "|"
-                    for i = 1 to int (percent*scaleBars) do txt <- txt + sprintf "#" // "█"
+                    for i = 1 to int (percent*scaleBars) do txt <- txt + sprintf "█"
                     txt <- txt + sprintf "\r\n"
         
                 txt <- txt + sprintf "Total Items:;;;;;;;;%d \r\n" len
@@ -65,13 +73,44 @@ module PrintDistribution =
                 txt <- txt + sprintf "Delta from Average: down =  %.1f %s, up= %.1f %s, \r\n"  (av-aMin) units (aMax-av) units
                 txt <- txt + sprintf "Range = %.1f \r\n" aRange
                 txt <- txt + sprintf "Minimum = %.1f %s, Maximum = %.1f %s \r\n\r\n"  aMin units aMax units
-                txt
+                txt.Replace(";",separator)
+    
 
-    ///* units as string ("mm"?) -> scale for Bars ( ~0.5 to ~2.0) -> substeps (int 5 to 30) -> list of floats -> returns string
-    let sprintDistribution          units scaleBars steps     (vs:seq<float>) =  sprintDistributionMain units scaleBars steps (vs:seq<float>) 0.0 0.0
-
+    ///<summary>Returns a formated string that has bars to show the ditribution
+    /// of the given float values among a given number of buckets or steps.</summary>
+    ///<param name="units">(string) Units to add to text. e.g. "mm"</param>
+    ///<param name="scaleBars">(float) To have the bars relativy shorter or longer. ~0.5 to ~2.0 are good scales.</param>  
+    ///<param name="steps">(int) Amound of steps or buckets. Something between 5 to 30 makes sense.</param>  
+    ///<param name="values">(float seq) The values to analyse.</param> 
+    ///<returns>a formated string</returns>
+    let bySteps units scaleBars steps values =  
+        sprintDistributionMain units scaleBars steps values 0.0 0.0
+    
+    /// Returns a formted string that has bars to show the ditribution of the given float values among buckets (or steps).
+    /// You can specify the range or size 
+    /// Parameters:
     ///* units as string ("mm"?) -> scale for Bars ( ~0.5 to ~2.0) -> stepSize (float) -> list of floats -> returns string
-    let sprintDistributionByStepSize units scaleBars stepsSize (vs:seq<float>) = sprintDistributionMain units scaleBars 0 (vs:seq<float>) stepsSize 0.0
-
-    ///* units as string ("mm"?) -> scale for Bars ( ~0.5 to ~2.0) -> stepSize (float) -> offset for scale (float) ->list of floats -> returns string
-    let sprintDistributionByStepSizeOffset units scaleBars stepsSize offset (vs:seq<float>) = sprintDistributionMain units scaleBars 0 (vs:seq<float>) stepsSize offset
+    
+    
+    ///<summary>Returns a formated string that has bars to show the ditribution
+    /// of the given float values among buckets or steps of a defdined size.</summary>
+    ///<param name="units">(string) Units to add to text. e.g. "mm"</param>
+    ///<param name="scaleBars">(float) To have the bars relativy shorter or longer. ~0.5 to ~2.0 are good scales.</param>  
+    ///<param name="stepsSize">(int) Size or range of each steps or buckets. The Amount of bukets depends on the input.</param>  
+    ///<param name="values">(float seq) The values to analyse.</param> 
+    ///<returns>a formated string</returns>
+    let byStepSize units scaleBars stepsSize values = 
+        sprintDistributionMain units scaleBars 0 values stepsSize 0.0
+    
+    (*    
+    <summary>Returns a formated string that has bars to show the ditribution
+     of the given float values among buckets or steps of a defdined size.</summary>
+    <param name="units">(string) Units to add to text. e.g. "mm"</param>
+    <param name="scaleBars">(float) To have the bars relativy shorter or longer. ~0.5 to ~2.0 are good scales.</param>  
+    <param name="stepsSize">(int) Size or range of each steps or buckets. The Amount of bukets depends on the input.</param>
+    <param name="offset">(int) Offset or Shift for scale. NOT SURE HOW THIS WAS WORKING ?</param>    
+    <param name="values">(float seq) The values to analyse.</param> 
+    <returns>a formated string</returns>    
+    let byStepSizeOffset units scaleBars stepsSize offset values= 
+        sprintDistributionMain units scaleBars 0 values stepsSize offset
+        *)
