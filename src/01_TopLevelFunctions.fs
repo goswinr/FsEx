@@ -67,8 +67,8 @@ module  Util =
     /// e.g.: -1 is  last item .
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
     let inline negIdx i len =
-        let ii =  if i<0 then len+i else i
-        if ii<0 || ii >= len then failwithf "Util.negIdx: Cannot find right index for %d (for items count %d)" i len
+        let ii =  if i < 0 then len+i else i
+        if ii<0 || ii >= len then failwithf "Util.negIdx: Bad index %d for items count %d." i len
         ii
     
     /// If condition is true return f(x) else just x

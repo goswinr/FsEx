@@ -8,7 +8,11 @@ module List =
     let internal indexFromBack ix (xs: 'T list) =
         if List.isEmpty xs then failwithf "can't get index from back %d from empty list" ix
         else        
-            let ar = Array.zeroCreate (ix+1)
+            // there are two ways to get an item indexed from the back:
+            // (1) iterate all items and keep a buffer
+            // (2) iterate once to find length, and second time to find item ( no buffer)
+            // using (1) here:            
+            let ar = Array.zeroCreate (ix+1)// buffer
             let mutable i = 0
             let mutable k = 0
             let rec  loop (ys: 'T list) = 

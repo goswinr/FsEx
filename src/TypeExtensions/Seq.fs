@@ -8,25 +8,35 @@ open System.Runtime.CompilerServices
 module TypeExtensionsSeq = 
     
     let internal indexFromBack ix (xs: 'T seq) =     
-        use e = xs.GetEnumerator()
-        if e.MoveNext() then        
-            let ar = Array.zeroCreate (ix+1) // use array for buffer
-            let mutable i = 0
-            let mutable k = 0 
-            while (e.MoveNext()) do 
-                k <-i % (ix+1)//loop index
-                ar.[k]<- e.Current 
-                i <- i+1
-            if ix > i then failwithf "can't get index from back %d from  seq of %d items" ix (i+1)
-            ar.GetItem(k-ix) 
-        else
-            failwithf "can't get index from back %d from empty seq" ix
+        match xs with
+        | :? ('T[]) as a ->     a.GetItem(a.Length - 1 - ix)
+        | :? ('T IList) as a -> a.GetItem(a.Count  - 1 - ix) //ResizeArray and other collections           
+        | :? ('T list) as a ->  List.getItem (- 1 - ix) a
+        | _ -> 
+            // ther are two ways to get an item indexed from the back:
+            // (1) iterate all items and keep a buffer
+            // (2) iterate once to find length, and second time to find item ( no buffer)
+            // using (1) here:
+            use e = xs.GetEnumerator()
+            if e.MoveNext() then        
+                let ar = Array.zeroCreate (ix+1) // use array for buffer
+                let mutable i = 0
+                let mutable k = 0 
+                while (e.MoveNext()) do 
+                    k <-i % (ix+1)//loop index
+                    ar.[k]<- e.Current 
+                    i <- i+1
+                if ix > i then failwithf "can't get index from back %d from  seq of %d items" ix (i+1)
+                ar.GetItem(k-ix) 
+            else
+                failwithf "can't get index from back %d from empty seq" ix
     
 
     //[<Extension>] //Error 3246
     type Collections.Generic.IEnumerable<'T>  with 
         
         ///Returns Seq.length - 1
+        [<Extension>]
         member this.LastIndex = 
             if Seq.isEmpty this then failwithf "seq.LastIndex: Can not get LastIndex of empty Seq"
             (Seq.length this) - 1
@@ -104,7 +114,7 @@ module TypeExtensionsSeq =
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies (should consider for other extension modules as well)
 module Seq =   
     
-    /// faster implemetation of Seq.last till F# 4.8 is out
+    /// faster implemetation of Seq.last till F# 4.8  or 5.0 is out
     let lastFast (source : seq<_>) = TypeExtensionsSeq.indexFromBack 0  source // TODO keep this until https://github.com/dotnet/fsharp/pull/7765/files is part of fsharp core
 
     /// Allows for negative indices too, -1 is the last element.
@@ -201,7 +211,7 @@ module Seq =
             if e.MoveNext() then
                 let this = ref e.Current
                 if e.MoveNext() then                    
-                    yield lastFast xs ,!prev, !this //yield Seq.last xs ,!prev, !this
+                    yield indexFromBack 0 xs ,!prev, !this //yield Seq.last xs ,!prev, !this
                     yield !prev, !this, e.Current
                     prev := !this  
                     this := e.Current
@@ -229,7 +239,7 @@ module Seq =
             if e.MoveNext() then
                 let this = ref e.Current
                 if e.MoveNext() then
-                    yield  0, lastFast xs ,!prev, !this //     yield  0, Seq.last xs ,!prev, !this
+                    yield  0, indexFromBack 0 xs ,!prev, !this //     yield  0, Seq.last xs ,!prev, !this
                     yield  1, !prev, !this, e.Current
                     prev := !this  
                     this := e.Current
