@@ -9,6 +9,7 @@ open Microsoft.FSharp.Quotations.DerivedPatterns
 open Microsoft.FSharp.Quotations.Patterns
 open System.Runtime.CompilerServices
 open FsEx.SaveIgnore
+open System
 
 
 [<AutoOpen>] // to have print function auto opened at end
@@ -73,11 +74,17 @@ module NiceString =
         // -- generic pretty printer-----
         //-------------------------------
 
-        /// set this to change how deep the content of nested sq is printed (printFull ignores this)
-        let mutable toNiceStringMaxDepth = 2
+        /// set this to change how deep the content of nested seq is printed (printFull ignores this)
+        /// default = 3
+        let mutable toNiceStringMaxDepth = 3
     
         /// set this to change how how many items per seq are printed (printFull ignores this)
-        let mutable toNiceStringMaxItemsPerSeq = 4
+        /// default = 4
+        let mutable toNiceStringMaxItemsPerSeq = 5
+        
+        /// set this to change how many characters of a string might be printed at onece.
+        /// default = 5000
+        let mutable maxCharsInString = 5000
 
         let private before (splitter:string) (s:string) = 
             let start = s.IndexOf(splitter) 
@@ -176,7 +183,14 @@ module NiceString =
                   else None
                 else None
             | _ -> failwith "toNiceStringRec: the UC pattern can only be used against simple union cases"
-    
+        
+        let fixVeryLongStr (s:string) =
+            if s.Length > maxCharsInString then 
+                if s.Length < maxCharsInString + 500 then s // if its just 500 more add them, its ok 
+                else s.Substring(0,maxCharsInString) + sprintf "%s[...and %d more characters]" Environment.NewLine (s.Length - maxCharsInString)
+            else 
+                s
+
         /// The internal stringbuilder for recursive function
         let private sb = Text.StringBuilder()
 
@@ -194,7 +208,7 @@ module NiceString =
                 | :? float      as v   -> v |> floatToString    |> add
                 | :? single     as v   -> v |> singleToString   |> add        
                 | :? Char       as c   -> c.ToString()          |> add // "'" + c.ToString() + "'" // or add qotes?
-                | :? string     as s   -> s                     |> add // to not have it in quotes, s.ToString() adds a " at start and end
+                | :? string     as s   -> fixVeryLongStr s      |> add // to not have it in quotes, s.ToString() adds a " at start and end
                 | :? Guid       as g   -> sprintf "Guid[%O]" g  |> add
                 //| StructToNiceString s -> add s //reflection fails for extension members?
                 | UC <@ Some @> [v]    -> adn "Option.Some: ";  toNiceStringRec (v, externalFormater, indent+1)
