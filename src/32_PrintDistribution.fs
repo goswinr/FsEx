@@ -1,6 +1,7 @@
 ﻿namespace FsEx
 
 open System
+open System.Environment
 
 
 /// For getting a formated string that has bars to show the ditribution
@@ -13,12 +14,12 @@ module PrintDistribution =
     let mutable separator = ""
 
     let private sprintDistributionMain units scaleBars steps (vs:seq<float>) stepSize stepShift =
-        if Seq.isEmpty vs then "No Items, No Data\r\n"
+        if Seq.isEmpty vs then "No Items, No Data" + NewLine
         else
             let mi = Seq.min vs
             let ma = Seq.max vs 
             let range = ma-mi  
-            if range < 0.000001 then sprintf "All %d values in range of %g to %g \r\nTotal Items:;;;;;;;;%d " (Seq.length vs) mi ma (Seq.length vs)
+            if range < 0.000001 then sprintf "All %d values in range of %g to %g %sTotal Items:;;;;;;;;%d " (Seq.length vs) mi ma NewLine (Seq.length vs)
             else 
                 let av = vs|> Seq.filter (Double.IsNaN>>not) |> Seq.average                
                 let mid = mi + range*0.5
@@ -66,13 +67,13 @@ module PrintDistribution =
                     // sprintf bars:
                     if kk > 0 then txt <- txt + sprintf "|"
                     for i = 1 to int (percent*scaleBars) do txt <- txt + sprintf "█"
-                    txt <- txt + sprintf "\r\n"
+                    txt <- txt +  NewLine
         
-                txt <- txt + sprintf "Total Items:;;;;;;;;%d \r\n" len
-                txt <- txt + sprintf "Average= %.1f %s MiddleValue = %.1f %s \r\n"  av units mid units
-                txt <- txt + sprintf "Delta from Average: down =  %.1f %s, up= %.1f %s, \r\n"  (av-aMin) units (aMax-av) units
-                txt <- txt + sprintf "Range = %.1f \r\n" aRange
-                txt <- txt + sprintf "Minimum = %.1f %s, Maximum = %.1f %s \r\n\r\n"  aMin units aMax units
+                txt <- txt + sprintf "Total Items:;;;;;;;;%d%s" len NewLine
+                txt <- txt + sprintf "Average= %.1f %s MiddleValue = %.1f %s%s"  av units mid units NewLine
+                txt <- txt + sprintf "Delta from Average: down =  %.1f %s, up= %.1f %s%s"  (av-aMin) units (aMax-av) units NewLine
+                txt <- txt + sprintf "Range = %.1f%s" aRange NewLine
+                txt <- txt + sprintf "Minimum = %.1f %s, Maximum = %.1f %s%s%s"  aMin units aMax units NewLine NewLine
                 txt.Replace(";",separator)
     
 
