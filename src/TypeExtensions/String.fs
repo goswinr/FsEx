@@ -90,7 +90,7 @@ module String =
     /// Returns everytrhing before a given splitting string.
     /// Or full string if splitter not present
     let inline before (splitter:string) (s:string) = 
-        let start = s.IndexOf(splitter) 
+        let start = s.IndexOf(splitter, StringComparison.Ordinal) 
         if start = -1 then s
         else s.Substring(0, start )
     
@@ -110,10 +110,10 @@ module String =
     /// between "X" "T" "cXabTk" = "c", "ab", "k"
     /// returns three empty strings if not both found 
     let between (startChar:string) (endChar:string) (s:string) =         
-        let start = s.IndexOf(startChar) 
+        let start = s.IndexOf(startChar, StringComparison.Ordinal) 
         if start = -1 then "","",""
         else 
-            let ende = s.IndexOf(endChar, start + startChar.Length)
+            let ende = s.IndexOf(endChar, start + startChar.Length, StringComparison.Ordinal)
             if ende = -1 then "","",""
             else 
                 s.Substring(0, start ),
@@ -124,10 +124,10 @@ module String =
     /// betweenIncl between "X" "T" "cXabTk" = "c", "XabT", "k"
     /// returns three empty strings if not both found 
     let betweenIncl (startChar:string) (endChar:string) (s:string) =         
-        let start = s.IndexOf(startChar) 
+        let start = s.IndexOf(startChar, StringComparison.Ordinal) 
         if start = -1 then "","","" 
         else 
-            let ende = s.IndexOf(endChar, start + startChar.Length)
+            let ende = s.IndexOf(endChar, start + startChar.Length, StringComparison.Ordinal)
             if ende = -1 then "","",""
             else 
                 s.Substring(0, start),
@@ -180,8 +180,8 @@ module String =
     /// Compares two specified String objects and returns an integer that indicates their relative position in the sort order. Compare strings using ordinal (binary) sort rules and ignoring the case of the strings being compared.
     let inline compareIgnoreCase strA strB = compare StringComparison.OrdinalIgnoreCase strA strB
 
-    /// Determines whether the end of this string instance matches the specified string.
-    let inline endsWith (value : string) (s:string) = s.EndsWith(value)
+    /// Determines whether the end of this string instance matches the specified string using , StringComparison.Ordinal.
+    let inline endsWith (value : string) (s:string) = s.EndsWith(value, StringComparison.Ordinal)
 
     /// Determines whether the end of this string instance matches the specified string when compared using the specified culture.
     let inline endsWith' value ignoreCase culture (s:string) = s.EndsWith(value, ignoreCase, culture)
@@ -204,8 +204,8 @@ module String =
     /// Reports the zero-based index of the first occurrence of the specified character in this instance. The search starts at a specified character position and examines a specified number of character positions.
     let inline indexOfChar'' (value:char) startIndex count (s:string) = s.IndexOf(value, startIndex, count)
 
-    /// Reports the zero-based index of the first occurrence of the specified string in this instance.
-    let inline indexOfString (value:string) (s:string) = s.IndexOf(value)
+    /// Reports the zero-based index of the first occurrence of the specified string in this instance, using StringComparison.Ordinal.
+    let inline indexOfString (value:string) (s:string) = s.IndexOf(value, StringComparison.Ordinal)
 
     /// Reports the zero-based index of the first occurrence of the specified string in this instance. The search starts at a specified character position.
     let inline indexOfString' (value:string) (startIndex:int) (s:string) = s.IndexOf(value, startIndex)
@@ -315,8 +315,8 @@ module String =
     /// Splits a string into a maximum number of substrings based on the strings in an array. You can specify whether the substrings include empty array elements.
     let inline splitString' (separator:string[]) count (options:StringSplitOptions) (s:string) = s.Split(separator, count, options)
 
-    /// Determines whether the beginning of this string instance matches the specified string.
-    let inline startsWith (value : string) (s:string) = s.StartsWith(value)
+    /// Determines whether the beginning of this string instance matches the specified string, using StringComparison.Ordinal..
+    let inline startsWith (value : string) (s:string) = s.StartsWith(value, StringComparison.Ordinal)
 
     /// Determines whether the beginning of this string instance matches the specified string when compared using the specified comparison option.
     let inline startsWith' value comparisonType (s:string) = s.StartsWith(value, comparisonType)
