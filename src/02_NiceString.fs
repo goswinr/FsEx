@@ -283,6 +283,9 @@ module NiceString =
     
     /// prints three values separated by a space using FsEx.NiceString.toNiceString
     let print3 x y z = printfn "%s %s %s" (NiceString.toNiceString x) (NiceString.toNiceString y) (NiceString.toNiceString z) 
+    
+    /// prints four values separated by a space using FsEx.NiceString.toNiceString
+    let print4 w x y z = printfn "%s %s %s %s" (NiceString.toNiceString w) (NiceString.toNiceString x) (NiceString.toNiceString y) (NiceString.toNiceString z) 
 
     /// prints FsEx.NiceString.toNiceStringFull
     let printFull x = printfn "%s" (NiceString.toNiceStringFull x)
