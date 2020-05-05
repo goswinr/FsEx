@@ -159,9 +159,9 @@ module UtilMath =
     /// NumericSteping:Converts floats to floats within defined float step sizes, (always rounding down like the int function)
     let inline stepedFloat (prec:float) (v:float) : float = float (int (v / prec)) * prec
     
-    /// This float range function ensures that the end is always included
+    /// This float range function ensures that the end is always included.
     /// because [0.0 .. 0.1 .. 0.2 ] equals [0.0 .. 0.1 .. 0.3 ]
-    /// it increases the stop value by the smallest step possible 5 times
+    /// It increases the stop value by the smallest step possible 5 times
     let floatRange (start, step, stop) =
         if step = 0.0 then  failwithf "UtilMath.floatRange:stepsize cannot be zero: start: %g step: %g stop: %g " start step stop
         let range = stop - start 
