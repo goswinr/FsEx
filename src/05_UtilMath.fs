@@ -6,7 +6,9 @@ open System.Globalization
 
 module UtilMath =
     
+    /// American Englisch culture (used for float parsing)
     let enUs = CultureInfo.GetCultureInfo("en-us")
+    /// German culture (used for float parsing)
     let deAt = CultureInfo.GetCultureInfo("de-at")
     
     /// First tries to parses english float (period as decimal separator),
