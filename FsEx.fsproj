@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net472</TargetFramework> 
+    <LangVersion>preview</LangVersion>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages> <!--to only have the english resources--> 
+    <RootNamespace>FsEx</RootNamespace>
+    <AssemblyName>FsEx</AssemblyName>    
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NeutralLanguage>en</NeutralLanguage>  
+
+    <Version>0.2.0.0</Version>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
+
+    <Authors>Goswin Rothenthal</Authors>
+    <Product>FsEx</Product> 
+    <Description>A fsharp extension and utility library</Description>
+    <Copyright>Copyright: Goswin Rothenthal 2020 </Copyright>
+  
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <Compile Include="Src\TopLevelFunctions.fs" />
+    <Compile Include="Src\UtilMath.fs" />
+    <Compile Include="Src\MinMaxSortCompare.fs" />
+    <Compile Include="Src\NiceString.fs" />
+
+    <Compile Include="Src\TypeExtensions\Structs.fs" />
+    <Compile Include="Src\TypeExtensions\Color.fs" />
+    <Compile Include="Src\TypeExtensions\String.fs" />
+    <Compile Include="Src\TypeExtensions\Array.fs" />                                   
+    <Compile Include="Src\TypeExtensions\ResizeArray.fs" />
+    <Compile Include="Src\TypeExtensions\Dictionary.fs" />
+    <Compile Include="Src\TypeExtensions\List.fs" />
+    <Compile Include="Src\TypeExtensions\IList.fs" />
+    <Compile Include="Src\TypeExtensions\Seq.fs" />
+
+    <Compile Include="Src\Types\DefaultDict.fs" />
+    <Compile Include="Src\Types\StuctTuples.fs" /> 
+
+    <Compile Include="Src\ComputationalExpressions.fs" />
+    <Compile Include="Src\DynamicOperator.fs" />
+    <Compile Include="Src\PrintDistribution.fs" />
+  </ItemGroup>
+
+  
+
+</Project>
