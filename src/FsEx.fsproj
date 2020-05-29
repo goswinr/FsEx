@@ -8,11 +8,11 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     
     <!--assembly info -->
-    <Version>0.0.2.0</Version>
+    <Version>0.2.0.0</Version>
     <Authors>Goswin Rothenthal</Authors>
     <Product>FsEx</Product>
-    <AssemblyVersion>0.0.2.0</AssemblyVersion>
-    <FileVersion>0.0.2.0</FileVersion>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
     <NeutralLanguage>en</NeutralLanguage>
     <Description>a FSharp extension and utility library</Description>
     <Copyright>Copyright: Goswin Rothenthal 2019 </Copyright>
