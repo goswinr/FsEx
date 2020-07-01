@@ -4,7 +4,7 @@
     <OutputType>Library</OutputType>
     <TargetFramework>net472</TargetFramework> 
     <LangVersion>preview</LangVersion>
-    <SatelliteResourceLanguages>en</SatelliteResourceLanguages> <!--to only have the english resources--> 
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages> <!--to only have the english resources of Fsharp.Core--> 
     <RootNamespace>FsEx</RootNamespace>
     <AssemblyName>FsEx</AssemblyName>    
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
