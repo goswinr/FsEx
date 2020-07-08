@@ -1,6 +1,7 @@
 ﻿namespace FsEx
 
 open System
+open System.IO
 
 type EXT = Runtime.CompilerServices.ExtensionAttribute
 
@@ -74,7 +75,14 @@ module  Util =
     /// If condition is true return f(x) else just x
     let inline ifDo condition (f:'T->'T)  (x:'T) = 
         if condition then f x else x
-
+    
+    /// raises an expetion if the file path does not exist
+    let ensureFileExists s = 
+        if not (IO.File.Exists s) then  raise (FileNotFoundException("File missing or Path worng: '" + s + "'"))
+     
+     /// raises an expetion if the directory path does not exist
+    let ensureDirectoryExists s = 
+        if not (IO.Directory.Exists s) then  raise (DirectoryNotFoundException("Directory missing or Path worng: '" + s + "'"))           
 
 /// Shadows the ignore function to only accept structs
 /// This is to prevent accidetially ignoring partially aplied functions that would return struct
