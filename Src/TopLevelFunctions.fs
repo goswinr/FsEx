@@ -77,11 +77,11 @@ module  Util =
         if condition then f x else x
     
     /// raises an expetion if the file path does not exist
-    let ensureFileExists s = 
+    let checkIfFileExists s = 
         if not (IO.File.Exists s) then  raise (FileNotFoundException("File missing or Path worng: '" + s + "'"))
      
      /// raises an expetion if the directory path does not exist
-    let ensureDirectoryExists s = 
+    let checkIfDirectoryExists s = 
         if not (IO.Directory.Exists s) then  raise (DirectoryNotFoundException("Directory missing or Path worng: '" + s + "'"))           
 
 /// Shadows the ignore function to only accept structs
