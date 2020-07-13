@@ -4,6 +4,8 @@ open System
 open System.Globalization
 
 
+/// Math Utils
+/// Shadows the built in acos function to include clamping if values are slightly above -1.0 or 1.0
 module UtilMath =
     
     /// American Englisch culture (used for float parsing)
@@ -47,11 +49,11 @@ module UtilMath =
     
 
     /// Allows ints to be multiplied by floats
-    ///<c>int(round(float(i) * f))</c> 
+    /// <c>int(round(float(i) * f))</c> 
     let inline ( *. ) (i:int) (f:float) = int(round(float(i) * f)) // or do it like this:https://stackoverflow.com/questions/2812084/overload-operator-in-f/2812306#2812306
     
     /// Gives a float from int / int division
-    ///<c>(float(i)) / (float(j))</c> 
+    /// <c>(float(i)) / (float(j))</c> 
     let inline ( ./. ) (i:int) (j:int) = (float(i)) / (float(j)) // or do it like this:https://stackoverflow.com/questions/2812084/overload-operator-in-f/2812306#2812306
 
     
@@ -77,7 +79,9 @@ module UtilMath =
 
       
     /// Compares two floating point numbers within a relative tolerance for equality. 
-    /// The comparing tolerance is calculated as:  relativeTolerance * (the smaller of the two float arguments).
+    /// The comparing tolerance is calculated as:  
+    /// let mi = min (abs a) (abs b)
+    /// abs(a-b) < relativeTolerance*mi
     let inline areSameRel relativeTolerance (a:float) (b:float)  = 
         let mi = min (abs a) (abs b)
         abs(a-b) < relativeTolerance*mi
@@ -86,7 +90,8 @@ module UtilMath =
     let inline areSame absoluteTolerance (a:float) (b:float)  = 
         abs(a-b) < absoluteTolerance
     
-    /// Shadows the built in acos function to include clamping if values are slightly above -1.0 or 1.0
+    /// Shadows the built in 'acos' function to include clamping if values are slightly above -1.0 or 1.0
+    /// Tolerance 0.00001 
     /// This is useful on dot products from unit vectors
     let acos x =
         if x < -1.00001 then failwithf "acos failed on %g" x
@@ -100,7 +105,6 @@ module UtilMath =
     let inline toDegrees radians = 57.2957795130823 * radians // 57.2957795130823 = 180. / Math.PI
 
     let inline interpolate start ende (rel:float) = start + ( (ende-start) * rel )
-
 
     /// Given the min and max value and a test value,  (val-min) / (max-min)
     /// Returns the relative  position  of the test value between min (= 0.0) and (max = 1.0),
@@ -152,18 +156,23 @@ module UtilMath =
 
 
 
-    /// NumericSteping: Converts floats to ints, devides by precicion
+    /// Numeric Steping: Converts floats to ints, devides by precicion.
+    /// = int (v / prec)
     let inline precInt (prec:float) (v:float) : int = int (v / prec)
     
-    /// NumericSteping:Converts floats to ints within defined integer step sizes, (always rounding down like the int function)
+    /// Numeric Steping:Converts floats to ints within defined integer step sizes. 
+    /// Always rounding down like the int function
+    /// = int (v / float prec) * prec
     let inline stepedInt (prec:int) (v:float) : int = int (v / float prec) * prec
     
-    /// NumericSteping:Converts floats to floats within defined float step sizes, (always rounding down like the int function)
+    /// Numeric Steping:Converts floats to floats within defined float step sizes. 
+    /// Always rounding down like the int function)
+    /// = float (int (v / prec)) * prec
     let inline stepedFloat (prec:float) (v:float) : float = float (int (v / prec)) * prec
     
     /// This float range function ensures that the end is always included.
-    /// because [0.0 .. 0.1 .. 0.2 ] equals [0.0 .. 0.1 .. 0.3 ]
-    /// It increases the stop value by the smallest step possible 5 times
+    /// The F# build in range fails for example on [0.0 .. 0.1 .. 0.2 ] , it equals [0.0 .. 0.1 .. 0.3 ]
+    /// It increases the stop value by the smallest step possible 5 times, to ensure end value is included.
     let floatRange (start, step, stop) =
         if step = 0.0 then  failwithf "UtilMath.floatRange:stepsize cannot be zero: start: %g step: %g stop: %g " start step stop
         let range = stop - start 

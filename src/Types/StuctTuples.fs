@@ -102,7 +102,7 @@ type  IntTup =
 /// A struct of three integers
 /// use operator (===) for fast equality test
 /// Avoid using this struct in Fsharp.Core functions like: List.contains value. boxing will ocure
-/// Better: List.exists (fun v -> v === value)
+/// Better: List.exists ( (===) value)
 type [<Struct; CustomEquality; NoComparison>] IntTrip =        
     val a :int
     val b :int
