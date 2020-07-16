@@ -4,8 +4,10 @@ open System
 open System.Runtime.CompilerServices
 open System.Collections.Generic
 
-/// A type alias for System.Collections.Generic.Dictionary<'K,'V> 
-type Dict<'K,'V> = Dictionary<'K,'V> // type alias avoids the need to open System.Collections.Generic if FsEx namespace is open // dont use lowercase "dict"
+/// A System.Collections.Generic.Dictionary<'K,'V> 
+/// not the same sa lowercase 'dict'
+type Dict<'K,'V> =  Dictionary<'K,'V> // type alias avoids the need to open System.Collections.Generic if FsEx namespace is open // dont use lowercase "dict"
+
 
 [<AutoOpen>]
 module TypeExtensionsDictionary =   
@@ -16,12 +18,14 @@ module TypeExtensionsDictionary =
         /// Set value at key
         [<Extension>]
         member inline  d.SetValue k v =
-            d.[k] <-v        
-        
-        /// Get value at key
+            d.[k] <-v 
+                    
+        /// Get value at key, with nicer error messages
         [<Extension>] 
         member inline d.GetValue k  =
-             d.[k]
+             let ok, v = d.TryGetValue(k)
+             if ok then  v
+             else raise <|  KeyNotFoundException( sprintf "IDictionary.GetValue failed to find key %A in %A of %d items" k d d.Count)
         
         /// Get a value and remove it from Dictionary, like *.pop() in Python         
         [<Extension>] 
@@ -40,10 +44,13 @@ module TypeExtensionsDictionary =
         /// But with richer formationg for collections
         member obj.ToNiceString = NiceString.toNiceString obj
 
+
+
+
 /// static functions on IDictionary Interface
 module Dict = 
     
-    /// Get value at key from IDictionary
+    /// Get value at key from IDictionary, with nicer Error messages
     let get (k:'K) (d:IDictionary<'K,'V>) : 'V = 
         let ok, v = d.TryGetValue(k)
         if ok then  v
