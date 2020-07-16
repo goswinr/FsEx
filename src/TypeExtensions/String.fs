@@ -62,7 +62,9 @@ module TypeExtensionsString =
         
         //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfurtrunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
 
-        /// Allows for negative indices too.
+        /// Allows for negative indices too. -1 is last character
+        /// Includes end index in string 
+        /// for example str.Slice(0,-3) will trim off the last two character from the string 
         [<Extension>]
         member s.Slice(startIdx:int , endIdx:int):string =
             let count = s.Length
