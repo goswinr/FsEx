@@ -582,7 +582,7 @@ module ResizeArray =
     /// Considers List cirular and move elements up or down
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
     /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a]
-    let rotate k (xs: ResizeArray<_>)  =  init xs.Count (fun i -> xs.[if i-k < 0 then xs.Count+i-k  else i-k])
+    let rotate k (xs: ResizeArray<_>)  =  init xs.Count (fun i -> xs.[negIdxLooped (i-k) xs.Count])
 
 
     /// Returns a ResizeArray of the index and the item. (like enumerate in Python)

@@ -71,7 +71,13 @@ module  Util =
         let ii =  if i < 0 then len+i else i
         if ii<0 || ii >= len then failwithf "Util.negIdx: Bad index %d for items count %d." i len
         ii
-    
+
+    /// Converts negative indices to positive ones and loops to start after last index is reached
+    /// retrns a valid index for a colcction of 'len' items for any integer
+    let inline negIdxLooped i len =        
+        let t = i % len
+        if t < 0 then len+t else t
+
     /// If condition is true return f(x) else just x
     let inline ifDo condition (f:'T->'T)  (x:'T) = 
         if condition then f x else x
