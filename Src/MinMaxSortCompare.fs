@@ -4,6 +4,9 @@
 /// of tuple ,triples and quadruples
 module MinMaxSort = 
     
+    // make all inline because of https://stackoverflow.com/questions/6104221/why-is-this-f-code-so-slow
+
+
     /// Returns the smallest element.
     /// Elements are compared by applying the predicate function first.
     /// If both are equal then the first element is returned.
