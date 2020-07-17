@@ -126,7 +126,7 @@ module NiceString =
                         while enum.MoveNext() && k < toNiceStringMaxItemsPerSeq do 
                             rs.Add (box enum.Current)
                             k <- k+1
-                        if k= toNiceStringMaxItemsPerSeq && enum.MoveNext() then                         
+                        if k = toNiceStringMaxItemsPerSeq && enum.MoveNext() && count = -1 then                         
                             Some (MoreThan k, rs:>IEnumerable<_>, name, elName)   // the retuened seq is trimmed!  to a count of maxItemsPerSeq
                         else 
                             Some (Count k, rs:>IEnumerable<_>, name, elName)
@@ -139,7 +139,7 @@ module NiceString =
                             let mutable k = 0
                             while enum.MoveNext() && k < toNiceStringMaxItemsPerSeq do 
                                 k <- k+1
-                            if k= toNiceStringMaxItemsPerSeq && enum.MoveNext() then                         
+                            if k = toNiceStringMaxItemsPerSeq && enum.MoveNext() && count = -1 then                         
                                 Some (MoreThan k, ics, name, elName)  
                             else 
                                 Some (Count k, ics, name, elName)
