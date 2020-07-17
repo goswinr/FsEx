@@ -129,7 +129,7 @@ module NiceString =
                         if k = toNiceStringMaxItemsPerSeq && enum.MoveNext() && count = -1 then                         
                             Some (MoreThan k, rs:>IEnumerable<_>, name, elName)   // the retuened seq is trimmed!  to a count of maxItemsPerSeq
                         else 
-                            Some (Count k, rs:>IEnumerable<_>, name, elName)
+                            Some (Count count, rs:>IEnumerable<_>, name, elName)
                     else                
                         let ics = xs :?> IEnumerable<_> 
                         if count > 0 then 
@@ -142,7 +142,7 @@ module NiceString =
                             if k = toNiceStringMaxItemsPerSeq && enum.MoveNext() && count = -1 then                         
                                 Some (MoreThan k, ics, name, elName)  
                             else 
-                                Some (Count k, ics, name, elName)
+                                Some (Count count, ics, name, elName)
                 else
                     None
             |None -> None
