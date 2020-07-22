@@ -11,28 +11,28 @@ module TypeExtensionsResizeArray =
     type Collections.Generic.List<'T>  with 
     
         /// Gets the index of the last item in the ResizeArray.
-        /// equal to this.Length - 1    
+        /// equal to this.Count - 1    
         [<Extension>]
         member inline this.LastIndex = 
             if this.Count = 0 then failwithf "resizeArray.LastIndex: Can not get LastIndex of empty List"
             this.Count - 1
 
         /// Gets the last item in the ResizeArray.
-        /// equal to this.[this.Length - 1]
+        /// equal to this.[this.Count - 1]
         [<Extension>]
         member inline this.Last = 
             if this.Count = 0 then failwithf "resizeArray.Last: Can not get Last item of empty List"
             this.[this.Count - 1]
         
         /// Gets the second last item in the ResizeArray.
-        /// equal to this.[this.Length - 2]
+        /// equal to this.[this.Count - 2]
         [<Extension>]
         member inline this.SecondLast = 
             if this.Count < 2 then failwithf "resizeArray.SecondLast: Can not get SecondLast item of %s"  (NiceString.toNiceStringFull this)
             this.[this.Count - 2]
 
         /// Gets the third last item in the ResizeArray.
-        /// equal to this.[this.Length - 2]
+        /// equal to this.[this.Count - 3]
         [<Extension>]
         member inline this.ThirdLast = 
             if this.Count < 3 then failwithf "resizeArray.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
@@ -60,8 +60,16 @@ module TypeExtensionsResizeArray =
             if this.Count < 3 then failwithf "resizeArray.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
             this.[2]
 
+        /// Checks if this.Count = 0 
+        [<Extension>]
+        member inline this.IsEmpty = 
+            this.Count = 0 
         
-        
+        /// Checks if this.Count > 0 
+        [<Extension>]
+        member inline this.IsNotEmpty = 
+            this.Count > 0 
+
         /// Gets an item in the ResizeArray by index.
         /// Allows for negtive index too ( -1 is last item,  like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
