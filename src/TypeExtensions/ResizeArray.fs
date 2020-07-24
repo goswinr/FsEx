@@ -69,6 +69,11 @@ module TypeExtensionsResizeArray =
         [<Extension>]
         member inline this.IsNotEmpty = 
             this.Count > 0 
+        
+        /// Insert an item at the beginning of the list = index 0, 
+        /// (moving all other items up by one index)
+        member inline this.Insert0 x  = 
+            this.Insert(0,x)
 
         /// Gets an item in the ResizeArray by index.
         /// Allows for negtive index too ( -1 is last item,  like Python)
