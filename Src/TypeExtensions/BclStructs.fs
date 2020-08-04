@@ -17,29 +17,30 @@ module TypeExtensionsBclStructs =
         /// Calls byte(x)
         [<Extension>] member inline x.ToByte = byte(x)
         
-        /// Same as i.ToString() but without the need for the brackets
-        // (for nicer inlining)
+        /// Same as i.ToString() but as propertry, not method.
+        /// So without the need for the brackets. (for nicer inlining)
         [<Extension>] member inline x.AsString = x.ToString()
 
  
     type Byte with  
+
         /// Calls float(x)
         [<Extension>] member inline x.ToFloat = float(x)
 
         /// Calls byte(x)
-        [<Extension>] member inline x.ToInt = int(x)
-    
+        [<Extension>] member inline x.ToInt = int(x)    
     
  
     type Double with  
-        /// Converts int to float INCLUDING ROUNDING .
+        
+        /// Converts int to float including rounding .
         /// int(round(x))
         [<Extension>] member inline x.ToInt = int(round(x))
 
         /// With automatic formating of display reduced precision depending on float size
         [<Extension>] member x.ToNiceString = NiceString.floatToString x        
         
-        /// Similar to f.ToString() but
+        /// Similar to f.ToString() 
         /// with automatic formating to never use scientific notation
         /// will have maximum 15 decimal places
         /// f.ToString( "0.###############") 
@@ -50,6 +51,11 @@ module TypeExtensionsBclStructs =
         /// with automatic formating of display reduced precision depending on single size
         [<Extension>] member x.ToNiceString = NiceString.singleToString x
 
+        /// Similar to f.ToString() 
+        /// with automatic formating to never use scientific notation
+        /// will have maximum 7 decimal places
+        /// f.ToString( "0.###############") 
+        [<Extension>] member x.AsString = x.ToString( "0.#######") 
     
     type DateTime with
         
