@@ -169,6 +169,11 @@ module UtilMath =
     /// Always rounding down like the int function)
     /// = float (int (v / prec)) * prec
     let inline stepedFloat (prec:float) (v:float) : float = float (int (v / prec)) * prec
+
+    /// Numeric Steping:Converts floats to floats within defined float step sizes. 
+    /// Always rounding mid point  like the round function)
+    /// =  (round (v / prec)) * prec
+    let inline stepedFloatMid (prec:float) (v:float) : float = (round (v / prec)) * prec
     
     /// This float range function ensures that the end is always included.
     /// The F# build in range fails for example on [0.0 .. 0.1 .. 0.2 ] , it equals [0.0 .. 0.1 .. 0.3 ]
