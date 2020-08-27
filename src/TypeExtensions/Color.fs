@@ -69,7 +69,7 @@ module Color =
         /// val = value between 0.0 to 1.0, will get clamped
         /// returns color value from gradient blue to green  to yellow to red, excludes purple        
         let colorFromInterval v =  
-            if -0.001 <. v .< 1.001 then failwithf " *colorFromInterval: v is bigger than 1.0 or smaller than 0.0: %f" v
+            if -0.001 >. v .> 1.001 then failwithf " *colorFromInterval: v is bigger than 1.0 or smaller than 0.0: %f" v
             let v = UtilMath.clamp 0. 1. v  
             let v = (1.0 - v)* 0.66666666 // to not make full color cirle, = and to exclude the purple values.
             colorFromHSL (v,1.0,0.5)
