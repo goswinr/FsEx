@@ -15,10 +15,13 @@ module TypeExtensionsDictionary =
     //[<Extension>] //Error 3246
     type IDictionary<'K,'V> with           
         
-        /// Set value at key
+        /// Set value at key, with nicer error messages
         [<Extension>]
         member inline  d.SetValue k v =
-            d.[k] <-v 
+            try  d.[k] <-v
+            with 
+                | :? KeyNotFoundException  -> raise <|  KeyNotFoundException( sprintf "IDictionary.SetValue failed to find key '%A' in %A of %d items (for value: '%A')" k d d.Count v)
+                | e -> raise e
                     
         /// Get value at key, with nicer error messages
         [<Extension>] 
@@ -30,7 +33,7 @@ module TypeExtensionsDictionary =
         /// Get a value and remove it from Dictionary, like *.pop() in Python         
         [<Extension>] 
         member inline d.Pop k  =
-            let v= d.[k]
+            let v = d.GetValue k
             d.Remove(k)|> ignore
             v
 
