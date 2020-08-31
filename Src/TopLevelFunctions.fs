@@ -42,6 +42,7 @@ module  Util =
 
     /// Apply function, like |> , but ignore result. 
     /// Return original input
+    /// let inline (|>>) x f =  f x |> ignore ; x 
     let inline (|>>) x f =  f x |> ignore ; x 
 
     /// Get first element of Triple (Tuple of three elements)
