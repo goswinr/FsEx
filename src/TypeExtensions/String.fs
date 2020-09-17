@@ -167,6 +167,16 @@ module String =
             raise (IndexOutOfRangeException(err))         
         s.Substring(st,len) 
     
+    /// Fills the beginning of a string with the filler character 
+    /// until it has reached the desired length
+    let prefixToLength desiredLength (fillerChar:char) strToFill = 
+        let len = String.length strToFill
+        if len>desiredLength then 
+            failwithf "String.prefixToLength '%s' cant be filled to length %d because it is already %d long." strToFill desiredLength len
+        elif 
+            len = desiredLength then strToFill
+        else 
+            new String(fillerChar, desiredLength-len) + strToFill
 
     //-------------------------------------------------------------------------
     // taken from FSharpx
