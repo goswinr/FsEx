@@ -29,9 +29,9 @@ module TypeExtensionsColor =
 module Color =
         open FsEx.CompareOperators
 
-        let internal Rand = new Random(int <| System.DateTime.Now.TimeOfDay.TotalMilliseconds * 0.01297) // random seed different than other modules
+        let internal Rand = new Random(int <| System.DateTime.Now.TimeOfDay.TotalMilliseconds * 0.0129547) // random seed different than other modules
         
-        /// *Given Hue,Saturation,Luminance in range of 0.0 to 1.0, returns a Drawing.Color 
+        /// Given Hue,Saturation,Luminance in range of 0.0 to 1.0, returns a Drawing.Color 
         let colorFromHSL (H,S,L) = 
             // from http://stackoverflow.com/questions/2942/hsl-in-net
             // or http://bobpowell.net/RGBHSB.aspx
@@ -66,33 +66,38 @@ module Color =
 
             Color.FromArgb (int <| 255.* r ,  int <| 255.* g , int <| 255.* b )
 
-        /// val = value between 0.0 to 1.0, will get clamped
-        /// returns color value from gradient blue to green  to yellow to red, excludes purple        
+        /// Returns a color value from gradient blue to green  to yellow to red, excludes purple        
+        /// Input value to range from 0.0 to 1.0   
+        /// Will fail on to small or too big values,
+        /// but up to a tolerance of  0.001 outside of this range values wil be clamped)
         let colorFromInterval v =  
             if -0.001 >. v .> 1.001 then failwithf " *colorFromInterval: v is bigger than 1.0 or smaller than 0.0: %f" v
             let v = UtilMath.clamp 0. 1. v  
-            let v = (1.0 - v)* 0.66666666 // to not make full color cirle, = and to exclude the purple values.
+            let v = (1.0 - v) * 0.7 // 0.66666666 // to NOT make full color cirle, that means to exclude the purple values.
             colorFromHSL (v,1.0,0.5)
 
-        /// *Given a Drawing.Color , returns Hue,Saturation,Luminance in range of 0.0-1.0
+        /// Given a Drawing.Color , returns Hue,Saturation,Luminance in range of 0.0 to 1.0
         let HSLfromColor (color:Color) = color.GetHue()/360.0f |> float, 
                                          color.GetSaturation() |> float, 
                                          color.GetBrightness() |> float
     
-        /// *generates a Random color 
+        /// Generates a Random color 
         let randomColor () =  Color.FromArgb (Rand.Next(0,256), Rand.Next(0,256), Rand.Next(0,256))    
     
-        /// *generates a Random color with high saturation probability, exluding yellow colors
+        /// Generates a Random color with high saturation probability, exluding yellow colors
+        /// These are ideal for layer color in Rhino3d CAD app
         let rec randomColorForRhino () =
             let hue = Rand.NextDouble()       
-            let sat = UtilMath.randomStandardDeviation 1.0 0.2 |> (fun x -> if x > 1. then 2.-x else x )|>  UtilMath.clamp 0.1 1.0 
-            let lum = UtilMath.randomStandardDeviation 0.5 0.3 |> UtilMath.clamp 0.1 0.9 // to avoid total white or black
-            if hue < 0.19 && hue > 0.12 && sat > 0.8 && lum > 0.3 && lum < 0.7  then // to avoid a color close to yellow
-                randomColorForRhino ()
+            let sat = UtilMath.randomStandardDeviation 1.0 0.3  |> (fun x -> if x > 1. then 2.-x else x ) |>  UtilMath.clamp 0.1 1.0 
+            let lum = UtilMath.randomStandardDeviation 0.5 0.1                                            |>  UtilMath.clamp 0.2 0.8 // to avoid total white (1.0) or black (0.0)
+            if     hue < 0.19 && hue > 0.12 // to avoid a color close to yellow
+                && sat > 0.8  && lum > 0.3 
+                && lum < 0.7  then 
+                    randomColorForRhino ()
             else
                 colorFromHSL (hue,sat,lum)
         
-        /// * make a color lighter by perecentage (value between 0.0 to 1.0) (1.0 = white, 0.0 = current color) 
+        /// Make a color lighter by perecentage (value between 0.0 to 1.0) (1.0 = white, 0.0 = current color) 
         let makeLighter v c =
             if -0.001 >. v .> 1.001 then failwithf " *makeLighter: v is bigger than 1.0 or smaller than 0.0: %f" v
             let v = UtilMath.clamp 0. 1. v            
@@ -100,7 +105,7 @@ module Color =
             let delta = 1.0 - l
             colorFromHSL (h,s,l + delta * v)
 
-        /// * make a color darker by perecentage (value between 0.0 to 1.0) (1.0 = black, 0.0 = current color) 
+        /// Make a color darker by perecentage (value between 0.0 to 1.0) (1.0 = black, 0.0 = current color) 
         let makeDarker v c =
             if -0.001 >. v .> 1.001 then failwithf " *makeDarker: v is bigger than 1.0 or smaller than 0.0: %f" v
             let v = UtilMath.clamp 0. 1. v 
