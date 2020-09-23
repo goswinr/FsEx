@@ -88,6 +88,11 @@ module TypeExtensionsString =
 
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide String class in C# assemblies (should consider for other extension modules as well)
 module String =
+    
+    // Ensures all lines end on Environment.NewLine
+    // code: s.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine)
+    let unifyLineEndings (s:string) =
+        s.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine)
 
     /// Returns everytrhing before a given splitting string.
     /// Or full string if splitter not present
