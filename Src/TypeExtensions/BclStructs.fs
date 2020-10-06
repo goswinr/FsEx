@@ -33,7 +33,7 @@ module TypeExtensionsBclStructs =
  
     type Double with  
         
-        /// Converts int to float including rounding .
+        /// Converts float to int including rounding .
         /// int(round(x))
         [<Extension>] member inline x.ToInt = int(round(x))
 
@@ -57,6 +57,22 @@ module TypeExtensionsBclStructs =
         /// f.ToString( "0.###############") 
         [<Extension>] member x.AsString = x.ToString( "0.#######") 
     
+    
+    type Decimal with  
+           
+        /// Converts decimal to int including rounding .
+        /// int(round(x))
+        [<Extension>] member inline x.ToInt = int(round(x))
+
+        /// With automatic formating of display reduced precision depending on float size
+        [<Extension>] member x.ToNiceString = NiceString.floatToString (float x)        
+           
+        /// Similar to f.ToString() 
+        /// with automatic formating to never use scientific notation
+        /// will have maximum 15 decimal places
+        /// f.ToString( "0.###############") 
+        [<Extension>] member x.AsString = x.ToString( "0.###############") 
+
     type DateTime with
         
         /// Current local date as yyyy-MM-dd
