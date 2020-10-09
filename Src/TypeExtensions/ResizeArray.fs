@@ -14,50 +14,53 @@ module TypeExtensionsResizeArray =
         /// equal to this.Count - 1    
         [<Extension>]
         member inline this.LastIndex = 
-            if this.Count = 0 then failwithf "resizeArray.LastIndex: Can not get LastIndex of empty List"
+            if this.Count = 0 then raise <| IndexOutOfRangeException "resizeArray.LastIndex: Can not get LastIndex of empty List"
             this.Count - 1
 
         /// Gets the last item in the ResizeArray.
         /// equal to this.[this.Count - 1]
         [<Extension>]
         member inline this.Last = 
-            if this.Count = 0 then failwithf "resizeArray.Last: Can not get Last item of empty List"
+            if this.Count = 0 then raise <| IndexOutOfRangeException "resizeArray.Last: Can not get Last item of empty List"
             this.[this.Count - 1]
         
         /// Gets the second last item in the ResizeArray.
         /// equal to this.[this.Count - 2]
         [<Extension>]
         member inline this.SecondLast = 
-            if this.Count < 2 then failwithf "resizeArray.SecondLast: Can not get SecondLast item of %s"  (NiceString.toNiceStringFull this)
+            if this.Count < 2 then 
+                raise <| IndexOutOfRangeException( "resizeArray.SecondLast: Can not get SecondLast item of "  + (NiceString.toNiceStringFull this))
             this.[this.Count - 2]
 
         /// Gets the third last item in the ResizeArray.
         /// equal to this.[this.Count - 3]
         [<Extension>]
         member inline this.ThirdLast = 
-            if this.Count < 3 then failwithf "resizeArray.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
+            if this.Count < 3 then 
+                raise <| IndexOutOfRangeException( "resizeArray.ThirdLast: Can not get ThirdLast item of " + (NiceString.toNiceStringFull this))
             this.[this.Count - 3]
-
-        
+                    
         /// Gets the first item in the ResizeArray.
         /// equal to this.[0]
         [<Extension>]
         member inline this.First = 
-            if this.Count = 0 then failwithf "resizeArray.First: Can not get First item of empty List"
+            if this.Count = 0 then raise <| IndexOutOfRangeException "resizeArray.First: Can not get First item of empty List"
             this.[0]
 
         /// Gets the second item in the ResizeArray.
         /// equal to this.[1]
         [<Extension>]
         member inline this.Second = 
-            if this.Count < 2 then failwithf "resizeArray.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
+            if this.Count < 2 then 
+                raise <| IndexOutOfRangeException ( "resizeArray.Second: Can not get Second item of " +  (NiceString.toNiceStringFull this))
             this.[1]
 
         /// Gets the third item in the ResizeArray.
         /// equal to this.[2]
         [<Extension>]
         member inline this.Third = 
-            if this.Count < 3 then failwithf "resizeArray.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
+            if this.Count < 3 then 
+                raise <| IndexOutOfRangeException("resizeArray.Third: Can not get Third item of " +  (NiceString.toNiceStringFull this))
             this.[2]
 
         /// Checks if this.Count = 0 
