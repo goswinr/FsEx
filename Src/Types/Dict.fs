@@ -1,51 +1,42 @@
-namespace FsEx
+﻿namespace FsEx
 
 open System
 open System.Collections.Generic
 
 
-
-/// <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
-/// If accessing a non exiting key , the default function is called to create and set it. 
-/// Like defaultdict in Python</summary>    
-/// <param name="defaultFun">(unit->'V): The function to create a default value</param>
-type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V) =
+/// A thin wraper over System.Collections.Generic.Dictionary with nicer Error messages on accessing missing keys
+/// not the same sa lowercase 'dict'in F#
+type Dict< 'K,'V when 'K:equality > () =
     
     //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
 
     /// the internal dictionary
     let dd = Dictionary<'K,'V>() 
-
-    let dGet(k) =
-        let ok, v = dd.TryGetValue(k)
-        if ok then 
-            v
-        else 
-            let v = defaultFun()
-            dd.[k] <- v
-            v
+                
+    let get k  =
+         let ok, v = dd.TryGetValue(k)
+         if ok then  v
+         else raise <|  KeyNotFoundException( sprintf "Dict.Get failed to find key %A in %A of %d items" k dd dd.Count)
     
-    /// For Index operator: get or set the value for given key
+    
+    /// For Index operator .[i]: get or set the value for given key
     member _.Item 
-        with get k   = dGet k        
+        with get k   = get k        
         and  set k v = dd.[k] <- v
     
-    /// Get value for given key. 
-    /// Calls defaultFun to get value if key not found.
-    /// Also sets key to retuned value.
-    /// use .TryGetValue(k) if you dont want a missing key to be created
-    member _.Get k = dGet k 
+    /// Get value for given key
+    member _.Get k = get k 
     
     /// Get a value and remove key and value it from dictionary, like *.pop() in Python 
     /// Will fail if key does not exist
-    /// Does not set any new key if key is missing
     member dd.Pop(k:'K) =
         let ok, v = dd.TryGetValue(k)
         if ok then
             dd.Remove k |>ignore
             v
         else 
-            raise <|  KeyNotFoundException( sprintf "DefaultDict.Pop(key): Cannot pop key %A in %A of %d items" k dd dd.Count)
+            raise <|  KeyNotFoundException( sprintf "Dict.Pop(key): Cannot pop key %A in %A of %d items" k dd dd.Count)
+            
 
     /// Returns a (lazy) sequence of key and value tuples
     member _.Items =
@@ -138,7 +129,7 @@ type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V) =
 
     interface IDictionary<'K,'V> with 
         member _.Item 
-            with get k = dGet k
+            with get k = get k
             and  set k v = dd.[k] <- v 
        
         member _.Keys = (dd:>IDictionary<'K,'V>).Keys 
@@ -158,7 +149,7 @@ type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V) =
 
     interface IReadOnlyDictionary<'K,'V> with 
         member _.Item 
-            with get k = dGet k
+            with get k = get k
        
         member _.Keys = (dd:>IReadOnlyDictionary<'K,'V>).Keys 
 

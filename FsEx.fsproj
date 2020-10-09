@@ -32,10 +32,11 @@
     <Compile Include="Src\TypeExtensions\String.fs" />
     <Compile Include="Src\TypeExtensions\Array.fs" />                                   
     <Compile Include="Src\TypeExtensions\ResizeArray.fs" />
-    <Compile Include="Src\TypeExtensions\Dictionary.fs" />
+    <Compile Include="Src\TypeExtensions\IDictionary.fs" />
     <Compile Include="Src\TypeExtensions\List.fs" />
     <Compile Include="Src\TypeExtensions\IList.fs" />
     <Compile Include="Src\TypeExtensions\Seq.fs" />
+    <Compile Include="Src\Types\Dict.fs" />
 
     <Compile Include="Src\Types\DefaultDict.fs" />
     <Compile Include="Src\Types\StuctTuples.fs" /> 
