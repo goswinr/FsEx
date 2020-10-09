@@ -4,13 +4,9 @@ open System
 open System.Runtime.CompilerServices
 open System.Collections.Generic
 
-/// A System.Collections.Generic.Dictionary<'K,'V> 
-/// not the same sa lowercase 'dict'
-type Dict<'K,'V> =  Dictionary<'K,'V> // type alias avoids the need to open System.Collections.Generic if FsEx namespace is open // dont use lowercase "dict"
-
 
 [<AutoOpen>]
-module TypeExtensionsDictionary =   
+module TypeExtensionsIDictionary =   
 
     //[<Extension>] //Error 3246
     type IDictionary<'K,'V> with           
@@ -30,12 +26,16 @@ module TypeExtensionsDictionary =
              if ok then  v
              else raise <|  KeyNotFoundException( sprintf "IDictionary.GetValue failed to find key %A in %A of %d items" k d d.Count)
         
+        
         /// Get a value and remove it from Dictionary, like *.pop() in Python         
         [<Extension>] 
         member inline d.Pop k  =
-            let v = d.GetValue k
-            d.Remove(k)|> ignore
-            v
+            let ok, v = d.TryGetValue(k)
+            if ok then
+                d.Remove k |>ignore
+                v
+            else 
+                raise <|  KeyNotFoundException( sprintf "IDictionary.Pop(key): Cannot pop key %A in %A of %d items" k d d.Count)
 
         /// Returns a lazy seq of key and value tuples
         [<Extension>] 
