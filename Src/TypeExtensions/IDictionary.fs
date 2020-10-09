@@ -57,6 +57,9 @@ module Dict =
     let get (k:'K) (d:IDictionary<'K,'V>) : 'V = 
         let ok, v = d.TryGetValue(k)
         if ok then  v
-        else failwithf "Dict.get faild to find key %A in %A of %d items" k d d.Count
+        else raise <|  KeyNotFoundException( sprintf "Dict.get faild to find key %A in %A of %d items" k d d.Count)
     
-    
+    /// Set value at key from IDictionary
+    // just d.[k]<-v
+    let set (value:'V) (key:'K) (dict:IDictionary<'K,'V>) =  dict.[key]<-value
+        
