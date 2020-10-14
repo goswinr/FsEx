@@ -109,37 +109,43 @@ module String =
     /// like : string.Split([| spliter |], StringSplitOptions.None)  
     let inline splitKeep (spliter:string) (s:string) = s.Split([|spliter|], StringSplitOptions.None)    
     
-    /// split string into two elements, if splitter not found first string is same , second string is empty 
-    /// like : string.Split( [| spliter |],2, StringSplitOptions.RemoveEmptyEntries) in if xs.Length > 1 then xs.[0],xs.[1] else s,""
-    let inline split2 (spliter:string) (s:string) = let xs = s.Split( [|spliter|],2, StringSplitOptions.None) in if xs.Length > 1 then xs.[0],xs.[1] else s,""
+    /// split string into two elements, 
+    /// splitter is not included in the two return strings.
+    /// if splitter not found first string is same as input, second string is empty 
+    let splitOnce (spliter:string) (s:string) = 
+        let start = s.IndexOf(spliter, StringComparison.Ordinal) 
+        if start = -1 then s,""
+        else               s.Substring(0, start), s.Substring(start + spliter.Length)
     
     /// finds text betwween two strings
     /// between "X" "T" "cXabTk" = "c", "ab", "k"
-    /// returns three empty strings if not both found 
-    let between (startChar:string) (endChar:string) (s:string) =         
+    /// delimiters are excluded
+    /// if not both splitters are found returns original string and two empty strings 
+    /// previously called between, but now with new retuen value on fail
+    let splitTwice (startChar:string) (endChar:string) (s:string) =         
         let start = s.IndexOf(startChar, StringComparison.Ordinal) 
-        if start = -1 then "","",""
+        if start = -1 then s,"",""
         else 
             let ende = s.IndexOf(endChar, start + startChar.Length, StringComparison.Ordinal)
-            if ende = -1 then "","",""
+            if ende = -1 then s,"",""
             else 
                 s.Substring(0, start ),
                 s.Substring(start + startChar.Length, ende - start - startChar.Length),// finds text betwween two chars
                 s.Substring(ende + endChar.Length)
     
-    /// Finds text betwween two strings, includes delimiters on middle string 
-    /// betweenIncl between "X" "T" "cXabTk" = "c", "XabT", "k"
-    /// returns three empty strings if not both found 
-    let betweenIncl (startChar:string) (endChar:string) (s:string) =         
-        let start = s.IndexOf(startChar, StringComparison.Ordinal) 
-        if start = -1 then "","","" 
-        else 
-            let ende = s.IndexOf(endChar, start + startChar.Length, StringComparison.Ordinal)
-            if ende = -1 then "","",""
-            else 
-                s.Substring(0, start),
-                s.Substring(start, ende - start + endChar.Length),// finds text betwween two chars
-                s.Substring(ende + endChar.Length)
+    // Finds text betwween two strings, includes delimiters on middle string 
+    // betweenIncl between "X" "T" "cXabTk" = "c", "XabT", "k"
+    // returns three empty strings if not both found 
+    //let betweenIncl (startChar:string) (endChar:string) (s:string) =         
+    //   let start = s.IndexOf(startChar, StringComparison.Ordinal) 
+    //   if start = -1 then "","","" 
+    //   else 
+    //       let ende = s.IndexOf(endChar, start + startChar.Length, StringComparison.Ordinal)
+    //       if ende = -1 then "","",""
+    //       else 
+    //           s.Substring(0, start),
+    //           s.Substring(start, ende - start + endChar.Length),// finds text betwween two chars
+    //           s.Substring(ende + endChar.Length)
     
   
     /// First letter of string to Uppercase
