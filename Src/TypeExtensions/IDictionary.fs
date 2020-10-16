@@ -16,15 +16,15 @@ module TypeExtensionsIDictionary =
         member inline  d.SetValue k v =
             try  d.[k] <-v
             with 
-                | :? KeyNotFoundException  -> raise <|  KeyNotFoundException( sprintf "IDictionary.SetValue failed to find key '%A' in %A of %d items (for value: '%A')" k d d.Count v)
-                | e -> raise e
+                | :? KeyNotFoundException  ->  KeyNotFoundException.Raise "IDictionary.SetValue failed to find key '%A' in %A of %d items (for value: '%A')" k d d.Count v
+                | e                        -> raise e
                     
         /// Get value at key, with nicer error messages
         [<Extension>] 
         member inline d.GetValue k  =
              let ok, v = d.TryGetValue(k)
              if ok then  v
-             else raise <|  KeyNotFoundException( sprintf "IDictionary.GetValue failed to find key %A in %A of %d items" k d d.Count)
+             else KeyNotFoundException.Raise "IDictionary.GetValue failed to find key %A in %A of %d items" k d d.Count
         
         
         /// Get a value and remove it from Dictionary, like *.pop() in Python         
@@ -35,7 +35,7 @@ module TypeExtensionsIDictionary =
                 d.Remove k |>ignore
                 v
             else 
-                raise <|  KeyNotFoundException( sprintf "IDictionary.Pop(key): Cannot pop key %A in %A of %d items" k d d.Count)
+                KeyNotFoundException.Raise "IDictionary.Pop(key): Cannot pop key %A in %A of %d items" k d d.Count
 
         /// Returns a lazy seq of key and value tuples
         [<Extension>] 
@@ -57,7 +57,7 @@ module Dict =
     let get (k:'K) (d:IDictionary<'K,'V>) : 'V = 
         let ok, v = d.TryGetValue(k)
         if ok then  v
-        else raise <|  KeyNotFoundException( sprintf "Dict.get faild to find key %A in %A of %d items" k d d.Count)
+        else KeyNotFoundException.Raise "Dict.get faild to find key %A in %A of %d items" k d d.Count
     
     /// Set value at key from IDictionary
     // just d.[k]<-v

@@ -7,60 +7,69 @@ open FsEx.SaveIgnore
 [<AutoOpen>]
 module TypeExtensionsString =   
     
+    /// An Exception for the string functions defined in FsEx
+    type FsExStringException(s:string)=
+        inherit Exception(s)
+        
+        /// Raise the exeption with F# printf string formating
+        static member inline Raise msg =  Printf.kprintf (fun s -> raise (new FsExStringException(s))) msg 
+
+
     //[<Extension>] //Error 3246
     type System.String with
         
         /// like this.Length - 1
         [<Extension>]
         member inline this.LastIndex = 
-            if this.Length = 0 then failwithf "this.LastIndex: Cannot get LastIndex of empty String"
+            if this.Length = 0 then FsExStringException.Raise "this.LastIndex: Cannot get LastIndex of empty String"
             this.Length - 1
         
         
         [<Extension>]
         member inline s.Last = 
-            if s.Length = 0 then failwithf "this.Last: Cannot get Last item of empty String"
+            if s.Length = 0 then FsExStringException.Raise "this.Last: Cannot get Last item of empty String"
             s.[s.Length - 1]  
 
         [<Extension>]
         member inline this.SecondLast = 
-            if this.Length < 2 then failwithf "this.SecondLast: Can not get SecondLast item of '%s'" this
+            if this.Length < 2 then FsExStringException.Raise "this.SecondLast: Can not get SecondLast item of '%s'" this
             this.[this.Length - 2]
 
         [<Extension>]
         member inline this.ThirdLast = 
-            if this.Length < 3 then failwithf "this.ThirdLast: Can not get ThirdLast item of '%s'" this
+            if this.Length < 3 then FsExStringException.Raise "this.ThirdLast: Can not get ThirdLast item of '%s'" this
             this.[this.Length - 3]
 
         [<Extension>]
         /// get last x characters of string
         member s.LastX x = 
-            if s.Length < x then failwithf "this.LastX: Cannot get last %d item of too short String '%s' " x s
+            if s.Length < x then FsExStringException.Raise "this.LastX: Cannot get last %d item of too short String '%s' " x s
             s.Substring(s.Length-x,x) 
             
         [<Extension>]
         member inline this.First = 
-            if this.Length = 0 then failwithf "this.First: Can not get First item of empty String"
+            if this.Length = 0 then FsExStringException.Raise "this.First: Can not get First item of empty String"
             this.[0]
 
         [<Extension>]
         member inline this.Second = 
-            if this.Length < 2 then failwithf "this.Second: Can not get Second item of '%s'" this
+            if this.Length < 2 then FsExStringException.Raise "this.Second: Can not get Second item of '%s'" this
             this.[1]
 
         [<Extension>]
         member inline this.Third = 
-            if this.Length < 3 then failwithf "this.Third: Can not get Third item of '%s'" this
+            if this.Length < 3 then FsExStringException.Raise "this.Third: Can not get Third item of '%s'" this
             this.[2]
         
         [<Extension>] 
         /// Allows for negtive index too (like Python)
-        member this.GetItem index = 
+        member this.GetItem index =             
             let i = negIdx index this.Length
+            if i >= this.Length then FsExStringException.Raise "this.Third: Can not get Third item of '%s'" this
             this.[i]
     
         
-        //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfurtrunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
+        //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfortrunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
 
         /// Allows for negative indices too. -1 is last character
         /// Includes end index in string 
@@ -72,17 +81,17 @@ module TypeExtensionsString =
             let len = if endIdx<0 then count+endIdx-st+1 else endIdx-st+1
     
             if st < 0 || st > count-1 then 
-                let err = sprintf "GetSlice: Start index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
-                raise (IndexOutOfRangeException(err))
+                FsExStringException.Raise "GetSlice: Start index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
+                
     
             if st+len > count then 
-                let err = sprintf "GetSlice: End index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
-                raise (IndexOutOfRangeException(err)) 
+                FsExStringException.Raise "GetSlice: End index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
+                
             
             if len < 0 then
                 let en = if endIdx<0 then count+endIdx else endIdx
-                let err = sprintf "GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for String '%s' of %d chars" startIdx st endIdx en s count
-                raise (IndexOutOfRangeException(err)) 
+                FsExStringException.Raise "GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for String '%s' of %d chars" startIdx st endIdx en s count
+              
             
             s.Substring(st,len) 
 
@@ -167,15 +176,15 @@ module String =
         let st  = if startIdx<0 then count+startIdx    else startIdx
         let len = if endIdx<0   then count+endIdx-st+1 else endIdx-st+1    
         if st < 0 || st > count-1 then 
-            let err = sprintf "String.slice: Start index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
-            raise (IndexOutOfRangeException(err))    
+            FsExStringException.Raise "String.slice: Start index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
+            
         if st+len > count then 
-            let err = sprintf "String.slice: End index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
-            raise (IndexOutOfRangeException(err))         
+            FsExStringException.Raise "String.slice: End index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
+                  
         if len < 0 then
             let en = if endIdx<0 then count+endIdx else endIdx
-            let err = sprintf "String.slice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for String '%s' of %d items" startIdx st endIdx en s count
-            raise (IndexOutOfRangeException(err))         
+            FsExStringException.Raise "String.slice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for String '%s' of %d items" startIdx st endIdx en s count
+                    
         s.Substring(st,len) 
     
     /// Fills the beginning of a string with the filler character 
@@ -183,7 +192,7 @@ module String =
     let prefixToLength desiredLength (fillerChar:char) strToFill = 
         let len = String.length strToFill
         if len>desiredLength then 
-            failwithf "String.prefixToLength '%s' cant be filled to length %d because it is already %d long." strToFill desiredLength len
+            FsExStringException.Raise "String.prefixToLength '%s' cant be filled to length %d because it is already %d long." strToFill desiredLength len
         elif 
             len = desiredLength then strToFill
         else 
