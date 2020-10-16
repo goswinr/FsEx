@@ -141,4 +141,39 @@ module ResizeArrayBuilder =
 
 
    
+
+[<AutoOpen>]
+module RarrBuilder =
+
+    type RarrBuilder<'T> () =
+        member inline _.Yield (x: 'T) =  
+            fun (r: Rarr<'T>) -> r.Add(x)      
+        
+        member inline _.YieldFrom (xs: #seq<'T>) =
+            fun (r: Rarr<'T>) -> r.AddRange(xs) 
+        
+        member inline _.Combine (f, g) = 
+            fun (r: Rarr<'T>) -> f r; g r
+        
+        member inline _.Delay f = 
+            fun (r: Rarr<'T>) -> (f()) r
+        
+        member inline _.Zero () =  ignoreObj
+        
+        member inline _.For (xs: 'U seq, f: 'U -> Rarr<'T> -> unit) =
+            fun (r: Rarr<'T>) ->
+                use e = xs.GetEnumerator()
+                while e.MoveNext() do
+                    (f e.Current) r
+        
+        member inline _.While (p: unit -> bool, f: Rarr<'T> -> unit) =
+            fun (r: Rarr<'T>) -> while p () do  f r
+            
+        member inline _.Run (f: Rarr<'T> -> unit) =
+            let r = Rarr<'T>()
+            do f r
+            r  
+    
+    /// Computational Expression:  use 'yield' to add alements to a Rarr (= Collections.Generic.List).
+    let rarr<'T> = new RarrBuilder<'T> ()
     

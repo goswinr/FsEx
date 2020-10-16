@@ -27,6 +27,7 @@
     <Compile Include="Src\MinMaxSortCompare.fs" />
     <Compile Include="Src\NiceString.fs" />
     <Compile Include="Src\Rarr.fs" />
+    <Compile Include="Src\RarrModule.fs" />
 
     <Compile Include="Src\TypeExtensions\BclStructs.fs" />
     <Compile Include="Src\TypeExtensions\Color.fs" />
