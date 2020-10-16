@@ -125,6 +125,23 @@ module  Util =
     let checkIfDirectoryExists s = 
         if not (IO.Directory.Exists s) then  raise (DirectoryNotFoundException("Directory missing or Path worng: '" + s + "'"))           
 
+    /// generic parser that infers desired return type 
+    let inline tryParse<'a when 'a: (static member TryParse: string * byref<'a> -> bool)> x =
+        // https://twitter.com/mvsmal/status/1317020301046259712
+        let mutable res = Unchecked.defaultof<'a> 
+        if (^a: (static member TryParse: string * byref<'a> -> bool) (x, &res)) 
+        then Some res  
+        else None 
+    
+    /// generic parser that infers desired return type or fails with ArgumentException 
+    let inline parse<'a when 'a: (static member TryParse: string * byref<'a> -> bool)> x =
+        let mutable res = Unchecked.defaultof<'a> 
+        if (^a: (static member TryParse: string * byref<'a> -> bool) (x, &res)) 
+        then res  
+        else ArgumentException.Raise "Failed to parse %A to a %A" x (res.GetType())
+
+
+
 /// Shadows the ignore function to only accept structs
 /// This is to prevent accidetially ignoring partially aplied functions that would return struct
 module SaveIgnore = 
