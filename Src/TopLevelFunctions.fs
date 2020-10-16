@@ -15,6 +15,11 @@ type EXT = Runtime.CompilerServices.ExtensionAttribute
 /// module is set to auto open
 [<AutoOpen>]
 module  Exceptions = 
+    
+
+    type ArgumentException with
+        /// Raise the exeption with F# printf string formating
+        [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (ArgumentException(s))) msg 
 
     type IndexOutOfRangeException with
         /// Raise the exeption with F# printf string formating

@@ -1,5 +1,7 @@
 namespace FsEx
 
+open System
+
 
 [<AutoOpen>]
 module TypeExtensionsResizeArray =   
@@ -148,13 +150,8 @@ module TypeExtensionsResizeArray =
 
 /// Generic operations on the type System.Collections.Generic.List, which is called ResizeArray in the F# libraries.
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide ResizeArray class in C# assemblies (should consider for other extension modules as well)
-module ResizeArray =
-    // taken and extended from https://github.com/dotnet/fsharp/tree/master/src/utils    
-    open Microsoft.FSharp.Core
-    open Microsoft.FSharp.Core.OptimizedClosures
+module ResizeArray =    
 
-    /// Return the length of the collection.  You can also use property <c>arr.Length</c>.
-    let length (arr: ResizeArray<'T>) =  arr.Count
 
     /// Fetch an element from the collection.  You can also use the syntax <c>arr.[idx]</c>.
     /// However this function allows for negtive index too (like Python)
@@ -166,434 +163,20 @@ module ResizeArray =
     let set (arr: ResizeArray<'T>) (index: int) (x:'T) =  
         if index<0 then arr.[arr.Count+index] <- x  else arr.[index] <- x
 
-    /// Create an array whose elements are all initially the given value.
-    let create  (n: int) x = 
-        let r = new ResizeArray<'T>(n)
-        for i = 0 to n-1 do
-            r.Add x 
-        r       
-     
-    /// Create an array by calling the given generator on each index.
-    let init (n: int) (f: int -> 'T) =  
-        let r = new ResizeArray<'T>(n)
-        for i = 0 to n-1 do
-            r.Add (f i )
-        r
-
-    /// Read a range of elements from the first array and write them into the second.
-    let blit (arr1: ResizeArray<'T>) start1 (arr2: ResizeArray<'T>) start2 len =
-        if start1 < 0 then invalidArg "ResizeArray: start1" "index must be positive"
-        if start2 < 0 then invalidArg "ResizeArray: start2" "index must be positive"
-        if len < 0 then invalidArg "ResizeArray: len" "length must be positive"
-        if start1 + len > length arr1 then invalidArg "ResizeArray: start1" "(start1+len) out of range"
-        if start2 + len > length arr2 then invalidArg "ResizeArray: start2" "(start2+len) out of range"
-        for i = 0 to len - 1 do 
-            arr2.[start2+i] <- arr1.[start1 + i]
-
-    /// Build a new array that contains the elements of each of the given list of arrays.
-    let concat (arrs: ResizeArray<'T> seq) = 
-        let len = arrs |> Seq.sumBy (fun r -> r.Count)
-        let r = ResizeArray(len)
-        for arr in arrs do 
-            r.AddRange arr
-        r
-
-    /// Build a new array that contains the elements of the first array followed by the elements of the second array.
-    let append (arr1: ResizeArray<'T>) (arr2: ResizeArray<'T>) = concat [arr1; arr2]
-    
-    /// Build a new array that contains the given subrange specified by
-    /// starting index and length.
-    let sub (arr: ResizeArray<'T>) start len =
-        if start < 0 then invalidArg "ResizeArray: start" "index must be positive"
-        if len < 0 then invalidArg "ResizeArray: len" "length must be positive"
-        if start + len > length arr then invalidArg "ResizeArray: len" "length must be positive"
-        arr.GetRange(start, len)
-
-    /// Fill a range of the collection with the given element.
-    let fill (arr: ResizeArray<'T>) (start: int) (len: int) (x:'T) =
-        if start < 0 then invalidArg "ResizeArray: start" "index must be positive"
-        if len < 0 then invalidArg "ResizeArray: len" "length must be positive"
-        if start + len > length arr then invalidArg "ResizeArray: len" "length must be positive"
-        for i = start to start + len - 1 do 
-            arr.[i] <- x
-
-    /// Build a new array that contains the elements of the given array.
-    let copy (arr: ResizeArray<'T>) = new ResizeArray<_>(arr)
-
-    /// Build a list from the given array.
-    let toList (arr: ResizeArray<_>) =
-        let mutable res = []
-        for i = length arr - 1 downto 0 do
-            res <- arr.[i] :: res
-        res
-
-    /// Build an array from the given list.
-    let ofList (l: _ list) =
-        let len = l.Length
-        let res = new ResizeArray<_>(len)
-        let rec add = function
-          | [] -> ()
-          | e :: l -> res.Add(e); add l
-        add l
-        res
-
-    /// Apply the given function to each element of the array. 
-    let iter f (arr: ResizeArray<_>) = 
-        for i = 0 to arr.Count - 1 do
-            f arr.[i]
-
-    /// Build a new array whose elements are the results of applying the given function
-    /// to each of the elements of the array.
-    let map f (arr: ResizeArray<_>) =
-        let len = length arr
-        let res = new ResizeArray<_>(len)
-        for i = 0 to len - 1 do
-            res.Add(f arr.[i])
-        res
-
-    /// Build a new array whose elements are the results of applying the given function
-    /// to each of the elements of the array. The integer index passed to the
-    /// function indicates the index of element being transformed.
-    let mapi f (arr: ResizeArray<_>) =
-        let f = FSharpFunc<_,_,_>.Adapt(f)
-        let len = length arr
-        let res = new ResizeArray<_>(len)
-        for i = 0 to len - 1 do
-            res.Add(f.Invoke(i, arr.[i]))
-        res
-
-    /// Apply the given function to each element of the array.  The integer passed to the
-    /// function indicates the index of element.        
-    let iteri f (arr: ResizeArray<_>) =
-        let f = FSharpFunc<_,_,_>.Adapt(f)
-        for i = 0 to arr.Count - 1 do
-            f.Invoke(i, arr.[i])
-
-    /// Test if any element of the array satisfies the given predicate.
-    /// If the input function is <c>f</c> and the elements are <c>i0...iN</c> 
-    /// then computes <c>p i0 or ... or p iN</c>.
-    let exists (f: 'T -> bool) (arr: ResizeArray<'T>) =
-        let len = length arr 
-        let rec loop i = i < len && (f arr.[i] || loop (i+1))
-        loop 0
-
-    /// Test if all elements of the array satisfy the given predicate.
-    /// If the input function is <c>f</c> and the elements are <c>i0...iN</c> and "j0...jN"
-    /// then computes <c>p i0 && ... && p iN</c>.
-    let forall f (arr: ResizeArray<_>) =
-        let len = length arr
-        let rec loop i = i >= len || (f arr.[i] && loop (i+1))
-        loop 0
-
-    let private indexNotFound i (arr:ResizeArray<_>) = raise (System.Collections.Generic.KeyNotFoundException(sprintf "The index %d was not found in the ResizeArray / List of %d items" i arr.Count) )
-
-    /// Return the first element for which the given function returns True.
-    /// Raise <c>KeyNotFoundException</c> if no such element exists.
-    let find f (arr: ResizeArray<_>) = 
-        let rec loop i = 
-            if i >= length arr then indexNotFound i arr
-            elif f arr.[i] then arr.[i]
-            else loop (i+1)
-        loop 0
-
-    /// Apply the given function to successive elements, returning the first
-    /// result where function returns Some(x) for some x.
-    let tryPick f (arr: ResizeArray<_>) =
-        let rec loop i = 
-            if i >= length arr then None else
-            match f arr.[i] with 
-            | None -> loop(i+1)
-            | res -> res
-        loop 0
-
-    /// Return the first element for which the given function returns True.
-    /// Return None if no such element exists.
-    let tryFind f (arr: ResizeArray<_>) = 
-        let rec loop i = 
-            if i >= length arr then None
-            elif f arr.[i] then Some arr.[i]
-            else loop (i+1)
-        loop 0
-
-    /// Apply the given function to two arrays simultaneously. The
-    /// two arrays must have the same lengths, otherwise an Invalid Argument exception is
-    /// raised.
-    let iter2 f (arr1: ResizeArray<'T>) (arr2: ResizeArray<'b>) = 
-        let f = FSharpFunc<_,_,_>.Adapt(f)
-        let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
-        for i = 0 to len1 - 1 do 
-            f.Invoke(arr1.[i], arr2.[i])
-
-    /// Build a new collection whose elements are the results of applying the given function
-    /// to the corresponding elements of the two collections pairwise.  The two input
-    /// arrays must have the same lengths.
-    let map2 f (arr1: ResizeArray<'T>) (arr2: ResizeArray<'b>) = 
-        let f = FSharpFunc<_,_,_>.Adapt(f)
-        let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
-        let res = new ResizeArray<_>(len1)
-        for i = 0 to len1 - 1 do
-            res.Add(f.Invoke(arr1.[i], arr2.[i]))
-        res
-
-    /// Apply the given function to each element of the array. Return
-    /// the array comprised of the results 'x' for each element where
-    /// the function returns <c>Some(x)</c>.
-    let choose f (arr: ResizeArray<_>) = 
-        let res = new ResizeArray<_>() 
-        for i = 0 to length arr - 1 do
-            match f arr.[i] with 
-            | None -> ()
-            | Some b -> res.Add(b)
-        res
-
-    /// Return a new collection containing only the elements of the collection
-    /// for which the given predicate returns True.
-    let filter f (arr: ResizeArray<_>) = 
-        let res = new ResizeArray<_>() 
-        for i = 0 to length arr - 1 do 
-            let x = arr.[i] 
-            if f x then res.Add(x)
-        res
-
-    /// Split the collection into two collections, containing the 
-    /// elements for which the given predicate returns True and False
-    /// respectively.
-    let partition f (arr: ResizeArray<_>) = 
-      let res1 = new ResizeArray<_>()
-      let res2 = new ResizeArray<_>()
-      for i = 0 to length arr - 1 do 
-          let x = arr.[i] 
-          if f x then res1.Add(x) else res2.Add(x)
-      res1, res2
-
-    /// Return a new array with the elements in reverse order.
-    let rev (arr: ResizeArray<_>) = 
-      let len = length arr 
-      let res = new ResizeArray<_>(len)
-      for i = len - 1 downto 0 do 
-          res.Add(arr.[i])
-      res
-
-    /// Apply a function to each element of the array, threading an accumulator argument
-    /// through the computation. If the input function is <c>f</c> and the elements are <c>i0...iN</c> then 
-    /// computes <c>f i0 (...(f iN s))</c>.
-    let foldBack (f : 'T -> 'State -> 'State) (arr: ResizeArray<'T>) (acc: 'State) =
-        let mutable res = acc 
-        let len = length arr 
-        for i = len - 1 downto 0 do 
-            res <- f (get arr i) res
-        res
-
-    /// Apply a function to each element of the collection, threading an accumulator argument
-    /// through the computation. If the input function is <c>f</c> and the elements are <c>i0...iN</c> 
-    /// then computes <c>f (... (f s i0)...) iN</c>
-    let fold (f : 'State -> 'T -> 'State) (acc: 'State) (arr: ResizeArray<'T>) =
-        let mutable res = acc 
-        let len = length arr 
-        for i = 0 to len - 1 do 
-            res <- f res (get arr i)
-        res
-
-    /// Return a fixed-length array containing the elements of the input <c>ResizeArray</c>.
-    let toArray (arr: ResizeArray<'T>) = arr.ToArray()
-
-    /// Build a <c>ResizeArray</c> from the given elements.
-    let ofArray (arr: 'T[]) = new ResizeArray<_>(arr)
-
-    /// Return a view of the array as an enumerable object.
-    let toSeq (arr: ResizeArray<'T>) = Seq.readonly arr
-
-    /// Build a <c>ResizeArray</c> from the given elements.
-    let ofSeq (arr: 'T seq) = new ResizeArray<_>(arr)
-
-    /// Sort in place the elements using the given comparison function.
-    let sort (f: 'T -> 'T -> int) (arr: ResizeArray<'T>) :unit = 
-        arr.Sort (System.Comparison(f))
-
-    /// Sort in place the elements using the key extractor and generic comparison on the keys.
-    let sortBy (f:'T -> 'Key) (arr: ResizeArray<'T>): unit when 'Key : comparison = 
-        arr.Sort (System.Comparison(fun x y -> compare (f x) (f y)))
-
-
-    /// Test elements of the two arrays pairwise to see if any pair of element satisfies the given predicate.
-    /// Raise ArgumentException if the arrays have different lengths.
-    let exists2 f (arr1: ResizeArray<_>) (arr2: ResizeArray<_>) =
-        let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
-        let rec loop i = i < len1 && (f arr1.[i] arr2.[i] || loop (i+1))
-        loop 0
-
-    /// Return the index of the first element in the array
-    /// that satisfies the given predicate. Raise <c>KeyNotFoundException</c> if 
-    /// none of the elements satisfy the predicate.
-    let findIndex f (arr: ResizeArray<_>) =
-        let rec go n = if n >= length arr then indexNotFound n arr elif f arr.[n] then n else go (n+1)
-        go 0
-
-    /// Return the index of the first element in the array
-    /// that satisfies the given predicate. Raise <c>KeyNotFoundException</c> if 
-    /// none of the elements satisfy the predicate.
-    let findIndexi f (arr: ResizeArray<_>) =
-        let rec go n = if n >= length arr then indexNotFound n arr elif f n arr.[n] then n else go (n+1)
-        go 0
-
-    let private foldSub f acc (arr: ResizeArray<_>) start fin = 
-        let mutable res = acc
-        for i = start to fin do
-            res <- f res arr.[i] 
-        res
-
-    let private foldBackSub f (arr: ResizeArray<_>) start fin acc = 
-        let mutable res = acc 
-        for i = fin downto start do
-            res <- f arr.[i] res
-        res
-
-    /// Apply a function to each element of the array, threading an accumulator argument
-    /// through the computation. If the input function is <c>f</c> and the elements are <c>i0...iN</c> 
-    /// then computes <c>f (... (f i0 i1)...) iN</c>. Raises ArgumentException if the array has size zero.
-    let reduce f (arr : ResizeArray<_>) =
-        let arrn = length arr
-        if arrn = 0 then invalidArg "ResizeArray: arr" "the input array may not be empty"
-        else foldSub f arr.[0] arr 1 (arrn - 1)
-
-    /// Apply a function to each element of the array, threading an accumulator argument
-    /// through the computation. If the input function is <c>f</c> and the elements are <c>i0...iN</c> then 
-    /// computes <c>f i0 (...(f iN-1 iN))</c>. Raises ArgumentException if the array has size zero.        
-    let reduceBack f (arr: ResizeArray<_>) = 
-        let arrn = length arr
-        if arrn = 0 then invalidArg "ResizeArray: arr" "the input array may not be empty"
-        else foldBackSub f arr 0 (arrn - 2) arr.[arrn - 1]
-
-    /// Apply a function to pairs of elements drawn from the two collections, 
-    /// left-to-right, threading an accumulator argument
-    /// through the computation.  The two input
-    /// arrays must have the same lengths, otherwise an <c>ArgumentException</c> is
-    /// raised.
-    let fold2 f (acc: 'T) (arr1: ResizeArray<'T>) (arr2: ResizeArray<'U>) =
-        let f = FSharpFunc<_,_,_,_>.Adapt(f)
-        let mutable res = acc 
-        let len = length arr1
-        if len <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
-        for i = 0 to len - 1 do
-            res <- f.Invoke(res, arr1.[i],arr2.[i])
-        res
-
-    /// Apply a function to pairs of elements drawn from the two collections, right-to-left, 
-    /// threading an accumulator argument through the computation.  The two input
-    /// arrays must have the same lengths, otherwise an <c>ArgumentException</c> is
-    /// raised.
-    let foldBack2 f (arr1: ResizeArray<'T1>) (arr2: ResizeArray<'T2>) (acc: 'b) =
-        let f = FSharpFunc<_,_,_,_>.Adapt(f)
-        let mutable res = acc 
-        let len = length arr1
-        if len <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
-        for i = len - 1 downto 0 do 
-            res <- f.Invoke(arr1.[i],arr2.[i],res)
-        res
-
-    /// Test elements of the two arrays pairwise to see if all pairs of elements satisfy the given predicate.
-    /// Raise <c>ArgumentException</c> if the arrays have different lengths.
-    let forall2 f (arr1: ResizeArray<_>) (arr2: ResizeArray<_>) = 
-        let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
-        let rec loop i = i >= len1 || (f arr1.[i] arr2.[i] && loop (i+1))
-        loop 0
-
-   /// Return True if the given array is empty, otherwise False.        
-    let isEmpty (arr: ResizeArray<_>) = length (arr: ResizeArray<_>) = 0
-    
-    /// Apply the given function to pair of elements drawn from matching indices in two arrays,
-    /// also passing the index of the elements. The two arrays must have the same lengths, 
-    /// otherwise an <c>ArgumentException</c> is raised.
-    let iteri2 f (arr1: ResizeArray<'T>) (arr2: ResizeArray<'b>) =
-        let f = FSharpFunc<_,_,_,_>.Adapt(f)
-        let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
-        for i = 0 to len1 - 1 do 
-            f.Invoke(i, arr1.[i], arr2.[i])
-
-    /// Build a new collection whose elements are the results of applying the given function
-    /// to the corresponding elements of the two collections pairwise.  The two input
-    /// arrays must have the same lengths, otherwise an <c>ArgumentException</c> is
-    /// raised.
-    let mapi2 (f: int -> 'T -> 'U -> 'c) (arr1: ResizeArray<'T>) (arr2: ResizeArray<'U>) = 
-        let f = FSharpFunc<_,_,_,_>.Adapt(f)
-        let len1 = length arr1
-        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the arrays have different lengths"
-        init len1 (fun i -> f.Invoke(i, arr1.[i], arr2.[i]))
-
-    let private scanBackSub f (arr: ResizeArray<'T>) start fin acc = 
-        let f = FSharpFunc<_,_,_>.Adapt(f)
-        let mutable state = acc
-        let res = create (2+fin-start) acc
-        for i = fin downto start do
-            state <- f.Invoke(arr.[i], state)
-            res.[i - start] <- state
-        res
-
-    let private scanSub f  acc (arr : ResizeArray<'T>) start fin = 
-        let f = FSharpFunc<_,_,_>.Adapt(f)
-        let mutable state = acc
-        let res = create (fin-start+2) acc
-        for i = start to fin do
-            state <- f.Invoke(state, arr.[i])
-            res.[i - start+1] <- state
-        res
-
-    /// Like <c>fold</c>, but return the intermediary and final results.
-    let scan f acc (arr : ResizeArray<'T>) = 
-        let arrn = length arr
-        scanSub f acc arr 0 (arrn - 1)
-
-    /// Like <c>foldBack</c>, but return both the intermediary and final results.
-    let scanBack f (arr : ResizeArray<'T>) acc = 
-        let arrn = length arr
-        scanBackSub f arr 0 (arrn - 1) acc
-    
-    /// Return an array containing the given element.
-    let singleton x =
-        let res = new ResizeArray<_>(1)
-        res.Add(x)
-        res
-    
-    /// Return the index of the first element in the array
-    /// that satisfies the given predicate.
-    let tryFindIndex f (arr: ResizeArray<'T>) = 
-        let rec go n = if n >= length arr then None elif f arr.[n] then Some n else go (n+1)
-        go 0
-    
-    /// Return the index of the first element in the array
-    /// that satisfies the given predicate.        
-    let tryFindIndexi f (arr: ResizeArray<'T>) = 
-        let rec go n = if n >= length arr then None elif f n arr.[n] then Some n else go (n+1)
-        go 0
-    
-    /// Combine the two arrays into an array of pairs. The two arrays must have equal lengths, 
-    /// otherwise an <c>ArgumentException</c> is raised..
-    let zip (arr1: ResizeArray<_>) (arr2: ResizeArray<_>) = 
-        let len1 = length arr1 
-        if len1 <> length arr2 then invalidArg "ResizeArray: arr2" "the Lists have different lengths"
-        init len1 (fun i -> arr1.[i], arr2.[i])
-
-    /// Split an array of pairs into two arrays.
-    let unzip (arr: ResizeArray<_>) = 
-        let len = length arr
-        let res1 = new ResizeArray<_>(len)
-        let res2 = new ResizeArray<_>(len)
-        for i = 0 to len - 1 do 
-            let x, y = arr.[i] 
-            res1.Add(x)
-            res2.Add(y)
-        res1, res2
-
+        
     //---------------------------------------------------
     // extensions added only in FsEx:
     //----------------------------------------------------
-    
+        
     let empty() = ResizeArray<_>()
+
+    /// Create a ResizeArray by calling the given generator on each index.
+    //-[<CompiledName("Init")>]
+    let init count initializer : ResizeArray<'T> =
+        if count < 0 then invalidArg "count" "The number of elements may not be negative."
+        let resizeArray = ResizeArray (count)
+        for i = 0 to count - 1 do resizeArray.Add ( initializer count)
+        resizeArray
 
     /// Considers List cirular and move elements up or down
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
@@ -613,7 +196,7 @@ module ResizeArray =
             for i=1 to xs.Count-1 do
                 if cmpF xs.[i] m then m <- xs.[i]
             m 
-        
+            
         let inline simple2 cmpF (xs:ResizeArray<'T>) =
             if xs.Count < 2 then failwithf "*** Only %d elements in %A, for ResizeArray first+second max / min" xs.Count xs
             let mutable m1 = xs.[0]
@@ -626,7 +209,7 @@ module ResizeArray =
                 elif cmpF this m2 then
                     m2 <- this
             m1,m2  
-                
+                    
 
         /// If any are equal then the the order is kept by using ( a=b || ) since the comare operate does not include the equal test
         let inline sort3 cmp a b c  = 
@@ -677,7 +260,7 @@ module ResizeArray =
                 elif cmpF this m3 then
                     m3 <- this
             m1,m2,m3 
-                                
+                                    
         let inline indexByFun cmpF func (xs:ResizeArray<'T>) = 
             if xs.Count < 1 then failwithf "*** Empty %A, ResizeArray  max / min IndexByFun" xs
             let mutable f = func xs.[0]
@@ -736,9 +319,10 @@ module ResizeArray =
                     i3 <- i
                     e3 <- f 
             i1,i2,i3 
-    
-    //TODO test keeping of order !
+        
+    //TODO test keeping of order if equal !
 
+    (*
     /// Returns the smallest element of the ResizeArray.
     let min xs =     xs |> MinMax.simple (<)  // why inline? type specialisation ?
 
@@ -752,6 +336,7 @@ module ResizeArray =
     /// Returns the biggest element of the ResizeArray.
     /// Elements are compared by applying the predicate function first.
     let maxBy f xs = let i = xs |> MinMax.indexByFun (>) f in xs.[i]
+    *)
 
     /// Returns the Index of the smallest element of the ResizeArray.
     /// Elements are compared by applying the predicate function first.
@@ -768,12 +353,12 @@ module ResizeArray =
     /// Returns the biggest two elements of the ResizeArray.
     /// If they are equal then the the order is kept
     let max2 xs =     xs |> MinMax.simple2 (>)
-    
+        
     /// Returns the smallest two elements of the ResizeArray.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the the order is kept
     let min2By f xs = let i,ii = xs |> MinMax.index2ByFun (<) f in xs.[i],xs.[ii]
-    
+        
     /// Returns the biggest two elements of the ResizeArray.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the the order is kept
@@ -816,3 +401,1125 @@ module ResizeArray =
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the the order is kept
     let max3IndBy f xs = xs |> MinMax.index3ByFun (>) f
+
+    let inline checkNonNull tx xs = 
+        match xs with null -> raise (ArgumentNullException("in module FsEx.ResizeArray: " + tx)) |_ -> ()
+
+    // taken and extended from https://github.com/jack-pappas/ExtCore/blob/master/ExtCore/Collections.ResizeArray.fs 
+    // previously https://github.com/dotnet/fsharp/tree/master/src/utils   
+    
+    open Microsoft.FSharp.Core
+    open Microsoft.FSharp.Core.OptimizedClosures
+    open System.Collections.Generic
+    open LanguagePrimitives
+
+    /// Return the length of the collection.
+    //-[<CompiledName("Length")>]
+    let inline length (resizeArray : ResizeArray<'T>) : int =
+        resizeArray.Count
+
+    /// Return true if the given array is empty, otherwise false.
+    //-[<CompiledName("IsEmpty")>]
+    let inline isEmpty (resizeArray : ResizeArray<'T>) : bool =
+        resizeArray.Count = 0
+
+
+    /// Create a ResizeArray whose elements are all initially the given value.
+    //-[<CompiledName("Create")>]
+    let create count value : ResizeArray<'T> =
+        if count < 0 then
+            invalidArg "count" "The number of elements may not be negative."
+
+        let resizeArray = ResizeArray (count)
+        for i = 0 to count - 1 do
+            resizeArray.Add value
+        resizeArray
+
+
+    /// Adds an object to the end of the ResizeArray.
+    //-[<CompiledName("Add")>]
+    let inline add item (resizeArray : ResizeArray<'T>) : unit =
+        resizeArray.Add item
+
+    /// Determines whether an element is in the ResizeArray.
+    //-[<CompiledName("Contains")>]
+    let inline contains (value : 'T) (resizeArray : ResizeArray<'T>) : bool =
+        checkNonNull "resizeArray" resizeArray
+
+        resizeArray.Contains value
+
+    /// Build a ResizeArray from the given sequence.
+    //-[<CompiledName("OfSeq")>]
+    let inline ofSeq (sequence : seq<'T>) : ResizeArray<'T> =
+        ResizeArray (sequence)
+
+    /// Build a ResizeArray from the given list.
+    //-[<CompiledName("OfList")>]
+    let ofList (list : 'T list) : ResizeArray<'T> =
+        //checkNonNull "list" list
+
+        //let len = list.Length //edit by Goswin, could be costly
+        let res = ResizeArray<_>() //(len) 
+        let rec add = function
+            | [] -> ()
+            | e::l -> res.Add(e); add l
+        add list
+        res
+
+    /// Build a ResizeArray from the given array.
+    //-[<CompiledName("OfArray")>]
+    let inline ofArray (arr : 'T[]) : ResizeArray<'T> =
+        ResizeArray (arr)
+
+
+    /// Return a view of the ResizeArray as an enumerable object.
+    //-[<CompiledName("ToSeq")>]
+    let toSeq (resizeArray : ResizeArray<'T>) : seq<'T> =
+        checkNonNull "resizeArray" resizeArray
+
+        Seq.readonly resizeArray
+
+    /// Build a list from the given ResizeArray.
+    //-[<CompiledName("ToList")>]
+    let toList (resizeArray : ResizeArray<'T>) : 'T list =
+        checkNonNull "resizeArray" resizeArray
+
+        let mutable res = []
+        for i = length resizeArray - 1 downto 0 do
+            res <- resizeArray.[i] :: res
+        res
+
+    /// Return a fixed-length array containing the elements of the input ResizeArray.
+    //-[<CompiledName("ToArray")>]
+    let inline toArray (resizeArray : ResizeArray<'T>) : 'T[] =
+        resizeArray.ToArray ()
+
+   
+    /// Sorts the elements of the ResizeArray by mutating the ResizeArray in-place.
+    /// Elements are compared using Operators.compare.
+    //-[<CompiledName("SortInPlace")>]
+    let inline sortInPlace<'T when 'T : comparison> (resizeArray : ResizeArray<'T>) : unit =
+        resizeArray.Sort ()
+        
+    /// Sort the elements using the key extractor and generic comparison on the keys.
+    //-[<CompiledName("SortInPlaceBy")>]
+    let inline sortInPlaceBy<'T, 'Key when 'Key : comparison>     (projection : 'T -> 'Key) (resizeArray : ResizeArray<'T>) =
+        resizeArray.Sort (fun x y ->
+            compare (projection x) (projection y))
+
+    /// Sort the elements using the given comparison function.
+    //-[<CompiledName("SortInPlaceWith")>]
+    let inline sortInPlaceWith (comparer : 'T -> 'T -> int) (resizeArray : ResizeArray<'T>) : unit =
+        resizeArray.Sort (comparer)
+
+    /// Build a new ResizeArray that contains the elements of the given ResizeArray.
+    //-[<CompiledName("Copy")>]
+    let inline copy (resizeArray : ResizeArray<'T>) : ResizeArray<'T> =
+        ResizeArray (resizeArray)
+
+    /// Return an array containing the given element.
+    //-[<CompiledName("Singleton")>]
+    let singleton value : ResizeArray<'T> =
+        let resizeArray = ResizeArray ()
+        resizeArray.Add value
+        resizeArray
+
+    /// Build a new ResizeArray that contains the elements of each of the given sequence of ResizeArrays.
+    //-[<CompiledName("Concat")>]
+    let concat (resizeArrays : seq<ResizeArray<'T>>) : ResizeArray<'T> =
+        checkNonNull "resizeArrays" resizeArrays
+
+        let flattened = ResizeArray ()
+        for resizeArray in resizeArrays do
+            flattened.AddRange resizeArray
+        flattened
+    
+    /// Build a new ResizeArray that contains the elements of the first ResizeArray followed by
+    /// the elements of the second ResizeArray.
+    //-[<CompiledName("Append")>]
+    let append (resizeArray1 : ResizeArray<'T>) (resizeArray2 : ResizeArray<'T>) : ResizeArray<'T> =
+        checkNonNull "resizeArray1" resizeArray1
+        checkNonNull "resizeArray2" resizeArray2
+
+        let combined = ResizeArray (resizeArray1.Count + resizeArray2.Count)
+        combined.AddRange resizeArray1
+        combined.AddRange resizeArray2
+        combined
+
+    /// Build a new ResizeArray that contains the given subrange specified by
+    /// starting index and length.
+    //-[<CompiledName("Sub")>]
+    let sub (resizeArray : ResizeArray<'T>) start count : ResizeArray<'T> =
+        checkNonNull "resizeArray" resizeArray
+        if start < 0 then
+            invalidArg "start" "The start index cannot be less than zero (0)."
+        elif count < 0 then
+            invalidArg "count" "The number of elements to copy cannot be less than zero (0)."
+        elif start + count > length resizeArray then
+            invalidArg "count" "There are fewer than 'count' elements between the 'start' index and the end of the collection."
+    
+        resizeArray.GetRange (start, count)
+
+    /// Fill a range of the collection with the given element.
+    //-[<CompiledName("Fill")>]
+    let fill (resizeArray : ResizeArray<'T>) start count value : unit =
+        checkNonNull "resizeArray" resizeArray
+        if start < 0 then
+            invalidArg "start" "The start index cannot be less than zero (0)."
+        elif count < 0 then
+            invalidArg "count" "The number of elements to copy cannot be less than zero (0)."
+        elif start + count > length resizeArray then
+            invalidArg "count" "There are fewer than 'count' elements between the 'start' index and the end of the collection."
+    
+        // Overwrite the items within the range using the specified value.
+        for i = start to start + count - 1 do
+            resizeArray.[i] <- value
+
+    /// Return a new ResizeArray with the elements in reverse order.
+    //-[<CompiledName("Rev")>]
+    let rev (resizeArray : ResizeArray<'T>) : ResizeArray<'T> =
+        checkNonNull "resizeArray" resizeArray
+
+        let len = length resizeArray
+        let result = ResizeArray (len)
+        for i = len - 1 downto 0 do
+            result.Add resizeArray.[i]
+        result
+
+    /// Read a range of elements from the first ResizeArray and write them into the second.
+    //-[<CompiledName("Blit")>]
+    let blit (source : ResizeArray<'T>) sourceIndex (target : ResizeArray<'T>) targetIndex count : unit =
+        checkNonNull "source" source
+        checkNonNull "target" target
+        if sourceIndex < 0 then
+            invalidArg "sourceIndex" "The source index cannot be negative."
+        elif targetIndex < 0 then
+            invalidArg "targetIndex" "The target index cannot be negative."
+        elif count < 0 then
+            invalidArg "count" "Cannot copy a negative number of items."
+        elif sourceIndex + count > length source then
+            invalidArg "sourceIndex" "There are fewer than 'count' elements between 'sourceIndex' and the end of the source ResizeArray."
+        elif targetIndex + count > length target then
+            invalidArg "sourceIndex" "There are fewer than 'count' elements between 'sourceIndex' and the end of the target ResizeArray."
+
+        for i = 0 to count - 1 do
+            target.[targetIndex + i] <- source.[sourceIndex + i]
+
+    /// Combine the two ResizeArrays into a ResizeArray of pairs.
+    /// The two arrays must have equal lengths, otherwise an <c>ArgumentException</c> is raised.
+    //-[<CompiledName("Zip")>]
+    let zip (resizeArray1 : ResizeArray<'T1>) (resizeArray2 : ResizeArray<'T2>)
+        : ResizeArray<'T1 * 'T2> =
+        checkNonNull "resizeArray1" resizeArray1
+        checkNonNull "resizeArray2" resizeArray2
+
+        let len = length resizeArray1
+        if len <> length resizeArray2 then
+            invalidArg "resizeArray2" "The ResizeArrays have different lengths."
+
+        let results = ResizeArray (len)
+        for i = 0 to len - 1 do
+            results.Add (resizeArray1.[i], resizeArray2.[i])
+        results
+
+    /// Split a ResizeArray of pairs into two ResizeArrays.
+    //-[<CompiledName("Unzip")>]
+    let unzip (resizeArray : ResizeArray<'T1 * 'T2>) : ResizeArray<'T1> * ResizeArray<'T2> =
+        checkNonNull "resizeArray" resizeArray
+
+        let len = length resizeArray
+        let results1 = ResizeArray (len)
+        let results2 = ResizeArray (len)
+
+        for i = 0 to len - 1 do
+            let x, y = resizeArray.[i]
+            results1.Add x
+            results2.Add y
+
+        results1, results2
+
+    /// Test if any element of the array satisfies the given predicate.
+    /// If the input function is <c>f</c> and the elements are <c>i0...iN</c> 
+    /// then computes <c>p i0 or ... or p iN</c>.
+    //-[<CompiledName("Exists")>]
+    let inline exists (predicate : 'T -> bool) (resizeArray : ResizeArray<'T>) : bool =
+        checkNonNull "resizeArray" resizeArray
+        resizeArray.Exists (System.Predicate predicate)
+        
+
+    /// Test elements of the two arrays pairwise to see if any pair of element satisfies the given predicate.
+    /// Raise ArgumentException if the arrays have different lengths.
+    //-[<CompiledName("Exists2")>]
+    let exists2 predicate (resizeArray1 : ResizeArray<'T1>) (resizeArray2 : ResizeArray<'T2>) : bool =
+        checkNonNull "resizeArray1" resizeArray1
+        checkNonNull "resizeArray2" resizeArray2
+
+        let len = length resizeArray1
+        if len <> length resizeArray2 then
+            invalidArg "resizeArray2" "The ResizeArrays have different lengths."
+
+        let predicate = FSharpFunc<_,_,_>.Adapt predicate
+    
+        let mutable index = 0
+        let mutable foundMatch = false
+        while index < len && not foundMatch do
+            foundMatch <- predicate.Invoke (resizeArray1.[index], resizeArray2.[index])
+            index <- index + 1
+        foundMatch
+
+    /// Test if all elements of the array satisfy the given predicate.
+    /// If the input function is <c>f</c> and the elements are <c>i0...iN</c> and "j0...jN"
+    /// then computes <c>p i0 && ... && p iN</c>.
+    //-[<CompiledName("Forall")>]
+    let inline forall (predicate : 'T -> bool) (resizeArray : ResizeArray<'T>) : bool =
+        checkNonNull "resizeArray" resizeArray
+        resizeArray.TrueForAll (System.Predicate predicate)
+       
+
+    /// Test elements of the two arrays pairwise to see if all pairs of elements satisfy the given predicate.
+    /// Raise ArgumentException if the arrays have different lengths.
+    //-[<CompiledName("Forall2")>]
+    let forall2 predicate (resizeArray1 : ResizeArray<'T1>) (resizeArray2 : ResizeArray<'T2>) : bool =
+        checkNonNull "resizeArray1" resizeArray1
+        checkNonNull "resizeArray2" resizeArray2
+
+        let len = length resizeArray1
+        if len <> length resizeArray2 then
+            invalidArg "resizeArray2" "The ResizeArrays have different lengths."
+
+        let predicate = FSharpFunc<_,_,_>.Adapt predicate
+    
+        let mutable index = 0
+        let mutable allMatch = true
+        while index < len && allMatch do
+            allMatch <- predicate.Invoke (resizeArray1.[index], resizeArray2.[index])
+            index <- index + 1
+        allMatch
+
+    /// Return a new collection containing only the elements of the collection
+    /// for which the given predicate returns <c>true</c>.
+    //-[<CompiledName("Filter")>]
+    let inline filter (predicate : 'T -> bool) (resizeArray : ResizeArray<'T>) : ResizeArray<'T> =
+        checkNonNull "resizeArray" resizeArray
+        resizeArray.FindAll (System.Predicate predicate)
+       
+
+    /// <summary>
+    /// Apply the given function to each element of the array. Return
+    /// the array comprised of the results "x" for each element where
+    /// the function returns <c>Some(x)</c>.
+    /// </summary>
+    //-[<CompiledName("Choose")>]
+    let choose (chooser : 'T -> 'U option) (resizeArray : ResizeArray<'T>) : ResizeArray<'U> =
+        checkNonNull "resizeArray" resizeArray
+
+        // OPTIMIZATION : If the input list is empty return immediately.
+        if isEmpty resizeArray then
+            ResizeArray ()
+        else
+            let result = ResizeArray ()
+            let count = resizeArray.Count
+
+            for i = 0 to count - 1 do
+                match chooser resizeArray.[i] with
+                | None -> ()
+                | Some value ->
+                    result.Add value
+
+            result
+
+    /// <summary>
+    /// Return the first element for which the given function returns <c>true</c>.
+    /// Return <c>None</c> if no such element exists.
+    /// </summary>
+    //-[<CompiledName("TryFind")>]
+    let tryFind (predicate : 'T -> bool) (resizeArray : ResizeArray<'T>) : 'T option =
+        checkNonNull "resizeArray" resizeArray
+
+        let elementIndex =            
+            resizeArray.FindIndex (System.Predicate predicate)
+
+        match elementIndex with
+        | -1 ->
+            None
+        | index ->
+            Some resizeArray.[index]
+
+    /// <summary>
+    /// Return the first element for which the given function returns <c>true</c>.
+    /// Raise <c>KeyNotFoundException</c> if no such element exists.
+    /// </summary>
+    //-[<CompiledName("Find")>]
+    let find (predicate : 'T -> bool) (resizeArray : ResizeArray<'T>) : 'T =
+        checkNonNull "resizeArray" resizeArray
+
+        let elementIndex =           
+            resizeArray.FindIndex (System.Predicate predicate)
+          
+
+        match elementIndex with
+        | -1 ->
+            // TODO : Add a better error message.
+            // keyNotFound ""
+            raise <| System.Collections.Generic.KeyNotFoundException ()
+        | index ->
+            resizeArray.[index]
+
+    /// Return the index of the first element in the array
+    /// that satisfies the given predicate.
+    //-[<CompiledName("TryFindIndex")>]
+    let tryFindIndex (predicate : 'T -> bool) (resizeArray : ResizeArray<'T>) : int option =
+        checkNonNull "resizeArray" resizeArray
+
+        let elementIndex =          
+            resizeArray.FindIndex (System.Predicate predicate)
+         
+
+        match elementIndex with
+        | -1 ->
+            None
+        | index ->
+            Some index
+        
+    /// <summary>
+    /// Return the index of the first element in the array
+    /// that satisfies the given predicate. Raise <c>KeyNotFoundException</c> if 
+    /// none of the elements satisfy the predicate.
+    /// </summary>
+    //-[<CompiledName("FindIndex")>]
+    let findIndex (predicate : 'T -> bool) (resizeArray : ResizeArray<'T>) : int =
+        checkNonNull "resizeArray" resizeArray
+
+        let elementIndex =           
+            resizeArray.FindIndex (System.Predicate predicate)
+           
+        match elementIndex with
+        | -1 ->
+            // TODO : Add a better error message.
+            // keyNotFound ""
+            raise <| System.Collections.Generic.KeyNotFoundException ()
+        | index ->
+            index
+
+    /// Return the index of the first element in the array
+    /// that satisfies the given predicate.
+    //-[<CompiledName("TryFindIndexIndexed")>]
+    let tryFindIndexi predicate (resizeArray : ResizeArray<'T>) : int option =
+        checkNonNull "resizeArray" resizeArray
+
+        let predicate = FSharpFunc<_,_,_>.Adapt predicate
+
+        let lastIndex = length resizeArray - 1
+        let mutable index = -1
+        let mutable foundMatch = false
+        while index < lastIndex && not foundMatch do
+            let i = index + 1
+            index <- i
+            foundMatch <- predicate.Invoke (i, resizeArray.[i])
+
+        if foundMatch then
+            Some index
+        else None
+
+    /// <summary>
+    /// Return the index of the first element in the array
+    /// that satisfies the given predicate. Raise <c>KeyNotFoundException</c> if 
+    /// none of the elements satisfy the predicate.
+    /// </summary>
+    //-[<CompiledName("FindIndexIndexed")>]
+    let findIndexi predicate (resizeArray : ResizeArray<'T>) : int =
+        checkNonNull "resizeArray" resizeArray
+
+        match tryFindIndexi predicate resizeArray with
+        | Some index ->
+            index
+        | None ->
+            KeyNotFoundException.Raise "An element satisfying the predicate was not found in the collection." // edit Goswin
+
+    /// <summary>
+    /// Applies the given function to successive elements, returning the first
+    /// result where function returns <c>Some(x)</c> for some x. If the function
+    /// never returns <c>Some(x)</c>, returns <c>None</c>.
+    /// </summary>
+    //-[<CompiledName("TryPick")>]
+    let tryPick (picker : 'T -> 'U option) (resizeArray : ResizeArray<'T>) : 'U option =
+        checkNonNull "resizeArray" resizeArray
+
+        let count = resizeArray.Count
+        let mutable result = None
+        let mutable index = 0
+
+        while index < count && Option.isNone result do
+            result <- picker resizeArray.[index]
+            index <- index + 1
+        result
+
+    /// <summary>
+    /// Applies the given function to successive elements, returning the first
+    /// result where function returns <c>Some(x)</c> for some x. If the function
+    /// never returns <c>Some(x)</c>, raises KeyNotFoundException.
+    /// </summary>
+    //-[<CompiledName("Pick")>]
+    let pick (picker : 'T -> 'U option) (resizeArray : ResizeArray<'T>) : 'U =
+        checkNonNull "resizeArray" resizeArray
+
+        let count = resizeArray.Count
+        let mutable result = None
+        let mutable index = 0
+
+        while index < count && Option.isNone result do
+            result <- picker resizeArray.[index]
+            index <- index + 1
+
+        match result with
+        | Some result ->
+            result
+        | None ->
+            // TODO : Return a better error message
+            //keyNotFound ""
+            raise <| System.Collections.Generic.KeyNotFoundException ()
+
+    /// Apply the given function to each element of the array.
+    //-[<CompiledName("Iterate")>]
+    let iter (action : 'T -> unit) (resizeArray : ResizeArray<'T>) : unit =
+        checkNonNull "resizeArray" resizeArray
+
+        let count = resizeArray.Count
+        for i = 0 to count - 1 do
+            action resizeArray.[i]
+
+    /// Apply the given function to each element of the array. The integer passed to the
+    /// function indicates the index of element.
+    //-[<CompiledName("IterateIndexed")>]
+    let iteri (action : int -> 'T -> unit) (resizeArray : ResizeArray<'T>) : unit =
+        checkNonNull "resizeArray" resizeArray
+
+        let action = FSharpFunc<_,_,_>.Adapt action
+
+        let count = resizeArray.Count
+        for i = 0 to count - 1 do
+            action.Invoke (i, resizeArray.[i])
+
+    /// <summary>
+    /// Apply the given function to two arrays simultaneously. The two arrays
+    /// must have the same lengths, otherwise an <c>ArgumentException</c> is raised.
+    /// </summary>
+    //-[<CompiledName("Iterate2")>]
+    let iter2 action (resizeArray1 : ResizeArray<'T1>) (resizeArray2 : ResizeArray<'T1>) : unit =
+        checkNonNull "resizeArray1" resizeArray1
+        checkNonNull "resizeArray2" resizeArray2
+
+        let len = length resizeArray1
+        if len <> length resizeArray2 then
+            invalidArg "resizeArray2" "The ResizeArrays have different lengths."
+
+        let action = FSharpFunc<_,_,_>.Adapt action
+
+        for i = 0 to len - 1 do
+            action.Invoke (resizeArray1.[i], resizeArray2.[i])
+
+    /// <summary>
+    /// Apply the given function to pair of elements drawn from matching indices in two arrays,
+    /// also passing the index of the elements. The two arrays must have the same lengths, 
+    /// otherwise an <c>ArgumentException</c> is raised.
+    /// </summary>
+    //-[<CompiledName("IterateIndexed2")>]
+    let iteri2 action (resizeArray1 : ResizeArray<'T1>) (resizeArray2 : ResizeArray<'T2>) : unit =
+        checkNonNull "resizeArray1" resizeArray1
+        checkNonNull "resizeArray2" resizeArray2
+
+        let len = length resizeArray1
+        if len <> length resizeArray2 then
+            invalidArg "resizeArray2" "The ResizeArrays have different lengths."
+
+        let action = FSharpFunc<_,_,_,_>.Adapt action
+
+        for i = 0 to len - 1 do
+            action.Invoke (i, resizeArray1.[i], resizeArray2.[i])
+
+    /// <summary>
+    /// Build a new array whose elements are the results of applying the given function
+    /// to each of the elements of the array.
+    /// </summary>
+    /// <param name="mapping"></param>
+    /// <param name="resizeArray"></param>
+    /// <returns></returns>
+    //-[<CompiledName("Map")>]
+    let inline map (mapping : 'T -> 'U) (resizeArray : ResizeArray<'T>) : ResizeArray<'U> =
+        checkNonNull "resizeArray" resizeArray
+        resizeArray.ConvertAll (System.Converter mapping)
+        
+
+    /// <summary>
+    /// Build a new array whose elements are the results of applying the given function
+    /// to each of the elements of the array. The integer index passed to the
+    /// function indicates the index of element being transformed.
+    /// </summary>
+    /// <param name="mapping"></param>
+    /// <param name="resizeArray"></param>
+    /// <returns></returns>
+    //-[<CompiledName("MapIndexed")>]
+    let mapi (mapping : int -> 'T -> 'U) (resizeArray : ResizeArray<'T>) : ResizeArray<'U> =
+        checkNonNull "resizeArray" resizeArray
+
+        let mapping = FSharpFunc<_,_,_>.Adapt mapping
+        let count = resizeArray.Count
+        let result = ResizeArray (count)
+
+        for i = 0 to count - 1 do
+            result.Add <| mapping.Invoke (i, resizeArray.[i])
+        result
+
+    /// <summary>
+    /// Build a new collection whose elements are the results of applying the given function
+    /// to the corresponding elements of the two collections pairwise. The two input
+    /// arrays must have the same lengths.
+    /// </summary>
+    /// <param name="mapping"></param>
+    /// <param name="resizeArray1"></param>
+    /// <param name="resizeArray2"></param>
+    /// <returns></returns>
+    //-[<CompiledName("Map2")>]
+    let map2 mapping (resizeArray1 : ResizeArray<'T1>) (resizeArray2 : ResizeArray<'T2>) : ResizeArray<'U> =
+        checkNonNull "resizeArray1" resizeArray1
+        checkNonNull "resizeArray2" resizeArray2
+
+        let len = length resizeArray1
+        if len <> length resizeArray2 then
+            invalidArg "resizeArray2" "The ResizeArrays have different lengths."
+
+        let mapping = FSharpFunc<_,_,_>.Adapt mapping
+        let results = ResizeArray (len)
+
+        for i = 0 to len - 1 do
+            mapping.Invoke (resizeArray1.[i], resizeArray2.[i])
+            |> results.Add
+        results
+
+    /// <summary>
+    /// Build a new collection whose elements are the results of applying the given function
+    /// to the corresponding elements of the two collections pairwise. The two input
+    /// arrays must have the same lengths, otherwise an <c>ArgumentException</c> is raised.
+    /// </summary>
+    /// <param name="mapping"></param>
+    /// <param name="resizeArray1"></param>
+    /// <param name="resizeArray2"></param>
+    /// <returns></returns>
+    //-[<CompiledName("MapIndexed2")>]
+    let mapi2 mapping (resizeArray1 : ResizeArray<'T1>) (resizeArray2 : ResizeArray<'T2>) : ResizeArray<'U> =
+        checkNonNull "resizeArray1" resizeArray1
+        checkNonNull "resizeArray2" resizeArray2
+
+        let len = length resizeArray1
+        if len <> length resizeArray2 then
+            invalidArg "resizeArray2" "The ResizeArrays have different lengths."
+
+        let mapping = FSharpFunc<_,_,_,_>.Adapt mapping
+        let results = ResizeArray (len)
+
+        for i = 0 to len - 1 do
+            mapping.Invoke (i, resizeArray1.[i], resizeArray2.[i])
+            |> results.Add
+        results
+
+    /// <summary>
+    /// Apply a function to each element of the collection, threading an accumulator argument
+    /// through the computation. If the input function is <c>f</c> and the elements are <c>i0...iN</c> 
+    /// then computes <c>f (... (f s i0)...) iN</c>.
+    /// </summary>
+    /// <param name="folder"></param>
+    /// <param name="state"></param>
+    /// <param name="resizeArray"></param>
+    /// <returns></returns>
+    //-[<CompiledName("Fold")>]
+    let fold (folder : 'State -> 'T -> 'State) state (resizeArray : ResizeArray<'T>) : 'State =
+        checkNonNull "resizeArray" resizeArray
+
+        let folder = FSharpFunc<_,_,_>.Adapt folder
+
+        let mutable state = state
+        let count = resizeArray.Count
+        for i = 0 to count - 1 do
+            state <- folder.Invoke (state, resizeArray.[i])
+        state
+
+    /// <summary>foldSub on just part of teh ResizeArray</summary>
+    /// <param name="folder"></param>
+    /// <param name="state"></param>
+    /// <param name="resizeArray"></param>
+    /// <param name="startIndex"></param>
+    /// <param name="endIndex"></param>
+    /// <returns></returns>
+    //-[<CompiledName("FoldSub")>]
+    let foldSub folder (state : 'State) (resizeArray : ResizeArray<'T>) startIndex endIndex : 'State =
+        checkNonNull "resizeArray" resizeArray
+        if startIndex < 0 then
+            IndexOutOfRangeException.Raise "The starting index cannot be negative. but is %d" startIndex
+        elif endIndex > 0 then
+            IndexOutOfRangeException.Raise "The ending index cannot be negative. but is %d" endIndex
+    
+        let len = length resizeArray
+        if startIndex >= len then
+            IndexOutOfRangeException.Raise  "The starting index is outside the bounds of the ResizeArray: %d of %d" startIndex len
+        elif endIndex >= len then
+            IndexOutOfRangeException.Raise  "The ending index is outside the bounds of the ResizeArray: %d of %d" endIndex len
+
+        let folder = FSharpFunc<_,_,_>.Adapt folder
+
+        // Fold over the specified range of items.
+        let mutable state = state
+        for i = startIndex to endIndex do
+            state <- folder.Invoke (state, resizeArray.[i])
+        state
+
+    /// <summary>
+    /// Applies a function to each element of the collection, threading an accumulator argument
+    /// through the computation. The integer index passed to the function indicates the
+    /// index of the element within the collection.
+    /// </summary>
+    /// <param name="folder"></param>
+    /// <param name="state"></param>
+    /// <param name="resizeArray"></param>
+    /// <returns></returns>
+    //-[<CompiledName("FoldIndexed")>]
+    let foldi (folder : 'State -> int -> 'T -> 'State) state (resizeArray : ResizeArray<'T>) : 'State =
+        checkNonNull "resizeArray" resizeArray
+
+        let folder = FSharpFunc<_,_,_,_>.Adapt folder
+
+        let mutable state = state
+        let count = resizeArray.Count
+        for i = 0 to count - 1 do
+            state <- folder.Invoke (state, i, resizeArray.[i])
+        state
+
+    /// <summary>
+    /// Apply a function to pairs of elements drawn from the two collections, left-to-right,
+    /// threading an accumulator argument through the computation.  The two input arrays must
+    /// have the same lengths, otherwise an <c>ArgumentException</c> is raised.
+    /// </summary>
+    /// <param name="folder"></param>
+    /// <param name="state"></param>
+    /// <param name="resizeArray1"></param>
+    /// <param name="resizeArray2"></param>
+    /// <returns></returns>
+    //-[<CompiledName("Fold2")>]
+    let fold2 folder (state : 'State) (resizeArray1 : ResizeArray<'T1>) (resizeArray2 : ResizeArray<'T2>) : 'State =
+        checkNonNull "resizeArray1" resizeArray1
+        checkNonNull "resizeArray2" resizeArray2
+
+        let len = length resizeArray1
+        if len <> length resizeArray2 then
+            invalidArg "resizeArray2" "The arrays have different lengths."
+
+        let folder = FSharpFunc<_,_,_,_>.Adapt folder
+        let mutable state = state
+        for i = 0 to len - 1 do
+            state <- folder.Invoke (state, resizeArray1.[i], resizeArray2.[i])
+        state
+
+    /// <summary>
+    /// Apply a function to each element of the array, threading an accumulator argument
+    /// through the computation. If the input function is <c>f</c> and the elements are
+    /// <c>i0...iN</c> then computes <c>f i0 (...(f iN s))</c>.
+    /// </summary>
+    /// <param name="folder"></param>
+    /// <param name="resizeArray"></param>
+    /// <param name="state"></param>
+    /// <returns></returns>
+    //-[<CompiledName("FoldBack")>]
+    let foldBack (folder : 'T -> 'State -> 'State) (resizeArray : ResizeArray<'T>) state : 'State =
+        checkNonNull "resizeArray" resizeArray
+
+        let folder = FSharpFunc<_,_,_>.Adapt folder
+
+        let mutable state = state
+        for i = resizeArray.Count - 1 downto 0 do
+            state <- folder.Invoke (resizeArray.[i], state)
+        state
+
+    /// <summary>foldBackSub</summary>
+    /// <param name="folder"></param>
+    /// <param name="resizeArray"></param>
+    /// <param name="startIndex"></param>
+    /// <param name="endIndex"></param>
+    /// <param name="state"></param>
+    /// <returns></returns>
+    //-[<CompiledName("FoldBackSub")>]
+    let foldBackSub folder (resizeArray : ResizeArray<'T>) startIndex endIndex (state : 'State) : 'State =
+        checkNonNull "resizeArray" resizeArray
+        if startIndex < 0 then
+            IndexOutOfRangeException.Raise "The starting index cannot be negative. but is %d" startIndex
+        elif endIndex > 0 then
+            IndexOutOfRangeException.Raise "The ending index cannot be negative. but is %d" endIndex
+    
+        let len = length resizeArray
+        if startIndex >= len then
+            IndexOutOfRangeException.Raise  "The starting index is outside the bounds of the ResizeArray: %d of %d" startIndex len
+        elif endIndex >= len then
+            IndexOutOfRangeException.Raise  "The ending index is outside the bounds of the ResizeArray: %d of %d" endIndex len
+
+        let folder = FSharpFunc<_,_,_>.Adapt folder
+
+        // Fold over the specified range of items.
+        let mutable state = state
+        for i = endIndex downto startIndex do
+            state <- folder.Invoke (resizeArray.[i], state)
+        state
+
+    /// <summary>foldiBack</summary>
+    /// <param name="folder"></param>
+    /// <param name="resizeArray"></param>
+    /// <param name="state"></param>
+    /// <returns></returns>
+    //-[<CompiledName("FoldBackIndexed")>]
+    let foldiBack (folder : int -> 'T -> 'State -> 'State) (resizeArray : ResizeArray<'T>) state : 'State =
+        checkNonNull "resizeArray" resizeArray
+
+        let folder = FSharpFunc<_,_,_,_>.Adapt folder
+
+        let mutable state = state
+        for i = resizeArray.Count - 1 downto 0 do
+            state <- folder.Invoke (i, resizeArray.[i], state)
+        state
+
+    /// <summary>
+    /// Apply a function to pairs of elements drawn from the two collections, right-to-left, 
+    /// threading an accumulator argument through the computation.  The two input
+    /// arrays must have the same lengths, otherwise an <c>ArgumentException</c> is raised.
+    /// </summary>
+    /// <param name="folder"></param>
+    /// <param name="resizeArray1"></param>
+    /// <param name="resizeArray2"></param>
+    /// <param name="state"></param>
+    /// <returns></returns>
+    //-[<CompiledName("FoldBack2")>]
+    let foldBack2 folder (resizeArray1 : ResizeArray<'T1>) (resizeArray2 : ResizeArray<'T2>) (state : 'State) : 'State =
+        checkNonNull "resizeArray1" resizeArray1
+        checkNonNull "resizeArray2" resizeArray2
+
+        let len = length resizeArray1
+        if len <> length resizeArray2 then
+            invalidArg "resizeArray2" "The arrays have different lengths."
+
+        let folder = FSharpFunc<_,_,_,_>.Adapt folder
+        let mutable state = state
+        for i = len - 1 downto 0 do
+            state <- folder.Invoke (resizeArray1.[i], resizeArray2.[i], state)
+        state
+
+    /// <summary>
+    /// Apply a function to each element of the array, threading an accumulator argument
+    /// through the computation. If the input function is <c>f</c> and the elements are <c>i0...iN</c> 
+    /// then computes <c>f (... (f i0 i1)...) iN</c>.
+    /// Raises <c>ArgumentException</c> if the array has size zero.
+    /// <summary>
+    /// <param name="reduction"></param>
+    /// <param name="resizeArray"></param>
+    /// <returns></returns>
+    //-[<CompiledName("Reduce")>]
+    let reduce (reduction : 'T -> 'T -> 'T) (resizeArray : ResizeArray<'T>) =
+        checkNonNull "resizeArray" resizeArray
+        if isEmpty resizeArray then
+            invalidArg "resizeArray" "The ResizeArray is empty."
+
+        let reduction = FSharpFunc<_,_,_>.Adapt reduction
+
+        let mutable state = resizeArray.[0]
+        let count = resizeArray.Count
+        for i = 1 to count - 1 do
+            state <- reduction.Invoke (state, resizeArray.[i])
+        state
+
+    /// <summary>
+    /// Apply a function to each element of the array, threading an accumulator argument
+    /// through the computation. If the input function is <c>f</c> and the elements are <c>i0...iN</c> then 
+    /// computes <c>f i0 (...(f iN-1 iN))</c>.
+    /// Raises <c>ArgumentException</c> if the array has size zero.
+    /// </summary>
+    /// <param name="reduction"></param>
+    /// <param name="resizeArray"></param>
+    /// <returns></returns>
+    //-[<CompiledName("ReduceBack")>]
+    let reduceBack (reduction : 'T -> 'T -> 'T) (resizeArray : ResizeArray<'T>) : 'T =
+        checkNonNull "resizeArray" resizeArray
+        if isEmpty resizeArray then
+            invalidArg "resizeArray" "The ResizeArray is empty."
+
+        let reduction = FSharpFunc<_,_,_>.Adapt reduction
+
+        let count = resizeArray.Count
+        let mutable state = resizeArray.[count - 1]
+
+        for i = count - 2 downto 0 do
+            state <- reduction.Invoke (resizeArray.[i], state)
+        state
+
+    /// <summary>scanSub</summary>
+    /// <param name="folder"></param>
+    /// <param name="state"></param>
+    /// <param name="resizeArray"></param>
+    /// <param name="startIndex"></param>
+    /// <param name="endIndex"></param>
+    /// <returns></returns>
+    //-[<CompiledName("ScanSub")>]
+    let scanSub folder (state : 'State) (resizeArray : ResizeArray<'T>) startIndex endIndex : ResizeArray<'State> =
+        checkNonNull "resizeArray" resizeArray
+        if startIndex < 0 then
+            IndexOutOfRangeException.Raise "The starting index cannot be negative. but is %d" startIndex
+        elif endIndex > 0 then
+            IndexOutOfRangeException.Raise "The ending index cannot be negative. but is %d" endIndex
+    
+        let len = length resizeArray
+        if startIndex >= len then
+            IndexOutOfRangeException.Raise  "The starting index is outside the bounds of the ResizeArray: %d of %d" startIndex len
+        elif endIndex >= len then
+            IndexOutOfRangeException.Raise  "The ending index is outside the bounds of the ResizeArray: %d of %d" endIndex len
+
+        let folder = FSharpFunc<_,_,_>.Adapt folder
+
+        // Holds the initial and intermediate state values.
+        let results = ResizeArray (endIndex - startIndex + 2)
+        results.Add state
+
+        // Fold over the specified range of items.
+        let mutable state = state
+        for i = startIndex to endIndex do
+            state <- folder.Invoke (state, resizeArray.[i])
+            results.Add state
+        results
+
+    /// <summary>
+    /// Like <c>fold</c>, but return the intermediary and final results.
+    /// </summary>
+    /// <param name="folder"></param>
+    /// <param name="state"></param>
+    /// <param name="resizeArray"></param>
+    /// <returns></returns>
+    //-[<CompiledName("Scan")>]
+    let scan folder (state : 'State) (resizeArray : ResizeArray<'T>) : ResizeArray<'State> =
+        checkNonNull "resizeArray" resizeArray
+
+        scanSub folder state resizeArray 0 (length resizeArray - 1)
+
+    /// <summary>scanBackSub</summary>
+    /// <param name="folder"></param>
+    /// <param name="resizeArray"></param>
+    /// <param name="startIndex"></param>
+    /// <param name="endIndex"></param>
+    /// <param name="state"></param>
+    /// <returns></returns>
+    //-[<CompiledName("ScanBackSub")>]
+    let scanBackSub folder (resizeArray : ResizeArray<'T>) startIndex endIndex (state : 'State) : ResizeArray<'State> =
+        checkNonNull "resizeArray" resizeArray
+        if startIndex < 0 then
+            IndexOutOfRangeException.Raise "The starting index cannot be negative. but is %d" startIndex
+        elif endIndex > 0 then
+            IndexOutOfRangeException.Raise "The ending index cannot be negative. but is %d" endIndex
+    
+        let len = length resizeArray
+        if startIndex >= len then
+            IndexOutOfRangeException.Raise  "The starting index is outside the bounds of the ResizeArray: %d of %d" startIndex len
+        elif endIndex >= len then
+            IndexOutOfRangeException.Raise  "The ending index is outside the bounds of the ResizeArray: %d of %d" endIndex len
+
+        let folder = FSharpFunc<_,_,_>.Adapt folder
+
+        // Holds the initial and intermediate state values.
+        let results = ResizeArray (endIndex - startIndex + 2)
+        results.Add state
+
+        // Fold over the specified range of items.
+        let mutable state = state
+        for i = endIndex downto startIndex do
+            state <- folder.Invoke (resizeArray.[i], state)
+            results.Insert (0, state)
+        results
+
+    /// <summary>
+    /// Like <c>foldBack</c>, but return both the intermediary and final results.
+    /// </summary>
+    /// <param name="folder"></param>
+    /// <param name="resizeArray"></param>
+    /// <param name="state"></param>
+    /// <returns></returns>
+    //-[<CompiledName("ScanBack")>]
+    let scanBack folder (resizeArray : ResizeArray<'T>) (state : 'State) : ResizeArray<'State> =
+        checkNonNull "resizeArray" resizeArray
+
+        scanBackSub folder resizeArray 0 (length resizeArray - 1) state
+
+    /// <summary>
+    /// Split the collection into two collections, containing the elements for which
+    /// the given predicate returns <c>true</c> and <c>false</c> respectively.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <param name="resizeArray"></param>
+    /// <returns></returns>
+    //-[<CompiledName("Partition")>]
+    let partition predicate (resizeArray : ResizeArray<'T>) : ResizeArray<'T> * ResizeArray<'T> =
+        checkNonNull "resizeArray" resizeArray
+
+        let trueResults = ResizeArray ()
+        let falseResults = ResizeArray ()
+
+        let len = length resizeArray
+        for i = 0 to len - 1 do
+            let el = resizeArray.[i]
+            if predicate el then
+                trueResults.Add el
+            else
+                falseResults.Add el
+
+        trueResults, falseResults
+
+    /// <summary>
+    /// Splits the collection into two (2) collections, containing the elements for which the
+    /// given function returns <c>Choice1Of2</c> or <c>Choice2Of2</c>, respectively. This function is similar to
+    /// <c>ResizeArray.partition</c>, but it allows the returned collections to have different element types.
+    /// </summary>
+    /// <param name="partitioner"></param>
+    /// <param name="resizeArray"></param>
+    /// <returns></returns>
+    //-[<CompiledName("MapPartition")>]
+    let mapPartition partitioner (resizeArray : ResizeArray<'T>) : ResizeArray<'U1> * ResizeArray<'U2> =
+        checkNonNull "resizeArray" resizeArray
+
+        let results1 = ResizeArray ()
+        let results2 = ResizeArray ()
+
+        let len = length resizeArray
+        for i = 0 to len - 1 do
+            match partitioner resizeArray.[i] with
+            | Choice1Of2 value ->
+                results1.Add value
+            | Choice2Of2 value ->
+                results2.Add value
+
+        results1, results2
+
+    /// <summary>Returns the sum of the elements in the ResizeArray.</summary>
+    /// <param name="resizeArray">The input ResizeArray.</param>
+    /// <returns>The resulting sum.</returns>
+    //-[<CompiledName("Sum")>]
+    let inline sum (resizeArray : ResizeArray< ^T>) : ^T = 
+        checkNonNull "resizeArray" resizeArray
+
+        let mutable acc = LanguagePrimitives.GenericZero< (^T) >
+    //    for x in resizeArray do
+    //        acc <- Checked.(+) acc x
+        for i = 0 to resizeArray.Count - 1 do
+            acc <- Checked.(+) acc resizeArray.[i]
+        acc
+
+    /// <summary>Returns the sum of the results generated by applying the function to each element of the ResizeArray.</summary>
+    /// <param name="projection">The function to transform the ResizeArray elements into the type to be summed.</param>
+    /// <param name="resizeArray">The input ResizeArray.</param>
+    /// <returns>The resulting sum.</returns>
+    //-[<CompiledName("SumBy")>]
+    let inline sumBy (projection : 'T -> ^U) (resizeArray : ResizeArray<'T>) : ^U = 
+        checkNonNull "resizeArray" resizeArray
+
+        let mutable acc = LanguagePrimitives.GenericZero< (^U) >
+    //    for x in resizeArray do
+    //        acc <- Checked.(+) acc (projection x)
+        for i = 0 to resizeArray.Count - 1 do
+            acc <- Checked.(+) acc (projection resizeArray.[i])
+        acc
+
+    /// <summary>Returns the lowest of all elements of the ResizeArray, compared via Operators.min.</summary>
+    /// <param name="resizeArray">The input ResizeArray.</param>
+    /// <returns>The minimum element.</returns>
+    /// <exception cref="System.ArgumentException">Thrown when <paramref name="resizeArray"/> is empty.</exception>
+    //-[<CompiledName("Min")>]
+    let inline min (resizeArray : ResizeArray<'T>) =
+        checkNonNull "resizeArray" resizeArray
+        if resizeArray.Count = 0 then
+            invalidArg "resizeArray" "The input collection is empty."
+
+        let mutable acc = resizeArray.[0]
+        for i = 1 to resizeArray.Count - 1 do
+            let curr = resizeArray.[i]
+            if curr < acc then
+                acc <- curr
+        acc
+
+    /// <summary>Returns the lowest of all elements of the ResizeArray, compared via Operators.min on the function result.</summary>
+    /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
+    /// <param name="resizeArray">The input ResizeArray.</param>
+    /// <returns>The minimum element.</returns>
+    /// <exception cref="System.ArgumentException">Thrown when <paramref name="resizeArray"/> is empty.</exception>
+    //-[<CompiledName("MinBy")>]
+    let inline minBy (projection : 'T -> 'U) (resizeArray : ResizeArray<'T>) =
+        checkNonNull "resizeArray" resizeArray
+        if resizeArray.Count = 0 then
+            invalidArg "resizeArray" "The input collection is empty."
+
+        let mutable accv = resizeArray.[0]
+        let mutable acc = projection accv
+        for i = 1 to resizeArray.Count - 1 do
+            let currv = resizeArray.[i]
+            let curr = projection currv
+            if curr < acc then
+                acc <- curr
+                accv <- currv
+        accv
+
+    /// <summary>Returns the greatest of all elements of the ResizeArray, compared via Operators.max on the function result.</summary>
+    /// <param name="resizeArray">The input ResizeArray.</param>
+    /// <returns>The maximum element.</returns>
+    /// <exception cref="System.ArgumentException">Thrown when <paramref name="resizeArray"/> is empty.</exception>
+    //-[<CompiledName("Max")>]
+    let inline max (resizeArray : ResizeArray<'T>) =
+        checkNonNull "resizeArray" resizeArray
+        if resizeArray.Count = 0 then
+            invalidArg "resizeArray" "The input collection is empty."
+
+        let mutable acc = resizeArray.[0]
+        for i = 1 to resizeArray.Count - 1 do
+            let curr = resizeArray.[i]
+            if curr > acc then
+                acc <- curr
+        acc
+
+    /// <summary>Returns the greatest of all elements of the ResizeArray, compared via Operators.max on the function result.</summary>
+    /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
+    /// <param name="resizeArray">The input ResizeArray.</param>
+    /// <returns>The maximum element.</returns>
+    /// <exception cref="System.ArgumentException">Thrown when <paramref name="resizeArray"/> is empty.</exception>
+    //-[<CompiledName("MaxBy")>]
+    let inline maxBy (projection : 'T -> 'U) (resizeArray : ResizeArray<'T>) =
+        checkNonNull "resizeArray" resizeArray
+        if resizeArray.Count = 0 then
+            invalidArg "resizeArray" "The input collection is empty."
+
+        let mutable accv = resizeArray.[0]
+        let mutable acc = projection accv
+        for i = 1 to resizeArray.Count - 1 do
+            let currv = resizeArray.[i]
+            let curr = projection currv
+            if curr > acc then
+                acc <- curr
+                accv <- currv
+        accv
+
+    /// <summary>Returns the average of the elements in the ResizeArray.</summary>
+    /// <param name="resizeArray">The input ResizeArray.</param>
+    /// <returns>The average of the elements in the ResizeArray.</returns>
+    /// <exception cref="System.ArgumentException">Thrown when <paramref name="resizeArray"/> is empty.</exception>
+    //-[<CompiledName("Average")>]
+    let inline average (resizeArray : ResizeArray<'T>) : ^T =
+        checkNonNull "resizeArray" resizeArray
+
+        Seq.average resizeArray
+
+    /// <summary>Returns the average of the elements generated by applying the function to each element of the ResizeArray.</summary>
+    /// <param name="projection">The function to transform the ResizeArray elements before averaging.</param>
+    /// <param name="resizeArray">The input ResizeArray.</param>
+    /// <returns>The computed average.</returns>
+    /// <exception cref="System.ArgumentException">Thrown when <paramref name="resizeArray"/> is empty.</exception>
+    //-[<CompiledName("AverageBy")>]
+    let inline averageBy (projection : 'T -> ^U) (resizeArray : ResizeArray<'T>) : ^U = 
+        checkNonNull "resizeArray" resizeArray
+
+        Seq.averageBy projection resizeArray
