@@ -16,14 +16,14 @@ module TypeExtensionsResizeArray =
         /// equal to this.Count - 1    
         [<Extension>]
         member inline this.LastIndex = 
-            if this.Count = 0 then raise <| IndexOutOfRangeException "resizeArray.LastIndex: Can not get LastIndex of empty List"
+            if this.Count = 0 then IndexOutOfRangeException.Raise "resizeArray.LastIndex: Can not get LastIndex of empty List"
             this.Count - 1
 
         /// Gets the last item in the ResizeArray.
         /// equal to this.[this.Count - 1]
         [<Extension>]
         member inline this.Last = 
-            if this.Count = 0 then raise <| IndexOutOfRangeException "resizeArray.Last: Can not get Last item of empty List"
+            if this.Count = 0 then IndexOutOfRangeException.Raise "resizeArray.Last: Can not get Last item of empty List"
             this.[this.Count - 1]
         
         /// Gets the second last item in the ResizeArray.
@@ -31,7 +31,7 @@ module TypeExtensionsResizeArray =
         [<Extension>]
         member inline this.SecondLast = 
             if this.Count < 2 then 
-                raise <| IndexOutOfRangeException( "resizeArray.SecondLast: Can not get SecondLast item of "  + (NiceString.toNiceStringFull this))
+                IndexOutOfRangeException.Raise "resizeArray.SecondLast: Can not get SecondLast item of %s"   (NiceString.toNiceStringFull this)
             this.[this.Count - 2]
 
         /// Gets the third last item in the ResizeArray.
@@ -39,14 +39,14 @@ module TypeExtensionsResizeArray =
         [<Extension>]
         member inline this.ThirdLast = 
             if this.Count < 3 then 
-                raise <| IndexOutOfRangeException( "resizeArray.ThirdLast: Can not get ThirdLast item of " + (NiceString.toNiceStringFull this))
+                IndexOutOfRangeException.Raise "resizeArray.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
             this.[this.Count - 3]
                     
         /// Gets the first item in the ResizeArray.
         /// equal to this.[0]
         [<Extension>]
         member inline this.First = 
-            if this.Count = 0 then raise <| IndexOutOfRangeException "resizeArray.First: Can not get First item of empty List"
+            if this.Count = 0 then IndexOutOfRangeException.Raise "resizeArray.First: Can not get First item of empty List"
             this.[0]
 
         /// Gets the second item in the ResizeArray.
@@ -54,7 +54,7 @@ module TypeExtensionsResizeArray =
         [<Extension>]
         member inline this.Second = 
             if this.Count < 2 then 
-                raise <| IndexOutOfRangeException ( "resizeArray.Second: Can not get Second item of " +  (NiceString.toNiceStringFull this))
+                IndexOutOfRangeException.Raise  "resizeArray.Second: Can not get Second item of %s"   (NiceString.toNiceStringFull this)
             this.[1]
 
         /// Gets the third item in the ResizeArray.
@@ -62,7 +62,7 @@ module TypeExtensionsResizeArray =
         [<Extension>]
         member inline this.Third = 
             if this.Count < 3 then 
-                raise <| IndexOutOfRangeException("resizeArray.Third: Can not get Third item of " +  (NiceString.toNiceStringFull this))
+                IndexOutOfRangeException.Raise "resizeArray.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
             this.[2]
 
         /// Checks if this.Count = 0 
@@ -117,17 +117,17 @@ module TypeExtensionsResizeArray =
             let len = match endIdx   with None -> count-st | Some i -> if i<0 then count+i-st+1 else i-st+1
     
             if st < 0 || st > count-1 then 
-                let err = sprintf "resizeArray.GetSlice: Start index %d is out of range. Allowed values are -%d upto %d for List of %d items" startIdx.Value count (count-1) count
-                raise (IndexOutOfRangeException(err))
+                IndexOutOfRangeException.Raise "resizeArray.GetSlice: Start index %d is out of range. Allowed values are -%d upto %d for List of %d items" startIdx.Value count (count-1) count
+                
     
             if st+len > count then 
-                let err = sprintf "resizeArray.GetSlice: End index %d is out of range. Allowed values are -%d upto %d for List of %d items" endIdx.Value count (count-1) count
-                raise (IndexOutOfRangeException(err)) 
+                IndexOutOfRangeException.Raise "resizeArray.GetSlice: End index %d is out of range. Allowed values are -%d upto %d for List of %d items" endIdx.Value count (count-1) count
+                
                 
             if len < 0 then
                 let en =  match endIdx  with None -> count-1 | Some i -> if i<0 then count+i else i
-                let err = sprintf "resizeArray.GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for List of %d items" startIdx st endIdx en  count
-                raise (IndexOutOfRangeException(err)) 
+                IndexOutOfRangeException.Raise "resizeArray.GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for List of %d items" startIdx st endIdx en  count
+                
                 
             this.GetRange(st, len) 
          

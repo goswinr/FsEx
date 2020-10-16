@@ -16,7 +16,7 @@ type Dict< 'K,'V when 'K:equality > () =
     let get k  =
          let ok, v = dd.TryGetValue(k)
          if ok then  v
-         else raise <|  KeyNotFoundException( sprintf "Dict.Get failed to find key %A in %A of %d items" k dd dd.Count)
+         else KeyNotFoundException.Raise "Dict.Get failed to find key %A in %A of %d items" k dd dd.Count
     
     
     /// For Index operator .[i]: get or set the value for given key
@@ -35,7 +35,7 @@ type Dict< 'K,'V when 'K:equality > () =
             dd.Remove k |>ignore
             v
         else 
-            raise <|  KeyNotFoundException( sprintf "Dict.Pop(key): Cannot pop key %A in %A of %d items" k dd dd.Count)
+            KeyNotFoundException.Raise "Dict.Pop(key): Cannot pop key %A in %A of %d items" k dd dd.Count
             
 
     /// Returns a (lazy) sequence of key and value tuples
