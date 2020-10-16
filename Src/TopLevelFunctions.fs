@@ -2,10 +2,39 @@
 
 open System
 open System.IO
+open System.Runtime.CompilerServices
+open System.Text
+open System.Collections.Generic
 
 type EXT = Runtime.CompilerServices.ExtensionAttribute
 
 [<assembly:EXT>] do() // mark this assembly as extension assembly http://www.latkin.org/blog/2014/04/30/f-extension-methods-in-roslyn/
+
+
+/// Static Extension methods on Exceptions to cal Excn.Raise "%A" x with F# printf string formating
+/// module is set to auto open
+[<AutoOpen>]
+module  Exceptions = 
+
+    type IndexOutOfRangeException with
+        /// Raise the exeption with F# printf string formating
+        [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (IndexOutOfRangeException(s))) msg
+    
+    type KeyNotFoundException with
+        /// Raise the exeption with F# printf string formating
+        [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (KeyNotFoundException(s))) msg
+                        
+    type FileNotFoundException with
+        /// Raise the exeption with F# printf string formating
+        [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (FileNotFoundException(s))) msg
+
+    type DirectoryNotFoundException with
+        /// Raise the exeption with F# printf string formating
+        [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (DirectoryNotFoundException(s))) msg
+
+
+            
+
 
 /// General Utility functions
 /// module is set to auto open
@@ -22,7 +51,7 @@ module  Util =
     
     /// throws an exeption with 'msg' as Error message if 'value' is null.
     /// this function is usefull to doing many null checks without adding lots if clauses and lots of indenting
-    let inline failIfNull (msg:string) (value :'T) = 
+    let inline failIfNull (msg:string) (value :'T when 'T: null) = 
         match value with 
         | null -> failwithf "<null> in %s" msg  
         | _ -> ()
@@ -70,7 +99,7 @@ module  Util =
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
     let inline negIdx i len =
         let ii =  if i < 0 then len+i else i
-        if ii<0 || ii >= len then failwithf "Util.negIdx: Bad index %d for items count %d." i len
+        if ii<0 || ii >= len then IndexOutOfRangeException.Raise "Util.negIdx: Bad index %d for items count %d." i len
         ii
 
     /// Converts negative indices to positive ones and loops to start after last index is reached
