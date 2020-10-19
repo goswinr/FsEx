@@ -74,7 +74,13 @@ module  Util =
     /// Apply function, like |> , but ignore result. 
     /// Return original input
     /// let inline (|>>) x f =  f x |> ignore ; x 
+    [<Obsolete>]
     let inline (|>>) x f =  f x |> ignore ; x 
+
+    /// Apply function, like |> , but ignore result. 
+    /// Return original input
+    /// let inline (|>!) x f =  f x |> ignore ; x 
+    let inline (|>!) x f =  f x |> ignore ; x  //https://twitter.com/GoswinR/status/1316988132932407296
 
     /// Get first element of Triple (Tuple of three elements)
     let inline t1 (a,_,_) = a
