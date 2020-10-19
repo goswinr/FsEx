@@ -43,10 +43,9 @@ module MaybeBuilder =
             this.While(guard, f)
 
         member this.For(sequence:seq<_>, body) =
-            this.Using(sequence.GetEnumerator(),
-                                 fun enum -> this.While(enum.MoveNext, this.Delay(fun () -> body enum.Current)))
+            this.Using(sequence.GetEnumerator(), fun enum -> this.While(enum.MoveNext, this.Delay(fun () -> body enum.Current)))
     
-    /// A maybe monad. 
+    /// A maybe monad for option types. 
     let maybe = MaybeBuilder()
 
 [<AutoOpen>]
@@ -72,7 +71,8 @@ module StringBufferBuilder =
         member inline _.Yield (strings: seq<string>) =
             fun (b: StringBuilder) -> 
                 for s in strings do 
-                    Printf.bprintf b "%s%s" s Environment.NewLine         
+                    b.AppendLine (s)  |> ignoreObj
+                    //Printf.bprintf b "%s%s" s Environment.NewLine         
         
         member inline _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
         
@@ -138,7 +138,6 @@ module ResizeArrayBuilder =
     
     /// Computational Expression:  use 'yield' to add alements to a ResizeArray (= Collections.Generic.List).
     let resizeArray<'T> = new ResizeArrayBuilder<'T> ()
-
 
    
 
