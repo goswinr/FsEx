@@ -11,7 +11,7 @@ module TypeExtensionsString =
     type FsExStringException(s:string)=
         inherit Exception(s)
         
-        /// Raise the exeption with F# printf string formating
+        /// Raise the exception with F# printf string formating
         static member inline Raise msg =  Printf.kprintf (fun s -> raise (new FsExStringException(s))) msg 
 
 
