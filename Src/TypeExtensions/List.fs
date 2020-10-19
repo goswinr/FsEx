@@ -32,12 +32,11 @@ module List =
     
             loop xs
             if ix >= i then failwithf "can't get index from back %d from  list of %d items" ix i 
-            ar.GetItem(k-ix)
+            ar.GetNeg(k-ix)
         
     /// Gets an item in the list by index.
     /// Allows for negtive index too ( -1 is last item,  like Python)
-    let getItem index xs = 
+    let getNeg index xs = 
         if index >= 0 then List.item index xs
         else indexFromBack ( 1 - index ) xs
-            
-        
+         
