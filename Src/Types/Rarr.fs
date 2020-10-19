@@ -6,7 +6,7 @@ open System
 // Of course it would be simpler to just override the .Item method on System.Collections.Generic.List<'T> but unfortunatly it is sealed
 
 /// A mutable list like Collections.Generic.List<'T> but with nicer error messages on bad indices.
-/// It's just a very thin wrapper over a System.Collections.Generic.List<'T> 
+/// It's just a very thin wrapper over a System.Collections.Generic.List<'T>
 /// and has all its members and interfaces implemented.
 /// The name Rarr is derived from of the F# type ResizeArray
 type Rarr<'T>(xs:List<'T>) =     
@@ -33,7 +33,7 @@ type Rarr<'T>(xs:List<'T>) =
 
     /// Constructs a new Rarr with a given initial capacity. 
     /// A Rarr is a mutable list like Collections.Generic.List<'T> but with nicer error messages on bad indices.
-    /// It's just a very thin wrapper over a System.Collections.Generic.List<'T> 
+    /// It's just a very thin wrapper over a System.Collections.Generic.List<'T>
     /// and has all its members and interfaces implemented.
     /// The name Rarr is derived from of the F# type ResizeArray. The list is
     /// initially empty, but will have room for the given number of elements
@@ -43,7 +43,7 @@ type Rarr<'T>(xs:List<'T>) =
     
     /// Constructs a new Rarr, copying the contents of the given collection.
     /// A Rarr is a mutable list like Collections.Generic.List<'T> but with nicer error messages on bad indices.
-    /// It's just a very thin wrapper over a System.Collections.Generic.List<'T> 
+    /// It's just a very thin wrapper over a System.Collections.Generic.List<'T>
     /// and has all its members and interfaces implemented.
     /// The name Rarr is derived from of the F# type ResizeArray.
     /// The size and capacity of the new list will both be equal to the size of the
@@ -166,6 +166,11 @@ type Rarr<'T>(xs:List<'T>) =
         let v = xs.[i]
         xs.RemoveAt(i)
         v
+
+    /// Creates a shallow copy of the list
+    // (for a Rarr of structs this is like a deep copy)
+    member _.Clone() = Rarr(xs)
+        
     
     /// Defines F# slicing notation operator use including negative indices. ( -1 is last item, like Python)
     /// The resulting Rarr includes the end index.
@@ -198,18 +203,15 @@ type Rarr<'T>(xs:List<'T>) =
     //-------------------------https://referencesource.microsoft.com/#mscorlib/system/collections/generic/list.cs---------------
     
 
-
-
-    
-
     /// Sets or Gets the element at the given index. With nice error messages on bad indices.
     member _.Item // overriding this is the main purpose off all of this class
         with get index       = Rarr.get index xs          
         and  set index value = Rarr.set index value xs            
     
-    // Gets and sets the capacity of this list.  The capacity is the size of
-    // the internal array used to hold items.  When set, the internal 
-    // array of the list is reallocated to the given capacity.
+    /// Gets and sets the capacity of this list.  The capacity is the size of
+    /// the internal array used to hold items.  When set, the internal 
+    /// array of the list is reallocated to the given capacity.
+    /// Value must be same or bigger than Rarr.Count
     member _.Capacity   
         with get () = xs.Capacity
         and set c   = xs.Capacity <- c

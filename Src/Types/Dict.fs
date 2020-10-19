@@ -4,7 +4,7 @@ open System
 open System.Collections.Generic
 
 
-/// A thin wraper over System.Collections.Generic.Dictionary with nicer Error messages on accessing missing keys
+/// A thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys
 /// not the same sa lowercase 'dict'in F#
 type Dict< 'K,'V when 'K:equality > (dd : Dictionary<'K,'V>) =
     
@@ -15,11 +15,11 @@ type Dict< 'K,'V when 'K:equality > (dd : Dictionary<'K,'V>) =
          if ok then  v
          else KeyNotFoundException.Raise "Dict.Get failed to find key %A in %A of %d items" k dd dd.Count
     
-    /// create a new empty Dict
+    /// create a new empty Dict<'K,'V>
     new () = Dict(new Dictionary<'K,'V>())
     
 
-    /// Access the underlying Collections.Generic.Dictionary<'K,'V>
+    /// Access the underlying Collections.Generic.Dictionary<'K,'V>)
     /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of Dict!
     member _.Dictionary = dd
 

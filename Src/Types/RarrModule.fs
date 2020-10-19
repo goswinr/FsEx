@@ -95,7 +95,7 @@ module Rarr =
 
     /// splits a Rarr in two, like Rarr.filter but returning both
     /// The first Rarr has all elements where the filter function returned 'true'
-    let splitBy filter (rarr:seq<_>) =  
+    let inline splitBy filter (rarr:seq<_>) =  
         let t=Rarr()
         let f=Rarr()
         for x in rarr do
@@ -319,8 +319,22 @@ module Rarr =
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the the order is kept
     let max3IndBy f rarr = rarr |> MinMax.index3ByFun (>) f
-
    
+    /// Sorts the elements and return new shallow copy Rarr.
+    /// Elements are compared using Operators.compare.
+    let inline sorted<'T when 'T : comparison> (rarr : Rarr<'T>) : unit =       
+        Rarr(rarr).Sort ()
+        
+    /// Sort the elements and return new shallow copy Rarr.
+    ///using the key extractor and generic comparison on the keys.
+    let inline sortedBy<'T, 'Key when 'Key : comparison>     (projection : 'T -> 'Key) (rarr : Rarr<'T>) =
+        Rarr(rarr).Sort (fun x y ->
+            compare (projection x) (projection y))
+    
+    /// Sort the elements and return new shallow copy Rarr.
+    /// using the given comparison function.
+    let inline sortedWith (comparer : 'T -> 'T -> int) (rarr : Rarr<'T>) : unit =
+       Rarr(rarr).Sort (comparer)
 
 
     //-------------------------------------------------------------------------------------------------------------------------------
@@ -420,13 +434,15 @@ module Rarr =
     let inline sortInPlace<'T when 'T : comparison> (rarr : Rarr<'T>) : unit =
         rarr.Sort ()
         
-    /// Sort the elements using the key extractor and generic comparison on the keys.
+    /// Sort the elements of the Rarr by mutating the Rarr in-place.
+    /// Using the key extractor and generic comparison on the keys.
     //-[<CompiledName("SortInPlaceBy")>]
     let inline sortInPlaceBy<'T, 'Key when 'Key : comparison>     (projection : 'T -> 'Key) (rarr : Rarr<'T>) =
         rarr.Sort (fun x y ->
             compare (projection x) (projection y))
 
-    /// Sort the elements using the given comparison function.
+    /// Sort the elements of the Rarr by mutating the Rarr in-place.
+    /// Using the given comparison function.
     //-[<CompiledName("SortInPlaceWith")>]
     let inline sortInPlaceWith (comparer : 'T -> 'T -> int) (rarr : Rarr<'T>) : unit =
         rarr.Sort (comparer)
