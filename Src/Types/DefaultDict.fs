@@ -9,12 +9,11 @@ open System.Collections.Generic
 /// If accessing a non exiting key , the default function is called to create and set it. 
 /// Like defaultdict in Python</summary>    
 /// <param name="defaultFun">(unit->'V): The function to create a default value</param>
-type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V) =
+/// <param name="dd">(Dictionary<'K,'V>): An existing dictionary that will used as DefaultDict. 
+///   It will not be copied, but used directly</param>
+type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V, dd : Dictionary<'K,'V>) =
     
     //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
-
-    /// the internal dictionary
-    let dd = Dictionary<'K,'V>() 
 
     let dGet(k) =
         let ok, v = dd.TryGetValue(k)
@@ -25,6 +24,13 @@ type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V) =
             dd.[k] <- v
             v
     
+    /// <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
+    /// If accessing a non exiting key , the default function is called to create and set it. 
+    /// Like defaultdict in Python</summary>    
+    /// <param name="defaultFun">(unit->'V): The function to create a default value</param>
+    new (defaultFun: unit->'V) = DefaultDict( defaultFun, new  Dictionary<'K,'V>() ) 
+        
+
     /// For Index operator: get or set the value for given key
     member _.Item 
         with get k   = dGet k        

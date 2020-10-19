@@ -6,18 +6,17 @@ open System.Collections.Generic
 
 /// A thin wraper over System.Collections.Generic.Dictionary with nicer Error messages on accessing missing keys
 /// not the same sa lowercase 'dict'in F#
-type Dict< 'K,'V when 'K:equality > () =
+type Dict< 'K,'V when 'K:equality > (dd : Dictionary<'K,'V>) =
     
     //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
 
-    /// the internal dictionary
-    let dd = Dictionary<'K,'V>() 
-                
     let get k  =
          let ok, v = dd.TryGetValue(k)
          if ok then  v
          else KeyNotFoundException.Raise "Dict.Get failed to find key %A in %A of %d items" k dd dd.Count
     
+    /// create a new empty Dict
+    new () = Dict(new Dictionary<'K,'V>())
     
     /// For Index operator .[i]: get or set the value for given key
     member _.Item 
