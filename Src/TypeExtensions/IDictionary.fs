@@ -61,5 +61,6 @@ module Dict =
     
     /// Set value at key from IDictionary
     // just d.[k]<-v
-    let set (value:'V) (key:'K) (dict:IDictionary<'K,'V>) =  dict.[key]<-value
+    let set (value:'V) (key:'K) (dict:IDictionary<'K,'V>) =  
+        dict.[key]<-value
         
