@@ -9,9 +9,9 @@ module TypeExtensionsSeq =
     
     let internal indexFromBack ix (xs: 'T seq) =     
         match xs with
-        | :? ('T[]) as a ->     a.GetItem(a.Length - 1 - ix)
-        | :? ('T IList) as a -> a.GetItem(a.Count  - 1 - ix) //ResizeArray and other collections           
-        | :? ('T list) as a ->  List.getItem (- 1 - ix) a
+        | :? ('T[]) as a ->     a.GetNeg(a.Length - 1 - ix)
+        | :? ('T IList) as a -> a.GetNeg(a.Count  - 1 - ix) //ResizeArray and other collections           
+        | :? ('T list) as a ->  List.getNeg (- 1 - ix) a
         | _ -> 
             // ther are two ways to get an item indexed from the back:
             // (1) iterate all items and keep a buffer
@@ -27,7 +27,7 @@ module TypeExtensionsSeq =
                     ar.[k]<- e.Current 
                     i <- i+1
                 if ix > i then failwithf "can't get index from back %d from  seq of %d items" ix (i+1)
-                ar.GetItem(k-ix) 
+                ar.GetNeg(k-ix) 
             else
                 failwithf "can't get index from back %d from empty seq" ix
     
@@ -35,6 +35,24 @@ module TypeExtensionsSeq =
     //[<Extension>] //Error 3246
     type Collections.Generic.IEnumerable<'T>  with 
         
+        
+        /// Gets an item by index position in the Seq
+        /// Allows for negtive index too (like Python)
+        [<Extension>] 
+        member this.GetNeg (index) = 
+            try 
+                if index >= 0 then Seq.item index this
+                else indexFromBack ( 1 - index ) this
+            with 
+            | :? InvalidOperationException  as ex -> failwithf "seq.GetNeg(%d): Can not get %dth item of %s : %s" index index (NiceString.toNiceStringFull this) ex.Message
+            | ex -> raise ex //some other error raised while constructing lazy seq
+
+        
+        /// Gets an item by index position in the Seq
+        /// Allows for negtive index too (like Python)
+        [<Extension;Obsolete>] 
+        member this.GetItem (index) = this.GetNeg (index) // TODO Delete          
+
         ///Returns Seq.length - 1
         [<Extension>]
         member this.LastIndex = 
@@ -78,18 +96,8 @@ module TypeExtensionsSeq =
             | ex -> raise ex   //some other error raised while constructing lazy seq         
         
  
-        /// Gets an item by index position in the Seq
-        /// Allows for negtive index too (like Python)
-        [<Extension>] 
-        member this.GetItem (index) = 
-            try 
-                if index >= 0 then Seq.item index this
-                else indexFromBack ( 1 - index ) this
-            with 
-            | :? InvalidOperationException  as ex -> failwithf "seq.GetItem(%d): Can not get %dth item of %s : %s" index index (NiceString.toNiceStringFull this) ex.Message
-            | ex -> raise ex //some other error raised while constructing lazy seq
-                    
-        
+
+        /// Seq.Slice
         /// Allows for negative indices too, like Python, -1 is the last element.
         /// The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
         [<Extension>]
@@ -123,14 +131,19 @@ module Seq =
 
     /// Gets an item by index position in the Seq
     /// Allows for negtive index too (like Python)  
-    let getItem index  (xs:seq<_>) = xs.GetItem(index)
+    [<Obsolete>]
+    let getItem index  (xs:seq<_>) = xs.GetNeg(index) //TODO delete
+
+
+    /// Gets an item by index position in the Seq
+    /// Allows for negtive index too (like Python)  
+    let getNeg index  (xs:seq<_>) = xs.GetNeg(index)
 
     /// Considers sequence cirular and move elements up or down
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
     /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a]
-    let rotate r (xs:seq<_>) = xs |> ResizeArray.ofSeq |> ResizeArray.rotate r
-
-    
+    let rotate r (xs:seq<_>) = xs |> Rarr.ofSeq |> Rarr.rotate r
+        
     /// Yields the Seq without the last element
     let skipLast (xs:seq<_>) =  seq{ 
         use e = xs.GetEnumerator() 
@@ -143,10 +156,10 @@ module Seq =
             failwith "skipLast: Empty Input Sequence"}
     
     /// splits seq in two, like Seq.filter but returning both
-    /// the first ResizeArray has all elements where the filter function returned 'true'
+    /// the first Rarr has all elements where the filter function returned 'true'
     let splitBy filter (xs:seq<_>) =  
-        let t=ResizeArray()
-        let f=ResizeArray()
+        let t=Rarr()
+        let f=Rarr()
         for x in xs do
             if filter x then t.Add(x)
             else             f.Add(x)
@@ -195,9 +208,6 @@ module Seq =
                 failwith "thisNextLooped: Input Sequence only had one element"
         else
             failwith "thisNextLooped: Empty Input Sequence"}
-
-    
-    
 
 
     /// Yields looped Seq of (previous, this, next): from (last, first, second)  upto (second-last, last, first)
