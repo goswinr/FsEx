@@ -14,31 +14,28 @@ type EXT = Runtime.CompilerServices.ExtensionAttribute
 /// Static Extension methods on Exceptions to cal Excn.Raise "%A" x with F# printf string formating
 /// module is set to auto open
 [<AutoOpen>]
-module  Exceptions = 
-    
+module  Exceptions =     
 
     type ArgumentException with
-        /// Raise the exeption with F# printf string formating
+        /// Raise the exception with F# printf string formating
         [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (ArgumentException(s))) msg 
 
     type IndexOutOfRangeException with
-        /// Raise the exeption with F# printf string formating
+        /// Raise the exception with F# printf string formating
         [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (IndexOutOfRangeException(s))) msg
     
     type KeyNotFoundException with
-        /// Raise the exeption with F# printf string formating
+        /// Raise the exception with F# printf string formating
         [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (KeyNotFoundException(s))) msg
                         
     type FileNotFoundException with
-        /// Raise the exeption with F# printf string formating
+        /// Raise the exception with F# printf string formating
         [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (FileNotFoundException(s))) msg
 
     type DirectoryNotFoundException with
-        /// Raise the exeption with F# printf string formating
+        /// Raise the exception with F# printf string formating
         [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (DirectoryNotFoundException(s))) msg
-
-
-            
+       
 
 
 /// General Utility functions
@@ -46,19 +43,19 @@ module  Exceptions =
 [<AutoOpen>]
 module  Util = 
     
-    /// a quick way to throw an exeption.
+    /// a quick way to throw an exception.
     /// for use in temporary scripts when you are too lazy to do a proper exception.
     let inline fail() = failwith "Quick fail (inner exception should show more helpful message)" 
     
-    /// throws an exeption with 'msg' as Error message if 'value' is false.
+    /// throws an exception with 'msg' as Error message if 'value' is false.
     /// this function is usefull to follow up on any methods that return booleans indication sucess or failure
     let inline failIfFalse (msg:string) (value :bool)  = if not value then failwithf "failIfFalse: %s " msg 
     
-    /// throws an exeption with 'msg' as Error message if 'value' is null.
+    /// throws an exception with 'msg' as Error message if 'value' is null.
     /// this function is usefull to doing many null checks without adding lots if clauses and lots of indenting
-    let inline failIfNull (msg:string) (value :'T when 'T: null) = 
+    let inline failIfNull (msg:string) (value :'T when 'T: null) :unit = 
         match value with 
-        | null -> failwithf "<null> in %s" msg  
+        | null -> ArgumentException.Raise "<null> in FsEx.Util.failIfNull: %s" msg  
         | _ -> ()
     
     /// retuns false if the value is null.
@@ -89,15 +86,6 @@ module  Util =
     let inline t3 (_,_,c) = c    
 
 
-    /// Any int will give a valid index for given collection size.
-    /// division remainder will be used i % len
-    /// e.g.: -1 is  last item 
-    /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
-    let inline saveIdx i len =
-        let rest = i % len
-        if rest >= 0 then rest // does not fail on -4 for len 4
-        else len + rest
-
     /// Converts negative indices to positive ones
     /// correctet results from -len up to len-1
     /// e.g.: -1 is  last item .
@@ -106,13 +94,22 @@ module  Util =
         let ii =  if i < 0 then len+i else i
         if ii<0 || ii >= len then IndexOutOfRangeException.Raise "Util.negIdx: Bad index %d for items count %d." i len
         ii
-
+    
+    /// Any int will give a valid index for given collection size.
     /// Converts negative indices to positive ones and loops to start after last index is reached
-    /// retrns a valid index for a colcction of 'len' items for any integer
+    /// returns a valid index for a colcction of 'len' items for any integer
     let inline negIdxLooped i len =        
         let t = i % len
-        if t < 0 then len+t else t
+        if t >= 0 then t 
+        else           t + len 
 
+    /// Any int will give a valid index for given collection size.
+    /// division remainder will be used i % len
+    /// e.g.: -1 is  last item 
+    /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+    let inline saveIdx i len = negIdxLooped i len 
+      
+    
     /// If condition is true return f(x) else just x
     let inline ifDo condition (f:'T->'T)  (x:'T) = 
         if condition then f x else x
