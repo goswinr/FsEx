@@ -26,8 +26,11 @@
     <Compile Include="Src\UtilMath.fs" />
     <Compile Include="Src\MinMaxSortCompare.fs" />
     <Compile Include="Src\NiceString.fs" />
-    <Compile Include="Src\Rarr.fs" />
-    <Compile Include="Src\RarrModule.fs" />
+    <Compile Include="Src\Types\Rarr.fs" />
+    <Compile Include="Src\Types\RarrModule.fs" />
+    <Compile Include="Src\Types\Dict.fs" />
+    <Compile Include="Src\Types\DefaultDict.fs" />
+    <Compile Include="Src\Types\StuctTuples.fs" />
 
     <Compile Include="Src\TypeExtensions\BclStructs.fs" />
     <Compile Include="Src\TypeExtensions\Color.fs" />
@@ -37,11 +40,7 @@
     <Compile Include="Src\TypeExtensions\IDictionary.fs" />
     <Compile Include="Src\TypeExtensions\List.fs" />
     <Compile Include="Src\TypeExtensions\IList.fs" />
-    <Compile Include="Src\TypeExtensions\Seq.fs" />
-    <Compile Include="Src\Types\Dict.fs" />
-
-    <Compile Include="Src\Types\DefaultDict.fs" />
-    <Compile Include="Src\Types\StuctTuples.fs" /> 
+    <Compile Include="Src\TypeExtensions\Seq.fs" /> 
 
     <Compile Include="Src\ComputationalExpressions.fs" />
     <Compile Include="Src\DynamicOperator.fs" />
