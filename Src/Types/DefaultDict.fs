@@ -29,7 +29,10 @@ type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V, dd : Dictionar
     /// Like defaultdict in Python</summary>    
     /// <param name="defaultFun">(unit->'V): The function to create a default value</param>
     new (defaultFun: unit->'V) = DefaultDict( defaultFun, new  Dictionary<'K,'V>() ) 
-        
+    
+    /// Access the underlying Collections.Generic.Dictionary<'K,'V>
+    /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of DefaultDict!
+    member _.Dictionary = dd
 
     /// For Index operator: get or set the value for given key
     member _.Item 

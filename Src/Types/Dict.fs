@@ -18,6 +18,11 @@ type Dict< 'K,'V when 'K:equality > (dd : Dictionary<'K,'V>) =
     /// create a new empty Dict
     new () = Dict(new Dictionary<'K,'V>())
     
+
+    /// Access the underlying Collections.Generic.Dictionary<'K,'V>
+    /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of Dict!
+    member _.Dictionary = dd
+
     /// For Index operator .[i]: get or set the value for given key
     member _.Item 
         with get k   = get k        
