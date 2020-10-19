@@ -1294,7 +1294,7 @@ module ResizeArray =
     /// through the computation. If the input function is <c>f</c> and the elements are <c>i0...iN</c> 
     /// then computes <c>f (... (f i0 i1)...) iN</c>.
     /// Raises <c>ArgumentException</c> if the array has size zero.
-    /// <summary>
+    /// </summary>
     /// <param name="reduction"></param>
     /// <param name="resizeArray"></param>
     /// <returns></returns>

@@ -437,9 +437,8 @@ module Rarr =
     /// Sort the elements of the Rarr by mutating the Rarr in-place.
     /// Using the key extractor and generic comparison on the keys.
     //-[<CompiledName("SortInPlaceBy")>]
-    let inline sortInPlaceBy<'T, 'Key when 'Key : comparison>     (projection : 'T -> 'Key) (rarr : Rarr<'T>) =
-        rarr.Sort (fun x y ->
-            compare (projection x) (projection y))
+    let inline sortInPlaceBy<'T, 'Key when 'Key : comparison>  (projection : 'T -> 'Key) (rarr : Rarr<'T>) =
+        rarr.Sort (fun x y -> compare (projection x) (projection y))
 
     /// Sort the elements of the Rarr by mutating the Rarr in-place.
     /// Using the given comparison function.
@@ -1102,7 +1101,7 @@ module Rarr =
     /// through the computation. If the input function is <c>f</c> and the elements are <c>i0...iN</c> 
     /// then computes <c>f (... (f i0 i1)...) iN</c>.
     /// Raises <c>ArgumentException</c> if the array has size zero.
-    /// <summary>
+    /// </summary> 
     /// <param name="reduction"></param>
     /// <param name="rarr"></param>
     /// <returns></returns>

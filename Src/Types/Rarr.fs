@@ -9,7 +9,7 @@ open System
 /// It's just a very thin wrapper over a System.Collections.Generic.List<'T>
 /// and has all its members and interfaces implemented.
 /// The name Rarr is derived from of the F# type ResizeArray
-type Rarr<'T>(xs:List<'T>) =     
+type Rarr<'T> private (xs:List<'T>) =     
     
 
     static member inline internal get index (xs:List<'T>) = 
@@ -20,6 +20,12 @@ type Rarr<'T>(xs:List<'T>) =
         if index >= xs.Count then ArgumentOutOfRangeException.Raise "Cant set index %d to %A in Rarr of %d items: %A " index value xs.Count  xs
         xs.[index] <- value
     
+    /// Constructs a new Rarr by using the supplied List<'T>  directly, without any copying of items
+    static member CreateDirectly (xs:List<'T> ) = Rarr(xs)
+
+    /// Constructs a new Rarr by copying each item from the IEnumerable<'T>
+    static member CreateFromSeq (xs:seq<'T> ) = Rarr(xs)
+
     /// Constructs a new Rarr. 
     /// A Rarr is a mutable list like Collections.Generic.List<'T> but with nicer error messages on bad indices.
     /// It's just a very thin wrapper over a System.Collections.Generic.List<'T> 

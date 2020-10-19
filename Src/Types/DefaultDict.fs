@@ -8,10 +8,10 @@ open System.Collections.Generic
 /// <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
 /// If accessing a non exiting key , the default function is called to create and set it. 
 /// Like defaultdict in Python</summary>    
-/// <param name="defaultFun">(unit-&gt;&aposV): The function to create a default value</param>
-/// <param name="dd">(Dictionary&lt;&apos;K,&aposV&gt;): An existing dictionary that will used as DefaultDict. 
+/// <param name="defaultFun">(unit-&gt;&apos;V): The function to create a default value</param>
+/// <param name="dd">(Dictionary&lt;&apos;K,&apos;V&gt;): An existing dictionary that will used as DefaultDict. 
 ///   It will not be copied, but used directly</param>
-type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V, dd : Dictionary<'K,'V>) =
+type DefaultDict< 'K,'V when 'K:equality > private (defaultFun: unit->'V, dd : Dictionary<'K,'V>) =
     
     //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
 
@@ -27,9 +27,12 @@ type DefaultDict< 'K,'V when 'K:equality > (defaultFun: unit->'V, dd : Dictionar
     /// <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
     /// If accessing a non exiting key , the default function is called to create and set it. 
     /// Like defaultdict in Python</summary>    
-    /// <param name="defaultFun">(unit-&gt;&aposV): The function to create a default value</param>
+    /// <param name="defaultFun">(unit-&gt;&apos;V): The function to create a default value</param>
     new (defaultFun: unit->'V) = DefaultDict( defaultFun, new  Dictionary<'K,'V>() ) 
     
+    /// Constructs a new DefaultDict by using the supplied Dictionary<'K,'V> directly, without any copying of items
+    static member CreateDirectly (defaultFun: unit->'V) (xs:Dictionary<'K,'V> ) = DefaultDict(defaultFun,xs)
+
     /// Access the underlying Collections.Generic.Dictionary<'K,'V>
     /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of DefaultDict!
     member _.Dictionary = dd

@@ -6,7 +6,7 @@ open System.Collections.Generic
 
 /// A thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys
 /// not the same sa lowercase 'dict'in F#
-type Dict< 'K,'V when 'K:equality > (dd : Dictionary<'K,'V>) =
+type Dict< 'K,'V when 'K:equality > private (dd : Dictionary<'K,'V>) =
     
     //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
 
@@ -18,6 +18,9 @@ type Dict< 'K,'V when 'K:equality > (dd : Dictionary<'K,'V>) =
     /// create a new empty Dict<'K,'V>
     new () = Dict(new Dictionary<'K,'V>())
     
+
+    /// Constructs a new Dict by using the supplied Dictionary<'K,'V> directly, without any copying of items
+    static member CreateDirectly (xs:Dictionary<'K,'V> ) = Dict(xs)
 
     /// Access the underlying Collections.Generic.Dictionary<'K,'V>)
     /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of Dict!
