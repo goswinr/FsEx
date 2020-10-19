@@ -10,6 +10,69 @@ module TypeExtensionsArray =
     //[<Extension>] //Error 3246
     type ``[]``<'T>  with //Generic Array
         
+        /// Gets an item at index 
+        /// (use Array.GetNeg(i) member if you want to use negative indices too)
+        member this.Get index = 
+            if index >= this.Length then ArgumentOutOfRangeException.Raise "Cant get index %d from Array of %d items: %A" index this.Length this
+            this.[index]
+            
+        /// Sets an item at index 
+        /// (use Array.SetNeg(i) member if you want to use negative indices too)
+        member this.Set index value = 
+            if index >= this.Length then ArgumentOutOfRangeException.Raise "Cant set index %d to %A in Array of %d items: %A " index value this.Length  this
+            this.[index] <- value
+
+        /// Gets an item in the Array by index.
+        /// Allows for negtive index too ( -1 is last item,  like Python)
+        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        member this.GetNeg index = 
+            let len = this.Length
+            let ii =  if index < 0 then len + index else index
+            if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "Array.GetNeg: Can't get index %d from Array of %d items: %A" index this.Length this
+            this.[ii]        
+
+        /// Sets an item in the Array by index.
+        /// Allows for negtive index too ( -1 is last item,  like Python)
+        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        member this.SetNeg index value = 
+            let len = this.Length
+            let ii =  if index < 0 then len + index else index
+            if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "Array.SetNeg: Can't set index %d to %A rom Array of %d items: %A" index value this.Length this
+            this.[ii] <- value        
+   
+        /// Any index will return a value.
+        /// Array is treated as an endless loop in positive and negative direction   
+        member this.GetLooped index = 
+            let len = this.Length
+            if len=0 then ArgumentOutOfRangeException.Raise "Array.GetLooped: Can't get index %d from Array of 0 items" index
+            let t = index % len
+            let ii = if t >= 0 then t  else t + len 
+            this.[ii]              
+
+        /// Any index will set a value.
+        /// Array is treated as an endless loop in positive and negative direction   
+        member this.SetLooped index value  = 
+            let len = this.Length
+            if len=0 then ArgumentOutOfRangeException.Raise "Array.SetLooped: Can't Set index %d to %A in Array of 0 items" index value
+            let t = index % len
+            let ii = if t >= 0 then t  else t + len 
+            this.[ii] <- value
+
+       
+        /// Allows for negtive index too ( -1 is last item,  like Python)
+        [<Extension;Obsolete>] 
+        member this.GetItem index =  // TODO Delete
+            let i = negIdx index this.Length
+            this.[i]
+    
+     
+        /// Allows for negtive index too ( -1 is last item, like Python)
+        [<Extension;Obsolete>]
+        member this.SetItem index value =  // TODO Delete
+            let i = negIdx index this.Length
+            this.[i] <- value 
+
+
         /// Gets the index of the last item in the array.
         /// equal to this.Length - 1
         [<Extension>]
@@ -59,29 +122,13 @@ module TypeExtensionsArray =
             if this.Length < 3 then failwithf "array.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
             this.[2]
         
-        
-        /// Gets an item in the array by index.
-        /// Allows for negtive index too ( -1 is last item,  like Python)
-        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
-        [<Extension>] 
-        member this.GetItem index = 
-            let i = negIdx index this.Length
-            this.[i]
-    
-        
-        /// Sets an item in the array by index.
-        /// Allows for negtive index too ( -1 is last item, like Python)
-        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
-        [<Extension>]
-        member this.SetItem index value = 
-            let i = negIdx index this.Length
-            this.[i] <- value 
+
 
         //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164                
 
         /// Allows for negative indices too. ( -1 is last item, like Python)
         /// The resulting array includes the end index.
-        /// The built in slicing notaion (e.g. a.[1..3]) for arrays does not allow for negative indices.
+        /// The built in slicing notaion (e.g. a.[1..3]) for arrays does not allow for negative indices. (and can't be overwritten)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         [<Extension>]
         member this.Slice(startIdx:int , endIdx: int ) : 'T array=
