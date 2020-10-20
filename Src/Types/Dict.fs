@@ -3,6 +3,10 @@
 open System
 open System.Collections.Generic
 
+/// A type abbreviation for System.Collections.Generic.HashSet<'T> 
+/// so that it is available in FsEx namespace
+/// ( with a lowercase 's')
+type Hashset<'T> = HashSet<'T>
 
 /// A thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys
 /// not the same sa lowercase 'dict'in F#
