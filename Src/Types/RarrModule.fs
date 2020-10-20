@@ -108,14 +108,14 @@ module Rarr =
         //TODO test keeping of order if equal !
         
         let inline simple cmpF (xs:Rarr<'T>) =
-            if xs.Count < 1 then ArgumentException.Raise "Empty %A in Rarr max / min" xs
+            if xs.Count < 1 then ArgumentException.RaiseBase "Empty %A in Rarr max / min" xs
             let mutable m = xs.[0]
             for i=1 to xs.Count-1 do
                 if cmpF xs.[i] m then m <- xs.[i]
             m 
             
         let inline simple2 cmpF (xs:Rarr<'T>) =
-            if xs.Count < 2 then ArgumentException.Raise "Only %d elements in %A, for Rarr first+second max / min" xs.Count xs
+            if xs.Count < 2 then ArgumentException.RaiseBase "Only %d elements in %A, for Rarr first+second max / min" xs.Count xs
             let mutable m1 = xs.[0]
             let mutable m2 = xs.[1] 
             for i=1 to xs.Count-1 do
@@ -159,7 +159,7 @@ module Rarr =
                     else                   2,1,0
 
         let inline simple3 cmpF (xs:Rarr<'T>) =
-            if xs.Count < 3 then ArgumentException.Raise "Only %d elements in %A, for Rarr first+second+third max / min" xs.Count xs
+            if xs.Count < 3 then ArgumentException.RaiseBase "Only %d elements in %A, for Rarr first+second+third max / min" xs.Count xs
             let e1 = xs.[0]
             let e2 = xs.[1]
             let e3 = xs.[2]
@@ -179,7 +179,7 @@ module Rarr =
             m1,m2,m3 
                                     
         let inline indexByFun cmpF func (xs:Rarr<'T>) = 
-            if xs.Count < 1 then ArgumentException.Raise "Empty %A, Rarr  max / min IndexByFun" xs
+            if xs.Count < 1 then ArgumentException.RaiseBase "Empty %A, Rarr  max / min IndexByFun" xs
             let mutable f = func xs.[0]
             let mutable mf = f
             let mutable ii = 0
@@ -191,7 +191,7 @@ module Rarr =
             ii
 
         let inline index2ByFun cmpF func (xs:Rarr<'T>) =
-            if xs.Count < 2 then ArgumentException.Raise "Only %d elements in %A, for Rarr index2ByFun max / min" xs.Count xs            
+            if xs.Count < 2 then ArgumentException.RaiseBase "Only %d elements in %A, for Rarr index2ByFun max / min" xs.Count xs            
             let mutable i1 = 0
             let mutable i2 = 1 
             let mutable mf1 = func xs.[i1]
@@ -211,7 +211,7 @@ module Rarr =
 
 
         let inline index3ByFun (cmpOp:'U->'U->bool)  (byFun:'T->'U) (xs:Rarr<'T>) =
-            if xs.Count < 3 then ArgumentException.Raise "Only %d elements in %A, for Rarr index3ByFun max / min" xs.Count xs 
+            if xs.Count < 3 then ArgumentException.RaiseBase "Only %d elements in %A, for Rarr index3ByFun max / min" xs.Count xs 
             // sort first 3
             let mutable i1,i2,i3 =  indexOfSort3By byFun cmpOp xs.[0] xs.[1] xs.[2] // otherwise would fail on sorting first 3, test on Rarr([5;6;3;1;2;0])|> Rarr.max3 
             let mutable e1 =  byFun xs.[i1]

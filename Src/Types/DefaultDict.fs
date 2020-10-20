@@ -15,6 +15,7 @@ type DefaultDict< 'K,'V when 'K:equality > private (defaultFun: unit->'V, dd : D
     
     //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
 
+
     let dGet(k) =
         let ok, v = dd.TryGetValue(k)
         if ok then 
@@ -31,7 +32,9 @@ type DefaultDict< 'K,'V when 'K:equality > private (defaultFun: unit->'V, dd : D
     new (defaultFun: unit->'V) = DefaultDict( defaultFun, new  Dictionary<'K,'V>() ) 
     
     /// Constructs a new DefaultDict by using the supplied Dictionary<'K,'V> directly, without any copying of items
-    static member CreateDirectly (defaultFun: unit->'V) (xs:Dictionary<'K,'V> ) = DefaultDict(defaultFun,xs)
+    static member CreateDirectly (defaultFun: unit->'V) (di:Dictionary<'K,'V> ) =
+        if isNull di then ArgumentNullException.Raise "Dictionary in DefaultDict.CreateDirectly is null"
+        DefaultDict(defaultFun,di)
 
     /// Access the underlying Collections.Generic.Dictionary<'K,'V>
     /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of DefaultDict!

@@ -20,7 +20,9 @@ type Dict< 'K,'V when 'K:equality > private (dd : Dictionary<'K,'V>) =
     
 
     /// Constructs a new Dict by using the supplied Dictionary<'K,'V> directly, without any copying of items
-    static member CreateDirectly (xs:Dictionary<'K,'V> ) = Dict(xs)
+    static member CreateDirectly (dic:Dictionary<'K,'V> ) = 
+        if isNull dic then ArgumentNullException.Raise "Dictionary in Dict.CreateDirectly is null"
+        Dict(dic)
 
     /// Access the underlying Collections.Generic.Dictionary<'K,'V>)
     /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of Dict!
@@ -32,7 +34,10 @@ type Dict< 'K,'V when 'K:equality > private (dd : Dictionary<'K,'V>) =
         and  set k v = dd.[k] <- v
     
     /// Get value for given key
-    member _.Get k = get k 
+    member _.Get key = get key 
+
+    /// Set value for given key
+    member _.Set key value = dd.[key] <- value
     
     /// Get a value and remove key and value it from dictionary, like *.pop() in Python 
     /// Will fail if key does not exist

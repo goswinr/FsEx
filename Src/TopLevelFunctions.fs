@@ -14,29 +14,37 @@ type EXT = Runtime.CompilerServices.ExtensionAttribute
 /// Static Extension methods on Exceptions to cal Excn.Raise "%A" x with F# printf string formating
 /// module is set to auto open
 [<AutoOpen>]
-module  Exceptions =     
-
+module  Exceptions =
+    
     type ArgumentException with
-        /// Raise the exception with F# printf string formating
-        [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (ArgumentException(s))) msg 
+        /// Raise ArgumentException with F# printf string formating
+        /// this is also the base class of ArgumentOutOfRangeException and ArgumentNullException
+        [<Extension>] static member inline RaiseBase msg =  Printf.kprintf (fun s -> raise (ArgumentException(s))) msg 
+
+    type ArgumentOutOfRangeException with
+        /// Raise ArgumentOutOfRangeException with F# printf string formating
+        [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (ArgumentOutOfRangeException(s))) msg 
+
+    type ArgumentNullException with
+        /// Raise ArgumentNullException with F# printf string formating
+        [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (ArgumentNullException(s))) msg 
 
     type IndexOutOfRangeException with
-        /// Raise the exception with F# printf string formating
-        [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (IndexOutOfRangeException(s))) msg
-    
+        /// Raise IndexOutOfRangeException with F# printf string formating
+        [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (IndexOutOfRangeException(s))) msg    
+
     type KeyNotFoundException with
-        /// Raise the exception with F# printf string formating
+        /// Raise KeyNotFoundException with F# printf string formating
         [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (KeyNotFoundException(s))) msg
                         
     type FileNotFoundException with
-        /// Raise the exception with F# printf string formating
+        /// Raise FileNotFoundException with F# printf string formating
         [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (FileNotFoundException(s))) msg
 
     type DirectoryNotFoundException with
-        /// Raise the exception with F# printf string formating
+        /// Raise DirectoryNotFoundException with F# printf string formating
         [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (DirectoryNotFoundException(s))) msg
-       
-
+   
 
 /// General Utility functions
 /// module is set to auto open
@@ -55,7 +63,7 @@ module  Util =
     /// this function is usefull to doing many null checks without adding lots if clauses and lots of indenting
     let inline failIfNull (msg:string) (value :'T when 'T: null) :unit = 
         match value with 
-        | null -> ArgumentException.Raise "<null> in FsEx.Util.failIfNull: %s" msg  
+        | null -> ArgumentNullException.Raise "<null> in FsEx.Util.failIfNull: %s" msg  
         | _ -> ()
     
     /// retuns false if the value is null.
@@ -141,7 +149,7 @@ module  Util =
         let mutable res = Unchecked.defaultof<'a> 
         if (^a: (static member TryParse: string * byref<'a> -> bool) (x, &res)) 
         then res  
-        else ArgumentException.Raise "Failed to parse %A to a %A" x (res.GetType())
+        else ArgumentException.RaiseBase "Failed to parse %A to a %A" x (res.GetType())
 
 
 

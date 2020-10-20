@@ -11,7 +11,6 @@ open System
 /// The name Rarr is derived from of the F# type ResizeArray
 type Rarr<'T> private (xs:List<'T>) =     
     
-
     static member inline internal get index (xs:List<'T>) = 
         if index >= xs.Count then ArgumentOutOfRangeException.Raise "Cant get index %d from Rarr of %d items: %A" index xs.Count xs
         xs.[index]
@@ -21,10 +20,14 @@ type Rarr<'T> private (xs:List<'T>) =
         xs.[index] <- value
     
     /// Constructs a new Rarr by using the supplied List<'T>  directly, without any copying of items
-    static member CreateDirectly (xs:List<'T> ) = Rarr(xs)
+    static member CreateDirectly (xs:List<'T> ) = 
+        if isNull xs then ArgumentNullException.Raise "List in Rarr.CreateDirectly is null"
+        Rarr(xs)
 
     /// Constructs a new Rarr by copying each item from the IEnumerable<'T>
-    static member CreateFromSeq (xs:seq<'T> ) = Rarr(xs)
+    static member CreateFromSeq (xs:seq<'T> ) = 
+        if isNull xs then ArgumentNullException.Raise "Seq in Rarr.CreateFromSeq is null"
+        Rarr(xs)
 
     /// Constructs a new Rarr. 
     /// A Rarr is a mutable list like Collections.Generic.List<'T> but with nicer error messages on bad indices.
@@ -55,6 +58,7 @@ type Rarr<'T> private (xs:List<'T>) =
     /// The size and capacity of the new list will both be equal to the size of the
     /// given collection.
     new (collection : IEnumerable<'T>)  = 
+        if isNull collection then ArgumentNullException.Raise "IEnumerable in new Rarr(collection) constructor is null"
         Rarr(List(collection))
 
     /// Access the underlying Collections.Generic.List<'T>
