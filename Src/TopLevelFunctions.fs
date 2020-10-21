@@ -11,11 +11,13 @@ type EXT = Runtime.CompilerServices.ExtensionAttribute
 [<assembly:EXT>] do() // mark this assembly as extension assembly http://www.latkin.org/blog/2014/04/30/f-extension-methods-in-roslyn/
 
 
+
 /// Static Extension methods on Exceptions to cal Excn.Raise "%A" x with F# printf string formating
 /// module is set to auto open
 [<AutoOpen>]
-module  Exceptions =
-    
+module  Exceptions =    
+
+
     type ArgumentException with
         /// Raise ArgumentException with F# printf string formating
         /// this is also the base class of ArgumentOutOfRangeException and ArgumentNullException

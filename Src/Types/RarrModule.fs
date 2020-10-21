@@ -93,9 +93,9 @@ module Rarr =
     /// Returns a Rarr of the index and the item. (like enumerate in Python)
     let inline indexed (rarr: Rarr<_>)  =  init rarr.Count (fun i -> i,rarr.[i])
 
-    /// splits a Rarr in two, like Rarr.filter but returning both
+    /// Splits a Rarr in two, like Rarr.filter but returning both
     /// The first Rarr has all elements where the filter function returned 'true'
-    let inline splitBy filter (rarr:seq<_>) =  
+    let inline splitBy filter (rarr:Rarr<_>) =  
         let t=Rarr()
         let f=Rarr()
         for x in rarr do
