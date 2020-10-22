@@ -75,6 +75,9 @@ module  Util =
         | null -> false  
         | _ -> true     
     
+    /// Returns maybeNullValue if it is NOT null, else alternativeValue. 
+    let inline ifNull (alternativeValue:'T) (maybeNullValue:'T)  = match maybeNullValue with null -> alternativeValue | _ -> maybeNullValue  
+
     /// Returns the value on the left unless it is null, then it returns the value on the right.
     let inline (|?) (a:'T) (b:'T)  = // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs
         match a with 
