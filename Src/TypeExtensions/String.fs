@@ -212,7 +212,7 @@ module String =
     /// Compares two specified String objects and returns an integer that indicates their relative position in the sort order. Compare strings using ordinal (binary) sort rules and ignoring the case of the strings being compared.
     let inline compareIgnoreCase strA strB = compare StringComparison.OrdinalIgnoreCase strA strB
 
-    /// Determines whether the end of this string instance matches the specified string using , StringComparison.Ordinal.
+    /// Determines whether the end of this string instance matches the specified string using , using StringComparison.Ordinal.
     let inline endsWith (value : string) (s:string) = s.EndsWith(value, StringComparison.Ordinal)
 
     /// Determines whether the end of this string instance matches the specified string when compared using the specified culture.
@@ -239,25 +239,31 @@ module String =
     /// Reports the zero-based index of the first occurrence of the specified string in this instance, using StringComparison.Ordinal.
     let inline indexOfString (value:string) (s:string) = s.IndexOf(value, StringComparison.Ordinal)
 
-    /// Reports the zero-based index of the first occurrence of the specified string in this instance. The search starts at a specified character position.
-    let inline indexOfString' (value:string) (startIndex:int) (s:string) = s.IndexOf(value, startIndex)
+    /// Reports the zero-based index of the first occurrence of the specified string in this instance. 
+    /// The search starts at a specified character position, using StringComparison.Ordinal.
+    let inline indexOfString' (value:string) (startIndex:int) (s:string) = s.IndexOf(value, startIndex,StringComparison.Ordinal)
 
-    /// Reports the zero-based index of the first occurrence of the specified string in this instance. The search starts at a specified character position and examines a specified number of character positions.
-    let inline indexOfString'' (value:string) (startIndex:int) (count:int) (s:string) = s.IndexOf(value, startIndex, count)
+    /// Reports the zero-based index of the first occurrence of the specified string in this instance. 
+    /// The search starts at a specified character position and examines a specified number of character positions, using StringComparison.Ordinal.
+    let inline indexOfString'' (value:string) (startIndex:int) (count:int) (s:string) = s.IndexOf(value, startIndex, count, StringComparison.Ordinal)
 
-    /// Reports the zero-based index of the first occurrence of the specified string in the current String object. A parameter specifies the type of search to use for the specified string.
+    /// Reports the zero-based index of the first occurrence of the specified string in the current String object. 
+    /// A parameter specifies the type of search to use for the specified string.
     let inline indexOfStringWithComparison value (comparisonType:StringComparison) (s:string) = s.IndexOf(value, comparisonType)
 
-    /// Reports the zero-based index of the first occurrence of the specified string in the current String object. Parameters specify the starting search position in the current string and the type of search to use for the specified string.
+    /// Reports the zero-based index of the first occurrence of the specified string in the current String object. 
+    /// Parameters specify the starting search position in the current string and the type of search to use for the specified string.
     let inline indexOfStringWithComparison' value startIndex (comparisonType:StringComparison) (s:string) = s.IndexOf(value, startIndex, comparisonType)
 
-    /// Reports the zero-based index of the first occurrence of the specified string in the current String object. Parameters specify the starting search position in the current string, the number of characters in the current string to search, and the type of search to use for the specified string.
+    /// Reports the zero-based index of the first occurrence of the specified string in the current String object. 
+    /// Parameters specify the starting search position in the current string, the number of characters in the current string to search, and the type of search to use for the specified string.
     let inline indexOfStringWithComparison'' value startIndex count comparisonType (s:string) = s.IndexOf(value, startIndex, count, comparisonType)
 
     /// Reports the zero-based index of the first occurrence in this instance of any character in a specified array of Unicode characters.
     let inline indexOfAny anyOf (s:string) = s.IndexOfAny(anyOf)
 
-    /// Reports the zero-based index of the first occurrence in this instance of any character in a specified array of Unicode characters. The search starts at a specified character position.
+    /// Reports the zero-based index of the first occurrence in this instance of any character in a specified array of Unicode characters. 
+    /// The search starts at a specified character position.
     let inline indexOfAny' anyOf startIndex (s:string) = s.IndexOfAny(anyOf, startIndex)
 
     /// Reports the zero-based index of the first occurrence in this instance of any character in a specified array of Unicode characters. The search starts at a specified character position and examines a specified number of character positions.
@@ -281,14 +287,16 @@ module String =
     /// Reports the zero-based index position of the last occurrence of the specified Unicode character in a substring within this instance. The search starts at a specified character position and proceeds backward toward the beginning of the string for a specified number of character positions.
     let inline lastIndexOfChar'' (value:char) startIndex count (s:string) = s.LastIndexOf(value, startIndex, count)
 
-    /// Reports the zero-based index position of the last occurrence of a specified string within this instance.
-    let inline lastIndexOfString (value:string) (s:string) = s.LastIndexOf(value)
+    /// Reports the zero-based index position of the last occurrence of a specified string within this instance, using StringComparison.Ordinal.
+    let inline lastIndexOfString (value:string) (s:string) = s.LastIndexOf(value, StringComparison.Ordinal)
 
-    /// Reports the zero-based index position of the last occurrence of a specified string within this instance. The search starts at a specified character position and proceeds backward toward the beginning of the string.
-    let inline lastIndexOfString' (value:string) (startIndex:int) (s:string) = s.LastIndexOf(value, startIndex)
+    /// Reports the zero-based index position of the last occurrence of a specified string within this instance. 
+    /// The search starts at a specified character position and proceeds backward toward the beginning of the string, using StringComparison.Ordinal.
+    let inline lastIndexOfString' (value:string) (startIndex:int) (s:string) = s.LastIndexOf(value, startIndex, StringComparison.Ordinal)
 
-    /// Reports the zero-based index position of the last occurrence of a specified string within this instance. The search starts at a specified character position and proceeds backward toward the beginning of the string for a specified number of character positions.
-    let inline lastIndexOfString'' (value:string) (startIndex:int) (count:int) (s:string) = s.LastIndexOf(value, startIndex, count)
+    /// Reports the zero-based index position of the last occurrence of a specified string within this instance. 
+    /// The search starts at a specified character position and proceeds backward toward the beginning of the string for a specified number of character positions, using StringComparison.Ordinal.
+    let inline lastIndexOfString'' (value:string) (startIndex:int) (count:int) (s:string) = s.LastIndexOf(value, startIndex, count, StringComparison.Ordinal)
 
     /// Reports the zero-based index of the last occurrence of a specified string within the current String object. A parameter specifies the type of search to use for the specified string.
     let inline lastIndexOfStringWithComparison value (comparisonType:StringComparison) (s:string) = s.LastIndexOf(value, comparisonType)

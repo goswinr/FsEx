@@ -87,7 +87,7 @@ module NiceString =
         let mutable maxCharsInString = 5000
 
         let private before (splitter:string) (s:string) = 
-            let start = s.IndexOf(splitter) 
+            let start = s.IndexOf(splitter,StringComparison.Ordinal) 
             if start = -1 then s
             else s.Substring(0, start )
     
