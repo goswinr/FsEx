@@ -44,8 +44,17 @@ module TypeExtensionsBclStructs =
         /// with automatic formating to never use scientific notation
         /// will have maximum 15 decimal places
         /// f.ToString( "0.###############") 
-        [<Extension>] member x.AsString = x.ToString( "0.###############") 
- 
+        [<Extension>] member x.AsString = x.ToString( "0.###############")         
+
+        /// Format without digits behind coma
+        [<Extension>] member x.AsString0 = x.ToString( "0.") 
+
+        /// Format with one digits behind coma
+        [<Extension>] member x.AsString1 = x.ToString( "0.#") 
+
+        /// Format with two digits behind coma
+        [<Extension>] member x.AsString2 = x.ToString( "0.##") 
+
     type Single with  
 
         /// with automatic formating of display reduced precision depending on single size
@@ -57,6 +66,14 @@ module TypeExtensionsBclStructs =
         /// f.ToString( "0.###############") 
         [<Extension>] member x.AsString = x.ToString( "0.#######") 
     
+        /// Format without digits behind coma
+        [<Extension>] member x.AsString0 = x.ToString( "0.") 
+
+        /// Format with one digits behind coma
+        [<Extension>] member x.AsString1 = x.ToString( "0.#") 
+
+        /// Format with two digits behind coma
+        [<Extension>] member x.AsString2 = x.ToString( "0.##") 
     
     type Decimal with  
            
@@ -72,6 +89,16 @@ module TypeExtensionsBclStructs =
         /// will have maximum 15 decimal places
         /// f.ToString( "0.###############") 
         [<Extension>] member x.AsString = x.ToString( "0.###############") 
+
+        
+        /// Format without digits behind coma
+        [<Extension>] member x.AsString0 = x.ToString( "0.") 
+
+        /// Format with one digits behind coma
+        [<Extension>] member x.AsString1 = x.ToString( "0.#") 
+
+        /// Format with two digits behind coma
+        [<Extension>] member x.AsString2 = x.ToString( "0.##") 
 
     type DateTime with
         
