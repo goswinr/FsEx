@@ -171,19 +171,23 @@ module SaveIgnore =
     /// For structs use 'ignore'
     let inline ignoreObj (x:obj)=()
 
-/// Functions and operator !++ to deal with integer ref objects
+/// Functions (and operator !++) to deal with integer ref objects
 module IntRef = 
 
     /// Increment a ref cell and return new incremented integer value
+    [<Obsolete>]
     let inline (!++)  i = incr i; !i 
 
-    /// Increment a ref cell by two 
+    /// Increment a ref cell by two
+    [<Obsolete>]
     let inline incr2 i = i := !i+2
 
     /// Increment a ref cell by three 
+    [<Obsolete>]
     let inline incr3 i = i := !i+3
 
     /// Increment a ref cell by four
+    [<Obsolete>]
     let inline incr4 i = i := !i+4
 
     /// Increment a ref cell by a given int
@@ -195,15 +199,18 @@ module IntRef =
     let inline decr  i = i := !i-1 
     
     /// Decrement a ref cell by two
+    [<Obsolete>]
     let inline decr2 i = i := !i-2
     
     /// Decrement a ref cell by three
+    [<Obsolete>]
     let inline decr3 i = i := !i-3
     
     /// Decrement a ref cell by four
+    [<Obsolete>]
     let inline decr4 i = i := !i-4
     
-    /// Decrement a ref cell by a given int
+    /// Decrement a ref cell by a given int    
     let inline decrBy i (x:int) = i := !i - x    
     
     //let inline decrByR (x:int) i = i := !i - x           // useful ?
@@ -214,6 +221,23 @@ module IntRef =
     /// set ref cell to given int if it is smaller than current value
     let inline setMin i (x:int) = if x < !i then i := x
 
+
+/// Functions to deal with float ref objects
+module FloatRef = 
+        
+    /// Increment a ref cell by a given int
+    let inline incrBy i (x:float) = i := !i + x
+        
+    /// Decrement a ref cell by a given int    
+    let inline decrBy i (x:float) = i := !i - x    
+        
+    //let inline decrByR (x:int) i = i := !i - x           // useful ?
+        
+    /// set ref cell to given int if it is bigger than current value
+    let inline setMax i (x:float) = if x > !i then i := x
+    
+    /// set ref cell to given int if it is smaller than current value
+    let inline setMin i (x:float) = if x < !i then i := x
 
 type FSharpFuncUtil = 
     // from https://blog.paranoidcoding.com/2010/07/27/converting-system-func-lt-t1-tn-gt-to-fsharpfunc-lt-t-tresult-gt.html
