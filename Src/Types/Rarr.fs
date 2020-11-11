@@ -22,12 +22,12 @@ type Rarr<'T> private (xs:List<'T>) =
     /// Constructs a new Rarr by using the supplied List<'T>  directly, without any copying of items
     static member CreateDirectly (xs:List<'T> ) = 
         if isNull xs then ArgumentNullException.Raise "List in Rarr.CreateDirectly is null"
-        Rarr(xs)
+        new Rarr<'T>(xs)
 
     /// Constructs a new Rarr by copying each item from the IEnumerable<'T>
     static member CreateFromSeq (xs:seq<'T> ) = 
-        if isNull xs then ArgumentNullException.Raise "Seq in Rarr.CreateFromSeq is null"
-        Rarr(xs)
+        if isNull xs then ArgumentNullException.Raise "Seq in Rarr.CreateFromSeq is null"        
+        new Rarr<'T>(new List<'T>(xs))
 
     /// Constructs a new Rarr. 
     /// A Rarr is a mutable list like Collections.Generic.List<'T> but with nicer error messages on bad indices.
@@ -38,7 +38,7 @@ type Rarr<'T> private (xs:List<'T>) =
     /// of zero. Upon adding the first element to the list the capacity is
     /// increased to 16, and then increased in multiples of two as required.
     new () = 
-        Rarr(List())  
+        new Rarr<'T>(new List<'T>())  
 
     /// Constructs a new Rarr with a given initial capacity. 
     /// A Rarr is a mutable list like Collections.Generic.List<'T> but with nicer error messages on bad indices.
@@ -48,7 +48,7 @@ type Rarr<'T> private (xs:List<'T>) =
     /// initially empty, but will have room for the given number of elements
     /// before any reallocations are required.
     new (capacity : int) = 
-        Rarr(List(capacity))   
+        new Rarr<'T>(new List<'T>(capacity))   
     
     /// Constructs a new Rarr, copying the contents of the given collection.
     /// A Rarr is a mutable list like Collections.Generic.List<'T> but with nicer error messages on bad indices.
@@ -59,7 +59,7 @@ type Rarr<'T> private (xs:List<'T>) =
     /// given collection.
     new (collection : IEnumerable<'T>)  = 
         if isNull collection then ArgumentNullException.Raise "IEnumerable in new Rarr(collection) constructor is null"
-        Rarr(List(collection))
+        new Rarr<'T>(new List<'T>(collection))
 
     /// Access the underlying Collections.Generic.List<'T>
     /// ATTENTION! this is not even a shallow copy, mutating it will also change this Instance of Rarr!
@@ -179,7 +179,7 @@ type Rarr<'T> private (xs:List<'T>) =
 
     /// Creates a shallow copy of the list
     // (for a Rarr of structs this is like a deep copy)
-    member _.Clone() = Rarr(xs)
+    member this.Clone() = new Rarr<'T>(xs.GetRange(0,xs.Count)) // fastest way to create a shallow copy
         
     
     /// Defines F# slicing notation operator use including negative indices. ( -1 is last item, like Python)
@@ -348,7 +348,7 @@ type Rarr<'T> private (xs:List<'T>) =
     /// <param name="index">The zero-based List index at which the range starts.</param>
     /// <param name="count">The number of elements in the range.</param>
     /// <returns>A shallow copy of a range of elements in the source List.</returns>
-    member _.GetRange(index : int, count : int) =                                            xs.GetRange(index , count) |> Rarr
+    member _.GetRange(index : int, count : int) : Rarr<'T> =                    new Rarr<'T>(xs.GetRange(index , count))
     
     /// Returns the index of the first occurrence of a given value in a range of
     /// this list. The list is searched forwards from beginning to end.

@@ -9,7 +9,10 @@ module Rarr =
     //---------------------------------------------------
     // extensions added only in FsEx:
     //----------------------------------------------------
-        
+    
+    /// Creates a shallow copy by calling 
+    /// rarr.GetRange(0,rarr.Count) 
+    let inline shallowCopy (rarr: Rarr<'T>) = rarr.GetRange(0,rarr.Count) // fastest way to create a shallow copy
 
     /// Gets an item at index 
     /// (use Rarr.GetNeg(i) member if you want to use negative indices too)
@@ -320,21 +323,26 @@ module Rarr =
     /// If they are equal after function is applied then the the order is kept
     let max3IndBy f rarr = rarr |> MinMax.index3ByFun (>) f
    
-    /// Sorts the elements and return new shallow copy Rarr.
+    /// Sorts the elements and returns a new shallow copy of Rarr.
     /// Elements are compared using Operators.compare.
-    let inline sorted<'T when 'T : comparison> (rarr : Rarr<'T>) : unit =       
-        Rarr(rarr).Sort ()
+    let inline sort<'T when 'T : comparison> (rarr : Rarr<'T>) : Rarr<'T> =       
+        let r = rarr.GetRange(0,rarr.Count) // fastest way to create a shallow copy
+        r.Sort ()
+        r
         
-    /// Sort the elements and return new shallow copy Rarr.
+    /// Sort the elements and returns a new shallow copy of Rarr.
     ///using the key extractor and generic comparison on the keys.
-    let inline sortedBy<'T, 'Key when 'Key : comparison>     (projection : 'T -> 'Key) (rarr : Rarr<'T>) =
-        Rarr(rarr).Sort (fun x y ->
-            compare (projection x) (projection y))
+    let inline sortBy<'T, 'Key when 'Key : comparison>     (projection : 'T -> 'Key) (rarr : Rarr<'T>) : Rarr<'T>=
+        let r = rarr.GetRange(0,rarr.Count) // fastest way to create a shallow copy
+        r.Sort (fun x y ->compare (projection x) (projection y))
+        r
     
-    /// Sort the elements and return new shallow copy Rarr.
+    /// Sort the elements and returns new shallow copy of Rarr.
     /// using the given comparison function.
-    let inline sortedWith (comparer : 'T -> 'T -> int) (rarr : Rarr<'T>) : unit =
-       Rarr(rarr).Sort (comparer)
+    let inline sortWith (comparer : 'T -> 'T -> int) (rarr : Rarr<'T>) : Rarr<'T> =
+       let r = rarr.GetRange(0,rarr.Count) // fastest way to create a shallow copy
+       r.Sort (comparer)
+       r
 
 
     //-------------------------------------------------------------------------------------------------------------------------------
@@ -437,7 +445,7 @@ module Rarr =
     /// Sort the elements of the Rarr by mutating the Rarr in-place.
     /// Using the key extractor and generic comparison on the keys.
     //-[<CompiledName("SortInPlaceBy")>]
-    let inline sortInPlaceBy<'T, 'Key when 'Key : comparison>  (projection : 'T -> 'Key) (rarr : Rarr<'T>) =
+    let inline sortInPlaceBy<'T, 'Key when 'Key : comparison>  (projection : 'T -> 'Key) (rarr : Rarr<'T>) : unit=
         rarr.Sort (fun x y -> compare (projection x) (projection y))
 
     /// Sort the elements of the Rarr by mutating the Rarr in-place.
