@@ -66,7 +66,41 @@ module Rarr =
         rarr.RemoveAt(i)
         v
 
+    /// Gets the last item in the Rarr.
+    /// equal to this.[this.Count - 1]
+    let inline last  (rarr: Rarr<'T>) = 
+        if rarr.Count = 0 then IndexOutOfRangeException.Raise "Rarr.last: Can not get Last item of empty List"
+        rarr.[rarr.Count - 1]
+    
+    /// Gets the second last item in the Rarr.
+    /// equal to this.[this.Count - 2]
+    let inline secondLast  (rarr: Rarr<'T>)= 
+        if rarr.Count < 2 then  IndexOutOfRangeException.Raise "Rarr.secondLast: Can not get SecondLast item of %s"   (NiceString.toNiceStringFull rarr)
+        rarr.[rarr.Count - 2]
 
+    /// Gets the third last item in the Rarr.
+    /// equal to this.[this.Count - 3]
+    let inline thirdLast  (rarr: Rarr<'T>)= 
+        if rarr.Count < 3 then  IndexOutOfRangeException.Raise "Rarr.thirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull rarr)
+        rarr.[rarr.Count - 3]
+                
+    /// Gets the first item in the Rarr.
+    /// equal to this.[0]
+    let inline first  (rarr: Rarr<'T>)= 
+        if rarr.Count = 0 then IndexOutOfRangeException.Raise "Rarr.first: Can not get First item of empty Rarr List"
+        rarr.[0]
+
+    /// Gets the second item in the Rarr.
+    /// equal to this.[1]
+    let inline second  (rarr: Rarr<'T>)= 
+        if rarr.Count < 2 then IndexOutOfRangeException.Raise  "Rarr.second: Can not get Second item of %s"   (NiceString.toNiceStringFull rarr)
+        rarr.[1]
+
+    /// Gets the third item in the Rarr.
+    /// equal to this.[2]
+    let inline third  (rarr: Rarr<'T>)= 
+        if rarr.Count < 3 then IndexOutOfRangeException.Raise "Rarr.third: Can not get Third item of %s"  (NiceString.toNiceStringFull rarr)
+        rarr.[2]
 
     /// Allows for negative indices too. ( -1 is last item, like Python)
     /// This method only exist to be consisten with other collections extensions in FsEx. like array. 
