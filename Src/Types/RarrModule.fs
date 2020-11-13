@@ -111,7 +111,13 @@ module Rarr =
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
     let slice startIdx endIdx (rarr: Rarr<_>)  = rarr.GetSlice(startIdx, endIdx)
 
+    /// retuns an empty Rarr
     let inline empty() = Rarr<_>()
+
+    /// returns a Rarr that has at most k items, can be less too.
+    let inline truncate k (rarr: Rarr<'T>) =
+        if rarr.Count >= k then rarr.GetRange(0,k)
+        else                    rarr.GetRange(0,rarr.Count)
 
     /// Create a Rarr by calling the given generator on each index.
     //-[<CompiledName("Init")>]
