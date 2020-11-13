@@ -59,14 +59,23 @@ module  Util =
     
     /// throws an exception with 'msg' as Error message if 'value' is false.
     /// this function is usefull to follow up on any methods that return booleans indication sucess or failure
-    let inline failIfFalse (msg:string) (value :bool)  = if not value then failwithf "failIfFalse: %s " msg 
+    let inline failIfFalse (msg:string) (value :bool) :unit = 
+        if not value then failwithf "failIfFalse: %s " msg 
     
     /// throws an exception with 'msg' as Error message if 'value' is null.
     /// this function is usefull to doing many null checks without adding lots if clauses and lots of indenting
-    let inline failIfNull (msg:string) (value :'T when 'T: null) :unit = 
+    let inline failIfNull (msg:string) (value :'T when 'T: null) : unit = 
         match value with 
         | null -> ArgumentNullException.Raise "<null> in FsEx.Util.failIfNull: %s" msg  
         | _ -> ()
+
+    /// throws an exception with 'msg' as Error message if string is null or empty    
+    let inline failIfNullOrEmpty (failMsg:string) (stringToCheck :string) :unit = 
+        match stringToCheck with 
+        | null -> ArgumentNullException.Raise "null-string in FsEx.Util.failIfNullOrEmpty: %s" failMsg 
+        | ""   -> ArgumentException.RaiseBase "empty-string in FsEx.Util.failIfNullOrEmpty: %s" failMsg 
+        | _ -> ()        
+       
     
     /// retuns false if the value is null.
     /// the opposit of isNull
