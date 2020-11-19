@@ -72,11 +72,15 @@ module  Util =
     /// throws an exception with 'msg' as Error message if string is null or empty    
     let inline failIfNullOrEmpty (failMsg:string) (stringToCheck :string) :unit = 
         match stringToCheck with 
-        | null -> ArgumentNullException.Raise "null-string in FsEx.Util.failIfNullOrEmpty: %s" failMsg 
-        | ""   -> ArgumentException.RaiseBase "empty-string in FsEx.Util.failIfNullOrEmpty: %s" failMsg 
+        | null -> ArgumentNullException.Raise "Null string in FsEx.Util.failIfNullOrEmpty: %s" failMsg 
+        | ""   -> ArgumentException.RaiseBase "Empty string in FsEx.Util.failIfNullOrEmpty: %s" failMsg 
         | _ -> ()        
        
-    
+        /// throws an exception with 'msg' as Error message if string is null or empty    
+    let inline failIfEmptyGuid (failMsg:string) (guidToCheck :Guid) :unit = 
+        if guidToCheck = Guid.Empty then 
+            ArgumentException.RaiseBase "Empty Guid in  FsEx.Util.failIfEmptyGuid: %s" failMsg
+ 
     /// retuns false if the value is null.
     /// the opposit of isNull
     let inline notNull (value :'T when 'T: null) = // Fsharp core does it like this too. don't use Obejct.RefrenceEquals (because of Generics)
@@ -93,6 +97,7 @@ module  Util =
         | null -> b  
         | _    -> a // if Object.ReferenceEquals(a, null) then b else a   
 
+    /// use |>! instead
     /// Apply function, like |> , but ignore result. 
     /// Return original input
     /// let inline (|>>) x f =  f x |> ignore ; x 
@@ -102,6 +107,8 @@ module  Util =
     /// Apply function, like |> , but ignore result. 
     /// Return original input
     /// let inline (|>!) x f =  f x |> ignore ; x 
+    /// be aware of correct indenting see:
+    /// https://stackoverflow.com/questions/64784154/indentation-change-after-if-else-expression-not-taken-into-account
     let inline (|>!) x f =  f x |> ignore ; x  //https://twitter.com/GoswinR/status/1316988132932407296
 
     /// Get first element of Triple (Tuple of three elements)
