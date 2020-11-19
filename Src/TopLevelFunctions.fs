@@ -86,8 +86,16 @@ module  Util =
     let inline notNull (value :'T when 'T: null) = // Fsharp core does it like this too. don't use Obejct.RefrenceEquals (because of Generics)
         match value with 
         | null -> false  
-        | _ -> true     
+        | _ -> true    
     
+    /// retuns false if the Guid is Empty.
+    let inline notEmptyGuid (g :Guid) = 
+        g <> Guid.Empty
+    
+    /// retuns true if the Guid is Empty.
+    let inline isEmptyGuid (g :Guid) = 
+        g = Guid.Empty
+
     /// Returns maybeNullValue if it is NOT null, else alternativeValue. 
     let inline ifNull (alternativeValue:'T) (maybeNullValue:'T)  = match maybeNullValue with null -> alternativeValue | _ -> maybeNullValue  
 
