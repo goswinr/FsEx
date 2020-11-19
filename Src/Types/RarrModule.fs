@@ -124,7 +124,7 @@ module Rarr =
     let inline init count initializer : Rarr<'T> =
         if count < 0 then invalidArg "count" "The number of elements may not be negative."
         let rarr = Rarr (count)
-        for i = 0 to count - 1 do rarr.Add ( initializer count)
+        for i = 0 to count - 1 do rarr.Add ( initializer i)
         rarr
 
     /// Considers List cirular and move elements up or down
@@ -145,6 +145,19 @@ module Rarr =
             if filter x then t.Add(x)
             else             f.Add(x)
         t,f
+    
+    /// Returns true if the given Rarr has count items.
+    let inline hasItems count (rarr : Rarr<'T>) : bool =
+        rarr.Count = count
+
+    /// Returns true if the given Rarr has equal or more than count items.
+    let inline hasMinimumItems count (rarr : Rarr<'T>) : bool =
+        rarr.Count >= count
+
+    /// Returns true if the given Rarr has equal or less than count items.
+    let inline hasMaximumItems count (rarr : Rarr<'T>) : bool =
+        rarr.Count <= count
+
 
     /// internal only for finding 
     module internal MinMax =
