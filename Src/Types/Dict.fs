@@ -22,6 +22,9 @@ type Dict< 'K,'V when 'K:equality > private (dd : Dictionary<'K,'V>) =
     /// create a new empty Dict<'K,'V>
     new () = Dict(new Dictionary<'K,'V>())
     
+    /// create a new empty Dict<'K,'V> with an IEqualityComparer like HashIdentity.Structural
+    new (iEqCmp:IEqualityComparer<'K>) = Dict(new Dictionary<'K,'V>(iEqCmp)) 
+    
 
     /// Constructs a new Dict by using the supplied Dictionary<'K,'V> directly, without any copying of items
     static member CreateDirectly (dic:Dictionary<'K,'V> ) = 
