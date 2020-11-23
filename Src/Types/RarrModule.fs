@@ -403,8 +403,8 @@ module Rarr =
     // previously used https://github.com/dotnet/fsharp/tree/master/src/utils   
     //-------------------------------------------------------------------------------------------------------------------------------
     
-    let inline checkNonNull tx rarr = 
-        match rarr with null -> raise (ArgumentNullException("in module FsEx.Rarr: " + tx)) |_ -> ()
+    //let inline checkNonNull tx rarr = 
+    //    match rarr with null -> raise (ArgumentNullException("in module FsEx.Rarr: " + tx)) |_ -> ()
 
     open Microsoft.FSharp.Core
     open Microsoft.FSharp.Core.OptimizedClosures
@@ -1037,7 +1037,6 @@ module Rarr =
     let foldi (folder : 'State -> int -> 'T -> 'State) state (rarr : Rarr<'T>) : 'State =
         //+ checkNonNull "rarr" rarr
         let folder = FSharpFunc<_,_,_,_>.Adapt folder
-
         let mutable state = state
         let count = rarr.Count
         for i = 0 to count - 1 do
@@ -1061,7 +1060,6 @@ module Rarr =
         let len = length rarr1
         if len <> length rarr2 then
             invalidArg "rarr2" "The arrays have different lengths."
-
         let folder = FSharpFunc<_,_,_,_>.Adapt folder
         let mutable state = state
         for i = 0 to len - 1 do
@@ -1081,7 +1079,6 @@ module Rarr =
     let foldBack (folder : 'T -> 'State -> 'State) (rarr : Rarr<'T>) state : 'State =
         //+ checkNonNull "rarr" rarr
         let folder = FSharpFunc<_,_,_>.Adapt folder
-
         let mutable state = state
         for i = rarr.Count - 1 downto 0 do
             state <- folder.Invoke (rarr.[i], state)
@@ -1124,9 +1121,7 @@ module Rarr =
     //-[<CompiledName("FoldBackIndexed")>]
     let foldiBack (folder : int -> 'T -> 'State -> 'State) (rarr : Rarr<'T>) state : 'State =
         //+ checkNonNull "rarr" rarr
-
         let folder = FSharpFunc<_,_,_,_>.Adapt folder
-
         let mutable state = state
         for i = rarr.Count - 1 downto 0 do
             state <- folder.Invoke (i, rarr.[i], state)
@@ -1194,7 +1189,6 @@ module Rarr =
         //+ checkNonNull "rarr" rarr
         if isEmpty rarr then
             invalidArg "rarr" "The Rarr is empty."
-
         let reduction = FSharpFunc<_,_,_>.Adapt reduction
 
         let count = rarr.Count
@@ -1294,7 +1288,6 @@ module Rarr =
     //-[<CompiledName("ScanBack")>]
     let scanBack folder (rarr : Rarr<'T>) (state : 'State) : Rarr<'State> =
         //+ checkNonNull "rarr" rarr
-
         scanBackSub folder rarr 0 (length rarr - 1) state
 
     /// <summary>
@@ -1309,7 +1302,6 @@ module Rarr =
         //+ checkNonNull "rarr" rarr
         let trueResults = Rarr ()
         let falseResults = Rarr ()
-
         let len = length rarr
         for i = 0 to len - 1 do
             let el = rarr.[i]
@@ -1331,10 +1323,8 @@ module Rarr =
     //-[<CompiledName("MapPartition")>]
     let mapPartition partitioner (rarr : Rarr<'T>) : Rarr<'U1> * Rarr<'U2> =
         //+ checkNonNull "rarr" rarr
-
         let results1 = Rarr ()
         let results2 = Rarr ()
-
         let len = length rarr
         for i = 0 to len - 1 do
             match partitioner rarr.[i] with
@@ -1342,7 +1332,6 @@ module Rarr =
                 results1.Add value
             | Choice2Of2 value ->
                 results2.Add value
-
         results1, results2
 
     /// <summary>Returns the sum of the elements in the Rarr.</summary>
@@ -1351,10 +1340,8 @@ module Rarr =
     //-[<CompiledName("Sum")>]
     let inline sum (rarr : Rarr< ^T>) : ^T = 
         //+ checkNonNull "rarr" rarr
-
-        let mutable acc = LanguagePrimitives.GenericZero< (^T) >
-    //    for x in rarr do
-    //        acc <- Checked.(+) acc x
+        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.sum: The input list is empty."
+        let mutable acc = LanguagePrimitives.GenericZero< (^T) >  
         for i = 0 to rarr.Count - 1 do
             acc <- Checked.(+) acc rarr.[i]
         acc
@@ -1366,10 +1353,8 @@ module Rarr =
     //-[<CompiledName("SumBy")>]
     let inline sumBy (projection : 'T -> ^U) (rarr : Rarr<'T>) : ^U = 
         //+ checkNonNull "rarr" rarr
-
-        let mutable acc = LanguagePrimitives.GenericZero< (^U) >
-    //    for x in rarr do
-    //        acc <- Checked.(+) acc (projection x)
+        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.sumBy: The input list is empty."
+        let mutable acc = LanguagePrimitives.GenericZero< (^U) >    
         for i = 0 to rarr.Count - 1 do
             acc <- Checked.(+) acc (projection rarr.[i])
         acc
@@ -1381,9 +1366,7 @@ module Rarr =
     //-[<CompiledName("Min")>]
     let inline min (rarr : Rarr<'T>) =
         //+ checkNonNull "rarr" rarr
-        if rarr.Count = 0 then
-            invalidArg "rarr" "The input collection is empty."
-
+        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.min: The input list is empty."
         let mutable acc = rarr.[0]
         for i = 1 to rarr.Count - 1 do
             let curr = rarr.[i]
@@ -1399,9 +1382,7 @@ module Rarr =
     //-[<CompiledName("MinBy")>]
     let inline minBy (projection : 'T -> 'U) (rarr : Rarr<'T>) =
         //+ checkNonNull "rarr" rarr
-        if rarr.Count = 0 then
-            invalidArg "rarr" "The input collection is empty."
-
+        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.minBy: The input list is empty."
         let mutable accv = rarr.[0]
         let mutable acc = projection accv
         for i = 1 to rarr.Count - 1 do
@@ -1419,9 +1400,7 @@ module Rarr =
     //-[<CompiledName("Max")>]
     let inline max (rarr : Rarr<'T>) =
         //+ checkNonNull "rarr" rarr
-        if rarr.Count = 0 then
-            invalidArg "rarr" "The input collection is empty."
-
+        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.max: The input list is empty."
         let mutable acc = rarr.[0]
         for i = 1 to rarr.Count - 1 do
             let curr = rarr.[i]
@@ -1437,8 +1416,7 @@ module Rarr =
     //-[<CompiledName("MaxBy")>]
     let inline maxBy (projection : 'T -> 'U) (rarr : Rarr<'T>) =
         //+ checkNonNull "rarr" rarr
-        if rarr.Count = 0 then
-            invalidArg "rarr" "The input collection is empty."
+        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.maxBy: The input list is empty."
         let mutable accv = rarr.[0]
         let mutable acc = projection accv
         for i = 1 to rarr.Count - 1 do
@@ -1456,6 +1434,7 @@ module Rarr =
     //-[<CompiledName("Average")>]
     let inline average (rarr : Rarr<'T>) : ^T =
         //+ checkNonNull "rarr" rarr
+        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.average: The input list is empty."
         Seq.average rarr
 
     /// <summary>Returns the average of the elements generated by applying the function to each element of the Rarr.</summary>
@@ -1466,4 +1445,5 @@ module Rarr =
     //-[<CompiledName("AverageBy")>]
     let inline averageBy (projection : 'T -> ^U) (rarr : Rarr<'T>) : ^U = 
         //+ checkNonNull "rarr" rarr
+        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.averageBy: The input list is empty."
         Seq.averageBy projection rarr

@@ -325,7 +325,9 @@ type Rarr<'T> private (xs:List<'T>) =
     /// which copying begins.</param>
     member _.CopyTo(array : 'T[], arrayIndex : int) =                                        xs.CopyTo(array , arrayIndex) 
     
-    member _.CopyTo(index : int, array : 'T[], arrayIndex : int, count : int) =              xs.CopyTo(index , array , arrayIndex , count)    // TODO add XML doc str
+    // TODO add XML doc str
+    
+    member _.CopyTo(index : int, array : 'T[], arrayIndex : int, count : int) =              xs.CopyTo(index , array , arrayIndex , count)    
     member _.Exists (matchValue : Predicate<'T>) =                                           xs.Exists (matchValue) 
     member _.Find   (matchValue : Predicate<'T>) =                                           xs.Find   (matchValue) 
     member _.FindAll(matchValue : Predicate<'T>) =                                           xs.FindAll(matchValue) |> Rarr
