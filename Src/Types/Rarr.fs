@@ -6,6 +6,7 @@ open System
 // Of course it would be simpler to just override the .Item method on System.Collections.Generic.List<'T> but unfortunatly it is sealed
 
 /// A mutable list like Collections.Generic.List<'T> but with nicer error messages on bad indices.
+/// and some more useful methods like this.First or this.Last
 /// It's just a very thin wrapper over a System.Collections.Generic.List<'T>
 /// and has all its members and interfaces implemented.
 /// The name Rarr is derived from of the F# type ResizeArray
@@ -73,44 +74,69 @@ type Rarr<'T> private (xs:List<'T>) =
     /// Gets the index of the last item in the Rarr.
     /// equal to this.Count - 1  
     member _.LastIndex = 
-        if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.LastIndex: Can not get LastIndex of empty List"
+        if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.LastIndex: Can not get LastIndex of empty Rarr"
         xs.Count - 1
 
-    /// Gets the last item in the Rarr.
+    /// Get (or set) the last item in the Rarr.
     /// equal to this.[this.Count - 1]
-    member _.Last = 
-        if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.Last: Can not get Last item of empty List"
-        xs.[xs.Count - 1]
+    member this.Last
+        with get() = 
+            if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.Last: Can not get Last item of empty Rarr %A" (NiceString.toNiceStringFull this)
+            xs.[xs.Count - 1]
+        and set (v:'T) =
+            if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.Last: Can not set Last item of empty Rarr %A to %A" (NiceString.toNiceStringFull this) v
+            xs.[xs.Count - 1] <- v
     
-    /// Gets the second last item in the Rarr.
+    /// Get (or set) the second last item in the Rarr.
     /// equal to this.[this.Count - 2]
-    member this.SecondLast = 
-        if xs.Count < 2 then  IndexOutOfRangeException.Raise "Rarr.SecondLast: Can not get SecondLast item of %s"   (NiceString.toNiceStringFull this)
-        xs.[xs.Count - 2]
+    member this.SecondLast 
+        with get() = 
+            if xs.Count < 2 then  IndexOutOfRangeException.Raise "Rarr.SecondLast: Can not get SecondLast item of %s" (NiceString.toNiceStringFull this)
+            xs.[xs.Count - 2]
+        and set (v:'T) =
+            if xs.Count < 2 then  IndexOutOfRangeException.Raise "Rarr.SecondLast: Can not set SecondLast item of %s to %A" (NiceString.toNiceStringFull this) v
+            xs.[xs.Count - 2] <- v
 
-    /// Gets the third last item in the Rarr.
+
+    /// Get (or set) the third last item in the Rarr.
     /// equal to this.[this.Count - 3]
-    member this.ThirdLast = 
-        if xs.Count < 3 then  IndexOutOfRangeException.Raise "Rarr.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
-        xs.[xs.Count - 3]
+    member this.ThirdLast 
+        with get() =  
+            if xs.Count < 3 then  IndexOutOfRangeException.Raise "Rarr.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
+            xs.[xs.Count - 3]
+        and set (v:'T) =
+            if xs.Count < 3 then  IndexOutOfRangeException.Raise "Rarr.ThirdLast: Can not set ThirdLast item of %s to %A"  (NiceString.toNiceStringFull this) v
+            xs.[xs.Count - 3] <- v           
                 
-    /// Gets the first item in the Rarr.
+    /// Get (or set) Sets the first item in the Rarr.
     /// equal to this.[0]
-    member _.First = 
-        if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.First: Can not get First item of empty Rarr List"
-        xs.[0]
+    member this.First 
+        with get() =  
+            if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.First: Can not get First item of empty Rarr  %A "(NiceString.toNiceStringFull this)
+            xs.[0]
+        and set (v:'T) =
+            if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.First: Can not set First item of empty Rarr %A to %A" (NiceString.toNiceStringFull this) v
+            xs.[0] <- v           
 
-    /// Gets the second item in the Rarr.
+    /// Get (or set) the second item in the Rarr.
     /// equal to this.[1]
-    member this.Second = 
-        if xs.Count < 2 then IndexOutOfRangeException.Raise  "Rarr.Second: Can not get Second item of %s"   (NiceString.toNiceStringFull this)
-        xs.[1]
+    member this.Second 
+        with get() = 
+            if xs.Count < 2 then IndexOutOfRangeException.Raise  "Rarr.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
+            xs.[1]
+        and set (v:'T) =
+            if xs.Count < 2 then IndexOutOfRangeException.Raise  "Rarr.Second: Can not set Second item of %s to %A"  (NiceString.toNiceStringFull this) v
+            xs.[1] <- v           
 
-    /// Gets the third item in the Rarr.
+    /// Get (or set) the third item in the Rarr.
     /// equal to this.[2]
-    member this.Third = 
-        if xs.Count < 3 then IndexOutOfRangeException.Raise "Rarr.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
-        xs.[2]
+    member this.Third     
+        with get() =
+            if xs.Count < 3 then IndexOutOfRangeException.Raise "Rarr.Third: Can not get Third item of %s" (NiceString.toNiceStringFull this)
+            xs.[2]
+        and set (v:'T) =
+            if xs.Count < 3 then IndexOutOfRangeException.Raise "Rarr.Third: Can not set Third item of %s to %A" (NiceString.toNiceStringFull this) v
+            xs.[2] <- v          
 
     /// Checks if this.Count = 0 
     member _.IsEmpty = 
@@ -176,6 +202,13 @@ type Rarr<'T> private (xs:List<'T>) =
         let v = xs.[i]
         xs.RemoveAt(i)
         v
+    
+    /// Get and remove item at index from Rarr
+    member _.Pop(i:int)  =
+        if i >= xs.Count then ArgumentOutOfRangeException.Raise "Can't pop index %d from Rarr of %d items" i xs.Count              
+        let v = xs.[i]
+        xs.RemoveAt(i)
+        v
 
     /// Creates a shallow copy of the list
     // (for a Rarr of structs this is like a deep copy)
@@ -191,14 +224,14 @@ type Rarr<'T> private (xs:List<'T>) =
         let len = match endIdx   with None -> count-st | Some i -> if i<0 then count+i-st+1 else i-st+1
     
         if st < 0 || st > count-1 then 
-            IndexOutOfRangeException.Raise "Rarr.[ a.. b] (GetSlice): Start index %d is out of range. Allowed values are -%d upto %d for List of %d items" startIdx.Value count (count-1) count
+            IndexOutOfRangeException.Raise "Rarr.[ a.. b] (GetSlice): Start index %d is out of range. Allowed values are -%d upto %d for Rarr of %d items" startIdx.Value count (count-1) count
                 
         if st+len > count then 
-            IndexOutOfRangeException.Raise "Rarr.[ a.. b] (GetSlice): End index %d is out of range. Allowed values are -%d upto %d for List of %d items" endIdx.Value count (count-1) count
+            IndexOutOfRangeException.Raise "Rarr.[ a.. b] (GetSlice): End index %d is out of range. Allowed values are -%d upto %d for Rarr of %d items" endIdx.Value count (count-1) count
                         
         if len < 0 then
             let en =  match endIdx  with None -> count-1 | Some i -> if i<0 then count+i else i
-            IndexOutOfRangeException.Raise "Rrr.[ a.. b] (GetSlice): Start index '%A' (= %d) is bigger than end index '%A'(= %d) for List of %d items" startIdx st endIdx en  count
+            IndexOutOfRangeException.Raise "Rrr.[ a.. b] (GetSlice): Start index '%A' (= %d) is bigger than end index '%A'(= %d) for Rarr of %d items" startIdx st endIdx en  count
                         
         xs.GetRange(st, len) 
   
@@ -421,6 +454,7 @@ type Rarr<'T> private (xs:List<'T>) =
     /// decreased by one.
     member _.RemoveAt(index : int) =                                                         xs.RemoveAt(index) 
 
+    /// Removes a range of elements from this list.
     member _.RemoveRange(index : int, count : int) =                                         xs.RemoveRange(index , count) 
     
     // Reverses the elements in this list.

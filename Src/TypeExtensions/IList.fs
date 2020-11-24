@@ -79,48 +79,72 @@ module TypeExtensionsIList =
             if this.Count = 0 then failwithf "this.LastIndex: Can not get LastIndex of empty IList"
             this.Count - 1
 
-        /// Gets the last item in the IList.
+        /// Get (or set) the last item in the IList.
         /// equal to this.[this.Count - 1]
         [<Extension>]
-        member inline this.Last = 
-            if this.Count = 0 then failwithf "this.Last: Can not get Last item of empty IList"
-            this.[this.Count - 1]
-
-        /// Gets the second last item in the IList.
+        member this.Last
+            with get() = 
+                if this.Count = 0 then IndexOutOfRangeException.Raise "IList.Last: Can not get Last item of empty IList %A" (NiceString.toNiceStringFull this)
+                this.[this.Count - 1]
+            and set (v:'T) =
+                if this.Count = 0 then IndexOutOfRangeException.Raise "IList.Last: Can not set Last item of empty IList %A to %A" (NiceString.toNiceStringFull this) v
+                this.[this.Count - 1] <- v
+        
+        /// Get (or set) the second last item in the IList.
         /// equal to this.[this.Count - 2]
         [<Extension>]
-        member inline this.SecondLast = 
-            if this.Count < 2 then failwithf "this.SecondLast: Can not get SecondLast item of %s"  (NiceString.toNiceStringFull this)
-            this.[this.Count - 2]
-
-        /// Gets the third last item in the IList.
-        /// equal to this.[this.Count - 2]
+        member this.SecondLast 
+            with get() = 
+                if this.Count < 2 then  IndexOutOfRangeException.Raise "IList.SecondLast: Can not get SecondLast item of %s" (NiceString.toNiceStringFull this)
+                this.[this.Count - 2]
+            and set (v:'T) =
+                if this.Count < 2 then  IndexOutOfRangeException.Raise "IList.SecondLast: Can not set SecondLast item of %s to %A" (NiceString.toNiceStringFull this) v
+                this.[this.Count - 2] <- v
+        
+        
+        /// Get (or set) the third last item in the IList.
+        /// equal to this.[this.Count - 3]
         [<Extension>]
-        member inline this.ThirdLast = 
-            if this.Count < 3 then failwithf "this.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
-            this.[this.Count - 3]
-
-
-        /// Gets the first item in the IList.
+        member this.ThirdLast 
+            with get() =  
+                if this.Count < 3 then  IndexOutOfRangeException.Raise "IList.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
+                this.[this.Count - 3]
+            and set (v:'T) =
+                if this.Count < 3 then  IndexOutOfRangeException.Raise "IList.ThirdLast: Can not set ThirdLast item of %s to %A"  (NiceString.toNiceStringFull this) v
+                this.[this.Count - 3] <- v           
+                    
+        /// Get (or set) Sets the first item in the IList.
         /// equal to this.[0]
         [<Extension>]
-        member inline this.First = 
-            if this.Count = 0 then failwithf "this.First: Can not get First item of empty IList"
-            this.[0]
-
-        /// Gets the second item in the IList.
+        member this.First 
+            with get() =  
+                if this.Count = 0 then IndexOutOfRangeException.Raise "IList.First: Can not get First item of empty IList  %A "(NiceString.toNiceStringFull this)
+                this.[0]
+            and set (v:'T) =
+                if this.Count = 0 then IndexOutOfRangeException.Raise "IList.First: Can not set First item of empty IList %A to %A" (NiceString.toNiceStringFull this) v
+                this.[0] <- v           
+        
+        /// Get (or set) the second item in the IList.
         /// equal to this.[1]
         [<Extension>]
-        member inline this.Second = 
-            if this.Count < 2 then failwithf "this.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
-            this.[1]
-
-        /// Gets the third item in the IList.
+        member this.Second 
+            with get() = 
+                if this.Count < 2 then IndexOutOfRangeException.Raise  "IList.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
+                this.[1]
+            and set (v:'T) =
+                if this.Count < 2 then IndexOutOfRangeException.Raise  "IList.Second: Can not set Second item of %s to %A"  (NiceString.toNiceStringFull this) v
+                this.[1] <- v           
+        
+        /// Get (or set) the third item in the IList.
         /// equal to this.[2]
         [<Extension>]
-        member inline this.Third = 
-            if this.Count < 3 then failwithf "this.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
-            this.[2]
+        member this.Third     
+           with get() =
+               if this.Count < 3 then IndexOutOfRangeException.Raise "IList.Third: Can not get Third item of %s" (NiceString.toNiceStringFull this)
+               this.[2]
+           and set (v:'T) =
+               if this.Count < 3 then IndexOutOfRangeException.Raise "IList.Third: Can not set Third item of %s to %A" (NiceString.toNiceStringFull this) v
+               this.[2] <- v          
 
 
 
@@ -130,7 +154,7 @@ module TypeExtensionsIList =
         /// The built in slicing notaion (e.g. a.[1..3]) for ILists does not allow for negative indices.
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         [<Extension>]
-        member this.Slice(startIdx:int, endIdx:int) : 'T Rarr = // to use slicing notation e.g. : xs.[ 1 .. -1] // don't overload .GetSlive .[ x ... y] directly, this would be a casting horror for Lists and ILists wher neg indices  Slices dont work
+        member this.Slice(startIdx:int, endIdx:int) : 'T Rarr = // to use slicing notation e.g. : this.[ 1 .. -1] // don't overload .GetSlive .[ x ... y] directly, this would be a casting horror for Lists and ILists wher neg indices  Slices dont work
             let count = this.Count
             let st  = if startIdx< 0 then count + startIdx        else startIdx
             let len = if endIdx  < 0 then count + endIdx - st + 1 else endIdx - st + 1
@@ -148,7 +172,7 @@ module TypeExtensionsIList =
                 let err = sprintf "Slice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for IList of %d items" startIdx st endIdx en  count
                 raise (IndexOutOfRangeException(err))
         
-            Rarr.init len (fun i -> this.[st+i])
+            Rarr.init len (fun i -> this.[st+i]) 
         
     
 

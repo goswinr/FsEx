@@ -73,55 +73,75 @@ module TypeExtensionsArray =
             this.[i] <- value 
 
 
-        /// Gets the index of the last item in the array.
-        /// equal to this.Length - 1
-        [<Extension>]
-        member inline this.LastIndex = 
-            if this.Length = 0 then failwithf "array.LastIndex: Cannot get LastIndex of empty Array"
-            this.Length - 1
-       
-        /// Gets the last item in the array.
+
+        /// Get (or set) the last item in the Array.
         /// equal to this.[this.Length - 1]
         [<Extension>]
-        member inline this.Last = 
-            if this.Length = 0 then failwithf "array.Last: Cannot get Last item of empty Array"
-            this.[this.Length - 1]
-        
-        /// Gets the second last item in the array.
+        member this.Last
+            with get() = 
+                if this.Length = 0 then IndexOutOfRangeException.Raise "Array.Last: Can not get Last item of empty %A" (NiceString.toNiceStringFull this)
+                this.[this.Length - 1]
+            and set (v:'T) =
+                if this.Length = 0 then IndexOutOfRangeException.Raise "Array.Last: Can not set Last item of empty %A to %A" (NiceString.toNiceStringFull this) v
+                this.[this.Length - 1] <- v
+
+        /// Get (or set) the second last item in the Array.
         /// equal to this.[this.Length - 2]
         [<Extension>]
-        member inline this.SecondLast = 
-            if this.Length < 2 then failwithf "array.SecondLast: Can not get SecondLast item of %s"  (NiceString.toNiceStringFull this)
-            this.[this.Length - 2]
-        
-        /// Gets the third last item in the array.
-        /// equal to this.[this.Length - 2]
+        member this.SecondLast 
+            with get() = 
+                if this.Length < 2 then  IndexOutOfRangeException.Raise "Array.SecondLast: Can not get SecondLast item of %s" (NiceString.toNiceStringFull this)
+                this.[this.Length - 2]
+            and set (v:'T) =
+                if this.Length < 2 then  IndexOutOfRangeException.Raise "Array.SecondLast: Can not set SecondLast item of %s to %A" (NiceString.toNiceStringFull this) v
+                this.[this.Length - 2] <- v
+
+
+        /// Get (or set) the third last item in the Array.
+        /// equal to this.[this.Length - 3]
         [<Extension>]
-        member inline this.ThirdLast = 
-            if this.Length < 3 then failwithf "array.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
-            this.[this.Length - 3]
-                    
-        /// Gets the first item in the array.
+        member this.ThirdLast 
+            with get() =  
+                if this.Length < 3 then  IndexOutOfRangeException.Raise "Array.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
+                this.[this.Length - 3]
+            and set (v:'T) =
+                if this.Length < 3 then  IndexOutOfRangeException.Raise "Array.ThirdLast: Can not set ThirdLast item of %s to %A"  (NiceString.toNiceStringFull this) v
+                this.[this.Length - 3] <- v           
+            
+        /// Get (or set) Sets the first item in the Array.
         /// equal to this.[0]
         [<Extension>]
-        member inline this.First = 
-            if this.Length = 0 then failwithf "array.First: Can not get First item of empty Array"
-            this.[0]
-        
-        /// Gets the second item in the array.
+        member this.First 
+            with get() =  
+                if this.Length = 0 then IndexOutOfRangeException.Raise "Array.First: Can not get First item of empty Array %A "(NiceString.toNiceStringFull this)
+                this.[0]
+            and set (v:'T) =
+                if this.Length = 0 then IndexOutOfRangeException.Raise "Array.First: Can not set First item of empty Array %A to %A" (NiceString.toNiceStringFull this) v
+                this.[0] <- v           
+
+        /// Get (or set) the second item in the Array.
         /// equal to this.[1]
         [<Extension>]
-        member inline this.Second = 
-            if this.Length < 2 then failwithf "array.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
-            this.[1]
-        
-        /// Gets the third item in the array.
+        member this.Second 
+            with get() = 
+                if this.Length < 2 then IndexOutOfRangeException.Raise  "Array.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
+                this.[1]
+            and set (v:'T) =
+                if this.Length < 2 then IndexOutOfRangeException.Raise  "Array.Second: Can not set Second item of %s to %A"  (NiceString.toNiceStringFull this) v
+                this.[1] <- v           
+
+        /// Get (or set) the third item in the Array.
         /// equal to this.[2]
         [<Extension>]
-        member inline this.Third = 
-            if this.Length < 3 then failwithf "array.Third: Can not get Third item of %s"  (NiceString.toNiceStringFull this)
-            this.[2]
-        
+        member this.Third     
+            with get() =
+                if this.Length < 3 then IndexOutOfRangeException.Raise "Array.Third: Can not get Third item of %s" (NiceString.toNiceStringFull this)
+                this.[2]
+            and set (v:'T) =
+                if this.Length < 3 then IndexOutOfRangeException.Raise "Array.Third: Can not set Third item of %s to %A" (NiceString.toNiceStringFull this) v
+                this.[2] <- v          
+
+       
 
 
         //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164                
