@@ -111,6 +111,75 @@ module Rarr =
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
     let slice startIdx endIdx (rarr: Rarr<_>)  = rarr.GetSlice(startIdx, endIdx)
 
+    let inline private checkCount c txt (a:Rarr<_>) = 
+        if a.Count < c then ArgumentException.RaiseBase "Rarr %A has %d elements but needs  %d for Rarr.%s" a a.Count c txt
+    
+    /// Yields Seq from (first, second)  upto (second-last, last)  
+    /// not looped
+    /// the resulting seq is one element shorter than the input Rarr
+    let thisNext (a:_ Rarr) = 
+        checkCount 2 "thisNext" a  
+        seq {   for i = 0 to a.Count-2 do  yield a.[i], a.[i+1] }
+    
+    /// Yields looped Seq from (first, second)  upto (last, first) 
+    /// the resulting seq has the same element count as the input Rarr
+    let thisNextLoop (a:_ Rarr) = 
+        checkCount 2 "thisNextLoop " a 
+        seq {   for i = 0 to a.Count-2 do yield a.[i], a.[i+1] 
+                yield a.[a.Count-1], a.[0] }
+    
+    /// Yields looped Seq from (last,first)  upto (second-last, last) 
+    /// the resulting seq has the same element count as the input Rarr
+    let prevThisLoop (a:_ Rarr) = 
+        checkCount 2 "prevThisLoop" a 
+        seq {   yield a.[a.Count-1], a.[0]
+                for i = 0 to a.Count-2 do yield a.[i], a.[i+1] }
+    
+    /// Yields Seq from (first, second, third)  upto (third-last, second-last, last) 
+    /// not looped
+    /// the resulting seq is two elements shorter than the input Rarr
+    let prevThisNext (a:_ Rarr) = 
+        checkCount 3 "prevThisNext" a 
+        seq {   for i = 0 to a.Count-3 do yield a.[i], a.[i+1], a.[i+2] } //TODO keep prev in mutabe value to avoid accessing the same item 3 times
+    
+    /// Yields looped Seq of  from (last, first, second)  upto (second-last, last, first)
+    /// the resulting seq has the same element count as the input Rarr
+    let prevThisNextLoop (a:_ Rarr) =  
+        checkCount 3 "prevThisNextLoop" a 
+        seq{    yield  a.[a.Count-1], a.[0], a.[1] 
+                for i = 0 to a.Count-3 do yield a.[i], a.[i+1], a.[i+2]
+                yield  a.[a.Count-2],a.[a.Count-1], a.[0] }
+    
+    /// Yields Seq from (0,first, second)  upto (lastIndex-1 , second-last, last) 
+    /// not looped
+    /// the resulting seq is one element shorter than the input Rarr
+    let iThisNext (a:_ Rarr) =     
+        checkCount 2 "iThisNext" a 
+        seq {   for i = 0 to a.Count-2 do yield i, a.[i], a.[i+1] } 
+    
+    /// Yields looped Seq  from (0,first, second)  upto (lastIndex, last, first)
+    /// the resulting seq has the same element count as the input Rarr
+    let iThisNextLoop (a:_ Rarr) = 
+        checkCount 2 "iThisNextLoop" a  
+        seq {   for i = 0 to a.Count-2 do yield i, a.[i], a.[i+1] 
+                yield  a.Count-1, a.[a.Count-1], a.[0] }
+    
+    /// Yields Seq from (1, first, second, third)  upto (lastIndex-1 , third-last, second-last, last) 
+    /// not looped
+    /// the resulting seq is two elements shorter than the input Rarr
+    let iPrevThisNext (a:_ Rarr) =     
+        checkCount 3 "iPrevThisNext" a 
+        seq {   for i = 0 to a.Count-3 do yield i+1, a.[i], a.[i+1], a.[i+2] }
+    
+    /// Yields looped Seq from (1, last, first, second)  upto (lastIndex, second-last, last, first)
+    /// the resulting seq has the same element count as the input Rarr
+    let iPrevThisNextLoop (a:_ Rarr) = 
+        checkCount 3 "iPrevThisNextLoop" a 
+        seq {   yield  0, a.[a.Count-1], a.[0], a.[1]
+                for i = 0 to a.Count-3 do yield i+1, a.[i], a.[i+1], a.[i+2] 
+                yield  a.Count-1, a.[a.Count-2],a.[a.Count-1], a.[0] }
+    
+
     /// retuns an empty Rarr
     let inline empty() = Rarr<_>()
 
@@ -293,24 +362,23 @@ module Rarr =
                     e3 <- f 
             i1,i2,i3 
         
-    
 
     (* covered by part copied fron Ext-Core
 
-    // Returns the smallest element of the Rarr.
-    let min rarr =     rarr |> MinMax.simple (<)  // why inline? type specialisation ?
+        // Returns the smallest element of the Rarr.
+        let min rarr =     rarr |> MinMax.simple (<)  // why inline? type specialisation ?
 
-    // Returns the biggest element of the Rarr.
-    let max rarr =     rarr |> MinMax.simple (>)
+        // Returns the biggest element of the Rarr.
+        let max rarr =     rarr |> MinMax.simple (>)
 
-    // Returns the smallest element of the Rarr.
-    // Elements are compared by applying the predicate function first.
-    let minBy f rarr = let i = rarr |> MinMax.indexByFun (<) f in rarr.[i]
+        // Returns the smallest element of the Rarr.
+        // Elements are compared by applying the predicate function first.
+        let minBy f rarr = let i = rarr |> MinMax.indexByFun (<) f in rarr.[i]
 
-    // Returns the biggest element of the Rarr.
-    // Elements are compared by applying the predicate function first.
-    let maxBy f rarr = let i = rarr |> MinMax.indexByFun (>) f in rarr.[i]
-    *)
+        // Returns the biggest element of the Rarr.
+        // Elements are compared by applying the predicate function first.
+        let maxBy f rarr = let i = rarr |> MinMax.indexByFun (>) f in rarr.[i]
+        *)
 
     /// Returns the Index of the smallest element of the Rarr.
     /// Elements are compared by applying the predicate function first.
@@ -331,12 +399,16 @@ module Rarr =
     /// Returns the smallest two elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the the order is kept
-    let min2By f rarr = let i,ii = rarr |> MinMax.index2ByFun (<) f in rarr.[i],rarr.[ii]
+    let min2By f rarr = 
+        let i,ii = rarr |> MinMax.index2ByFun (<) f 
+        rarr.[i],rarr.[ii]
         
     /// Returns the biggest two elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the the order is kept
-    let max2By f rarr = let i,ii = rarr |> MinMax.index2ByFun (>) f in rarr.[i],rarr.[ii]
+    let max2By f rarr = 
+        let i,ii = rarr |> MinMax.index2ByFun (>) f 
+        rarr.[i],rarr.[ii]
 
     /// Returns the indices of the two smallest elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
@@ -359,12 +431,16 @@ module Rarr =
     /// Returns the smallest three elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the the order is kept
-    let min3By f rarr = let i,ii,iii = rarr |> MinMax.index3ByFun (<) f in rarr.[i],rarr.[ii],rarr.[iii]
+    let min3By f rarr = 
+        let i,ii,iii = rarr |> MinMax.index3ByFun (<) f 
+        rarr.[i],rarr.[ii],rarr.[iii]
 
     /// Returns the biggest three elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the the order is kept
-    let max3By f rarr = let i,ii,iii = rarr |> MinMax.index3ByFun (>) f in rarr.[i],rarr.[ii],rarr.[iii]
+    let max3By f rarr = 
+        let i,ii,iii = rarr |> MinMax.index3ByFun (>) f 
+        rarr.[i],rarr.[ii],rarr.[iii]
 
     /// Returns the indices of the three smallest elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
