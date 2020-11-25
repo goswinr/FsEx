@@ -10,6 +10,7 @@ module TypeExtensionsSeq =
     let internal indexFromBack ix (xs: 'T seq) =     
         match xs with
         | :? ('T[]) as a ->     a.GetNeg(a.Length - 1 - ix)
+        | :? ('T Rarr) as a  -> a.GetNeg(a.Count  - 1 - ix) //ResizeArray and other collections           
         | :? ('T IList) as a -> a.GetNeg(a.Count  - 1 - ix) //ResizeArray and other collections           
         | :? ('T list) as a ->  List.getNeg (- 1 - ix) a
         | _ -> 
@@ -165,8 +166,11 @@ module Seq =
             else             f.Add(x)
         t,f
                 
+    //---------------------prev-this-next ------------------------------
+    //---------------------prev-this-next ------------------------------
+    //---------------------prev-this-next ------------------------------
 
-    /// Yields looped Seq of (this, next) from (first, second)  upto (last, first)
+    /// Yields looped Seq from (first, second)  upto (last, first)
     /// The length of the resulting seq is the same as the input seq.
     /// Use Seq.skipLast afterwards or Seq.windowed if you don't want a looped sequence.
     let thisNext(xs:seq<_>) =  seq{ 
@@ -182,10 +186,12 @@ module Seq =
                         prev := e.Current
                     yield !prev, first
             else
-                failwith "thisNextLooped: Input Sequence only had one element"
+                failwithf "Seq.thisNext: Input Sequence only had one element %A" xs
         else
-            failwith "thisNextLooped: Empty Input Sequence"}
+            failwith "Seq.thisNext: Empty Input Sequence"}
     
+    let windowed2(xs:seq<'T>): seq<'T*'T> =  failwith "not impl"
+
     /// Yields looped Seq of (index,this, next) from (0,first, second)  upto (lastIndex, last, first)
     /// The length of the resulting seq is the same as the input seq.
     /// Use Seq.skipLast afterwards or Seq.windowed if you don't want a looped sequence.
@@ -212,7 +218,7 @@ module Seq =
 
     /// Yields looped Seq of (previous, this, next): from (last, first, second)  upto (second-last, last, first)
     /// The length of the resulting seq is the same as the input seq.
-    /// Use Seq.skipLast afterwards or Seq.windowed if you don't want a looped sequence.
+    /// Use Seq.skip and Seq.skipLast afterwards or Seq.windowed if you don't want a looped sequence.
     let prevThisNext (xs:seq<_>) =  seq { 
         use e = xs.GetEnumerator()
         if e.MoveNext() then
@@ -239,7 +245,7 @@ module Seq =
 
     /// Yields looped Seq of (index, previous, this, next): from (0, last, first, second)  upto (lastIndex, second-last, last, first)
     /// The length of the resulting seq is the same as the input seq.
-    /// Use Seq.skipLast afterwards or Seq.windowed if you don't want a looped sequence.
+    /// Use  Seq.skip and Seq.skipLast afterwards or Seq.windowed if you don't want a looped sequence.
     let iPrevThisNext (xs:seq<_>) =  seq { 
         use e = xs.GetEnumerator()
         let kk = ref 2
