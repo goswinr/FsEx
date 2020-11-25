@@ -487,9 +487,16 @@ module Rarr =
     open System.Collections.Generic
     open LanguagePrimitives
 
-    /// Return the length of the collection.
+    /// Return the length or count of the collection.
+    /// same as Rarr.count
     //-[<CompiledName("Length")>]
     let inline length (rarr : Rarr<'T>) : int =
+        rarr.Count
+
+    /// Return the length or count of the collection.
+    /// same as Rarr.length
+    //-[<CompiledName("Length")>]
+    let inline count (rarr : Rarr<'T>) : int =
         rarr.Count
 
     /// Return true if the given array is empty, otherwise false.
@@ -597,7 +604,7 @@ module Rarr =
 
     /// Build a new Rarr that contains the elements of each of the given sequence of Rarrs.
     //-[<CompiledName("Concat")>]
-    let concat (rarrs : seq<Rarr<'T>>) : Rarr<'T> =
+    let concat (rarrs : seq<#seq<'T>>) : Rarr<'T> =
         //+ checkNonNull "rarrs" rarrs
         let flattened = Rarr ()
         for rarr in rarrs do
