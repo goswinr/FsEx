@@ -4,37 +4,50 @@ open System
 open System.Collections.Generic
 
 
-
-/// <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
+/// A System.Collections.Generic.Dictionary with default Values that get created upon accessing a missing key.
 /// If accessing a non exiting key , the default function is called to create and set it. 
-/// Like defaultdict in Python</summary>    
-/// <param name="defaultFun">(unit-&gt;&apos;V): The function to create a default value</param>
-/// <param name="dd">(Dictionary&lt;&apos;K,&apos;V&gt;): An existing dictionary that will used as DefaultDict. 
-///   It will not be copied, but used directly</param>
-type DefaultDict< 'K,'V when 'K:equality > private (defaultFun: unit->'V, dd : Dictionary<'K,'V>) =
+/// Like defaultdict in Python
+type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K->'V, dd : Dictionary<'K,'V>) =
     
     //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
 
-
-    let dGet(k) =
+    let dGet(k) = // apart form this getter the rest is the same as in System.Collections.Generic.Dictionary
         let ok, v = dd.TryGetValue(k)
         if ok then 
             v
         else 
-            let v = defaultFun()
+            let v = defaultOfKeyFun(k) 
             dd.[k] <- v
             v
     
     /// <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
-    /// If accessing a non exiting key , the default function is called to create and set it. 
+    /// If accessing a non exiting key , the default paramterless function is called to create the value and set it. 
     /// Like defaultdict in Python</summary>    
-    /// <param name="defaultFun">(unit-&gt;&apos;V): The function to create a default value</param>
-    new (defaultFun: unit->'V) = DefaultDict( defaultFun, new  Dictionary<'K,'V>() ) 
+    /// <param name="defaultFun">(unit-&gt;&apos;V): The paramterless function to create a default value</param>
+    new (defaultFun: unit->'V) = 
+        let f (k:'K) = defaultFun()
+        DefaultDict( f, new  Dictionary<'K,'V>() ) 
+
+
+    /// <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
+    /// If accessing a non exiting key , the default function is called on ther key to create the value and set it. 
+    /// Similar to  defaultdict in Python</summary>    
+    /// <param name="defaultOfKeyFun">(&apos;K-&gt;&apos;V): The function to create a default value from the key</param>
+    new (defaultOfKeyFun: 'K->'V) = 
+        DefaultDict( defaultOfKeyFun, new  Dictionary<'K,'V>() ) 
+
     
     /// Constructs a new DefaultDict by using the supplied Dictionary<'K,'V> directly, without any copying of items
     static member CreateDirectly (defaultFun: unit->'V) (di:Dictionary<'K,'V> ) =
         if isNull di then ArgumentNullException.Raise "Dictionary in DefaultDict.CreateDirectly is null"
-        DefaultDict(defaultFun,di)
+        let f (k:'K )= defaultFun()
+        DefaultDict( f, new  Dictionary<'K,'V>() ) 
+
+    /// Constructs a new DefaultDict by using the supplied Dictionary<'K,'V> directly, without any copying of items
+    static member CreateDirectlyOfKeyFun (defaultOfKeyFun: 'K->'V) (di:Dictionary<'K,'V> ) =
+        if isNull di then ArgumentNullException.Raise "Dictionary in DefaultDict.CreateDirectly is null"        
+        DefaultDict( defaultOfKeyFun, new  Dictionary<'K,'V>() ) 
+
 
     /// Access the underlying Collections.Generic.Dictionary<'K,'V>
     /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of DefaultDict!
