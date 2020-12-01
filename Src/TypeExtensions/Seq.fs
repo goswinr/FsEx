@@ -149,10 +149,10 @@ module Seq =
     let skipLast (xs:seq<_>) =  seq{ 
         use e = xs.GetEnumerator() 
         if e.MoveNext() then
-            let prev = ref e.Current
+            let mutable prev =  e.Current
             while e.MoveNext() do
-                yield  !prev
-                prev := e.Current
+                yield  prev
+                prev <- e.Current
         else
             failwith "skipLast: Empty Input Sequence"}
     
@@ -170,101 +170,164 @@ module Seq =
     //---------------------prev-this-next ------------------------------
     //---------------------prev-this-next ------------------------------
 
-    /// Yields looped Seq from (first, second)  upto (last, first)
+    /// Yields a looped Seq from (first, second)  upto (last, first)
     /// The length of the resulting seq is the same as the input seq.
-    /// Use Seq.skipLast afterwards or Seq.windowed if you don't want a looped sequence.
-    let thisNext(xs:seq<_>) =  seq{ 
-        use e = xs.GetEnumerator()
-        if e.MoveNext() then
-            let prev = ref e.Current
-            let first = e.Current
+    /// Use Seq.windowed2 if you don't want a looped sequence.
+    let thisNext (xs:seq<'T>) : seq<'T*'T> = 
+        seq{use e = xs.GetEnumerator()
             if e.MoveNext() then
-                    yield !prev, e.Current 
-                    prev := e.Current 
-                    while e.MoveNext() do 
-                        yield  !prev, e.Current 
-                        prev := e.Current
-                    yield !prev, first
-            else
-                failwithf "Seq.thisNext: Input Sequence only had one element %A" xs
-        else
-            failwith "Seq.thisNext: Empty Input Sequence"}
-    
-    let windowed2(xs:seq<'T>): seq<'T*'T> =  failwith "not impl"
-
-    /// Yields looped Seq of (index,this, next) from (0,first, second)  upto (lastIndex, last, first)
-    /// The length of the resulting seq is the same as the input seq.
-    /// Use Seq.skipLast afterwards or Seq.windowed if you don't want a looped sequence.
-    let iThisNext (xs:seq<_>) =  seq{ 
-        use e = xs.GetEnumerator()
-        let kk = ref 0  
-        if e.MoveNext() then
-            let prev = ref e.Current
-            let first = e.Current
-            if e.MoveNext() then
-                    yield !kk, !prev, e.Current 
-                    prev := e.Current 
-                    while e.MoveNext() do
-                        incr kk 
-                        yield  !kk, !prev, e.Current 
-                        prev := e.Current
-                    incr kk 
-                    yield !kk, !prev, first
-            else
-                failwith "thisNextLooped: Input Sequence only had one element"
-        else
-            failwith "thisNextLooped: Empty Input Sequence"}
-
-
-    /// Yields looped Seq of (previous, this, next): from (last, first, second)  upto (second-last, last, first)
-    /// The length of the resulting seq is the same as the input seq.
-    /// Use Seq.skip and Seq.skipLast afterwards or Seq.windowed if you don't want a looped sequence.
-    let prevThisNext (xs:seq<_>) =  seq { 
-        use e = xs.GetEnumerator()
-        if e.MoveNext() then
-            let prev = ref e.Current
-            let first = e.Current
-            if e.MoveNext() then
-                let this = ref e.Current
-                if e.MoveNext() then                    
-                    yield indexFromBack 0 xs ,!prev, !this //yield Seq.last xs ,!prev, !this
-                    yield !prev, !this, e.Current
-                    prev := !this  
-                    this := e.Current
-                    while e.MoveNext() do 
-                        yield  !prev, !this, e.Current
-                        prev := !this 
-                        this := e.Current                            
-                    yield !prev, !this, first
-                else                     
-                    failwithf "prevThisNextLooped: Input Sequence only had two elements: %s" xs.ToNiceString
-            else
-                failwithf "prevThisNextLooped: Input Sequence only had one element: %s" xs.ToNiceString
-        else
-            failwithf "prevThisNextLooped: Empty Input Sequence %A" xs} 
-
-    /// Yields looped Seq of (index, previous, this, next): from (0, last, first, second)  upto (lastIndex, second-last, last, first)
-    /// The length of the resulting seq is the same as the input seq.
-    /// Use  Seq.skip and Seq.skipLast afterwards or Seq.windowed if you don't want a looped sequence.
-    let iPrevThisNext (xs:seq<_>) =  seq { 
-        use e = xs.GetEnumerator()
-        let kk = ref 2
-        if e.MoveNext() then
-            let prev = ref e.Current
-            let first = e.Current
-            if e.MoveNext() then
-                let this = ref e.Current
+                let mutable prev = e.Current
+                let first = e.Current
                 if e.MoveNext() then
-                    yield  0, indexFromBack 0 xs ,!prev, !this //     yield  0, Seq.last xs ,!prev, !this
-                    yield  1, !prev, !this, e.Current
-                    prev := !this  
-                    this := e.Current
+                        yield prev, e.Current 
+                        prev <- e.Current 
+                        while e.MoveNext() do 
+                            yield  prev, e.Current 
+                            prev <- e.Current
+                        yield prev, first
+                else
+                    failwithf "Seq.thisNext: Input Sequence only had one element %A" xs.ToNiceString
+            else
+                failwith "Seq.thisNext: Empty Input Sequence"}
+    
+    /// Yields a Seq from (first, second)  upto (second last, last)
+    /// The length of the resulting seq is one shorter than input seq.
+    /// Use Seq.thisNext if you want a looped sequence till (last, first)
+    let windowed2 (xs:seq<'T>): seq<'T*'T> =  
+        seq{use e = xs.GetEnumerator()
+            if e.MoveNext() then
+                let mutable prev = e.Current                
+                if e.MoveNext() then
+                    yield prev, e.Current 
+                    prev <- e.Current 
                     while e.MoveNext() do 
-                        yield !kk, !prev, !this, e.Current
-                        incr kk
-                        prev := !this 
-                        this := e.Current                            
-                    yield !kk, !prev, !this, first
+                        yield  prev, e.Current 
+                        prev <- e.Current                        
+                else
+                    failwithf "Seq.windowed2: Input Sequence only had one element %A" xs.ToNiceString
+            else
+                failwith "Seq.windowed2: Empty Input Sequence"}  
+
+
+    /// Yields looped Seq from (0, first, second)  upto (lastIndex, last, first)
+    /// The length of the resulting seq is the same as the input seq.
+    /// Use Seq.windowed2i if you don't want a looped sequence.
+    let iThisNext (xs:seq<'T>): seq<int *'T*'T>  =  
+        seq{use e = xs.GetEnumerator()
+            let mutable kk =  0  
+            if e.MoveNext() then
+                let mutable prev = e.Current
+                let first = e.Current
+                if e.MoveNext() then
+                        yield kk, prev, e.Current 
+                        prev <- e.Current 
+                        while e.MoveNext() do
+                            kk <- kk + 1
+                            yield  kk, prev, e.Current 
+                            prev <- e.Current
+                        kk <- kk + 1 
+                        yield kk, prev, first
+                else
+                    failwith "thisNextLooped: Input Sequence only had one element"
+            else
+                failwith "thisNextLooped: Empty Input Sequence"}
+
+    /// Yields a Seq from (0,first, second) upto (secondLastIndex, second last, last)
+    /// The length of the resulting seq is one shorter than input seq.
+    /// Use Seq.iTthisNext if you want a looped sequence till (lastIndex,last, first)
+    let windowed2i (xs:seq<'T>): seq<int *'T*'T> =  
+        seq{use e = xs.GetEnumerator()
+            let mutable kk =  0  
+            if e.MoveNext() then
+                let mutable prev = e.Current
+                if e.MoveNext() then
+                    yield kk, prev, e.Current 
+                    prev <- e.Current 
+                    while e.MoveNext() do
+                        kk <- kk + 1
+                        yield  kk, prev, e.Current 
+                        prev <- e.Current  
+                else
+                    failwithf "Seq.windowed2i: Input Sequence only had one element %A" xs.ToNiceString
+            else
+                failwith "Seq.windowed2i: Empty Input Sequence"}  
+
+
+    /// Yields a looped Seq from (last, first, second)  upto (second-last, last, first)
+    /// The length of the resulting seq is the same as the input seq.
+    /// Use Seq.windowed3 if you don't want a looped sequence.
+    let prevThisNext (xs:seq<'T>) : seq<'T *'T*'T> =  seq { 
+        use e = xs.GetEnumerator()
+        if e.MoveNext() then
+            let mutable prev =  e.Current
+            let first = e.Current
+            if e.MoveNext() then
+                let mutable this = e.Current
+                if e.MoveNext() then                    
+                    yield indexFromBack 0 xs ,prev, this //yield Seq.last xs ,prev, this
+                    yield prev, this, e.Current
+                    prev <- this  
+                    this <- e.Current
+                    while e.MoveNext() do 
+                        yield  prev, this, e.Current
+                        prev <- this 
+                        this <- e.Current                            
+                    yield prev, this, first
+                else                     
+                    failwithf "Seq.prevThisNextLooped: Input Sequence only had two elements: %s" xs.ToNiceString
+            else
+                failwithf "Seq.prevThisNextLooped: Input Sequence only had one element: %s" xs.ToNiceString
+        else
+            failwithf "Seq.prevThisNextLooped: Empty Input Sequence %A" xs} 
+
+
+    /// Yields a Seq from (first, second, third)  upto (third-last, second-last, last)
+    /// The length of the resulting seq is two shorter than the input seq.
+    /// Use Seq.prevThisNext if you want a looped sequence upto (second-last, last, first)
+    let windowed3 (xs:seq<'T>) : seq<'T *'T*'T> =  seq { 
+        use e = xs.GetEnumerator()
+        if e.MoveNext() then
+            let mutable prev =  e.Current            
+            if e.MoveNext() then
+                let mutable this = e.Current
+                if e.MoveNext() then
+                    yield prev, this, e.Current
+                    prev <- this  
+                    this <- e.Current
+                    while e.MoveNext() do 
+                        yield  prev, this, e.Current
+                        prev <- this 
+                        this <- e.Current
+                else                     
+                    failwithf "Seq.windowed3: Input Sequence only had two elements: %s" xs.ToNiceString
+            else
+                failwithf "Seq.windowed3: Input Sequence only had one element: %s" xs.ToNiceString
+        else
+            failwithf "Seq.windowed3: Empty Input Sequence %A" xs} 
+
+
+    /// Yields looped Seq from (0, last, first, second)  upto (lastIndex, second-last, last, first)
+    /// The length of the resulting seq is the same as the input seq.
+    /// Use Seq.windowed3i if you don't want a looped sequence.
+    let iPrevThisNext (xs:seq<'T>) : seq<int*'T *'T*'T> = seq { 
+        use e = xs.GetEnumerator()        
+        if e.MoveNext() then
+            let mutable prev =  e.Current
+            let first = e.Current
+            if e.MoveNext() then
+                let mutable this = e.Current
+                if e.MoveNext() then
+                    yield  0, indexFromBack 0 xs ,prev, this 
+                    yield  1, prev, this, e.Current
+                    let mutable kk = 2
+                    prev <- this  
+                    this <- e.Current
+                    while e.MoveNext() do 
+                        yield kk, prev, this, e.Current
+                        kk <- kk + 1
+                        prev <- this 
+                        this <- e.Current                            
+                    yield kk, prev, this, first
                 else                     
                     failwithf "prevThisNextLooped: Input Sequence %s only had two elements" xs.ToNiceString
             else
@@ -272,3 +335,27 @@ module Seq =
         else
             failwithf "prevThisNextLooped: Empty Input Sequence %A" xs} 
 
+    /// Yields a Seq from (1, first, second, third)  upto (secondLastIndex, third-last, second-last, last)
+    /// The length of the resulting seq is two shorter than the input seq.
+    /// Use Seq.iPrevThisNext if you want a looped sequence upto (lastIndex,second-last, last, first)
+    let windowed3i (xs:seq<'T>) : seq<int*'T *'T*'T> =  seq { 
+        use e = xs.GetEnumerator()        
+        if e.MoveNext() then
+            let mutable prev =  e.Current            
+            if e.MoveNext() then
+                let mutable this = e.Current
+                if e.MoveNext() then                   
+                    let mutable kk = 1
+                    prev <- this  
+                    this <- e.Current
+                    while e.MoveNext() do 
+                        yield  kk, prev, this, e.Current
+                        kk <- kk + 1
+                        prev <- this 
+                        this <- e.Current
+                else                     
+                    failwithf "Seq.windowed3i: Input Sequence only had two elements: %s" xs.ToNiceString
+            else
+                failwithf "Seq.windowed3i: Input Sequence only had one element: %s" xs.ToNiceString
+        else
+            failwithf "Seq.windowed3i: Empty Input Sequence %A" xs} 
