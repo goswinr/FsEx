@@ -212,13 +212,14 @@ type Rarr<'T> private (xs:List<'T>) =
 
     /// Creates a shallow copy of the list
     // (for a Rarr of structs this is like a deep copy)
-    member this.Clone() = new Rarr<'T>(xs.GetRange(0,xs.Count)) // fastest way to create a shallow copy
+    member _.Clone() = new Rarr<'T>(xs.GetRange(0,xs.Count)) // fastest way to create a shallow copy
         
     
     /// Defines F# slicing notation operator use including negative indices. ( -1 is last item, like Python)
     /// The resulting Rarr includes the end index.
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)    
-    member _.GetSlice(startIdx, endIdx) =    //.GetSlice maps onto slicing operator .[1..3]
+    member _.GetSlice(startIdx, endIdx) =    
+        //.GetSlice maps onto slicing operator .[1..3]
         let count = xs.Count
         let st  = match startIdx with None -> 0        | Some i -> if i<0 then count+i      else i
         let len = match endIdx   with None -> count-st | Some i -> if i<0 then count+i-st+1 else i-st+1
@@ -337,12 +338,12 @@ type Rarr<'T> private (xs:List<'T>) =
     /// It does a linear, O(n) search.  Equality is determined by calling item.Equals().
     member _.Contains(item : 'T) =                                                           xs.Contains(item) 
     
-    ///<summary>Converts the elements in the current List to another type, and returns 
+    /// <summary>Converts the elements in the current List to another type, and returns 
     /// a list containing the converted elements.</summary>
-    ///<param name="converter">A System.Converter delegate that converts each element from 
+    /// <param name="converter">A System.Converter delegate that converts each element from 
     /// one type to another type.</param>
-    ///<typeparam name="TOutput">The type of the elements of the target array.</typeparam>
-    ///<returns>A List of the target type containing the converted elements from 
+    /// <typeparam name="TOutput">The type of the elements of the target array.</typeparam>
+    /// <returns>A List of the target type containing the converted elements from 
     /// the current List.</returns>
     member _.ConvertAll<'TOutput>(converter : Converter<'T, 'TOutput>) =                     xs.ConvertAll(converter) |> Rarr
     
@@ -350,27 +351,81 @@ type Rarr<'T> private (xs:List<'T>) =
     /// The method uses the Array.Copy method to copy the elements.
     member _.CopyTo(array : 'T[]) =                                                          xs.CopyTo(array) 
     
-    ///<summary>Copies the elements of the Rarr to an Array, 
+    /// <summary>Copies the elements of the Rarr to an Array, 
     /// starting at a particular Array index.</summary>
-    ///<param name="array">The one-dimensional Array that is the destination of the 
+    /// <param name="array">The one-dimensional Array that is the destination of the 
     /// elements copied from the List The Array must have zero-based indexing.</param>
-    ///<param name="arrayIndex">The zero-based index in the Array at 
+    /// <param name="arrayIndex">The zero-based index in the Array at 
     /// which copying begins.</param>
-    member _.CopyTo(array : 'T[], arrayIndex : int) =                                        xs.CopyTo(array , arrayIndex) 
+    member _.CopyTo(array : 'T[], arrayIndex : int) =                                        xs.CopyTo(array , arrayIndex)     
     
-    // TODO add XML doc str
-    
+    /// <summary>Copies a range of elements from the List to a compatible one-dimensional array, starting at the specified index of the target array.</summary>
+    /// <param name="index">The zero-based index in the source List at which copying begins.</param>
+    /// <param name="array">The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied from List. The <see cref="T:System.Array" /> must have zero-based indexing.</param>
+    /// <param name="arrayIndex">The zero-based index in <paramref name="array" /> at which copying begins.</param>
+    /// <param name="count">The number of elements to copy.</param>
     member _.CopyTo(index : int, array : 'T[], arrayIndex : int, count : int) =              xs.CopyTo(index , array , arrayIndex , count)    
+    
+    /// <summary>Determines whether the List contains elements that match the conditions defined by the specified predicate.</summary>
+    /// <param name="matchValue">The Predicate delegate that defines the conditions of the elements to search for.</param>
+    /// <returns>true if the List contains one or more elements that match the conditions defined by the specified predicate; otherwise, false.</returns>
     member _.Exists (matchValue : Predicate<'T>) =                                           xs.Exists (matchValue) 
+    
+    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the first occurrence within the entire List.</summary>
+    /// <param name="matchValue">The Predicate delegate that defines the conditions of the element to search for.</param>
+    /// <returns>The first element that matches the conditions defined by the specified predicate, if found; otherwise, the default value for type 'T.</returns>
     member _.Find   (matchValue : Predicate<'T>) =                                           xs.Find   (matchValue) 
+    
+    /// <summary>Retrieves all the elements that match the conditions defined by the specified predicate.</summary>
+    /// <param name="matchValue">The Predicate delegate that defines the conditions of the elements to search for.</param>
+    /// <returns>A List containing all the elements that match the conditions defined by the specified predicate, if found; otherwise, an empty List.</returns>
     member _.FindAll(matchValue : Predicate<'T>) =                                           xs.FindAll(matchValue) |> Rarr
+    
+    /// <summary>Retrieves all the elements that match the conditions defined by the specified predicate.</summary>
+    /// <param name="matchValue">The Predicate delegate that defines the conditions of the elements to search for.</param>
+    /// <returns>A List containing all the elements that match the conditions defined by the specified predicate, if found; otherwise, an empty List.</returns>
     member _.FindIndex(matchValue : Predicate<'T>) =                                         xs.FindIndex(matchValue)
+    
+    
+    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the zero-based index of the first occurrence within the range of elements in the List that extends from the specified index to the last element.</summary>
+    /// <param name="startIndex">The zero-based starting index of the search.</param>
+    /// <param name="matchValue">The Predicate delegate that defines the conditions of the element to search for.</param>
+    /// <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by matchValue, if found; otherwise, -1.</returns>
     member _.FindIndex(startIndex : int, matchValue : Predicate<'T>) =                       xs.FindIndex(startIndex , matchValue)
+    
+    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the zero-based index of the first occurrence within the range of elements in the List that starts at the specified index and contains the specified number of elements.</summary>
+    /// <param name="startIndex">The zero-based starting index of the search.</param>
+    /// <param name="count">The number of elements in the section to search.</param>
+    /// <param name="matchValue">The Predicate delegate that defines the conditions of the element to search for.</param>
+    /// <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by matchValue, if found; otherwise, -1.</returns>
     member _.FindIndex(startIndex : int, count : int, matchValue : Predicate<'T>) =          xs.FindIndex(startIndex , count , matchValue) 
+    
+    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the last occurrence within the entire List.</summary>
+    /// <param name="matchValue">The Predicate delegate that defines the conditions of the element to search for.</param>
+    /// <returns>The last element that matches the conditions defined by the specified predicate, if found; otherwise, the default value for type 'T.</returns>
     member _.FindLast(matchValue : Predicate<'T>) =                                          xs.FindLast(matchValue) 
+    
+    
+    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the zero-based index of the last occurrence within the entire List.</summary>
+    /// <param name="matchValue">The Predicate delegate that defines the conditions of the element to search for.</param>
+    /// <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by matchValue, if found; otherwise, -1.</returns>
     member _.FindLastIndex(matchValue : Predicate<'T>) =                                     xs.FindLastIndex(matchValue) 
+    
+    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the zero-based index of the last occurrence within the range of elements in the List that extends from the first element to the specified index.</summary>
+    /// <param name="startIndex">The zero-based starting index of the backward search.</param>
+    /// <param name="matchValue">The Predicate delegate that defines the conditions of the element to search for.</param>
+    /// <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by matchValue, if found; otherwise, -1.</returns>
     member _.FindLastIndex(startIndex : int, matchValue : Predicate<'T>) =                   xs.FindLastIndex(startIndex , matchValue) 
+    
+    /// <summary>Searches for an element that matches the conditions defined by the specified predicate, and returns the zero-based index of the last occurrence within the range of elements in the List that contains the specified number of elements and ends at the specified index.</summary>
+    /// <param name="startIndex">The zero-based starting index of the backward search.</param>
+    /// <param name="count">The number of elements in the section to search.</param>
+    /// <param name="matchValue">The Predicate delegate that defines the conditions of the element to search for.</param>
+    /// <returns>The zero-based index of the last occurrence of an element that matches the conditions defined by matchValue, if found; otherwise, -1.</returns>
     member _.FindLastIndex(startIndex : int, count : int, matchValue : Predicate<'T>) =      xs.FindLastIndex(startIndex , count , matchValue) 
+    
+    /// <summary>Performs the specified action on each element of the List.</summary>
+    /// <param name="action">The <see cref="T:System.Action`1" /> delegate to perform on each element of the List.</param>
     member _.ForEach(action : Action<'T>) =                                                  xs.ForEach(action) 
     
     /// Returns an enumerator for this list with the given
