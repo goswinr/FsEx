@@ -114,38 +114,42 @@ module Rarr =
     let inline private checkCount c txt (a:Rarr<_>) = 
         if a.Count < c then ArgumentException.RaiseBase "Rarr %A has %d elements but needs  %d for Rarr.%s" a a.Count c txt
     
+    (*
+
+    implemet those with cashing to avoid repeated index lookup, see Seq module
+
     /// Yields Seq from (first, second)  upto (second-last, last)  
     /// not looped
     /// the resulting seq is one element shorter than the input Rarr
-    let thisNext (a:_ Rarr) = 
-        checkCount 2 "thisNext" a  
+    let windowed2 (a:_ Rarr) = 
+        checkCount 2 "windowed2" a  
         seq {   for i = 0 to a.Count-2 do  yield a.[i], a.[i+1] }
     
     /// Yields looped Seq from (first, second)  upto (last, first) 
     /// the resulting seq has the same element count as the input Rarr
-    let thisNextLoop (a:_ Rarr) = 
-        checkCount 2 "thisNextLoop " a 
+    let thisNext (a:_ Rarr) = 
+        checkCount 2 "thisNext" a 
         seq {   for i = 0 to a.Count-2 do yield a.[i], a.[i+1] 
                 yield a.[a.Count-1], a.[0] }
     
     /// Yields looped Seq from (last,first)  upto (second-last, last) 
     /// the resulting seq has the same element count as the input Rarr
-    let prevThisLoop (a:_ Rarr) = 
-        checkCount 2 "prevThisLoop" a 
+    let prevThis (a:_ Rarr) = 
+        checkCount 2 "prevThis" a 
         seq {   yield a.[a.Count-1], a.[0]
                 for i = 0 to a.Count-2 do yield a.[i], a.[i+1] }
     
     /// Yields Seq from (first, second, third)  upto (third-last, second-last, last) 
     /// not looped
     /// the resulting seq is two elements shorter than the input Rarr
-    let prevThisNext (a:_ Rarr) = 
-        checkCount 3 "prevThisNext" a 
+    let windowed3 (a:_ Rarr) = 
+        checkCount 3 "windowed3" a 
         seq {   for i = 0 to a.Count-3 do yield a.[i], a.[i+1], a.[i+2] } //TODO keep prev in mutabe value to avoid accessing the same item 3 times
     
     /// Yields looped Seq of  from (last, first, second)  upto (second-last, last, first)
     /// the resulting seq has the same element count as the input Rarr
-    let prevThisNextLoop (a:_ Rarr) =  
-        checkCount 3 "prevThisNextLoop" a 
+    let prevThisNext (a:_ Rarr) =  
+        checkCount 3 "prevThisNext" a 
         seq{    yield  a.[a.Count-1], a.[0], a.[1] 
                 for i = 0 to a.Count-3 do yield a.[i], a.[i+1], a.[i+2]
                 yield  a.[a.Count-2],a.[a.Count-1], a.[0] }
@@ -153,32 +157,33 @@ module Rarr =
     /// Yields Seq from (0,first, second)  upto (lastIndex-1 , second-last, last) 
     /// not looped
     /// the resulting seq is one element shorter than the input Rarr
-    let iThisNext (a:_ Rarr) =     
-        checkCount 2 "iThisNext" a 
+    let windowed2i (a:_ Rarr) =     
+        checkCount 2 "windowed2i" a 
         seq {   for i = 0 to a.Count-2 do yield i, a.[i], a.[i+1] } 
     
     /// Yields looped Seq  from (0,first, second)  upto (lastIndex, last, first)
     /// the resulting seq has the same element count as the input Rarr
-    let iThisNextLoop (a:_ Rarr) = 
-        checkCount 2 "iThisNextLoop" a  
+    let iThisNext (a:_ Rarr) = 
+        checkCount 2 "iThisNext" a  
         seq {   for i = 0 to a.Count-2 do yield i, a.[i], a.[i+1] 
                 yield  a.Count-1, a.[a.Count-1], a.[0] }
     
     /// Yields Seq from (1, first, second, third)  upto (lastIndex-1 , third-last, second-last, last) 
     /// not looped
     /// the resulting seq is two elements shorter than the input Rarr
-    let iPrevThisNext (a:_ Rarr) =     
-        checkCount 3 "iPrevThisNext" a 
+    let windowed3i (a:_ Rarr) =     
+        checkCount 3 "windowed3i" a 
         seq {   for i = 0 to a.Count-3 do yield i+1, a.[i], a.[i+1], a.[i+2] }
     
     /// Yields looped Seq from (1, last, first, second)  upto (lastIndex, second-last, last, first)
     /// the resulting seq has the same element count as the input Rarr
-    let iPrevThisNextLoop (a:_ Rarr) = 
-        checkCount 3 "iPrevThisNextLoop" a 
+    let iPrevThisNext (a:_ Rarr) = 
+        checkCount 3 "iPrevThisNext" a 
         seq {   yield  0, a.[a.Count-1], a.[0], a.[1]
                 for i = 0 to a.Count-3 do yield i+1, a.[i], a.[i+1], a.[i+2] 
                 yield  a.Count-1, a.[a.Count-2],a.[a.Count-1], a.[0] }
     
+    *)
 
     /// retuns an empty Rarr
     let inline empty() = Rarr<_>()
