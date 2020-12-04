@@ -17,7 +17,6 @@ type EXT = Runtime.CompilerServices.ExtensionAttribute
 [<AutoOpen>]
 module  Exceptions =    
 
-
     type ArgumentException with
         /// Raise ArgumentException with F# printf string formating
         /// this is also the base class of ArgumentOutOfRangeException and ArgumentNullException
@@ -47,6 +46,52 @@ module  Exceptions =
         /// Raise DirectoryNotFoundException with F# printf string formating
         [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (DirectoryNotFoundException(s))) msg
    
+[<AutoOpen>]
+module IO = 
+    open System.Runtime.InteropServices
+    
+    module private Kernel32 = 
+        //https://stackoverflow.com/questions/6375599/is-this-pinvoke-code-correct-and-reliable
+        //https://stackoverflow.com/questions/1689460/f-syntax-for-p-invoke-signature-using-marshalas
+        [<DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)>]        
+        extern [<MarshalAs(UnmanagedType.Bool)>] bool DeleteFile (string name ); // dont rename must be called 'DeleteFile'
+    
+    /// Removes the blocking of dll files from untrusted sources, e.g. the internet
+    /// calls pInvoke  kernel32.dll DeleteFile() to remove Zone.Identifier
+    /// Raises an exception if file does not exist
+    /// Returns true if Zone.Identifier where removed from the file stream. Else false
+    let unblockFile(filePath:string ) : bool =
+        if IO.File.Exists(filePath) then 
+            Kernel32.DeleteFile(filePath + ":Zone.Identifier") 
+        else 
+            FileNotFoundException.Raise "FsEx.IO.unblock cant find file %s" filePath    
+
+    /// Raises an FileNotFoundException if the file path does not exist
+    let checkIfFileExists s = 
+        if not (IO.File.Exists s) then  raise (FileNotFoundException("File missing or path worng: '" + s + "'"))
+     
+     /// Raises an DirectoryNotFoundException if the directory path does not exist
+    let checkIfDirectoryExists s = 
+        if not (IO.Directory.Exists s) then  raise (DirectoryNotFoundException("Directory missing or path worng: '" + s + "'"))     
+    
+    /// Returns all files in folder and subfolders
+    /// Ignores all errors and moves on to next folder
+    let rec getAllFiles (dir:string) = 
+        seq { if Directory.Exists dir then 
+                let files = try Directory.GetFiles(dir) with _ -> [||]
+                Array.sortInPlace files
+                yield! files
+                let dirs = try Directory.GetDirectories(dir) with _ -> [||]
+                Array.sortInPlace dirs
+                for subdir in dirs do 
+                    yield! getAllFiles subdir }
+
+    /// Returns all files in folder and subfolders that fit pattern (e.g. "*.pdf" ) 
+    /// may fail on IOExceptions
+    let rec getAllFilesByPattern (dir:string) pattern =
+        seq {   yield! Directory.EnumerateFiles(dir, pattern)
+                for d in Directory.EnumerateDirectories(dir) do
+                    yield! getAllFilesByPattern d pattern }
 
 /// General Utility functions
 /// module is set to auto open
@@ -157,13 +202,7 @@ module  Util =
     let inline ifDo condition (f:'T->'T)  (x:'T) = 
         if condition then f x else x
     
-    /// raises an expetion if the file path does not exist
-    let checkIfFileExists s = 
-        if not (IO.File.Exists s) then  raise (FileNotFoundException("File missing or Path worng: '" + s + "'"))
-     
-     /// raises an expetion if the directory path does not exist
-    let checkIfDirectoryExists s = 
-        if not (IO.Directory.Exists s) then  raise (DirectoryNotFoundException("Directory missing or Path worng: '" + s + "'"))           
+      
 
     /// generic parser that infers desired return type 
     let inline tryParse<'a when 'a: (static member TryParse: string * byref<'a> -> bool)> x =
@@ -244,7 +283,6 @@ module IntRef =
 
     /// set ref cell to given int if it is smaller than current value
     let inline setMin i (x:int) = if x < !i then i := x
-
 
 /// Functions to deal with float ref objects
 module FloatRef = 
