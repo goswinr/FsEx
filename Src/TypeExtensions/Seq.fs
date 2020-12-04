@@ -123,6 +123,59 @@ module TypeExtensionsSeq =
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies (should consider for other extension modules as well)
 module Seq =   
     
+    /// Applies a function to Seq
+    /// If resulting Seq meets the resultPredicate it is returned , otherwise  orinal input is returned.
+    let applyIfResult (resultPredicate:seq<'T> -> bool) (transform:seq<'T> -> seq<'T>)  (xs: seq<'T>) : seq<'T> =
+        let r = transform xs
+        if resultPredicate r then r
+        else xs
+
+    /// Applies a function to Seq if it meets the inputPredicate, otherwise just returns input.
+    /// If resulting Seq meets the resultPredicate it is returned , otherwise orinal input is returned.
+    let applyIfInputAndResult (inputPredicate:seq<'T> -> bool) (resultPredicate:seq<'T> -> bool) (transform:seq<'T> -> seq<'T>)  (xs: seq<'T>) : seq<'T> =
+        if inputPredicate xs then
+            let r = transform xs
+            if resultPredicate r then r
+            else xs
+        else
+            xs
+
+    /// Returns true if the given Rarr has count items.
+    let  hasItems count (xs : seq<'T>) : bool =
+        match xs with
+        | :? ('T[]) as a ->     a.Length = count
+        | :? ('T Rarr) as a  -> a.Count  = count       
+        | :? ('T IList) as a -> a.Count  = count
+        | _ ->
+            let mutable k = 0
+            use e = xs.GetEnumerator()
+            while e.MoveNext() && k <= count do  k <- k+1
+            k = count
+
+    /// Returns true if the given Rarr has equal or more than count items.
+    let  hasMinimumItems count (xs : seq<'T>) : bool =
+        match xs with
+        | :? ('T[]) as a ->     a.Length >= count
+        | :? ('T Rarr) as a  -> a.Count  >= count       
+        | :? ('T IList) as a -> a.Count  >= count
+        | _ ->
+            let mutable k = 0
+            use e = xs.GetEnumerator()
+            while e.MoveNext() && k <= count do  k <- k+1
+            k >= count
+
+    /// Returns true if the given Rarr has equal or less than count items.
+    let  hasMaximumItems count (xs : seq<'T>) : bool =
+        match xs with
+        | :? ('T[]) as a ->     a.Length <= count
+        | :? ('T Rarr) as a  -> a.Count  <= count       
+        | :? ('T IList) as a -> a.Count  <= count
+        | _ ->
+            let mutable k = 0
+            use e = xs.GetEnumerator()
+            while e.MoveNext() && k <= count do  k <- k+1
+            k <= count
+
     /// faster implemetation of Seq.last till F# 4.8  or 5.0 is out
     let lastFast (source : seq<_>) = TypeExtensionsSeq.indexFromBack 0  source // TODO keep this until https://github.com/dotnet/fsharp/pull/7765/files is part of fsharp core
 
