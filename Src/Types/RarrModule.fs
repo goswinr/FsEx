@@ -10,6 +10,25 @@ module Rarr =
     // extensions added only in FsEx:
     //----------------------------------------------------
     
+    /// Applies a function to List
+    /// If resulting List meets the resultPredicate it is returned , otherwise  orinal input is returned.
+    let applyIfResult (resultPredicate:Rarr<'T> -> bool) (transform:Rarr<'T> -> Rarr<'T>)  (rarr: Rarr<'T>) : Rarr<'T> =
+        let r = transform rarr
+        if resultPredicate r then r
+        else rarr
+
+    /// Applies a function to List if it meets the inputPredicate, otherwise just returns input.
+    /// If resulting List meets the resultPredicate it is returned , otherwise orinal input is returned.
+    let applyIfInputAndResult (inputPredicate:Rarr<'T> -> bool) (resultPredicate:Rarr<'T> -> bool) (transform:Rarr<'T> -> Rarr<'T>)  (rarr: Rarr<'T>) : Rarr<'T> =
+        if inputPredicate rarr then
+            let r = transform rarr
+            if resultPredicate r then r
+            else rarr
+        else
+            rarr
+    
+   
+
     /// Creates a shallow copy by calling 
     /// rarr.GetRange(0,rarr.Count) 
     let inline shallowCopy (rarr: Rarr<'T>) = rarr.GetRange(0,rarr.Count) // fastest way to create a shallow copy
@@ -196,7 +215,7 @@ module Rarr =
     /// Create a Rarr by calling the given generator on each index.
     //-[<CompiledName("Init")>]
     let inline init count initializer : Rarr<'T> =
-        if count < 0 then invalidArg "count" "The number of elements may not be negative."
+        if count < 0 then ArgumentException.RaiseBase "Rarr.init: The count can't be %d" count   
         let rarr = Rarr (count)
         for i = 0 to count - 1 do rarr.Add ( initializer i)
         rarr
@@ -371,7 +390,7 @@ module Rarr =
     (* covered by part copied fron Ext-Core
 
         // Returns the smallest element of the Rarr.
-        let min rarr =     rarr |> MinMax.simple (<)  // why inline? type specialisation ?
+        let min rarr =     rarr |> MinMax.simple (<)  
 
         // Returns the biggest element of the Rarr.
         let max rarr =     rarr |> MinMax.simple (>)
@@ -483,6 +502,7 @@ module Rarr =
     // taken and adapded from https://github.com/jack-pappas/ExtCore/blob/master/ExtCore/Collections.Rarr.fs 
     // previously used https://github.com/dotnet/fsharp/tree/master/src/utils   
     //-------------------------------------------------------------------------------------------------------------------------------
+    // alternative: https://github.com/fsprojects/FSharpx.Collections/blob/master/src/FSharpx.Collections/ResizeArray.fs
     
     //let inline checkNonNull tx rarr = 
     //    match rarr with null -> raise (ArgumentNullException("in module FsEx.Rarr: " + tx)) |_ -> ()
@@ -509,13 +529,10 @@ module Rarr =
     let inline isEmpty (rarr : Rarr<'T>) : bool =
         rarr.Count = 0
 
-
     /// Create a Rarr whose elements are all initially the given value.
     //-[<CompiledName("Create")>]
     let create count value : Rarr<'T> =
-        if count < 0 then
-            invalidArg "count" "The number of elements may not be negative."
-
+        if count < 0 then ArgumentException.RaiseBase "Rarr.create: The count can't be %d" count        
         let rarr = Rarr (count)
         for i = 0 to count - 1 do
             rarr.Add value
@@ -534,9 +551,13 @@ module Rarr =
         rarr.Contains value
 
     /// Build a Rarr from the given sequence.
+    /// if input is a Rarr or Generic.List it is returned directly
     //-[<CompiledName("OfSeq")>]
     let inline ofSeq (sequence : seq<'T>) : Rarr<'T> =
-        Rarr (sequence)
+        match sequence with
+        | :? Rarr<'T> as r -> r
+        | :? List<'T> as l -> Rarr.CreateDirectly(l)
+        | _ -> Rarr (sequence)
 
     /// Build a Rarr from the given list.
     //-[<CompiledName("OfList")>]
@@ -554,7 +575,6 @@ module Rarr =
     //-[<CompiledName("OfArray")>]
     let inline ofArray (arr : 'T[]) : Rarr<'T> =
         Rarr (arr)
-
 
     /// Return a view of the Rarr as an enumerable object.
     //-[<CompiledName("ToSeq")>]
@@ -688,13 +708,12 @@ module Rarr =
     /// Combine the two Rarrs into a Rarr of pairs.
     /// The two arrays must have equal lengths, otherwise an <c>ArgumentException</c> is raised.
     //-[<CompiledName("Zip")>]
-    let zip (rarr1 : Rarr<'T1>) (rarr2 : Rarr<'T2>)
-        : Rarr<'T1 * 'T2> =
+    let zip (rarr1 : Rarr<'T1>) (rarr2 : Rarr<'T2>) : Rarr<'T1 * 'T2> =
         //+ checkNonNull "rarr1" rarr1
         //+ checkNonNull "rarr2" rarr2
         let len = length rarr1
         if len <> length rarr2 then
-            invalidArg "rarr2" "The Rarrs have different lengths."
+            ArgumentException.RaiseBase "Rarr.zip: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count              
         let results = Rarr (len)
         for i = 0 to len - 1 do
             results.Add (rarr1.[i], rarr2.[i])
@@ -730,7 +749,7 @@ module Rarr =
         //+ checkNonNull "rarr2" rarr2
         let len = length rarr1
         if len <> length rarr2 then
-            invalidArg "rarr2" "The Rarrs have different lengths."
+            ArgumentException.RaiseBase "Rarr.exists2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count 
 
         let predicate = FSharpFunc<_,_,_>.Adapt predicate
     
@@ -758,7 +777,7 @@ module Rarr =
         //+ checkNonNull "rarr2" rarr2
         let len = length rarr1
         if len <> length rarr2 then
-            invalidArg "rarr2" "The Rarrs have different lengths."
+            ArgumentException.RaiseBase "Rarr.forall2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count 
 
         let predicate = FSharpFunc<_,_,_>.Adapt predicate
     
@@ -957,7 +976,7 @@ module Rarr =
         //+ checkNonNull "rarr2" rarr2
         let len = length rarr1
         if len <> length rarr2 then
-            invalidArg "rarr2" "The Rarrs have different lengths."
+            ArgumentException.RaiseBase "Rarr.iter2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count 
 
         let action = FSharpFunc<_,_,_>.Adapt action
 
@@ -975,7 +994,7 @@ module Rarr =
         //+ checkNonNull "rarr2" rarr2
         let len = length rarr1
         if len <> length rarr2 then
-            invalidArg "rarr2" "The Rarrs have different lengths."
+            ArgumentException.RaiseBase "Rarr.iteri2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count 
 
         let action = FSharpFunc<_,_,_,_>.Adapt action
 
@@ -1029,7 +1048,7 @@ module Rarr =
         //+ checkNonNull "rarr2" rarr2
         let len = length rarr1
         if len <> length rarr2 then
-            invalidArg "rarr2" "The Rarrs have different lengths."
+            ArgumentException.RaiseBase "Rarr.map2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count 
 
         let mapping = FSharpFunc<_,_,_>.Adapt mapping
         let results = Rarr (len)
@@ -1054,7 +1073,7 @@ module Rarr =
         //+ checkNonNull "rarr2" rarr2
         let len = length rarr1
         if len <> length rarr2 then
-            invalidArg "rarr2" "The Rarrs have different lengths."
+            ArgumentException.RaiseBase "Rarr.mapi2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count 
 
         let mapping = FSharpFunc<_,_,_,_>.Adapt mapping
         let results = Rarr (len)
@@ -1147,7 +1166,7 @@ module Rarr =
         //+ checkNonNull "rarr2" rarr2
         let len = length rarr1
         if len <> length rarr2 then
-            invalidArg "rarr2" "The arrays have different lengths."
+            ArgumentException.RaiseBase "Rarr.fold2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count 
         let folder = FSharpFunc<_,_,_,_>.Adapt folder
         let mutable state = state
         for i = 0 to len - 1 do
@@ -1232,7 +1251,7 @@ module Rarr =
 
         let len = length rarr1
         if len <> length rarr2 then
-            invalidArg "rarr2" "The arrays have different lengths."
+            ArgumentException.RaiseBase "Rarr.foldBack2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count 
 
         let folder = FSharpFunc<_,_,_,_>.Adapt folder
         let mutable state = state
