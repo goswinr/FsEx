@@ -98,6 +98,11 @@ module TypeExtensionsString =
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide String class in C# assemblies (should consider for other extension modules as well)
 module String =
     
+    /// removes substring from a string. same as:
+    /// fromString.Replace(textToRemove, "")
+    let inline delete (textToRemove:string) (fromString:string)=
+        fromString.Replace(textToRemove, "")
+
     // Ensures all lines end on Environment.NewLine
     // code: s.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine)
     let unifyLineEndings (s:string) =
