@@ -26,8 +26,7 @@ module Rarr =
             else rarr
         else
             rarr
-    
-   
+  
 
     /// Creates a shallow copy by calling 
     /// rarr.GetRange(0,rarr.Count) 
@@ -239,6 +238,30 @@ module Rarr =
             else             f.Add(x)
         t,f
     
+    
+    /// Structural equality
+    /// compares each element in both lists for eqality . Rarrs must also be of same Count
+    let equals (rarr1: Rarr<'T>) (rarr2: Rarr<'T>) =
+        if rarr1.Count <> rarr2.Count then false 
+        else
+            let rec eq i = 
+                if i < rarr1.Count then 
+                    if rarr1.[i] = rarr2.[i] then eq (i+1)
+                    else false
+                else
+                    true
+            eq 0
+    
+    /// Returns a Rarr with just one item.
+    let inline singelton (x :'T)  =
+        let r = Rarr(1)
+        r.Add x
+        r
+
+    /// Returns true if the given Rarr has just one item.
+    let inline hasOne count (rarr : Rarr<'T>) : bool =
+        rarr.Count = 1
+
     /// Returns true if the given Rarr has count items.
     let inline hasItems count (rarr : Rarr<'T>) : bool =
         rarr.Count = count
