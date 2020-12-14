@@ -60,12 +60,15 @@ module StringBufferBuilder =
         member inline _.Yield (c: char) =      fun (b: StringBuilder) -> b.Append  c   |> ignoreObj
         member inline _.Yield (f: float) =     fun (b: StringBuilder) -> f |> NiceString.floatToString |> b.Append  |> ignoreObj
         member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> b.Append (i.ToString())  |> ignoreObj
+        member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> b.Append (g.ToString())  |> ignoreObj
         //member inline _.Yield (x: 'T) =        fun (b: StringBuilder)  -> b.Append (x.ToString())  |> ignore
 
         member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> b.AppendLine txt |> ignoreObj // 
         member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> b.AppendLine  (c.ToString())   |> ignoreObj
         member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> f |> NiceString.floatToString |> b.AppendLine  |> ignoreObj
         member inline _.YieldFrom (i: int) =       fun (b: StringBuilder)  -> b.AppendLine (i.ToString())  |> ignoreObj
+        member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder)  -> b.Append (g.ToString())  |> ignoreObj
+
         //member inline _.YieldFrom (f: StringBuffer) = f // use for new line instead
         
         member inline _.Yield (strings: seq<string>) =
@@ -99,7 +102,7 @@ module StringBufferBuilder =
     /// Computational Expression:  
     /// use 'yield' to append text
     /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
-    /// accepts ints and floats too. (including nice Formating)
+    /// accepts ints and floats too. (including nice Formating via NiceString.floatToString )
     let stringBuffer = StringBufferBuilder ()
 
 
