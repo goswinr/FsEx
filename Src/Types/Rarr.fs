@@ -139,12 +139,13 @@ type Rarr<'T> private (xs:List<'T>) =
             xs.[2] <- v          
 
     /// Checks if this.Count = 0 
-    member _.IsEmpty = 
-        xs.Count = 0 
+    member _.IsEmpty =  xs.Count = 0 
     
     /// Checks if this.Count > 0 
-    member _.IsNotEmpty = 
-        xs.Count > 0 
+    member _.IsNotEmpty =  xs.Count > 0 
+
+    /// Checks if this.Count > 0 
+    member _.HasItems =  xs.Count > 0 
     
     /// Insert an item at the beginning of the list = index 0, 
     /// (moving all other items up by one index)
