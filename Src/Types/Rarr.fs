@@ -10,25 +10,7 @@ open System
 /// It's just a very thin wrapper over a System.Collections.Generic.List<'T>
 /// and has all its members and interfaces implemented.
 /// The name Rarr is derived from of the F# type ResizeArray
-type Rarr<'T> private (xs:List<'T>) =     
-    
-    static member inline internal get index (xs:List<'T>) = 
-        if index >= xs.Count then ArgumentOutOfRangeException.Raise "Cant get index %d from Rarr of %d items: %A" index xs.Count xs
-        xs.[index]
-
-    static member inline internal set index value (xs:List<'T>) = 
-        if index >= xs.Count then ArgumentOutOfRangeException.Raise "Cant set index %d to %A in Rarr of %d items: %A " index value xs.Count  xs
-        xs.[index] <- value
-    
-    /// Constructs a new Rarr by using the supplied List<'T>  directly, without any copying of items
-    static member CreateDirectly (xs:List<'T> ) = 
-        if isNull xs then ArgumentNullException.Raise "List in Rarr.CreateDirectly is null"
-        new Rarr<'T>(xs)
-
-    /// Constructs a new Rarr by copying each item from the IEnumerable<'T>
-    static member CreateFromSeq (xs:seq<'T> ) = 
-        if isNull xs then ArgumentNullException.Raise "Seq in Rarr.CreateFromSeq is null"        
-        new Rarr<'T>(new List<'T>(xs))
+type Rarr<'T> private (xs:List<'T>) = 
 
     /// Constructs a new Rarr. 
     /// A Rarr is a mutable list like Collections.Generic.List<'T> but with nicer error messages on bad indices.
@@ -61,6 +43,24 @@ type Rarr<'T> private (xs:List<'T>) =
     new (collection : IEnumerable<'T>)  = 
         if isNull collection then ArgumentNullException.Raise "IEnumerable in new Rarr(collection) constructor is null"
         new Rarr<'T>(new List<'T>(collection))
+    
+    static member inline internal get index (xs:List<'T>) = 
+        if index >= xs.Count then ArgumentOutOfRangeException.Raise "Cant get index %d from Rarr of %d items: %A" index xs.Count xs
+        xs.[index]
+
+    static member inline internal set index value (xs:List<'T>) = 
+        if index >= xs.Count then ArgumentOutOfRangeException.Raise "Cant set index %d to %A in Rarr of %d items: %A " index value xs.Count  xs
+        xs.[index] <- value
+    
+    /// Constructs a new Rarr by using the supplied List<'T>  directly, without any copying of items
+    static member CreateDirectly (xs:List<'T> ) = 
+        if isNull xs then ArgumentNullException.Raise "List in Rarr.CreateDirectly is null"
+        new Rarr<'T>(xs)
+
+    /// Constructs a new Rarr by copying each item from the IEnumerable<'T>
+    static member CreateFromSeq (xs:seq<'T> ) = 
+        if isNull xs then ArgumentNullException.Raise "Seq in Rarr.CreateFromSeq is null"        
+        new Rarr<'T>(new List<'T>(xs))
 
     /// Access the underlying Collections.Generic.List<'T>
     /// ATTENTION! this is not even a shallow copy, mutating it will also change this Instance of Rarr!
@@ -237,7 +237,14 @@ type Rarr<'T> private (xs:List<'T>) =
                         
         xs.GetRange(st, len) 
   
-    
+    /// Like Rarr.filter but modifying the Rarr in place.
+    /// Removes Items form Rarr if predicate returns true.
+    member _.Filter (predicate: 'T -> bool) :unit =
+        for i = xs.Count - 1 downto 0 do // reverse order important
+            if predicate xs.[i] then 
+                xs.RemoveAt(i)
+        
+
     /// A property like the ToString() method, 
     /// But with richer formationg for collections
     member this.ToNiceString = NiceString.toNiceString this
