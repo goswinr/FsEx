@@ -3,8 +3,9 @@ namespace FsEx
 open System
 
 
-[<AutoOpen>]
-module TypeExtensionsResizeArray =   
+//[<AutoOpen>]
+[<Obsolete>]
+module ResizeArrayTypeExtensions =   
     
     open Microsoft.FSharp.Core
     open System.Runtime.CompilerServices
@@ -150,8 +151,9 @@ module TypeExtensionsResizeArray =
 
 
 /// Generic operations on the type System.Collections.Generic.List, which is called ResizeArray in the F# libraries.
-[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide ResizeArray class in C# assemblies (should consider for other extension modules as well)
 [<Obsolete>]
+[<RequireQualifiedAccess>]
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide ResizeArray class in C# assemblies (should consider for other extension modules as well)
 module ResizeArray =    
 
 
