@@ -12,7 +12,7 @@ open FsEx.SaveIgnore
 open System
 
 
-[<AutoOpen>] // to have print function auto opened at end
+[<AutoOpen>] // to have print functions at end of module auto opened
 module NiceString =
 
     [<RequireQualifiedAccess>]
@@ -289,6 +289,68 @@ module NiceString =
 
     /// prints FsEx.NiceString.toNiceStringFull
     let printFull x = printfn "%s" (NiceString.toNiceStringFull x)
-   
 
 
+    /// Exposes functionality of the Seff Editor, if FsEx is loeded there
+    type internal Seff private () = // no public constructor  
+       
+        //static let mutable syncContext: Threading.SynchronizationContext  = null //set via reflection below from Seff.Rhino       
+           
+        //static let mutable seffWindow : System.Windows.Window = null //set via reflection below from Seff.Rhino   
+           
+        static let mutable printColor : int-> int -> int -> string -> unit = //set via reflection below from Seff.Rhino
+            fun r g b s -> printf "%s" s    
+           
+        static let mutable printnColor : int-> int -> int -> string -> unit = //set via reflection below from Seff.Rhino
+            fun r g b s -> printfn "%s" s
+         
+        static let allAss = AppDomain.CurrentDomain.GetAssemblies()
+        
+        static let assemblySeff, assemblyRhinoCommon = 
+            let ass = AppDomain.CurrentDomain.GetAssemblies()
+            ass |> Seq.tryFind (fun a -> a.GetName().Name = "Seff") ,
+            ass |> Seq.tryFind (fun a -> a.GetName().Name = "RhinoCommon") 
+
+        static let mutable doInit = true
+        
+        static let init()=
+            doInit <- false
+            let allAss = AppDomain.CurrentDomain.GetAssemblies()
+            
+            let assemblySeff       =  allAss |> Seq.tryFind (fun a -> a.GetName().Name = "Seff")
+            //let assemblyRhinoCommon = allAss |> Seq.tryFind (fun a -> a.GetName().Name = "RhinoCommon") 
+            
+            match assemblySeff with 
+            | Some seffAssembly -> 
+                try   
+                    let printModule = seffAssembly.GetType("Seff.Model.ISeffLogModule")                    
+                    printColor   <- printModule.GetProperty("printColor" ).GetValue(seffAssembly)  :?>  int-> int -> int -> string -> unit
+                    printnColor  <- printModule.GetProperty("printnColor").GetValue(seffAssembly) :?>  int-> int -> int -> string -> unit
+                with ex ->
+                    eprintfn "Failed to get Seff.Model.ISeffLog.printnColor via Reflection, If you are not using the Seff Editor Plugin this is normal.\r\nMessage: %A" ex     
+                
+            |None -> ()
+                //eprintfn "Only found:"
+                //AppDomain.CurrentDomain.GetAssemblies()
+                //|> Seq.map (fun a -> a.GetName().Name ) 
+                //|> Seq.sortBy string
+                //|> Seq.iter (eprintfn "%s" )
+            
+    
+        static member PrintColor r g b s = 
+            if doInit then init()
+            printColor r g b s
+        
+        static member PrintnColor r g b s = 
+            if doInit then init()
+            printnColor r g b s
+    
+    /// print with rgb colors if running in Seff Editor. Else just normal printf 
+    /// does NOT add a new line
+    /// red -> green -> blue -> string -> unit
+    let printfColor red green blue msg =  Printf.kprintf (fun s -> Seff.PrintColor red green blue s)  msg
+
+    /// print with rgb colors if running in Seff Editor. Else just normal printfn
+    /// adds a new line at end
+    /// red -> green -> blue -> string -> unit
+    let printfnColor red green blue msg = Printf.kprintf (fun s -> Seff.PrintnColor red green blue s)  msg
