@@ -38,15 +38,17 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K->'V, base
         let d = new  Dictionary<'K,'V>()
         DefaultDict( defaultOfKeyFun, d ) 
     
+    (*
     /// Constructs a new DefaultDict by using the supplied Dictionary<'K,'V> directly, without any copying of items
     static member CreateDirectly (defaultFun: unit->'V) (di:Dictionary<'K,'V> ) =
         if isNull di then ArgumentNullException.Raise "Dictionary in DefaultDict.CreateDirectly is null"
         let f (k:'K) = defaultFun()
         let d = new  Dictionary<'K,'V>()
         DefaultDict( f, d ) 
+    *)
 
     /// Constructs a new DefaultDict by using the supplied Dictionary<'K,'V> directly, without any copying of items
-    static member CreateDirectlyOfKeyFun (defaultOfKeyFun: 'K->'V) (di:Dictionary<'K,'V> ) =
+    static member CreateDirectly (defaultOfKeyFun: 'K->'V) (di:Dictionary<'K,'V> ) =
         if isNull di then ArgumentNullException.Raise "Dictionary in DefaultDict.CreateDirectly is null"        
         let d = new  Dictionary<'K,'V>()
         DefaultDict( defaultOfKeyFun, d) 
