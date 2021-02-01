@@ -13,10 +13,10 @@ open System
 
 
 [<AutoOpen>] // to have print functions at end of module auto opened
-module NiceString =
+module Print =
 
     [<RequireQualifiedAccess>]
-    module NiceString =
+    module NiceString  =
     
         /// set this to change the printing of floats larger than 10'000
         let mutable thousandSeparator = "'"
@@ -291,25 +291,27 @@ module NiceString =
     let printFull x = printfn "%s" (NiceString.toNiceStringFull x)
 
 
-    /// Exposes functionality of the Seff Editor, if FsEx is loeded there
+    /// Exposes functionality of the Seff Editor, when  FsEx is loaded there
     type internal Seff private () = // no public constructor  
        
         //static let mutable syncContext: Threading.SynchronizationContext  = null //set via reflection below from Seff.Rhino       
            
-        //static let mutable seffWindow : System.Windows.Window = null //set via reflection below from Seff.Rhino   
+        //static let mutable seffWindow : System.Windows.Window = null //set via reflection below from Seff  
            
-        static let mutable printColor : int-> int -> int -> string -> unit = //set via reflection below from Seff.Rhino
+        static let mutable printColor : int-> int -> int -> string -> unit = //set via reflection below from Seff
             fun r g b s -> printf "%s" s    
            
-        static let mutable printnColor : int-> int -> int -> string -> unit = //set via reflection below from Seff.Rhino
+        static let mutable printnColor : int-> int -> int -> string -> unit = //set via reflection below from Seff
             fun r g b s -> printfn "%s" s
+
+        static let mutable clear : unit -> unit = fun () -> () //set via reflection below from Seff
          
-        static let allAss = AppDomain.CurrentDomain.GetAssemblies()
+        //static let allAss = AppDomain.CurrentDomain.GetAssemblies()
         
-        static let assemblySeff, assemblyRhinoCommon = 
-            let ass = AppDomain.CurrentDomain.GetAssemblies()
-            ass |> Seq.tryFind (fun a -> a.GetName().Name = "Seff") ,
-            ass |> Seq.tryFind (fun a -> a.GetName().Name = "RhinoCommon") 
+        //static let assemblySeff, assemblyRhinoCommon = 
+        //    let ass = AppDomain.CurrentDomain.GetAssemblies()
+        //    ass |> Seq.tryFind (fun a -> a.GetName().Name = "Seff") ,
+        //    ass |> Seq.tryFind (fun a -> a.GetName().Name = "RhinoCommon") 
 
         static let mutable doInit = true
         
@@ -325,9 +327,10 @@ module NiceString =
                 try   
                     let printModule = seffAssembly.GetType("Seff.Model.ISeffLogModule")                    
                     printColor   <- printModule.GetProperty("printColor" ).GetValue(seffAssembly)  :?>  int-> int -> int -> string -> unit
-                    printnColor  <- printModule.GetProperty("printnColor").GetValue(seffAssembly) :?>  int-> int -> int -> string -> unit
+                    printnColor  <- printModule.GetProperty("printnColor").GetValue(seffAssembly)  :?>  int-> int -> int -> string -> unit
+                    clear        <- printModule.GetProperty("clear").GetValue(seffAssembly)        :?>  unit -> unit
                 with ex ->
-                    eprintfn "Failed to get Seff.Model.ISeffLog.printnColor via Reflection, If you are not using the Seff Editor Plugin this is normal.\r\nMessage: %A" ex     
+                    eprintfn "Failed to get Seff.Model.ISeffLog.printnColor via Reflection, If you are not using the Seff Editor Plugin this is normal. The function 'printfnColor' will behave just as 'printfn'\r\nMessage: %A" ex     
                 
             |None -> ()
                 //eprintfn "Only found:"
@@ -344,6 +347,11 @@ module NiceString =
         static member PrintnColor r g b s = 
             if doInit then init()
             printnColor r g b s
+
+        static member Clear () = 
+            if doInit then init()
+            clear()
+
     
     /// print with rgb colors if running in Seff Editor. Else just normal printf 
     /// does NOT add a new line
@@ -354,3 +362,6 @@ module NiceString =
     /// adds a new line at end
     /// red -> green -> blue -> string -> unit
     let printfnColor red green blue msg = Printf.kprintf (fun s -> Seff.PrintnColor red green blue s)  msg
+
+    /// Clears the Seff Log View if it can be found via reflection in loaded assemblies.
+    let clearSeffLog() = Seff.Clear()
