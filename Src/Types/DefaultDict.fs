@@ -7,7 +7,7 @@ open System.Collections.Generic
 /// A System.Collections.Generic.Dictionary with default Values that get created upon accessing a missing key.
 /// If accessing a non exiting key , the default function is called to create and set it. 
 /// Like defaultdict in Python
-type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K->'V, baseDict : Dictionary<'K,'V>) =
+type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, baseDict : Dictionary<'K,'V>) =
     
     //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
 
@@ -19,33 +19,15 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K->'V, base
             let v = defaultOfKeyFun(k) 
             baseDict.[k] <- v
             v
-    (* covered by generic version below
-    // <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
-    // If accessing a non exiting key , the default paramterless function is called to create the value and set it. 
-    // Like defaultdict in Python</summary>    
-    // <param name="defaultFun">(unit-&gt;&apos;V): The paramterless function to create a default value</param>
-    new (defaultFun: unit->'V) = 
-        let f (k:'K) = defaultFun()
-        let d = new  Dictionary<'K,'V>()
-        DefaultDict( f,d ) 
-    *)
-
+   
     /// <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
     /// If accessing a non exiting key , the default function is called on ther key to create the value and set it. 
     /// Similar to  defaultdict in Python</summary>    
     /// <param name="defaultOfKeyFun">(&apos;K-&gt;&apos;V): The function to create a default value from the key</param>
-    new (defaultOfKeyFun: 'K->'V) = 
+    new (defaultOfKeyFun: 'K -> 'V) = 
         let d = new  Dictionary<'K,'V>()
-        DefaultDict( defaultOfKeyFun, d ) 
-    
-    (*
-    /// Constructs a new DefaultDict by using the supplied Dictionary<'K,'V> directly, without any copying of items
-    static member CreateDirectly (defaultFun: unit->'V) (di:Dictionary<'K,'V> ) =
-        if isNull di then ArgumentNullException.Raise "Dictionary in DefaultDict.CreateDirectly is null"
-        let f (k:'K) = defaultFun()
-        let d = new  Dictionary<'K,'V>()
-        DefaultDict( f, d ) 
-    *)
+        DefaultDict( defaultOfKeyFun, d )     
+  
 
     /// Constructs a new DefaultDict by using the supplied Dictionary<'K,'V> directly, without any copying of items
     static member CreateDirectly (defaultOfKeyFun: 'K->'V) (di:Dictionary<'K,'V> ) =
@@ -84,7 +66,7 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K->'V, base
     member _.Items =
         seq { for KeyValue(k, v) in baseDict -> k, v}
         
-    //override baseDict.ToString() = // covered by NiceString Pretty printer ?
+    // override baseDict.ToString() = // covered by NiceString Pretty printer ?
         //stringBuffer {
         //    yield "DefaultDict with "
         //    yield baseDict.Count.ToString()

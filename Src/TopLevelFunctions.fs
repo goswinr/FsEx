@@ -202,7 +202,19 @@ module  Util =
     let inline ifDo condition (f:'T->'T)  (x:'T) = 
         if condition then f x else x
     
-      
+    /// Caches the results of a function in Map
+    /// the arument to thge function will be used as key in the Map
+    /// can be unit or null too
+    let memoize f =
+        let cache = ref Map.empty
+        fun x ->
+            match (!cache).TryFind(x) with
+            | Some res -> res
+            | None ->
+                let res = f x
+                cache := (!cache).Add(x,res)
+                res
+
 
     /// generic parser that infers desired return type 
     let inline tryParse<'a when 'a: (static member TryParse: string * byref<'a> -> bool)> x =
@@ -226,13 +238,13 @@ module  Util =
 module SaveIgnore = 
     
     /// This ignore only work on Value types, 
-    /// Objects and functions need to be ignored with ignoreObj
+    /// Objects and functions need to be ignored with 'ignoreObj'
     /// This is to prevent accidetially ignoring partially aplied functions that would return struct
-    let inline ignore (x:'T when 'T: struct)=()
+    let inline ignore (x:'T when 'T: struct) = ()
 
     /// Ignores any object (and struct)
     /// For structs use 'ignore'
-    let inline ignoreObj (x:obj)=()
+    let inline ignoreObj (x:obj) = ()
 
 /// Functions (and operator !++) to deal with integer ref objects
 module IntRef = 
