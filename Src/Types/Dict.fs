@@ -22,11 +22,14 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
 
     
     /// create a new empty Dict<'K,'V>
+    /// A Dict is a thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys
+    /// (not the same as lowercase 'dict' in F#)
     new () = Dict(new Dictionary<'K,'V>())
     
     /// create a new empty Dict<'K,'V> with an IEqualityComparer like HashIdentity.Structural
-    new (iEqCmp:IEqualityComparer<'K>) = Dict(new Dictionary<'K,'V>(iEqCmp)) 
-    
+    /// A Dict is a thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys
+    /// (not the same as lowercase 'dict' in F#)
+    new (iEqCmp:IEqualityComparer<'K>) = Dict(new Dictionary<'K,'V>(iEqCmp))     
 
     /// Constructs a new Dict by using the supplied Dictionary<'K,'V> directly, without any copying of items
     static member CreateDirectly (dic:Dictionary<'K,'V> ) = 
@@ -57,8 +60,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
             v
         else 
             KeyNotFoundException.Raise "Dict.Pop(key): Cannot pop key %A in %A of %d items" key dic dic.Count
-            
-
+      
     /// Returns a (lazy) sequence of key and value tuples
     member _.Items =
         seq { for kvp in dic -> kvp.Key, kvp.Value}

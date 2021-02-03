@@ -25,8 +25,7 @@ module Rarr =
             if resultPredicate r then r
             else rarr
         else
-            rarr
-  
+            rarr  
 
     /// Creates a shallow copy by calling 
     /// rarr.GetRange(0,rarr.Count) 
@@ -257,9 +256,15 @@ module Rarr =
         let r = Rarr(1)
         r.Add x
         r
+    
+    /// Returns true if the given Rarr has just one item.
+    /// same as Rarr.hasOne
+    let inline isSingelton (rarr : Rarr<'T>) : bool =
+        rarr.Count = 1
 
     /// Returns true if the given Rarr has just one item.
-    let inline hasOne count (rarr : Rarr<'T>) : bool =
+    /// same as Rarr.isSingelton
+    let inline hasOne (rarr : Rarr<'T>) : bool =
         rarr.Count = 1
 
     /// Returns true if the given Rarr has count items.

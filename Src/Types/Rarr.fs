@@ -140,6 +140,9 @@ type Rarr<'T> private (xs:List<'T>) =
 
     /// Checks if this.Count = 0 
     member _.IsEmpty =  xs.Count = 0 
+
+     /// Checks if this.Count = 1
+    member _.IsSingelton =  xs.Count = 1   
     
     /// Checks if this.Count > 0 
     member _.IsNotEmpty =  xs.Count > 0 
