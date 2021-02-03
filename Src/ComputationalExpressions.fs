@@ -1,9 +1,16 @@
 ﻿namespace FsEx
 open System
 open FsEx.SaveIgnore
+open System.Text
 
-[<AutoOpen>]
-module MaybeBuilder =    
+module ComputationalExpressionsBuilders =    
+    let csvSep = ';'
+
+    let inline add   (b: StringBuilder) (s:string)   = b.Append      s |> ignoreObj
+    let inline addLn (b: StringBuilder) (s:string)   = b.AppendLine  s |> ignoreObj
+    let inline addCsv   (b: StringBuilder) (s:string) = b.Append(s).Append(csvSep)                             |> ignoreObj
+    let inline addCsvLn (b: StringBuilder) (s:string) = b.Append(s).Append(csvSep).Append(Environment.NewLine) |> ignoreObj
+
 
     /// The maybe monad. 
     type MaybeBuilder() =
@@ -45,37 +52,29 @@ module MaybeBuilder =
         member this.For(sequence:seq<_>, body) =
             this.Using(sequence.GetEnumerator(), fun enum -> this.While(enum.MoveNext, this.Delay(fun () -> body enum.Current)))
     
-    /// A maybe monad for option types. 
-    let maybe = MaybeBuilder()
-
-[<AutoOpen>]
-module StringBufferBuilder =    
-    // adapted from https://github.com/fsharp/fslang-suggestions/issues/775
-
-    open System.Text
 
     type StringBufferBuilder () = 
-        
-        member inline _.Yield (txt: string) =  fun (b: StringBuilder) -> b.Append  txt |> ignoreObj
-        member inline _.Yield (c: char) =      fun (b: StringBuilder) -> b.Append  c   |> ignoreObj
-        member inline _.Yield (f: float) =     fun (b: StringBuilder) -> f |> NiceString.floatToString |> b.Append  |> ignoreObj
-        member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> b.Append (i.ToString())  |> ignoreObj
-        member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> b.Append (g.ToString())  |> ignoreObj
+        // adapted from https://github.com/fsharp/fslang-suggestions/issues/775
+
+        member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  add b txt 
+        member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  b.Append  c |> ignoreObj
+        member inline _.Yield (f: float) =     fun (b: StringBuilder) ->  add b (NiceString.floatToString f)
+        member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> add b (i.ToString())  
+        member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> add b (g.ToString())  
         //member inline _.Yield (x: 'T) =        fun (b: StringBuilder)  -> b.Append (x.ToString())  |> ignore
 
-        member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> b.AppendLine txt |> ignoreObj // 
-        member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> b.AppendLine  (c.ToString())   |> ignoreObj
-        member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> f |> NiceString.floatToString |> b.AppendLine  |> ignoreObj
-        member inline _.YieldFrom (i: int) =       fun (b: StringBuilder)  -> b.AppendLine (i.ToString())  |> ignoreObj
-        member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder)  -> b.Append (g.ToString())  |> ignoreObj
+        member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> addLn b txt 
+        member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> addLn b (c.ToString())   
+        member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addLn b (NiceString.floatToString  f)
+        member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addLn b (i.ToString())  
+        member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addLn b (g.ToString())  
 
         //member inline _.YieldFrom (f: StringBuffer) = f // use for new line instead
         
         member inline _.Yield (strings: seq<string>) =
             fun (b: StringBuilder) -> 
                 for s in strings do 
-                    b.AppendLine (s)  |> ignoreObj
-                    //Printf.bprintf b "%s%s" s Environment.NewLine         
+                    addLn b s      
         
         member inline _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
         
@@ -99,53 +98,45 @@ module StringBufferBuilder =
             do f b
             b.ToString()
     
-    /// Computational Expression:  
-    /// use 'yield' to append text
-    /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
-    /// accepts ints and floats too. (including nice Formating via NiceString.floatToString )
-    let stringBuffer = StringBufferBuilder ()
 
+    type CsvBuilder () = 
+           
+           member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  addCsv b txt 
+           member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  addCsv b (c.ToString())  
+           member inline _.Yield (f: float) =     fun (b: StringBuilder) ->  addCsv b (NiceString.floatToString f)
+           member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> addCsv b (i.ToString())  
+           member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> addCsv b (g.ToString())  
+           //member inline _.Yield (x: 'T) =        fun (b: StringBuilder)  -> b.Append (x.ToString())  |> ignore
 
+           member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> addCsvLn b txt 
+           member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> addCsvLn b (c.ToString())   
+           member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addCsvLn b (NiceString.floatToString  f)
+           member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addCsvLn b (i.ToString())  
+           member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addCsvLn b (g.ToString())  
 
-[<AutoOpen>]
-module ResizeArrayBuilder =
-
-    type ResizeArrayBuilder<'T> () =
-        member inline _.Yield (x: 'T) =  
-            fun (r: ResizeArray<'T>) -> r.Add(x)      
-        
-        member inline _.YieldFrom (xs: #seq<'T>) =
-            fun (r: ResizeArray<'T>) -> r.AddRange(xs) 
-        
-        member inline _.Combine (f, g) = 
-            fun (r: ResizeArray<'T>) -> f r; g r
-        
-        member inline _.Delay f = 
-            fun (r: ResizeArray<'T>) -> (f()) r
-        
-        member inline _.Zero () =  ignoreObj
-        
-        member inline _.For (xs: 'U seq, f: 'U -> ResizeArray<'T> -> unit) =
-            fun (r: ResizeArray<'T>) ->
-                use e = xs.GetEnumerator()
-                while e.MoveNext() do
-                    (f e.Current) r
-        
-        member inline _.While (p: unit -> bool, f: ResizeArray<'T> -> unit) =
-            fun (r: ResizeArray<'T>) -> while p () do  f r
-            
-        member inline _.Run (f: ResizeArray<'T> -> unit) =
-            let r = ResizeArray<'T>()
-            do f r
-            r  
-    
-    /// Computational Expression:  use 'yield' to add alements to a ResizeArray (= Collections.Generic.List).
-    let resizeArray<'T> = new ResizeArrayBuilder<'T> ()
-
-   
-
-[<AutoOpen>]
-module RarrBuilder =
+                     
+           member inline _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
+           
+           member inline _.Delay f = fun (b: StringBuilder) -> (f()) b
+           
+           member inline _.Zero () = ignoreObj
+           
+           member inline _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) =
+               fun (b: StringBuilder) ->
+                   use e = xs.GetEnumerator ()
+                   while e.MoveNext() do
+                       (f e.Current) b
+           
+           member inline _.While (p: unit -> bool, f: StringBuilder -> unit) =
+               fun (b: StringBuilder) -> 
+                   while p () do 
+                       f b
+               
+           member inline _.Run (f: StringBuilder -> unit) =
+               let b = StringBuilder()
+               do f b
+               b.ToString()
+       
 
     type RarrBuilder<'T> () =
         member inline _.Yield (x: 'T) =  
@@ -175,7 +166,31 @@ module RarrBuilder =
             let r = Rarr<'T>()
             do f r
             r  
+  
+  
+[<AutoOpen>]
+module ComputationalExpressions  =
+    open ComputationalExpressionsBuilders 
     
+    /// A maybe monad for option types. 
+    let maybe = MaybeBuilder()
+
+    /// Computational Expression:  
+    /// use 'yield' to append text
+    /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
+    /// accepts ints and floats too. (including nice Formating via NiceString.floatToString )
+    let stringBuffer = StringBufferBuilder () 
+     
+    /// Computational Expression for making csv files:  
+    /// use 'yield' to append text and a  subsequent semicolon
+    /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
+    /// accepts ints and floats too. (including nice Formating via NiceString.floatToString )
+    let csv = CsvBuilder ()
+
     /// Computational Expression:  use 'yield' to add alements to a Rarr (= Collections.Generic.List).
     let rarr<'T> = new RarrBuilder<'T> ()
+ 
+
     
+
+   
