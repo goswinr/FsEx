@@ -363,5 +363,8 @@ module Print =
     /// red -> green -> blue -> string -> unit
     let printfnColor red green blue msg = Printf.kprintf (fun s -> Seff.PrintnColor red green blue s)  msg
 
-    /// Clears the Seff Log View if it can be found via reflection in loaded assemblies.
+    /// Clears the Seff Log View, 
+    /// if it can be found via reflection in loaded assemblies,
+    /// else does nothing.
+    /// Can be called from any thread.
     let clearSeffLog() = Seff.Clear()
