@@ -123,6 +123,16 @@ module TypeExtensionsSeq =
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies (should consider for other extension modules as well)
 module Seq =   
     
+    /// Counts for how many items of the Seq the predicate returns true.    
+    /// same as Seq.filter and then Seq.length 
+    let inline countIf (predicate : 'T -> bool) (xs : seq<'T>) : int = //countBy is something else !!
+        let mutable k = 0
+        for x in xs do
+            if predicate x then 
+                k <- k + 1
+        k
+
+
     /// Applies a function to Seq
     /// If resulting Seq meets the resultPredicate it is returned , otherwise  orinal input is returned.
     let applyIfResult (resultPredicate:seq<'T> -> bool) (transform:seq<'T> -> seq<'T>)  (xs: seq<'T>) : seq<'T> =

@@ -525,6 +525,20 @@ module Rarr =
        r.Sort (comparer)
        r
 
+    /// Return the length or count of the collection.
+    /// same as Rarr.length
+    //-[<CompiledName("Length")>]
+    let inline count (rarr : Rarr<'T>) : int =
+        rarr.Count
+    
+    /// Counts for how many items of the collection the predicate returns true.    
+    /// same as Rarr.filter and then Rarr.length 
+    let inline countIf (predicate : 'T -> bool) (rarr : Rarr<'T>) : int = //countBy is something else !!
+        let mutable k = 0
+        for i=0 to rarr.Count - 1 do
+            if predicate rarr.[i] then 
+                k <- k + 1
+        k
 
     //-------------------------------------------------------------------------------------------------------------------------------
     // taken and adapded from https://github.com/jack-pappas/ExtCore/blob/master/ExtCore/Collections.Rarr.fs 
@@ -546,11 +560,6 @@ module Rarr =
     let inline length (rarr : Rarr<'T>) : int =
         rarr.Count
 
-    /// Return the length or count of the collection.
-    /// same as Rarr.length
-    //-[<CompiledName("Length")>]
-    let inline count (rarr : Rarr<'T>) : int =
-        rarr.Count
 
     /// Return true if the given array is empty, otherwise false.
     //-[<CompiledName("IsEmpty")>]
