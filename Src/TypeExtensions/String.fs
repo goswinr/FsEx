@@ -1,7 +1,10 @@
 namespace FsEx
 
 open System
+open System.Text
+
 open System.Runtime.CompilerServices
+
 open FsEx.SaveIgnore
 
 [<AutoOpen>]
@@ -13,9 +16,7 @@ module TypeExtensionsString =
         
         /// Raise the exception with F# printf string formating
         static member inline Raise msg =  Printf.kprintf (fun s -> raise (new FsExStringException(s))) msg 
-
-
-    //[<Extension>] //Error 3246
+    
     type System.String with
         
         /// like this.Length - 1
@@ -197,6 +198,18 @@ module String =
             if r < 0 then k 
             else find (r + subString.Length) (k + 1)
         find 0 0
+    
+    /// removes accents & diacritics from characters
+    /// eventually returns string.Normalize(NormalizationForm.FormC)
+    let normalize (txt:string ) = 
+        // better: https://github.com/apache/lucenenet/blob/master/src/Lucene.Net.Analysis.Common/Analysis/Miscellaneous/ASCIIFoldingFilter.cs
+        // https://stackoverflow.com/questions/249087/how-do-i-remove-diacritics-accents-from-a-string-in-net
+        txt.Normalize(System.Text.NormalizationForm.FormD)
+        |> Seq.filter ( fun c -> Globalization.CharUnicodeInfo.GetUnicodeCategory(c) <> Globalization.UnicodeCategory.NonSpacingMark  )
+        |> String.Concat
+        |> fun s -> s.Normalize(NormalizationForm.FormC)
+
+       
 
     //-------------------------------------------------------------------------
     // taken from FSharpx
@@ -307,8 +320,8 @@ module String =
     /// Reports the zero-based index position of the last occurrence of a specified string within this instance. The search starts at a specified character position and proceeds backward toward the beginning of the string for the specified number of character positions. A parameter specifies the type of comparison to perform when searching for the specified string.
     let inline lastIndexOfStringWithComparison'' value startIndex count (comparisonType:StringComparison) (s:string) = s.LastIndexOf(value, startIndex, count, comparisonType)
 
-    /// Returns a new string whose textual value is the same as this string, but whose binary representation is in Unicode normalization form C.
-    let inline normalize (s:string) = s.Normalize()
+    // Returns a new string whose textual value is the same as this string, but whose binary representation is in Unicode normalization form C.
+    //let inline normalize (s:string) = s.Normalize() // see more advanced implementation at top
 
     /// Returns a new string whose textual value is the same as this string, but whose binary representation is in the specified Unicode normalization form.
     let inline normalize' normalizationForm (s:string) = s.Normalize(normalizationForm)
