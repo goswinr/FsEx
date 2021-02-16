@@ -10,7 +10,7 @@ open System.Runtime.CompilerServices
 module TypeExtensionsColor =      
 
 
-    //[<Extension>] //Error 3246
+    
     type Drawing.Color with        
         /// Compare to another color only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor        
         [<Extension>] 

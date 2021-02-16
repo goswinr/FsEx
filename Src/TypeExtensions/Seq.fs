@@ -33,7 +33,7 @@ module TypeExtensionsSeq =
                 failwithf "can't get index from back %d from empty seq" ix
     
 
-    //[<Extension>] //Error 3246
+    
     type Collections.Generic.IEnumerable<'T>  with 
         
         

@@ -7,7 +7,7 @@ open System.Runtime.CompilerServices
 [<AutoOpen>]
 module TypeExtensionsIList =  
 
-    //[<Extension>] //Error 3246
+    
     type Collections.Generic.IList<'T>  with 
         
         /// Gets an item at index 

@@ -8,7 +8,7 @@ open System.Collections.Generic
 [<AutoOpen>]
 module TypeExtensionsIDictionary =   
 
-    //[<Extension>] //Error 3246
+    
     type IDictionary<'K,'V> with           
         
         /// Set value at key, with nicer error messages
