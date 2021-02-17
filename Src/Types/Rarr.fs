@@ -81,10 +81,10 @@ type Rarr<'T> private (xs:List<'T>) =
     /// equal to this.[this.Count - 1]
     member this.Last
         with get() = 
-            if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.Last: Can not get Last item of empty Rarr %A" (NiceString.toNiceStringFull this)
+            if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.Last: Can not get Last item of empty Rarr %s" (NiceString.toNiceStringFull this)
             xs.[xs.Count - 1]
         and set (v:'T) =
-            if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.Last: Can not set Last item of empty Rarr %A to %A" (NiceString.toNiceStringFull this) v
+            if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.Last: Can not set Last item of empty Rarr %s to %A" (NiceString.toNiceStringFull this) v
             xs.[xs.Count - 1] <- v
     
     /// Get (or set) the second last item in the Rarr.
@@ -112,10 +112,10 @@ type Rarr<'T> private (xs:List<'T>) =
     /// equal to this.[0]
     member this.First 
         with get() =  
-            if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.First: Can not get First item of empty Rarr  %A "(NiceString.toNiceStringFull this)
+            if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.First: Can not get First item of empty Rarr  %s "(NiceString.toNiceStringFull this)
             xs.[0]
         and set (v:'T) =
-            if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.First: Can not set First item of empty Rarr %A to %A" (NiceString.toNiceStringFull this) v
+            if xs.Count = 0 then IndexOutOfRangeException.Raise "Rarr.First: Can not set First item of empty Rarr %s to %A" (NiceString.toNiceStringFull this) v
             xs.[0] <- v           
 
     /// Get (or set) the second item in the Rarr.
@@ -166,19 +166,19 @@ type Rarr<'T> private (xs:List<'T>) =
     /// Gets an item in the Rarr by index.
     /// Allows for negtive index too ( -1 is last item,  like Python)
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
-    member _.GetNeg index = 
+    member this.GetNeg index = 
         let len = xs.Count
         let ii =  if index < 0 then len + index else index
-        if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "Rarr.GetNeg: Can't get index %d from Rarr of %d items: %A" index xs.Count xs
+        if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "Rarr.GetNeg: Can't get index %d from Rarr of %d items: %s" index xs.Count (NiceString.toNiceStringFull this) 
         xs.[ii]        
 
     /// Sets an item in the Rarr by index.
     /// Allows for negtive index too ( -1 is last item,  like Python)
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
-    member _.SetNeg index value = 
+    member this.SetNeg index value = 
         let len = xs.Count
         let ii =  if index < 0 then len + index else index
-        if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "Rarr.SetNeg: Can't set index %d to %A rom Rarr of %d items: %A" index value xs.Count xs
+        if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "Rarr.SetNeg: Can't set index %d to %A rom Rarr of %d items: %s" index value xs.Count (NiceString.toNiceStringFull this) 
         xs.[ii] <- value        
    
     /// Any index will return a value.
@@ -216,29 +216,29 @@ type Rarr<'T> private (xs:List<'T>) =
 
     /// Creates a shallow copy of the list
     // (for a Rarr of structs this is like a deep copy)
-    member _.Clone() = new Rarr<'T>(xs.GetRange(0,xs.Count)) // fastest way to create a shallow copy
+    member this.Clone() = this.GetRange(0,xs.Count) // fastest way to create a shallow copy
         
     
     /// Defines F# slicing notation operator use including negative indices. ( -1 is last item, like Python)
     /// The resulting Rarr includes the end index.
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)    
-    member _.GetSlice(startIdx, endIdx) =    
+    member this.GetSlice(startIdx: option<int>, endIdx: option<int>) : Rarr<'T> =    
         //.GetSlice maps onto slicing operator .[1..3]
         let count = xs.Count
         let st  = match startIdx with None -> 0        | Some i -> if i<0 then count+i      else i
         let len = match endIdx   with None -> count-st | Some i -> if i<0 then count+i-st+1 else i-st+1
     
         if st < 0 || st > count-1 then 
-            IndexOutOfRangeException.Raise "Rarr.[ a.. b] (GetSlice): Start index %d is out of range. Allowed values are -%d upto %d for Rarr of %d items" startIdx.Value count (count-1) count
+            IndexOutOfRangeException.Raise "Rarr.[a..b] , this.GetSlice(startIdx: option<int>, endIdx: option<int>): Start index %d is out of range. Allowed values are -%d upto %d for Rarr of %d items" startIdx.Value count (count-1) count
                 
         if st+len > count then 
-            IndexOutOfRangeException.Raise "Rarr.[ a.. b] (GetSlice): End index %d is out of range. Allowed values are -%d upto %d for Rarr of %d items" endIdx.Value count (count-1) count
+            IndexOutOfRangeException.Raise "Rarr.[a..b] , this.GetSlice(startIdx: option<int>, endIdx: option<int>): End index %d is out of range. Allowed values are -%d upto %d for Rarr of %d items" endIdx.Value count (count-1) count
                         
         if len < 0 then
             let en =  match endIdx  with None -> count-1 | Some i -> if i<0 then count+i else i
             IndexOutOfRangeException.Raise "Rrr.[ a.. b] (GetSlice): Start index '%A' (= %d) is bigger than end index '%A'(= %d) for Rarr of %d items" startIdx st endIdx en  count
                         
-        xs.GetRange(st, len) 
+        this.GetRange(st, len) 
   
     /// Like Rarr.filter but modifying the Rarr in place.
     /// Removes Items form Rarr if predicate returns true.
@@ -618,10 +618,10 @@ type Rarr<'T> private (xs:List<'T>) =
         member _.RemoveAt(index) =          (xs:>Collections.IList).RemoveAt(index)
         member _.Item
             with get index = 
-                if index >= xs.Count then ArgumentOutOfRangeException.Raise "Cant get index %d from Rarr non Generic IList of %d items: %A" index xs.Count xs
+                if index >= xs.Count then ArgumentOutOfRangeException.Raise "Cant get index %d from Rarr (cast to non Generic IList) of %d items: %A" index xs.Count xs
                 (xs:>Collections.IList).[index]
             and set index value = 
-                if index >= xs.Count then ArgumentOutOfRangeException.Raise "Cant set index %d to %A in  Rarr non Generic IList of %d items: %A " index value xs.Count  xs
+                if index >= xs.Count then ArgumentOutOfRangeException.Raise "Cant set index %d to %A in Rarr (cast to non Generic IList) of %d items: %A " index value xs.Count  xs
                 (xs:>Collections.IList).[index] <- value
         
         member _.Remove x =   (xs:>Collections.IList).Remove x
