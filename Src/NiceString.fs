@@ -9,6 +9,9 @@ open Microsoft.FSharp.Quotations.Patterns
 open FsEx.SaveIgnore
 
 
+// TODO use 
+// http://www.fssnip.net/cV/title/A-Generic-PrettyPrinter-for-Record-types
+
 
 [<AutoOpen>] // to have print functions at end of module auto opened
 module Print =
@@ -207,7 +210,7 @@ module Print =
             let add  (s:string) =  sb.Append(String(' ', 4 *  indent )).Append(s)     |> ignoreObj
             let adn  (s:string) =  sb.AppendLine(s) |> ignoreObj
         
-            match externalFormater x with
+            match externalFormater x with // first check if externalFormater provides a string , this is used e.g. for types from RhinoCommon.dll
             | Some s -> add s
             | None ->
                 match x with // boxed already
