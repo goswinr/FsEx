@@ -2,14 +2,12 @@
 
 open System.Collections.Generic
 open System
-open System.Runtime.CompilerServices
 open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.DerivedPatterns
 open Microsoft.FSharp.Quotations.Patterns
-open System.Runtime.CompilerServices
 open FsEx.SaveIgnore
-open System
+
 
 
 [<AutoOpen>] // to have print functions at end of module auto opened
@@ -19,7 +17,7 @@ module Print =
     module NiceString  =
     
         /// set this to change the printing of floats larger than 10'000
-        let mutable thousandSeparator = "'"
+        let mutable thousandSeparator = '\'' // = just one quote '
 
         let internal formatThousands (s:string) =
             let last = s.Length - 1         
@@ -32,7 +30,7 @@ module Print =
                     add s.[i]
                 else
                     if (last - i + 1) % 3 = 0 then 
-                        sb.Append(thousandSeparator) |> ignoreObj
+                        add thousandSeparator
                         add s.[i]
                     else                
                         add s.[i]
@@ -42,8 +40,9 @@ module Print =
         /// e.g.: 0 digits behind comma if above 1000 
         let floatToString  (x:float) =
             if   Double.IsNaN x then "NaN"
-            elif Double.IsInfinity x then "Infinity"
-            elif x = -1.23432101234321e+308 then "-1.234321e+308 (=RhinoMath.UnsetValue)" // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetValue.htm
+            elif x = Double.NegativeInfinity then "Negative Infinity"
+            elif x = Double.PositiveInfinity then "Positive Infinity"
+            elif x = -1.23432101234321e+308 then "-1.23432e+308 ( = RhinoMath.UnsetValue)" // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetValue.htm
             elif x = 0.0 then "0.0" // not "0" as in sprintf "%g"
             else
                 let  a = abs x
@@ -58,8 +57,9 @@ module Print =
         /// e.g.: 0 digits behind comma if above 1000
         let singleToString  (x:float32) =
             if   Single.IsNaN x then "NaN"
-            elif Single.IsInfinity x then "Infinity"
-            elif x = -1.234321e+38f then "-1.2343e+38 (=RhinoMath.UnsetSingle)" // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetSingle.htm
+            elif x = Single.NegativeInfinity then "Negative Infinity"
+            elif x = Single.PositiveInfinity then "Positive Infinity"            
+            elif x = -1.234321e+38f then "-1.2343e+38 ( = RhinoMath.UnsetSingle)" // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetSingle.htm
             elif x = 0.0f then "0.0" // not "0" as in sprintf "%g"
             else
                 let  a = abs x
@@ -86,6 +86,8 @@ module Print =
         /// default = 5000
         let mutable maxCharsInString = 5000
 
+        /// return the string befor a splitter
+        /// if splitter is missing return full string 
         let private before (splitter:string) (s:string) = 
             let start = s.IndexOf(splitter,StringComparison.Ordinal) 
             if start = -1 then s
@@ -101,7 +103,7 @@ module Print =
     
         type private Count = Count of int | MoreThan of int
 
-        let private (|IsSeq|_|) (xs : obj) =
+        let private (|IsSeq|_|) (xs : obj) : option<Count*seq<obj>*string*string> =
             let typ = xs.GetType() 
             let interfaces= typ.GetInterfaces()
             let seqType = interfaces  |> Seq.tryFind( fun x -> x.IsGenericType && x.GetGenericTypeDefinition() = typedefof<IEnumerable<_>> )
@@ -111,38 +113,43 @@ module Print =
                 let count =
                     match iCollType with
                     |None -> -1 // no count available on sequences that do not have ICollection interface
-                    |Some _ -> (xs :?> Collections.ICollection).Count
+                    |Some _ -> 
+                        try (xs :?> ICollection<_>).Count // TODO fix
+                        with _ -> -2
             
                 let args = iet.GetGenericArguments()
                 if args.Length = 1 then             
                     let arg = args.[0]            
                     let name =   formatTypeName typ.Namespace typ.Name           
                     let elName = formatTypeName arg.Namespace arg.Name 
-                    if args.[0].IsValueType then //create new trimmed Colllection with values boxed
-                        let rs = ResizeArray<obj>()
-                        let ics = xs :?> Collections.IEnumerable
-                        let enum = ics.GetEnumerator()
-                        let mutable k = 0
-                        while enum.MoveNext() && k < toNiceStringMaxItemsPerSeq do 
-                            rs.Add (box enum.Current)
-                            k <- k+1
-                        if k = toNiceStringMaxItemsPerSeq && enum.MoveNext() && count = -1 then                         
-                            Some (MoreThan k, rs:>IEnumerable<_>, name, elName)   // the retuened seq is trimmed!  to a count of maxItemsPerSeq
-                        else 
-                            Some (Count count, rs:>IEnumerable<_>, name, elName)
-                    else                
-                        let ics = xs :?> IEnumerable<_> 
-                        if count > 0 then 
-                            Some (Count count, ics, name, elName)
-                        else
+                    try // xs :?> IEnumerable<_> may stil fail  on Map // TODO fix
+                        if args.[0].IsValueType then //create new trimmed Colllection with values boxed
+                        
+                            let rs = ResizeArray<obj>()
+                            let ics = xs :?> IEnumerable<_>
                             let enum = ics.GetEnumerator()
                             let mutable k = 0
                             while enum.MoveNext() && k < toNiceStringMaxItemsPerSeq do 
+                                rs.Add (box enum.Current)
                                 k <- k+1
-                            if k = toNiceStringMaxItemsPerSeq && enum.MoveNext() && count = -1 then                         
-                                Some (MoreThan k, ics, name, elName)  
+                            if k = toNiceStringMaxItemsPerSeq && enum.MoveNext() && count < 0 then                         
+                                Some (MoreThan k, rs:>IEnumerable<_>, name, elName)   // the retuened seq is trimmed!  to a count of maxItemsPerSeq
                             else 
+                                Some (Count count, rs:>IEnumerable<_>, name, elName)
+                        else                
+                            let ics = xs :?> IEnumerable<_> 
+                            if count > 0 then 
                                 Some (Count count, ics, name, elName)
+                            else
+                                let enum = ics.GetEnumerator()
+                                let mutable k = 0
+                                while enum.MoveNext() && k < toNiceStringMaxItemsPerSeq do 
+                                    k <- k+1
+                                if k = toNiceStringMaxItemsPerSeq && enum.MoveNext() && count < 0 then                         
+                                    Some (MoreThan k, ics, name, elName)  
+                                else 
+                                    Some (Count count, ics, name, elName)
+                    with _ -> None
                 else
                     None
             |None -> None
@@ -234,7 +241,8 @@ module Print =
                                 toNiceStringRec ("...", externalFormater, indent+1)                            
                         else 
                             adn ""                
-                | _ ->  x.ToString() |> add
+                //| _ ->  x.ToString() |> add
+                | _ ->  sprintf "%A" x |> add
     
         /// Nice formating for floats  and sequences of any kind, first four items are printed out.
         /// use externalFormater for types defined in other assemblies alowed
@@ -291,7 +299,7 @@ module Print =
     let printFull x = printfn "%s" (NiceString.toNiceStringFull x)
 
 
-    /// Exposes functionality of the Seff Editor, when  FsEx is loaded there
+    /// Exposes functionality of the Seff Editor, when FsEx is loaded there
     type internal Seff private () = // no public constructor  
        
         //static let mutable syncContext: Threading.SynchronizationContext  = null //set via reflection below from Seff.Rhino       
