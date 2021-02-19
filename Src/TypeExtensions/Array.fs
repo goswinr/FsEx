@@ -12,12 +12,14 @@ module TypeExtensionsArray =
         
         /// Gets an item at index 
         /// (use Array.GetNeg(i) member if you want to use negative indices too)
+        [<Extension>]
         member this.Get index = 
             if index >= this.Length then ArgumentOutOfRangeException.Raise "Cant get index %d from Array of %d items: %A" index this.Length this
             this.[index]
             
         /// Sets an item at index 
         /// (use Array.SetNeg(i) member if you want to use negative indices too)
+        [<Extension>]
         member this.Set index value = 
             if index >= this.Length then ArgumentOutOfRangeException.Raise "Cant set index %d to %A in Array of %d items: %A " index value this.Length  this
             this.[index] <- value
@@ -25,40 +27,44 @@ module TypeExtensionsArray =
         /// Gets an item in the Array by index.
         /// Allows for negtive index too ( -1 is last item,  like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        [<Extension>]
         member this.GetNeg index = 
             let len = this.Length
             let ii =  if index < 0 then len + index else index
-            if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "Array.GetNeg: Can't get index %d from Array of %d items: %A" index this.Length this
+            if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "Array.GetNeg: Failed to get index %d from Array of %d items: %A" index this.Length this
             this.[ii]        
 
         /// Sets an item in the Array by index.
         /// Allows for negtive index too ( -1 is last item,  like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        [<Extension>]
         member this.SetNeg index value = 
             let len = this.Length
             let ii =  if index < 0 then len + index else index
-            if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "Array.SetNeg: Can't set index %d to %A rom Array of %d items: %A" index value this.Length this
+            if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "Array.SetNeg: Failed to set index %d to %A rom Array of %d items: %A" index value this.Length this
             this.[ii] <- value        
    
         /// Any index will return a value.
-        /// Array is treated as an endless loop in positive and negative direction   
+        /// Array is treated as an endless loop in positive and negative direction
+        [<Extension>]
         member this.GetLooped index = 
             let len = this.Length
-            if len=0 then ArgumentOutOfRangeException.Raise "Array.GetLooped: Can't get index %d from Array of 0 items" index
+            if len=0 then ArgumentOutOfRangeException.Raise "Array.GetLooped: Failed to get index %d from Array of 0 items" index
             let t = index % len
             let ii = if t >= 0 then t  else t + len 
             this.[ii]              
 
         /// Any index will set a value.
         /// Array is treated as an endless loop in positive and negative direction   
+        [<Extension>]
         member this.SetLooped index value  = 
             let len = this.Length
-            if len=0 then ArgumentOutOfRangeException.Raise "Array.SetLooped: Can't Set index %d to %A in Array of 0 items" index value
+            if len=0 then ArgumentOutOfRangeException.Raise "Array.SetLooped: Failed to Set index %d to %A in Array of 0 items" index value
             let t = index % len
             let ii = if t >= 0 then t  else t + len 
             this.[ii] <- value
 
-       
+        (* obsolete
         /// Allows for negtive index too ( -1 is last item,  like Python)
         [<Extension;Obsolete>] 
         member this.GetItem index =  // TODO Delete
@@ -71,7 +77,7 @@ module TypeExtensionsArray =
         member this.SetItem index value =  // TODO Delete
             let i = negIdx index this.Length
             this.[i] <- value 
-
+        *)
 
 
         /// Get (or set) the last item in the Array.
@@ -79,10 +85,10 @@ module TypeExtensionsArray =
         [<Extension>]
         member this.Last
             with get() = 
-                if this.Length = 0 then IndexOutOfRangeException.Raise "Array.Last: Can not get Last item of empty %A" (NiceString.toNiceStringFull this)
+                if this.Length = 0 then IndexOutOfRangeException.Raise "Array.Last: Failed to get last item of empty %A" (NiceString.toNiceStringFull this)
                 this.[this.Length - 1]
             and set (v:'T) =
-                if this.Length = 0 then IndexOutOfRangeException.Raise "Array.Last: Can not set Last item of empty %A to %A" (NiceString.toNiceStringFull this) v
+                if this.Length = 0 then IndexOutOfRangeException.Raise "Array.Last: Failed to set last item of empty %A to %A" (NiceString.toNiceStringFull this) v
                 this.[this.Length - 1] <- v
 
         /// Get (or set) the second last item in the Array.
@@ -90,10 +96,10 @@ module TypeExtensionsArray =
         [<Extension>]
         member this.SecondLast 
             with get() = 
-                if this.Length < 2 then  IndexOutOfRangeException.Raise "Array.SecondLast: Can not get SecondLast item of %s" (NiceString.toNiceStringFull this)
+                if this.Length < 2 then  IndexOutOfRangeException.Raise "Array.SecondLast: Failed to get second last item of %s" (NiceString.toNiceStringFull this)
                 this.[this.Length - 2]
             and set (v:'T) =
-                if this.Length < 2 then  IndexOutOfRangeException.Raise "Array.SecondLast: Can not set SecondLast item of %s to %A" (NiceString.toNiceStringFull this) v
+                if this.Length < 2 then  IndexOutOfRangeException.Raise "Array.SecondLast: Failed to set second last item of %s to %A" (NiceString.toNiceStringFull this) v
                 this.[this.Length - 2] <- v
 
 
@@ -102,10 +108,10 @@ module TypeExtensionsArray =
         [<Extension>]
         member this.ThirdLast 
             with get() =  
-                if this.Length < 3 then  IndexOutOfRangeException.Raise "Array.ThirdLast: Can not get ThirdLast item of %s"  (NiceString.toNiceStringFull this)
+                if this.Length < 3 then  IndexOutOfRangeException.Raise "Array.ThirdLast: Failed to get third last item of %s"  (NiceString.toNiceStringFull this)
                 this.[this.Length - 3]
             and set (v:'T) =
-                if this.Length < 3 then  IndexOutOfRangeException.Raise "Array.ThirdLast: Can not set ThirdLast item of %s to %A"  (NiceString.toNiceStringFull this) v
+                if this.Length < 3 then  IndexOutOfRangeException.Raise "Array.ThirdLast: Failed to set third last item of %s to %A"  (NiceString.toNiceStringFull this) v
                 this.[this.Length - 3] <- v           
             
         /// Get (or set) Sets the first item in the Array.
@@ -113,10 +119,10 @@ module TypeExtensionsArray =
         [<Extension>]
         member this.First 
             with get() =  
-                if this.Length = 0 then IndexOutOfRangeException.Raise "Array.First: Can not get First item of empty Array %A "(NiceString.toNiceStringFull this)
+                if this.Length = 0 then IndexOutOfRangeException.Raise "Array.First: Failed to get first item of empty Array %A "(NiceString.toNiceStringFull this)
                 this.[0]
             and set (v:'T) =
-                if this.Length = 0 then IndexOutOfRangeException.Raise "Array.First: Can not set First item of empty Array %A to %A" (NiceString.toNiceStringFull this) v
+                if this.Length = 0 then IndexOutOfRangeException.Raise "Array.First: Failed to set first item of empty Array %A to %A" (NiceString.toNiceStringFull this) v
                 this.[0] <- v           
 
         /// Get (or set) the second item in the Array.
@@ -124,10 +130,10 @@ module TypeExtensionsArray =
         [<Extension>]
         member this.Second 
             with get() = 
-                if this.Length < 2 then IndexOutOfRangeException.Raise  "Array.Second: Can not get Second item of %s"  (NiceString.toNiceStringFull this)
+                if this.Length < 2 then IndexOutOfRangeException.Raise  "Array.Second: Failed to get second item of %s"  (NiceString.toNiceStringFull this)
                 this.[1]
             and set (v:'T) =
-                if this.Length < 2 then IndexOutOfRangeException.Raise  "Array.Second: Can not set Second item of %s to %A"  (NiceString.toNiceStringFull this) v
+                if this.Length < 2 then IndexOutOfRangeException.Raise  "Array.Second: Failed to set second item of %s to %A"  (NiceString.toNiceStringFull this) v
                 this.[1] <- v           
 
         /// Get (or set) the third item in the Array.
@@ -135,16 +141,17 @@ module TypeExtensionsArray =
         [<Extension>]
         member this.Third     
             with get() =
-                if this.Length < 3 then IndexOutOfRangeException.Raise "Array.Third: Can not get Third item of %s" (NiceString.toNiceStringFull this)
+                if this.Length < 3 then IndexOutOfRangeException.Raise "Array.Third: Failed to get third item of %s" (NiceString.toNiceStringFull this)
                 this.[2]
             and set (v:'T) =
-                if this.Length < 3 then IndexOutOfRangeException.Raise "Array.Third: Can not set Third item of %s to %A" (NiceString.toNiceStringFull this) v
+                if this.Length < 3 then IndexOutOfRangeException.Raise "Array.Third: Failed to set third item of %s to %A" (NiceString.toNiceStringFull this) v
                 this.[2] <- v          
 
        
 
 
-        //member this.GetSlice(startIdx, endIdx) = // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164                
+        // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164                
+        // member this.GetSlice(startIdx, endIdx) = 
 
         /// Allows for negative indices too. ( -1 is last item, like Python)
         /// The resulting array includes the end index.
