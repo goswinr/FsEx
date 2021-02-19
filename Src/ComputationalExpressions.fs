@@ -5,6 +5,8 @@ open System.Text
 
 module ComputationalExpressionsBuilders =    
     let csvSep = ';'
+    
+    let inline addchr   (b: StringBuilder) (c:char)   = b.Append      c |> ignoreObj
 
     let inline add   (b: StringBuilder) (s:string)   = b.Append      s |> ignoreObj
     let inline addLn (b: StringBuilder) (s:string)   = b.AppendLine  s |> ignoreObj
@@ -56,16 +58,16 @@ module ComputationalExpressionsBuilders =
     type StringBufferBuilder () = 
         // adapted from https://github.com/fsharp/fslang-suggestions/issues/775
 
+        member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  addchr b c 
         member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  add b txt 
-        member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  b.Append  c |> ignoreObj
-        member inline _.Yield (f: float) =     fun (b: StringBuilder) ->  add b (NiceString.floatToString f)
+        member inline _.Yield (f: float) =     fun (b: StringBuilder) ->  add b (f.AsString) // thousand separators not desired ? (NiceString.Floats.floatToString f)
         member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> add b (i.ToString())  
         member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> add b (g.ToString())  
         //member inline _.Yield (x: 'T) =        fun (b: StringBuilder)  -> b.Append (x.ToString())  |> ignore
 
         member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> addLn b txt 
         member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> addLn b (c.ToString())   
-        member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addLn b (NiceString.floatToString  f)
+        member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addLn b (f.AsString) // thousand separators not desired ? (NiceString.Floats.floatToString f)
         member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addLn b (i.ToString())  
         member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addLn b (g.ToString())  
 
@@ -103,14 +105,14 @@ module ComputationalExpressionsBuilders =
            
            member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  addCsv b txt 
            member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  addCsv b (c.ToString())  
-           member inline _.Yield (f: float) =     fun (b: StringBuilder) ->  addCsv b (NiceString.floatToString f)
+           member inline _.Yield (f: float) =     fun (b: StringBuilder) ->  addCsv b (f.AsString)
            member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> addCsv b (i.ToString())  
            member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> addCsv b (g.ToString())  
            //member inline _.Yield (x: 'T) =        fun (b: StringBuilder)  -> b.Append (x.ToString())  |> ignore
 
            member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> addCsvLn b txt 
            member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> addCsvLn b (c.ToString())   
-           member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addCsvLn b (NiceString.floatToString  f)
+           member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addCsvLn b (f.AsString)
            member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addCsvLn b (i.ToString())  
            member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addCsvLn b (g.ToString())  
 

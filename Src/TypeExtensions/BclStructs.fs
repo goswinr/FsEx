@@ -20,6 +20,9 @@ module TypeExtensionsBclStructs =
         /// Same as i.ToString() but as propertry, not method.
         /// So without the need for the brackets. (for nicer inlining)
         [<Extension>] member inline x.AsString = x.ToString()
+        
+        /// With thousands separators
+        [<Extension>] member x.ToNiceString = x.ToString() |> NiceString.Floats.formatThousands        
 
  
     type Byte with  
@@ -38,7 +41,8 @@ module TypeExtensionsBclStructs =
         [<Extension>] member inline x.ToInt = int(round(x))
 
         /// With automatic formating of display reduced precision depending on float size
-        [<Extension>] member x.ToNiceString = NiceString.floatToString x        
+        /// also includes thousands separators
+        [<Extension>] member x.ToNiceString = NiceString.Floats.floatToString x        
         
         /// Similar to f.ToString() 
         /// with automatic formating to never use scientific notation
@@ -58,7 +62,8 @@ module TypeExtensionsBclStructs =
     type Single with  
 
         /// with automatic formating of display reduced precision depending on single size
-        [<Extension>] member x.ToNiceString = NiceString.singleToString x
+        /// also includes thousands separators
+        [<Extension>] member x.ToNiceString = NiceString.Floats.singleToString x
 
         /// Similar to f.ToString() 
         /// with automatic formating to never use scientific notation
@@ -82,7 +87,8 @@ module TypeExtensionsBclStructs =
         [<Extension>] member inline x.ToInt = int(round(x))
 
         /// With automatic formating of display reduced precision depending on float size
-        [<Extension>] member x.ToNiceString = NiceString.floatToString (float x)        
+        /// also includes thousands separators
+        [<Extension>] member x.ToNiceString = NiceString.Floats.floatToString (float x)        
            
         /// Similar to f.ToString() 
         /// with automatic formating to never use scientific notation

@@ -32,47 +32,19 @@ module NiceString  =
 
         /// Allows to inject an optional formater that gets called befor main formater
         /// This formater shall return None if the main formater should be used
-        let mutable externalFormater: 'T -> option<string> = 
-            fun (x:'T) -> None
+        /// use externalFormater for types defined in other assemblies 
+        let mutable externalFormater : obj -> option<string> = // TODO  functions as value cannot be generic !!! how else cou this function be changed at a later moment  in NiceStringImplementation??
+            fun _ -> None   
         
-        let mutable mainFormater: 'T -> string = 
-            fun (x:'T) -> sprintf "%A" x
+        let mutable mainFormater: obj -> string = 
+            sprintf "%A"
                 
 
+        let mutable mainFormaterFull: obj -> string = 
+            sprintf "%A" 
+                
 
-
-
-
-
-    /// Nice formating for floats , some Rhino Objects and sequences of any kind, first four items are printed out.
-    /// set NiceString.toNiceStringMaxItemsPerSeq to other value if more or less shall be shown (default is 4)
-    /// set NiceString.toNiceStringMaxDepth to change how deep nested lists are printed (default is 2)
-    let toNiceString (x:'T) = toNiceStringWithFormater(x, (fun _ -> None) ) 
-   
-
-    /// Nice formating for floats , some Rhino Objects and sequences of any kind, all items including nested items are printed out.
-    /// use externalFormater for types defined in other assemblies alowed
-    let toNiceStringFullWithFormater (x:'T, externalFormater: obj-> option<string>) = 
-        let maxDepthP = toNiceStringMaxDepth  
-        let maxItemsPerSeqP = toNiceStringMaxItemsPerSeq 
-        toNiceStringMaxDepth <- Int32.MaxValue
-        toNiceStringMaxItemsPerSeq  <- Int32.MaxValue
-
-        sb.Clear() |> ignoreObj
-        toNiceStringRec(box x, externalFormater, 0)
-
-        toNiceStringMaxDepth <- maxDepthP 
-        toNiceStringMaxItemsPerSeq  <- maxItemsPerSeqP 
-        let s = sb.ToString()
-        let st = s.Trim()
-        if st.Contains (Environment.NewLine) then s else st // trim new line on one line strings
-
-    /// Nice formating for floats , some Rhino Objects and sequences of any kind, all items including nested items are printed out.
-    let toNiceStringFull (x:'T) = toNiceStringFullWithFormater(x, (fun _ -> None))
-
-  
-    module internal Floats = 
-
+    module internal Floats  = 
 
         let internal formatThousands (s:string) =
             let last = s.Length - 1         
@@ -85,7 +57,7 @@ module NiceString  =
                     add s.[i]
                 else
                     if (last - i + 1) % 3 = 0 then 
-                        add thousandSeparator
+                        add NiceStringSettings.thousandSeparator
                         add s.[i]
                     else                
                         add s.[i]
@@ -124,3 +96,17 @@ module NiceString  =
                 elif a > 10.f    then sprintf "%.2f" x 
                 elif a > 1.f     then sprintf "%.3f" x 
                 else                  sprintf "%g"   x  
+
+
+
+    /// Nice formating for floats , some Rhino Objects and sequences of any kind, first four items are printed out.
+    /// set NiceString.toNiceStringMaxItemsPerSeq to other value if more or less shall be shown (default is 4)
+    /// set NiceString.toNiceStringMaxDepth to change how deep nested lists are printed (default is 3)
+    /// see values in NiceString.NiceStringSettings
+    let toNiceString (x:'T) = NiceStringSettings.mainFormater x
+
+
+    /// Nice formating for floats , some Rhino Objects and sequences of any kind, all items including nested items are printed out.
+    let toNiceStringFull (x:'T) = NiceStringSettings.mainFormaterFull x
+
+  

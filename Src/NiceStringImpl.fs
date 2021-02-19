@@ -17,6 +17,7 @@ open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 module internal NiceStringImplementation  =
     
     open NiceString
+    open NiceString.NiceStringSettings
 
     //--------------------------------
     // -- generic pretty printer-----
@@ -149,8 +150,8 @@ module internal NiceStringImplementation  =
         | None ->
             match x with // boxed already
             | null -> "'null' (or Option.None)" |> add
-            | :? float      as v   -> v |> floatToString    |> add
-            | :? single     as v   -> v |> singleToString   |> add        
+            | :? float      as v   -> v |> Floats.floatToString    |> add
+            | :? single     as v   -> v |> Floats.singleToString   |> add        
             | :? Char       as c   -> c.ToString()          |> add // "'" + c.ToString() + "'" // or add qotes?
             | :? string     as s   -> fixVeryLongStr s      |> add // to not have it in quotes, s.ToString() adds a " at start and end
             | :? Guid       as g   -> sprintf "Guid[%O]" g  |> add

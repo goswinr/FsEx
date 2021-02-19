@@ -8,7 +8,7 @@ open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 [<AutoOpen>] // to have print functions at end of module auto opened
 module Print =
     
-    open NiceString2
+    open NiceString
 
     /// Exposes functionality liek print and clear of the Seff Editor, when FsEx is loaded there
     type internal Seff private () = // no public constructor  
