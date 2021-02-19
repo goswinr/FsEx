@@ -60,7 +60,7 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
             baseDict.Remove k |>ignore
             v
         else 
-            raise <|  KeyNotFoundException( sprintf "DefaultDict.Pop(key): Cannot pop key %A in %A of %d items" k baseDict baseDict.Count)
+            raise <|  KeyNotFoundException( sprintf "DefaultDict.Pop(key): Failed to pop key %A in %A of %d items" k baseDict baseDict.Count)
 
     /// Returns a (lazy) sequence of key and value tuples
     member _.Items =

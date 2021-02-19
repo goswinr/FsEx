@@ -35,7 +35,7 @@ module TypeExtensionsIDictionary =
                 d.Remove k |>ignore
                 v
             else 
-                KeyNotFoundException.Raise "IDictionary.Pop(key): Cannot pop key %A in %A of %d items" k d d.Count
+                KeyNotFoundException.Raise "IDictionary.Pop(key): Failed to pop key %A in %A of %d items" k d d.Count
 
         /// Returns a lazy seq of key and value tuples
         [<Extension>] 

@@ -46,6 +46,9 @@ module  Exceptions =
         /// Raise DirectoryNotFoundException with F# printf string formating
         [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (DirectoryNotFoundException(s))) msg
    
+
+    // type FsExStringException is defined in String Module
+
 [<AutoOpen>]
 module IO = 
     open System.Runtime.InteropServices
@@ -54,7 +57,7 @@ module IO =
         //https://stackoverflow.com/questions/6375599/is-this-pinvoke-code-correct-and-reliable
         //https://stackoverflow.com/questions/1689460/f-syntax-for-p-invoke-signature-using-marshalas
         [<DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)>]        
-        extern [<MarshalAs(UnmanagedType.Bool)>] bool DeleteFile (string name ); // dont rename must be called 'DeleteFile'
+        extern [<MarshalAs(UnmanagedType.Bool)>] bool DeleteFile (string name ); // dont rename! must be called 'DeleteFile'
     
     /// Removes the blocking of dll files from untrusted sources, e.g. the internet
     /// calls pInvoke  kernel32.dll DeleteFile() to remove Zone.Identifier
@@ -102,6 +105,7 @@ module IO =
 /// module is set to auto open
 [<AutoOpen>]
 module  Util = 
+    
     
     /// a quick way to throw an exception.
     /// for use in temporary scripts when you are too lazy to do a proper exception.
@@ -369,11 +373,8 @@ module IntRef =
     /// Decrement a ref cell by four
     [<Obsolete>]
     let inline decr4 i = i := !i-4
-    
 
-    
-    
-    
+   
 
 /// Functions to deal with float ref objects
 module FloatRef = 
@@ -391,6 +392,7 @@ module FloatRef =
     
     /// set ref cell to given int if it is smaller than current value
     let inline setMin i (x:float) = if x < !i then i := x
+
 
 type FSharpFuncUtil = 
     // from https://blog.paranoidcoding.com/2010/07/27/converting-system-func-lt-t1-tn-gt-to-fsharpfunc-lt-t-tresult-gt.html

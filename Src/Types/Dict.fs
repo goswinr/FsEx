@@ -59,7 +59,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
             dic.Remove key |>ignore
             v
         else 
-            KeyNotFoundException.Raise "Dict.Pop(key): Cannot pop key %A in %A of %d items" key dic dic.Count
+            KeyNotFoundException.Raise "Dict.Pop(key): Failed to pop key %A in %A of %d items" key dic dic.Count
       
     /// Returns a (lazy) sequence of key and value tuples
     member _.Items =

@@ -45,7 +45,7 @@ module TypeExtensionsSeq =
                 if index >= 0 then Seq.item index this
                 else indexFromBack ( 1 - index ) this
             with 
-            | :? InvalidOperationException  as ex -> failwithf "seq.GetNeg(%d): Can not get %dth item of %s : %s" index index (NiceString.toNiceStringFull this) ex.Message
+            | :? InvalidOperationException  as ex -> failwithf "seq.GetNeg(%d): Failed to get %dth item of %s : %s" index index (NiceString.toNiceStringFull this) ex.Message
             | ex -> raise ex //some other error raised while constructing lazy seq
 
         
@@ -57,7 +57,7 @@ module TypeExtensionsSeq =
         ///Returns Seq.length - 1
         [<Extension>]
         member this.LastIndex = 
-            if Seq.isEmpty this then failwithf "seq.LastIndex: Can not get LastIndex of empty Seq"
+            if Seq.isEmpty this then failwithf "seq.LastIndex: Failed to get LastIndex of empty Seq"
             (Seq.length this) - 1
         
         /// Gets the last item in the Seq
@@ -75,7 +75,7 @@ module TypeExtensionsSeq =
         /// Gets the first item in the Seq
         [<Extension>]
         member this.First = 
-            if Seq.isEmpty this then failwithf "seq.First: Can not get LastIndex of empty Seq"
+            if Seq.isEmpty this then failwithf "seq.First: Failed to get LastIndex of empty Seq"
             Seq.head this
         
         /// Gets the second item in the Seq
@@ -84,7 +84,7 @@ module TypeExtensionsSeq =
             try 
                 this|> Seq.skip 1 |> Seq.head
             with 
-            | :? InvalidOperationException  as ex -> failwithf "seq.Second: Can not get Second item of %s : %s"  (NiceString.toNiceStringFull this) ex.Message
+            | :? InvalidOperationException  as ex -> failwithf "seq.Second: Failed to get second item of %s : %s"  (NiceString.toNiceStringFull this) ex.Message
             | ex -> raise ex  //some other error raised while constructing lazy seq          
         
         /// Gets the third item in the Seq
@@ -93,7 +93,7 @@ module TypeExtensionsSeq =
             try 
                 this|> Seq.skip 2 |> Seq.head
             with 
-            | :? InvalidOperationException  as ex -> failwithf "seq.Third: Can not get Third item of %s : %s"  (NiceString.toNiceStringFull this) ex.Message
+            | :? InvalidOperationException  as ex -> failwithf "seq.Third: Failed to get third item of %s : %s"  (NiceString.toNiceStringFull this) ex.Message
             | ex -> raise ex   //some other error raised while constructing lazy seq         
         
  

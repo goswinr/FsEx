@@ -77,7 +77,7 @@ open Microsoft.FSharp.Reflection
             failwithf "Property or nested type '%s' not found in '%s'." name typ.Name 
           elif not ((typeof<'R>).IsAssignableFrom(typeof<System.Type>)) then
             let rname = (typeof<'R>.Name)
-            failwithf "Cannot return nested type '%s' as a type '%s'." nested.Name rname
+            failwithf "Failed to return nested type '%s' as a type '%s'." nested.Name rname
           else nested |> box |> unbox<'R>
         else
           // Call property and return result if we found some
