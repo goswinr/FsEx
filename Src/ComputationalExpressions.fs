@@ -1,6 +1,6 @@
 ﻿namespace FsEx
 open System
-open FsEx.SaveIgnore
+open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 open System.Text
 
 module ComputationalExpressionsBuilders =    

@@ -6,7 +6,7 @@ open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations
 open Microsoft.FSharp.Quotations.DerivedPatterns
 open Microsoft.FSharp.Quotations.Patterns
-open FsEx.SaveIgnore
+open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
 
 // TODO use 
