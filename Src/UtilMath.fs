@@ -5,7 +5,7 @@ open System.Globalization
 
 
 /// Math Utils
-/// Shadows the built in acos function to include clamping if values are slightly above -1.0 or 1.0
+/// Shadows the built in trigonometric asin and acos function to include clamping if values are slightly above -1.0 or 1.0
 module UtilMath =
     
     /// American Englisch culture (used for float parsing)
@@ -90,13 +90,23 @@ module UtilMath =
     let inline areSame absoluteTolerance (a:float) (b:float)  = 
         abs(a-b) < absoluteTolerance
     
-    /// Shadows the built in 'acos' function to include clamping if values are slightly above -1.0 or 1.0
-    /// Tolerance 0.00001 
+    /// Shadows the built in 'acos' (Invers Cosine) function to include clamping if values are slightly above -1.0 or 1.0
+    /// Tolerance: 0.00001 
     /// This is useful on dot products from unit vectors
+    /// returns angel in Radians
     let acos x =
-        if x < -1.00001 then failwithf "acos failed on %g" x
-        if x >  1.00001 then failwithf "acos failed on %g" x
+        if x < -1.00001 then failwithf "acos failed on %f , input must be between -1.00001 and +1.00001" x
+        if x >  1.00001 then failwithf "acos failed on %f , input must be between -1.00001 and +1.00001" x
         else x |> clamp -1.0 1.0 |> System.Math.Acos
+
+    /// Shadows the built in 'asin' (Invers Sine) function to include clamping if values are slightly above -1.0 or 1.0
+    /// Tolerance: 0.00001 
+    /// returns angel in Radians
+    let asin x =
+        if x < -1.00001 then failwithf "asin failed on %f , input must be between -1.00001 and +1.00001" x
+        if x >  1.00001 then failwithf "asin failed on %f , input must be between -1.00001 and +1.00001" x
+        else x |> clamp -1.0 1.0 |> System.Math.Asin
+
 
     /// Converts Angels from Degrees to Radians
     let inline toRadians degrees = 0.0174532925199433 * degrees // 0.0174532925199433 = Math.PI / 180. 
@@ -104,6 +114,7 @@ module UtilMath =
     /// Converts Angels from Radians to Degrees
     let inline toDegrees radians = 57.2957795130823 * radians // 57.2957795130823 = 180. / Math.PI
 
+    /// start + ( (ende-start) * rel )
     let inline interpolate start ende (rel:float) = start + ( (ende-start) * rel )
 
     /// Given the min and max value and a test value,  (val-min) / (max-min)
@@ -134,7 +145,7 @@ module UtilMath =
             else            -(logBase ** (Math.Floor (Math.Log (abs x, logBase)))) // with negative sign, (log fails on negative numbers)
     
     /// Converts an Int32 to a string of 32 characters of '1' or '0'.
-    let asBinaryString (n:int) =  
+    let asBinaryString (n:int) : string =  
         // or System.Convert.ToString (n,2)
         let b = Array.zeroCreate 32
         let mutable pos = 31
@@ -153,7 +164,6 @@ module UtilMath =
             
             *)
         new System.String(b)
-
 
 
     /// Numeric Steping: Converts floats to ints, devides by precicion.
