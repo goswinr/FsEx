@@ -35,7 +35,6 @@
     <Compile Include="Src/UtilMath.fs" />
     <Compile Include="Src/MinMaxSortCompare.fs" />
     <Compile Include="Src\NiceString.fs" />
-    <Compile Include="Src\NiceStringImpl.fs" />
     <Compile Include="Src/Types/Rarr.fs" />
     <Compile Include="Src/Types/RarrModule.fs" />
     <Compile Include="Src/Types/Dict.fs" />
