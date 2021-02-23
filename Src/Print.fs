@@ -3,6 +3,7 @@
 
 open System
 open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
+open System.Linq.Expressions
 
 
 [<AutoOpen>] // to have print functions at end of module auto opened
@@ -89,6 +90,25 @@ module Print =
     /// adds a new line at end
     /// red -> green -> blue -> string -> unit
     let printfnColor red green blue msg = Printf.kprintf (fun s -> Seff.PrintnColor red green blue s)  msg
+
+
+    /// highligths the given word in the line to print 
+    let printWithHighlight (word:string) (fullLine:string)=        
+        let rec loop (fromIdx:int) =
+            match fullLine.IndexOf(word, fromIdx) with 
+            | -1 -> Seff.PrintnColor 180 180 180 (fullLine.Substring(fromIdx))// adds line return 
+            | i  -> 
+                let beforeLen = i - fromIdx
+                if beforeLen > 0 then Seff.PrintColor 180 180 180 (fullLine.Substring(fromIdx,beforeLen))
+                
+                if i + word.Length = fullLine.Length then                    
+                    Seff.PrintnColor 0   0   0 (fullLine.Substring(i,word.Length)) // adds line return 
+                else                                            
+                    Seff.PrintColor  0   0   0 (fullLine.Substring(i,word.Length)) // no line return
+                    loop (i + word.Length)
+        loop 0
+        
+
 
     /// Clears the Seff Log View, 
     /// if it can be found via reflection in loaded assemblies,
