@@ -42,7 +42,7 @@ module NiceStringSettings =
         fun _ -> None   
     
 
-module internal NiceFormat  = 
+module NiceFormat  = 
     open NiceStringSettings
 
     let addThousandSeparators (s:string) =
