@@ -14,10 +14,10 @@ module Print =
     type internal Seff private () = // no public constructor  
                   
         static let mutable printColor : int-> int -> int -> string -> unit = //set via reflection below from Seff
-            fun r g b s -> printf "%s" s    
+            fun r g b s -> Console.WriteLine s    
            
         static let mutable printnColor : int-> int -> int -> string -> unit = //set via reflection below from Seff
-            fun r g b s -> printfn "%s" s
+            fun r g b s -> Console.WriteLine s
 
         static let mutable clear : unit -> unit =  //set via reflection below from Seff         
             fun () -> ()
@@ -59,10 +59,14 @@ module Print =
         static member Clear () = 
             if doInit then init() // to delay reflection calls to lates possible moment
             clear()
-
     
-    /// prints FsEx.toNiceString
-    let print x = printfn "%s" (toNiceString x)
+    /// Includes nice formating for floats , on seqencesthe  first five items are printed out.
+    /// Settings are exposed in NiceString.NiceStringSettings
+    /// •thousandSeparator          = '\'' (this is just one quote: ')  ; set this to change the printing of floats larger than 10'000
+    /// •toNiceStringMaxDepth       = 3                                 ; set this to change how deep the content of nested seq is printed (printFull ignores this)
+    /// •toNiceStringMaxItemsPerSeq = 5                                 ; set this to change how how many items per seq are printed (printFull ignores this)
+    /// • maxCharsInString          = 5000                              ; set this to change how many characters of a string might be printed at onece.    
+    let print x = Console.WriteLine (toNiceString x)// about 2-3 times faster than printf "%s"
     
     /// prints two values separated by a space using FsEx.toNiceString
     let print2 x y = printfn "%s %s" (toNiceString x) (toNiceString y)
@@ -74,7 +78,7 @@ module Print =
     let print4 w x y z = printfn "%s %s %s %s" (toNiceString w) (toNiceString x) (toNiceString y) (toNiceString z) 
 
     /// prints FsEx.toNiceStringFull
-    let printFull x = printfn "%s" (toNiceStringFull x)
+    let printFull x = Console.WriteLine (toNiceStringFull x)
     
     /// print with rgb colors if running in Seff Editor. Else just normal printf 
     /// does NOT add a new line

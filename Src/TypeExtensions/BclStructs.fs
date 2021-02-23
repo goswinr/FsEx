@@ -22,7 +22,7 @@ module TypeExtensionsBclStructs =
         [<Extension>] member inline x.AsString = x.ToString()
         
         /// With thousands separators
-        [<Extension>] member x.ToNiceString = x.ToString() |> NiceString.Floats.formatThousands        
+        [<Extension>] member x.ToNiceString = NiceFormat.int x         
 
  
     type Byte with  
@@ -42,7 +42,7 @@ module TypeExtensionsBclStructs =
 
         /// With automatic formating of display reduced precision depending on float size
         /// also includes thousands separators
-        [<Extension>] member x.ToNiceString = NiceString.Floats.floatToString x        
+        [<Extension>] member x.ToNiceString = NiceFormat.float x     
         
         /// Similar to f.ToString() 
         /// with automatic formating to never use scientific notation
@@ -63,7 +63,7 @@ module TypeExtensionsBclStructs =
 
         /// with automatic formating of display reduced precision depending on single size
         /// also includes thousands separators
-        [<Extension>] member x.ToNiceString = NiceString.Floats.singleToString x
+        [<Extension>] member x.ToNiceString = NiceFormat.single x   
 
         /// Similar to f.ToString() 
         /// with automatic formating to never use scientific notation
@@ -88,7 +88,7 @@ module TypeExtensionsBclStructs =
 
         /// With automatic formating of display reduced precision depending on float size
         /// also includes thousands separators
-        [<Extension>] member x.ToNiceString = NiceString.Floats.floatToString (float x)        
+        [<Extension>] member x.ToNiceString = NiceFormat.decimal x      
            
         /// Similar to f.ToString() 
         /// with automatic formating to never use scientific notation
