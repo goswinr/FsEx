@@ -4,14 +4,13 @@ open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 open System.Text
 
 module ComputationalExpressionsBuilders =    
-    let csvSep = ';'
+    let mutable csvSep = ';'
     
-    let inline addchr   (b: StringBuilder) (c:char)   = b.Append      c |> ignoreObj
-
-    let inline add   (b: StringBuilder) (s:string)   = b.Append      s |> ignoreObj
-    let inline addLn (b: StringBuilder) (s:string)   = b.AppendLine  s |> ignoreObj
-    let inline addCsv   (b: StringBuilder) (s:string) = b.Append(s).Append(csvSep)                             |> ignoreObj
-    let inline addCsvLn (b: StringBuilder) (s:string) = b.Append(s).Append(csvSep).Append(Environment.NewLine) |> ignoreObj
+    let inline private addchr   (b: StringBuilder) (c:char)   = b.Append      c                                          |> ignoreObj
+    let inline private add      (b: StringBuilder) (s:string) = b.Append      s                                          |> ignoreObj
+    let inline private addLn    (b: StringBuilder) (s:string) = b.AppendLine  s                                          |> ignoreObj
+    let inline private addCsv   (b: StringBuilder) (s:string) = b.Append(s).Append(csvSep)                               |> ignoreObj
+    let inline private addCsvLn (b: StringBuilder) (s:string) = b.Append(s).Append(csvSep).Append(Environment.NewLine)   |> ignoreObj
 
 
     /// The maybe monad. 
@@ -114,8 +113,7 @@ module ComputationalExpressionsBuilders =
            member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> addCsvLn b (c.ToString())   
            member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addCsvLn b (f.AsString)
            member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addCsvLn b (i.ToString())  
-           member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addCsvLn b (g.ToString())  
-
+           member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addCsvLn b (g.ToString()) 
                      
            member inline _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
            
