@@ -45,6 +45,10 @@ module NiceStringSettings =
 module NiceFormat  = 
     open NiceStringSettings
 
+    //let internal deDE = Globalization.CultureInfo("de-DE")
+    let internal invC = Globalization.CultureInfo.InvariantCulture
+
+
     let addThousandSeparators (s:string) =
         let last = s.Length - 1         
         let sb = Text.StringBuilder()
@@ -77,16 +81,16 @@ module NiceFormat  =
         else
             let  a = abs x
             if   a < roundToZeroBelow then "0.0"
-            elif a > 10000. then x.ToString("#") |> addThousandSeparators 
+            elif a > 10000. then x.ToString("#")|> addThousandSeparators 
             elif a > 1000.  then x.ToString("#")
-            elif a > 100.   then x.ToString("#.#")
-            elif a > 10.    then x.ToString("#.##")
-            elif a > 1.     then x.ToString("#.###")
-            elif a > 0.1    then x.ToString("#.####")
-            elif a > 0.01   then x.ToString("#.#####")
-            elif a > 0.001  then x.ToString("#.######")
-            elif a > 0.0001 then x.ToString("#.#######")
-            else                  x.ToString("#.###############") // 15 decimal paces for doubles
+            elif a > 100.   then x.ToString("#.#" , invC)
+            elif a > 10.    then x.ToString("#.##" , invC)
+            elif a > 1.     then x.ToString("#.###" , invC)
+            elif a > 0.1    then x.ToString("0.####" , invC)
+            elif a > 0.01   then x.ToString("0.#####" , invC)
+            elif a > 0.001  then x.ToString("0.######" , invC)
+            elif a > 0.0001 then x.ToString("0.#######" , invC)
+            else                  x.ToString("0.###############" , invC)// 15 decimal paces for doubles
     
     /// Formating with automatic precision 
     /// e.g.: 0 digits behind comma if above 1000 
@@ -95,16 +99,16 @@ module NiceFormat  =
         else
             let  a = abs x
             if   a < decimal(roundToZeroBelow) then "0.0"
-            elif a > 10000M then x.ToString("#") |> addThousandSeparators 
+            elif a > 10000M then x.ToString("#")|> addThousandSeparators 
             elif a > 1000M  then x.ToString("#")
-            elif a > 100M   then x.ToString("#.#")
-            elif a > 10M    then x.ToString("#.##")
-            elif a > 1M     then x.ToString("#.###")
-            elif a > 0.1M    then x.ToString("#.####")
-            elif a > 0.01M   then x.ToString("#.#####")
-            elif a > 0.001M  then x.ToString("#.######")
-            elif a > 0.0001M then x.ToString("#.#######")
-            else                  x.ToString("#.########")   
+            elif a > 100M   then x.ToString("#.#" , invC)
+            elif a > 10M    then x.ToString("#.##" , invC)
+            elif a > 1M     then x.ToString("#.###" , invC)
+            elif a > 0.1M    then x.ToString("0.####" , invC)
+            elif a > 0.01M   then x.ToString("0.#####" , invC)
+            elif a > 0.001M  then x.ToString("0.######" , invC)
+            elif a > 0.0001M then x.ToString("0.#######" , invC)
+            else                  x.ToString("0.########" , invC)  
 
     /// Formating with automatic precision 
     /// e.g.: 0 digits behind comma if above 1000
@@ -117,15 +121,15 @@ module NiceFormat  =
         else
             let  a = abs x
             if   a < float32(roundToZeroBelow) then "0.0"
-            elif a > 10000.f then x.ToString("#") |> addThousandSeparators 
+            elif a > 10000.f then x.ToString("#")|> addThousandSeparators 
             elif a > 1000.f  then x.ToString("#")
-            elif a > 100.f   then x.ToString("#.#")
-            elif a > 10.f    then x.ToString("#.##")
-            elif a > 1.f     then x.ToString("#.###")
-            elif a > 0.1f    then x.ToString("#.####")
-            elif a > 0.01f   then x.ToString("#.#####")
-            elif a > 0.001f  then x.ToString("#.######")
-            else                  x.ToString("#.#######")  // 7 decimal paces for singles
+            elif a > 100.f   then x.ToString("#.#" , invC)
+            elif a > 10.f    then x.ToString("#.##" , invC)
+            elif a > 1.f     then x.ToString("0.###" , invC)
+            elif a > 0.1f    then x.ToString("0.####" , invC)
+            elif a > 0.01f   then x.ToString("0.#####" , invC)
+            elif a > 0.001f  then x.ToString("0.######" , invC)
+            else                  x.ToString("0.#######" , invC) // 7 decimal paces for singles
     
 
     /// If the input string is longer than maxChars + 20 then 

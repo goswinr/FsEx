@@ -7,6 +7,9 @@ open System.Runtime.CompilerServices
 
 [<AutoOpen>]
 module TypeExtensionsBclStructs =      
+    
+    let internal deDE = Globalization.CultureInfo("de-DE")
+    let internal invC = Globalization.CultureInfo.InvariantCulture
 
  
     type Int32 with  
@@ -44,20 +47,27 @@ module TypeExtensionsBclStructs =
         /// also includes thousands separators
         [<Extension>] member x.ToNiceString = NiceFormat.float x     
         
-        /// Similar to f.ToString() 
+        /// Similar to f.ToString() using InvariantCulture
         /// with automatic formating to never use scientific notation
         /// will have maximum 15 decimal places
-        /// f.ToString( "0.###############") 
-        [<Extension>] member x.AsString = x.ToString( "0.###############")         
+        /// f.ToString( "0.###############" , InvariantCulture )
+        [<Extension>] member x.AsString = x.ToString( "0.###############",invC)   
+        
+        /// Similar to f.ToString()
+        /// but with German culture using comma (,) as decimal separator
+        /// with automatic formating to never use scientific notation
+        /// will have maximum 15 decimal places
+        /// f.ToString( "0.###############" , InvariantCulture )
+        [<Extension>] member x.AsStringDE = x.ToString( "0.###############",deDE)   
 
         /// Format without digits behind coma
-        [<Extension>] member x.AsString0 = x.ToString( "0.") 
+        [<Extension>] member x.AsString0 = x.ToString( "#") 
 
         /// Format with one digits behind coma
-        [<Extension>] member x.AsString1 = x.ToString( "0.#") 
+        [<Extension>] member x.AsString1 = x.ToString( "0.#",invC) 
 
         /// Format with two digits behind coma
-        [<Extension>] member x.AsString2 = x.ToString( "0.##") 
+        [<Extension>] member x.AsString2 = x.ToString( "0.##",invC) 
 
     type Single with  
 
@@ -68,17 +78,24 @@ module TypeExtensionsBclStructs =
         /// Similar to f.ToString() 
         /// with automatic formating to never use scientific notation
         /// will have maximum 7 decimal places
-        /// f.ToString( "0.###############") 
-        [<Extension>] member x.AsString = x.ToString( "0.#######") 
+        /// f.ToString( "0.###############" , InvariantCulture)
+        [<Extension>] member x.AsString = x.ToString( "0.#######" , invC)
+
+        /// Similar to f.ToString()
+        /// but with German culture using comma (,) as decimal separator
+        /// with automatic formating to never use scientific notation
+        /// will have maximum 7 decimal places
+        /// f.ToString( "0.###############" , InvariantCulture)
+        [<Extension>] member x.AsStringDE = x.ToString( "0.#######" , deDE)
     
         /// Format without digits behind coma
-        [<Extension>] member x.AsString0 = x.ToString( "0.") 
+        [<Extension>] member x.AsString0 = x.ToString( "#") 
 
         /// Format with one digits behind coma
-        [<Extension>] member x.AsString1 = x.ToString( "0.#") 
+        [<Extension>] member x.AsString1 = x.ToString( "0.#" , invC)
 
         /// Format with two digits behind coma
-        [<Extension>] member x.AsString2 = x.ToString( "0.##") 
+        [<Extension>] member x.AsString2 = x.ToString( "0.##" , invC)
     
     type Decimal with  
            
@@ -93,18 +110,24 @@ module TypeExtensionsBclStructs =
         /// Similar to f.ToString() 
         /// with automatic formating to never use scientific notation
         /// will have maximum 15 decimal places
-        /// f.ToString( "0.###############") 
-        [<Extension>] member x.AsString = x.ToString( "0.###############") 
+        /// f.ToString( "0.###############" , InvariantCulture)
+        [<Extension>] member x.AsString = x.ToString( "0.###############" , invC)
 
-        
+        /// Similar to f.ToString() 
+        /// but with German culture using comma (,) as decimal separator
+        /// with automatic formating to never use scientific notation
+        /// will have maximum 15 decimal places
+        /// f.ToString( "0.###############" , de-DE)
+        [<Extension>] member x.AsStringDE = x.ToString( "0.###############" , deDE)
+
         /// Format without digits behind coma
-        [<Extension>] member x.AsString0 = x.ToString( "0.") 
+        [<Extension>] member x.AsString0 = x.ToString( "#") 
 
         /// Format with one digits behind coma
-        [<Extension>] member x.AsString1 = x.ToString( "0.#") 
+        [<Extension>] member x.AsString1 = x.ToString( "0.#" , invC)
 
         /// Format with two digits behind coma
-        [<Extension>] member x.AsString2 = x.ToString( "0.##") 
+        [<Extension>] member x.AsString2 = x.ToString( "0.##" , invC)
 
     type DateTime with
         

@@ -4,15 +4,17 @@ open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 open System.Text
 
 module ComputationalExpressionsBuilders =    
-    let mutable csvSep = ';'
-    
+    let mutable csvSepEn = ','
+    let mutable csvSepDe = ';'
+
     let inline private addchr   (b: StringBuilder) (c:char)   = b.Append      c                                          |> ignoreObj
     let inline private add      (b: StringBuilder) (s:string) = b.Append      s                                          |> ignoreObj
     let inline private addLn    (b: StringBuilder) (s:string) = b.AppendLine  s                                          |> ignoreObj
-    let inline private addCsv   (b: StringBuilder) (s:string) = b.Append(s).Append(csvSep)                               |> ignoreObj
-    let inline private addCsvLn (b: StringBuilder) (s:string) = b.Append(s).Append(csvSep).Append(Environment.NewLine)   |> ignoreObj
-
-
+    let inline private addCsvEn   (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepEn)                               |> ignoreObj
+    let inline private addCsvEnLn (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepEn).Append(Environment.NewLine)   |> ignoreObj
+    let inline private addCsvDe   (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepDe)                               |> ignoreObj
+    let inline private addCsvDeLn (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepDe).Append(Environment.NewLine)   |> ignoreObj
+    
     /// The maybe monad. 
     type MaybeBuilder() =
         // from https://github.com/fsprojects/FSharpx.Extras/blob/master/src/FSharpx.Extras/ComputationExpressions/Option.fs
@@ -100,20 +102,21 @@ module ComputationalExpressionsBuilders =
             b.ToString()
     
 
-    type CsvBuilder () = 
+    type CsvBuilderEN () = 
            
-           member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  addCsv b txt 
-           member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  addCsv b (c.ToString())  
-           member inline _.Yield (f: float) =     fun (b: StringBuilder) ->  addCsv b (f.AsString)
-           member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> addCsv b (i.ToString())  
-           member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> addCsv b (g.ToString())  
+           member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  addCsvEn b txt 
+           member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  addCsvEn b (c.ToString())  
+           member inline _.Yield (f: float) =     fun (b: StringBuilder) ->  addCsvEn b (f.AsString)
+           member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> addCsvEn b (i.ToString())  
+           member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> addCsvEn b (g.ToString())  
            //member inline _.Yield (x: 'T) =        fun (b: StringBuilder)  -> b.Append (x.ToString())  |> ignore
 
-           member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> addCsvLn b txt 
-           member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> addCsvLn b (c.ToString())   
-           member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addCsvLn b (f.AsString)
-           member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addCsvLn b (i.ToString())  
-           member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addCsvLn b (g.ToString()) 
+           member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> addCsvEnLn b txt 
+           member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> addCsvEnLn b (c.ToString())   
+           member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addCsvEnLn b (f.AsString)
+           member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addCsvEnLn b (i.ToString())  
+           member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addCsvEnLn b (g.ToString()) 
+           member inline _.YieldFrom () =             fun (b: StringBuilder) -> b.AppendLine()
                      
            member inline _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
            
@@ -136,7 +139,48 @@ module ComputationalExpressionsBuilders =
                let b = StringBuilder()
                do f b
                b.ToString()
-       
+    
+    type CsvBuilderDE () = 
+           
+           member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  addCsvDe b txt 
+           member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  addCsvDe b (c.ToString())  
+           member inline _.Yield (f: float) =     fun (b: StringBuilder) ->  addCsvDe b (f.AsStringDE)
+           member inline _.Yield (f: single) =    fun (b: StringBuilder) ->  addCsvDe b (f.AsStringDE)
+           member inline _.Yield (f: decimal) =   fun (b: StringBuilder) ->  addCsvDe b (f.AsStringDE)
+           member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> addCsvDe b (i.ToString())  
+           member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> addCsvDe b (g.ToString())  
+           //member inline _.Yield (x: 'T) =        fun (b: StringBuilder)  -> b.Append (x.ToString())  |> ignore
+
+           member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> addCsvDeLn b txt 
+           member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> addCsvDeLn b (c.ToString())   
+           member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addCsvDeLn b (f.AsStringDE)
+           member inline _.YieldFrom (f: single) =    fun (b: StringBuilder) -> addCsvDeLn b (f.AsStringDE)
+           member inline _.YieldFrom (f: decimal) =   fun (b: StringBuilder) -> addCsvDeLn b (f.AsStringDE)
+           member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addCsvDeLn b (i.ToString())  
+           member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addCsvDeLn b (g.ToString()) 
+           member inline _.YieldFrom () =             fun (b: StringBuilder) -> b.AppendLine()
+                     
+           member inline _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
+           
+           member inline _.Delay f = fun (b: StringBuilder) -> (f()) b
+           
+           member inline _.Zero () = ignoreObj
+           
+           member inline _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) =
+               fun (b: StringBuilder) ->
+                   use e = xs.GetEnumerator ()
+                   while e.MoveNext() do
+                       (f e.Current) b
+           
+           member inline _.While (p: unit -> bool, f: StringBuilder -> unit) =
+               fun (b: StringBuilder) -> 
+                   while p () do 
+                       f b
+               
+           member inline _.Run (f: StringBuilder -> unit) =
+               let b = StringBuilder()
+               do f b
+               b.ToString()
 
     type RarrBuilder<'T> () =
         member inline _.Yield (x: 'T) =  
@@ -181,11 +225,19 @@ module ComputationalExpressions  =
     /// accepts ints and floats too. (including nice Formating via NiceString.floatToString )
     let stringBuffer = StringBufferBuilder () 
      
-    /// Computational Expression for making csv files:  
+    /// Computational Expression for making csv files in Englisch culture:  
+    /// use 'yield' to append text and a  subsequent comma
+    /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
+    /// accepts ints and floats too. (floats are printed in full length using f.AsString)
+    let csvEN = CsvBuilderEN ()
+
+
+    /// Computational Expression for making csv files German culture:  
     /// use 'yield' to append text and a  subsequent semicolon
     /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
-    /// accepts ints and floats too. (including nice Formating via NiceString.floatToString )
-    let csv = CsvBuilder ()
+    /// accepts ints and floats too. (floats are printed in full length using f.AsStringDE)
+    let csvDE = CsvBuilderDE ()
+
 
     /// Computational Expression:  use 'yield' to add alements to a Rarr (= Collections.Generic.List).
     let rarr<'T> = new RarrBuilder<'T> ()
