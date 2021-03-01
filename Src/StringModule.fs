@@ -82,34 +82,62 @@ module String =
         if isNull splitter      then FsExStringException.Raise "String.splitKeep: splitter is null (stringToSplit:%s)" (exnf stringToSplit)
         stringToSplit.Split([|splitter|], StringSplitOptions.None)    
     
-    /// split string into two elements, 
-    /// splitter is not included in the two return strings.
-    /// if splitter not found first string is same as input, second string is empty 
+    /// Split string into two elements, 
+    /// Fails if  splitter is not found.
+    /// The splitter is not included in the two return strings.
     let (*inline*) splitOnce (splitter:string) (stringToSplit:string) = 
+        if isNull stringToSplit then FsExStringException.Raise "String.splitOnce: stringToSplit is null (splitter:%s)" (exnf splitter)
+        if isNull splitter         then FsExStringException.Raise "String.splitOnce: splitter is null (stringToSplit:%s)" (exnf stringToSplit)
+        let start = stringToSplit.IndexOf(splitter, StringComparison.Ordinal) 
+        if start = -1 then FsExStringException.Raise "String.splitOnce: splitter '%s' not found in stringToSplit:'%s'" splitter stringToSplit
+        else               stringToSplit.Substring(0, start), stringToSplit.Substring(start + splitter.Length)
+    
+    /// Finds text betwween two strings
+    /// e.g.: between "X" "T" "cXabTk" = "c", "ab", "k"
+    /// Failsn if not both splitters are found.
+    /// Delimiters are excluded in the three returned strings
+    let (*inline*) splitTwice (firstSplitter:string) (secondSplitter:string) (stringToSplit:string) =         
+        if isNull stringToSplit then FsExStringException.Raise "String.splitTwice: stringToSplit is null (firstSplitter:%s, secondSplitter:%s) " (exnf firstSplitter) (exnf secondSplitter)
+        if isNull firstSplitter    then FsExStringException.Raise "String.splitTwice: firstSplitter is null (stringToSplit:%s, secondSplitter:%s)" (exnf stringToSplit)(exnf secondSplitter)
+        if isNull secondSplitter      then FsExStringException.Raise "String.splitTwice: secondSplitter is null (stringToSplit:%s, firstSplitter:%s)" (exnf stringToSplit)(exnf firstSplitter)        
+        let start = stringToSplit.IndexOf(firstSplitter, StringComparison.Ordinal) 
+        if start = -1 then FsExStringException.Raise "String.splitTwice: firstSplitter:'%s' not found in stringToSplit:'%s'  (secondSplitter:'%s')" firstSplitter stringToSplit secondSplitter
+        else 
+            let ende = stringToSplit.IndexOf(secondSplitter, start + firstSplitter.Length, StringComparison.Ordinal)
+            if ende = -1 then FsExStringException.Raise "String.splitTwice: secondSplitter:'%s' not found in stringToSplit:'%s'  (firstSplitter:'%s')" secondSplitter stringToSplit firstSplitter
+            else 
+                stringToSplit.Substring(0, start ),
+                stringToSplit.Substring(start + firstSplitter.Length, ende - start - firstSplitter.Length),// finds text betwween two chars
+                stringToSplit.Substring(ende + secondSplitter.Length)
+
+    /// Split string into two elements, 
+    /// If splitter not found first string is same as input, second string is empty 
+    /// Splitter is not included in the two return strings.
+    let (*inline*) splitMaybeOnce (splitter:string) (stringToSplit:string) = 
         if isNull stringToSplit then FsExStringException.Raise "String.splitOnce: stringToSplit is null (splitter:%s)" (exnf splitter)
         if isNull splitter         then FsExStringException.Raise "String.splitOnce: splitter is null (stringToSplit:%s)" (exnf stringToSplit)
         let start = stringToSplit.IndexOf(splitter, StringComparison.Ordinal) 
         if start = -1 then stringToSplit,""
         else               stringToSplit.Substring(0, start), stringToSplit.Substring(start + splitter.Length)
     
-    /// finds text betwween two strings
-    /// between "X" "T" "cXabTk" = "c", "ab", "k"
-    /// delimiters are excluded
-    /// if not both splitters are found returns original string and two empty strings 
-    /// previously called between, but now with new return value on fail
-    let (*inline*) splitTwice (startChars:string) (endChars:string) (stringToSplit:string) =         
-        if isNull stringToSplit then FsExStringException.Raise "String.splitTwice: stringToSplit is null (startChars:%s, endChars:%s) " (exnf startChars) (exnf endChars)
-        if isNull startChars    then FsExStringException.Raise "String.splitTwice: startChars is null (stringToSplit:%s, endChars:%s)" (exnf stringToSplit)(exnf endChars)
-        if isNull endChars      then FsExStringException.Raise "String.splitTwice: endChars is null (stringToSplit:%s, startChars:%s)" (exnf stringToSplit)(exnf startChars)        
-        let start = stringToSplit.IndexOf(startChars, StringComparison.Ordinal) 
+    /// Finds text betwween two strings
+    /// e.g.: between "X" "T" "cXabTk" = "c", "ab", "k"
+    /// If not both splitters are found returns original string and two empty strings 
+    /// Delimiters are excluded in the three returned strings
+    let (*inline*) splitMaybeTwice (firstSplitter:string) (secondSplitter:string) (stringToSplit:string) =         
+        if isNull stringToSplit then FsExStringException.Raise "String.splitTwice: stringToSplit is null (firstSplitter:%s, secondSplitter:%s) " (exnf firstSplitter) (exnf secondSplitter)
+        if isNull firstSplitter    then FsExStringException.Raise "String.splitTwice: firstSplitter is null (stringToSplit:%s, secondSplitter:%s)" (exnf stringToSplit)(exnf secondSplitter)
+        if isNull secondSplitter      then FsExStringException.Raise "String.splitTwice: secondSplitter is null (stringToSplit:%s, firstSplitter:%s)" (exnf stringToSplit)(exnf firstSplitter)        
+        let start = stringToSplit.IndexOf(firstSplitter, StringComparison.Ordinal) 
         if start = -1 then stringToSplit,"",""
         else 
-            let ende = stringToSplit.IndexOf(endChars, start + startChars.Length, StringComparison.Ordinal)
+            let ende = stringToSplit.IndexOf(secondSplitter, start + firstSplitter.Length, StringComparison.Ordinal)
             if ende = -1 then stringToSplit,"",""
             else 
                 stringToSplit.Substring(0, start ),
-                stringToSplit.Substring(start + startChars.Length, ende - start - startChars.Length),// finds text betwween two chars
-                stringToSplit.Substring(ende + endChars.Length)
+                stringToSplit.Substring(start + firstSplitter.Length, ende - start - firstSplitter.Length),// finds text betwween two chars
+                stringToSplit.Substring(ende + secondSplitter.Length)
+
   
     /// First letter of string to Uppercase
     let (*inline*) up1 (s:String)  = 
