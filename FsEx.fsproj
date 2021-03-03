@@ -24,7 +24,8 @@
   
   </PropertyGroup>
   
-  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'"> 
+      <!--needed foruse in  Revit 2018 ?-->
       <PackageReference Update="FSharp.Core" Version="4.6.2" />
   </ItemGroup>
 
@@ -34,13 +35,15 @@
     <Compile Include="Src/TopLevelFunctions.fs" />
     <Compile Include="Src/UtilMath.fs" />
     <Compile Include="Src/MinMaxSortCompare.fs" />
-    <Compile Include="Src\NiceString.fs" />
+    <Compile Include="Src/NiceString.fs" />
+    
     <Compile Include="Src/Types/Rarr.fs" />
-    <Compile Include="Src/Types/RarrModule.fs" />
     <Compile Include="Src/Types/Dict.fs" />
     <Compile Include="Src/Types/DefaultDict.fs" />
     <Compile Include="Src/Types/StuctTuples.fs" />
-    <Compile Include="Src\StringModule.fs" />
+    
+    <Compile Include="Src/RarrModule.fs" />
+    <Compile Include="Src/StringModule.fs" />
 
     <Compile Include="Src/TypeExtensions/BclStructs.fs" />
     <Compile Include="Src/TypeExtensions/Color.fs" />
@@ -53,7 +56,7 @@
 
     <Compile Include="Src/ComputationalExpressions.fs" />
     <Compile Include="Src/DynamicOperator.fs" />
-    <Compile Include="Src\Print.fs" />
+    <Compile Include="Src/Print.fs" />
     <Compile Include="Src/PrintDistribution.fs" />
   </ItemGroup>
 
