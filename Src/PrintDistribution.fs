@@ -13,7 +13,7 @@ module PrintDistribution =
     /// Set this to ',' or ';' if you want a CSV file as output.
     let mutable separator = ""
 
-    let newLn = Environment.NewLine
+    let private newLn = Environment.NewLine
 
     let private sprintDistributionMain units scaleBars steps (vs:seq<float>) stepSize stepShift =
         if Seq.isEmpty vs then "No Items, No Data" + newLn
@@ -71,7 +71,7 @@ module PrintDistribution =
                     for i = 1 to int (percent*scaleBars) do txt <- txt + sprintf "█"
                     txt <- txt +  newLn
         
-                txt <- txt + sprintf "Total Items:;;;;;;;;%d%s" len newLn
+                txt <- txt + sprintf "Total Items:;;;;;;;;%d%s" len newLn 
                 txt <- txt + sprintf "Average= %.1f %s MiddleValue = %.1f %s%s"  av units mid units newLn
                 txt <- txt + sprintf "Delta from Average: down =  %.1f %s, up= %.1f %s%s"  (av-aMin) units (aMax-av) units newLn
                 txt <- txt + sprintf "Range = %.1f%s" aRange newLn
@@ -86,14 +86,10 @@ module PrintDistribution =
     ///<param name="steps">(int) Amound of steps or buckets. Something between 5 to 30 makes sense.</param>  
     ///<param name="values">(float seq) The values to analyse.</param> 
     ///<returns>a formated string</returns>
-    let bySteps units scaleBars steps values =  
+    let byStepCount units scaleBars steps values =  
         sprintDistributionMain units scaleBars steps values 0.0 0.0
     
-    /// Returns a formted string that has bars to show the ditribution of the given float values among buckets (or steps).
-    /// You can specify the range or size 
-    /// Parameters:
-    ///* units as string ("mm"?) -> scale for Bars ( ~0.5 to ~2.0) -> stepSize (float) -> list of floats -> returns string
-    
+
     
     ///<summary>Returns a formated string that has bars to show the ditribution
     /// of the given float values among buckets or steps of a defdined size.</summary>
@@ -105,7 +101,15 @@ module PrintDistribution =
     let byStepSize units scaleBars stepsSize values = 
         sprintDistributionMain units scaleBars 0 values stepsSize 0.0
     
-    (*    
+    (*  
+    
+    /// Returns a formted string that has bars to show the ditribution of the given float values among buckets (or steps).
+    /// You can specify the range or size 
+    /// Parameters:
+    ///* units as string ("mm"?) -> scale for Bars ( ~0.5 to ~2.0) -> stepSize (float) -> list of floats -> returns string
+    
+
+
     <summary>Returns a formated string that has bars to show the ditribution
      of the given float values among buckets or steps of a defdined size.</summary>
     <param name="units">(string) Units to add to text. e.g. "mm"</param>
