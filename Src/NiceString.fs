@@ -364,7 +364,7 @@ module NiceString  =
        
 
 
-module StringMakerCombinators = 
+module private StringMakerCombinators = 
     //adapted from "C:\work\Goswin\30_F#\01_Books\FSharpForTechnicalComputing\F#.NET Journal\000_All html text only\genericprettyprinting.html"
 
     (*
