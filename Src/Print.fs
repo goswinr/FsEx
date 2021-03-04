@@ -93,20 +93,24 @@ module Print =
 
 
     /// highligths the given word in the line to print 
+    /// adds line return at end
     let printWithHighlight (word:string) (fullLine:string)=        
-        let rec loop (fromIdx:int) =
-            match fullLine.IndexOf(word, fromIdx) with 
-            | -1 -> Seff.PrintnColor 180 180 180 (fullLine.Substring(fromIdx))// adds line return 
-            | i  -> 
-                let beforeLen = i - fromIdx
-                if beforeLen > 0 then Seff.PrintColor 180 180 180 (fullLine.Substring(fromIdx,beforeLen))
+        if String.IsNullOrWhiteSpace word then 
+            Seff.PrintnColor 180 180 180 (fullLine)// adds line return 
+        else
+            let rec loop (fromIdx:int) =
+                match fullLine.IndexOf(word, fromIdx) with 
+                | -1 -> Seff.PrintnColor 180 180 180 (fullLine.Substring(fromIdx))// adds line return 
+                | i  -> 
+                    let beforeLen = i - fromIdx
+                    if beforeLen > 0 then Seff.PrintColor 180 180 180 (fullLine.Substring(fromIdx,beforeLen))
                 
-                if i + word.Length = fullLine.Length then                    
-                    Seff.PrintnColor 0   0   0 (fullLine.Substring(i,word.Length)) // adds line return 
-                else                                            
-                    Seff.PrintColor  0   0   0 (fullLine.Substring(i,word.Length)) // no line return
-                    loop (i + word.Length)
-        loop 0
+                    if i + word.Length = fullLine.Length then                    
+                        Seff.PrintnColor 0   0   0 (fullLine.Substring(i,word.Length)) // adds line return 
+                    else                                            
+                        Seff.PrintColor  0   0   0 (fullLine.Substring(i,word.Length)) // no line return
+                        loop (i + word.Length)
+            loop 0
         
 
 
