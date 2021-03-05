@@ -337,20 +337,23 @@ module NiceString  =
     open NiceStringSettings
 
 
-    /// Nice formating for floats , some Rhino Objects and sequences of any kind, first four items are printed out.
-    /// Settings are exposed in NiceString.NiceStringSettings
+    //TODO sync the docstring here with print and printfull in module Print and the shadowing one in Rhino.scripting 
+
+
+    /// Nice formating for numbers including thousand Separator and (nested) sequences, first five items are printed out.
+    /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
     /// • thousandSeparator          = '\'' (this is just one quote: ')  ; set this to change the printing of floats and integers larger than 10'000
     /// • toNiceStringMaxDepth       = 3                                 ; set this to change how deep the content of nested seq is printed (printFull ignores this)
     /// • toNiceStringMaxItemsPerSeq = 5                                 ; set this to change how how many items per seq are printed (printFull ignores this)
-    /// • maxCharsInString          = 5000                              ;set this to change how many characters of a string might be printed at onece.    
+    /// • maxCharsInString           = 5000                              ; set this to change how many characters of a string might be printed at once.    
     let toNiceString (x:'T) = 
         x |> box |> getLines 0 |> formatLines
 
 
-    /// Nice formating for floats and numbers in including thousand Separator ,  all items including nested items are printed out.
-    /// Settings are exposed in NiceString.NiceStringSettings
+    /// Nice formating for numbers including thousand Separator, all items of sequences, including nested items, are printed out.
+    /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
     /// • thousandSeparator          = '\'' (this is just one quote: ')  ; set this to change the printing of floats and integers larger than 10'000
-    /// • maxCharsInString          = 5000                              ;set this to change how many characters of a string might be printed at onece.
+    /// • maxCharsInString           = 5000                              ; set this to change how many characters of a string might be printed at once.
     let toNiceStringFull (x:'T) = 
         //set depth and max item count to 99999999 afterwards then reset it again :
         let pervDepth    = maxDepth

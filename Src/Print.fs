@@ -29,7 +29,7 @@ module Print =
             doInit <- false
             let allAss = AppDomain.CurrentDomain.GetAssemblies()
             
-            let assemblySeff       =  allAss |> Seq.tryFind (fun a -> a.GetName().Name = "Seff")            
+            let assemblySeff =  allAss |> Seq.tryFind (fun a -> a.GetName().Name = "Seff")            
             
             match assemblySeff with 
             | Some seffAssembly -> 
@@ -61,39 +61,44 @@ module Print =
             if doInit then init() // to delay reflection calls to lates possible moment
             clear()
     
-    /// Includes nice formating for floats , on seqencesthe  first five items are printed out.
-    /// Settings are exposed in NiceString.NiceStringSettings
-    /// •thousandSeparator          = '\'' (this is just one quote: ')  ; set this to change the printing of floats larger than 10'000
-    /// •toNiceStringMaxDepth       = 3                                 ; set this to change how deep the content of nested seq is printed (printFull ignores this)
-    /// •toNiceStringMaxItemsPerSeq = 5                                 ; set this to change how how many items per seq are printed (printFull ignores this)
-    /// • maxCharsInString          = 5000                              ; set this to change how many characters of a string might be printed at onece.    
-    let print x = Console.WriteLine (toNiceString x)// about 2-3 times faster than printf "%s"
+    /// Nice formating for numbers including thousand Separator and (nested) sequences, first five items are printed out.
+    /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
+    /// • thousandSeparator          = '\'' (this is just one quote: ')  ; set this to change the printing of floats and integers larger than 10'000
+    /// • toNiceStringMaxDepth       = 3                                 ; set this to change how deep the content of nested seq is printed (printFull ignores this)
+    /// • toNiceStringMaxItemsPerSeq = 5                                 ; set this to change how how many items per seq are printed (printFull ignores this)
+    /// • maxCharsInString           = 5000                              ; set this to change how many characters of a string might be printed at once.  
+    let print x = 
+        Console.WriteLine (toNiceString x)// Console.WriteLine is about 2-3 times faster than printf "%s"
     
-    /// prints two values separated by a space using FsEx.toNiceString
-    let print2 x y = printfn "%s %s" (toNiceString x) (toNiceString y)
-    
-    /// prints three values separated by a space using FsEx.toNiceString
-    let print3 x y z = printfn "%s %s %s" (toNiceString x) (toNiceString y) (toNiceString z) 
-    
-    /// prints four values separated by a space using FsEx.toNiceString
-    let print4 w x y z = printfn "%s %s %s %s" (toNiceString w) (toNiceString x) (toNiceString y) (toNiceString z) 
-
-    /// prints FsEx.toNiceStringFull
+    /// Nice formating for numbers including thousand Separator, all items of sequences, including nested items, are printed out.
+    /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
+    /// • thousandSeparator          = '\'' (this is just one quote: ')  ; set this to change the printing of floats and integers larger than 10'000
+    /// • maxCharsInString           = 5000                              ; set this to change how many characters of a string might be printed at once.
     let printFull x = Console.WriteLine (toNiceStringFull x)
     
-    /// print with rgb colors if running in Seff Editor. Else just normal printf 
-    /// does NOT add a new line
+
+    /// Pprints two values separated by a space using FsEx.NiceString.toNiceString
+    let print2 x y = printfn "%s %s" (toNiceString x) (toNiceString y)
+    
+    /// Prints three values separated by a space using FsEx.NiceString.toNiceString
+    let print3 x y z = printfn "%s %s %s" (toNiceString x) (toNiceString y) (toNiceString z) 
+    
+    /// Prints four values separated by a space using FsEx.NiceString.toNiceString
+    let print4 w x y z = printfn "%s %s %s %s" (toNiceString w) (toNiceString x) (toNiceString y) (toNiceString z) 
+
+    /// Print with rgb colors if running in Seff Editor. Else just normal printf 
+    /// Does NOT add a new line
     /// red -> green -> blue -> string -> unit
     let printfColor red green blue msg =  Printf.kprintf (fun s -> Seff.PrintColor red green blue s)  msg
 
-    /// print with rgb colors if running in Seff Editor. Else just normal printfn
-    /// adds a new line at end
+    /// Print with rgb colors if running in Seff Editor. Else just normal printfn
+    /// Adds a new line at end
     /// red -> green -> blue -> string -> unit
     let printfnColor red green blue msg = Printf.kprintf (fun s -> Seff.PrintnColor red green blue s)  msg
 
 
-    /// highligths the given word in the line to print 
-    /// adds line return at end
+    /// Highligths the given word in the line to print 
+    /// Adds line return at end
     let printWithHighlight (word:string) (fullLine:string)=        
         if String.IsNullOrWhiteSpace word then 
             Seff.PrintnColor 180 180 180 (fullLine)// adds line return 
