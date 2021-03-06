@@ -124,6 +124,8 @@ module ExtensionsSeq =
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies (should consider for other extension modules as well)
 module Seq =   
     
+    open ExtensionsSeq
+
     /// Counts for how many items of the Seq the predicate returns true.    
     /// same as Seq.filter and then Seq.length 
     let inline countIf (predicate : 'T -> bool) (xs : seq<'T>) : int = //countBy is something else !!
@@ -188,7 +190,7 @@ module Seq =
             k <= count
 
     /// faster implemetation of Seq.last till F# 4.8  or 5.0 is out
-    let lastFast (source : seq<_>) = TypeExtensionsSeq.indexFromBack 0  source // TODO keep this until https://github.com/dotnet/fsharp/pull/7765/files is part of fsharp core
+    let lastFast (source : seq<'T>) = indexFromBack 0  source // TODO keep this until https://github.com/dotnet/fsharp/pull/7765/files is part of fsharp core
 
     /// Allows for negative indices too, -1 is the last element.
     /// The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5

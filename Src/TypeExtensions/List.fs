@@ -4,7 +4,8 @@
 
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies (should consider for other extension modules as well)
 module List = 
-    
+    open ExtensionsArray
+
     let internal indexFromBack ix (xs: 'T list) =
         if List.isEmpty xs then failwithf "List.indexFromBack: can't get index from back %d from empty list" ix //TODO fix error type
         else        
