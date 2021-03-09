@@ -4,9 +4,13 @@ open System
 open System.Collections.Generic
 open System.Runtime.CompilerServices
 
-[<AutoOpen>]
-module TypeExtensionsSeq = 
+//[<AutoOpen>]
+
+/// provides Extension methods on Collections.Generic.IEnumerable 
+module ExtensionsSeq = 
     
+    open ExtensionsIList // for a.GetNeg
+
     let internal indexFromBack ix (xs: 'T seq) =     
         match xs with
         | :? ('T[]) as a ->     a.GetNeg(a.Length - 1 - ix)
@@ -30,8 +34,7 @@ module TypeExtensionsSeq =
                 if ix > i then failwithf "can't get index from back %d from  seq of %d items" ix (i+1)
                 ar.GetNeg(k-ix) 
             else
-                failwithf "can't get index from back %d from empty seq" ix
-    
+                failwithf "can't get index from back %d from empty seq" ix    
 
     
     type Collections.Generic.IEnumerable<'T>  with 
@@ -57,7 +60,7 @@ module TypeExtensionsSeq =
         ///Returns Seq.length - 1
         [<Extension>]
         member this.LastIndex = 
-            if Seq.isEmpty this then failwithf "seq.LastIndex: Failed to get LastIndex of empty Seq"
+            if Seq.isEmpty this then failwithf "seq.LastIndex: Failed to get LastIndex of empty Seq" //TODO fix Exeption type
             (Seq.length this) - 1
         
         /// Gets the last item in the Seq
@@ -96,8 +99,6 @@ module TypeExtensionsSeq =
             | :? InvalidOperationException  as ex -> failwithf "seq.Third: Failed to get third item of %s : %s"  (NiceString.toNiceStringFull this) ex.Message
             | ex -> raise ex   //some other error raised while constructing lazy seq         
         
- 
-
         /// Seq.Slice
         /// Allows for negative indices too, like Python, -1 is the last element.
         /// The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
@@ -115,9 +116,9 @@ module TypeExtensionsSeq =
             | ex -> raise ex //some other error raised while constructing lazy seq
             
         
-        [<Extension>]  
         /// A property like the ToString() method, 
         /// But with richer formationg for collections
+        [<Extension>]  
         member obj.ToNiceString = NiceString.toNiceString obj
             
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies (should consider for other extension modules as well)
@@ -133,16 +134,16 @@ module Seq =
         k
 
 
-    /// Applies a function to Seq
-    /// If resulting Seq meets the resultPredicate it is returned , otherwise  orinal input is returned.
-    let applyIfResult (resultPredicate:seq<'T> -> bool) (transform:seq<'T> -> seq<'T>)  (xs: seq<'T>) : seq<'T> =
+    /// Applies a function to each element in Seq
+    /// If resulting element meets the resultPredicate it is returned , otherwise the original input is returned.   
+    let mapIfResult (resultPredicate:seq<'T> -> bool) (transform:seq<'T> -> seq<'T>)  (xs: seq<'T>) : seq<'T> =
         let r = transform xs
         if resultPredicate r then r
         else xs
 
-    /// Applies a function to Seq if it meets the inputPredicate, otherwise just returns input.
-    /// If resulting Seq meets the resultPredicate it is returned , otherwise orinal input is returned.
-    let applyIfInputAndResult (inputPredicate:seq<'T> -> bool) (resultPredicate:seq<'T> -> bool) (transform:seq<'T> -> seq<'T>)  (xs: seq<'T>) : seq<'T> =
+    /// Applies a function to each element in Seq if it meets the inputPredicate, otherwise just returns input element unchanged.
+    /// If resulting element meets the resultPredicate it is returned , otherwise the original input element is returned.   
+    let mapIfInputAndResult (inputPredicate:seq<'T> -> bool) (resultPredicate:seq<'T> -> bool) (transform:seq<'T> -> seq<'T>)  (xs: seq<'T>) : seq<'T> =
         if inputPredicate xs then
             let r = transform xs
             if resultPredicate r then r

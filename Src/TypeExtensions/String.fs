@@ -5,8 +5,9 @@ open System.Text
 open System.Runtime.CompilerServices
 open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
-[<AutoOpen>]
-module TypeExtensionsString =      
+//[<AutoOpen>]
+
+module ExtensionsString =      
     
     type System.String with
         
@@ -76,10 +77,10 @@ module TypeExtensionsString =
             s.[2]
         
 
-        [<Extension>]
         /// Gets an item in the string by index.
         /// Allows for negtive index too ( -1 is last item,  like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        [<Extension>]
         member s.GetNeg index = 
             if isNull s then String.FsExStringException.Raise "string.GetNeg: Failed to get character at index %d from string from null string." index 
             let len = s.Length
@@ -87,9 +88,9 @@ module TypeExtensionsString =
             if ii<0 || ii >= len then String.FsExStringException.Raise "string.GetNeg: Failed to get character at index %d from string of %d items: %s" index s.Length s
             s.[ii]   
 
-        [<Extension>]
         /// Any index will return a value.
         /// Rarr is treated as an endless loop in positive and negative direction   
+        [<Extension>]
         member s.GetLooped index = 
             if isNull s then String.FsExStringException.Raise "string.GetLooped: Failed to get character at index %d from string from null string." index 
             let len = s.Length

@@ -6,7 +6,7 @@
 module List = 
     
     let internal indexFromBack ix (xs: 'T list) =
-        if List.isEmpty xs then failwithf "can't get index from back %d from empty list" ix
+        if List.isEmpty xs then failwithf "List.indexFromBack: can't get index from back %d from empty list" ix //TODO fix error type
         else        
             // there are two ways to get an item indexed from the back:
             // (1) iterate all items and keep a buffer
@@ -31,7 +31,7 @@ module List =
                 | _ -> () // cought already above
     
             loop xs
-            if ix >= i then failwithf "can't get index from back %d from  list of %d items" ix i 
+            if ix >= i then failwithf "List.indexFromBack: can't get index from back %d from  list of %d items" ix i 
             ar.GetNeg(k-ix)
         
     /// Gets an item in the list by index.

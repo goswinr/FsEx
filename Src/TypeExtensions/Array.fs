@@ -4,8 +4,9 @@ open System
 open System.Runtime.CompilerServices
 
 
-[<AutoOpen>]
-module TypeExtensionsArray =  
+//[<AutoOpen>]
+
+module ExtensionsArray =  //TODO add Docstring
 
     
     type ``[]``<'T>  with //Generic Array

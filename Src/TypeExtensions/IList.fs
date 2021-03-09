@@ -4,20 +4,23 @@ open System
 open System.Collections.Generic
 open System.Runtime.CompilerServices
 
-[<AutoOpen>]
-module TypeExtensionsIList =  
+// [<AutoOpen>]
 
-    
+/// provides Extension methods on Collections.Generic.IList 
+module ExtensionsIList =  
+
     type Collections.Generic.IList<'T>  with 
         
         /// Gets an item at index 
         /// (use IList.GetNeg(i) member if you want to use negative indices too)
+        [<Extension>]
         member this.Get index = 
             if index >= this.Count then ArgumentOutOfRangeException.Raise "Cant get index %d from IList of %d items: %A" index this.Count this
             this.[index]
             
         /// Sets an item at index 
         /// (use IList.SetNeg(i) member if you want to use negative indices too)
+        [<Extension>]
         member this.Set index value = 
             if index >= this.Count then ArgumentOutOfRangeException.Raise "Cant set index %d to %A in IList of %d items: %A " index value this.Count  this
             this.[index] <- value
@@ -25,6 +28,7 @@ module TypeExtensionsIList =
         /// Gets an item in the IList by index.
         /// Allows for negtive index too ( -1 is last item,  like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        [<Extension>]
         member this.GetNeg index = 
             let len = this.Count
             let ii =  if index < 0 then len + index else index
@@ -34,6 +38,7 @@ module TypeExtensionsIList =
         /// Sets an item in the IList by index.
         /// Allows for negtive index too ( -1 is last item,  like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        [<Extension>]
         member this.SetNeg index value = 
             let len = this.Count
             let ii =  if index < 0 then len + index else index
@@ -41,7 +46,8 @@ module TypeExtensionsIList =
             this.[ii] <- value        
    
         /// Any index will return a value.
-        /// IList is treated as an endless loop in positive and negative direction   
+        /// IList is treated as an endless loop in positive and negative direction
+        [<Extension>]
         member this.GetLooped index = 
             let len = this.Count
             if len=0 then ArgumentOutOfRangeException.Raise "IList.GetLooped: Failed to get index %d from IList of 0 items" index
@@ -50,26 +56,27 @@ module TypeExtensionsIList =
             this.[ii]              
 
         /// Any index will set a value.
-        /// IList is treated as an endless loop in positive and negative direction   
+        /// IList is treated as an endless loop in positive and negative direction
+        [<Extension>]
         member this.SetLooped index value  = 
             let len = this.Count
             if len=0 then ArgumentOutOfRangeException.Raise "IList.SetLooped: Failed to Set index %d to %A in IList of 0 items" index value
             let t = index % len
             let ii = if t >= 0 then t  else t + len 
-            this.[ii] <- value
-       
+            this.[ii] <- value       
         
-        
-        /// Allows for negtive index too ( -1 is last item,  like Python)
+        (*
+        // Allows for negtive index too ( -1 is last item,  like Python)
         [<Extension; Obsolete>] 
         member this.GetItem index = 
             if index<0 then this.[this.Count+index]   else this.[index]
     
         
-        /// Allows for negtive index too ( -1 is last item, like Python)
+        // Allows for negtive index too ( -1 is last item, like Python)
         [<Extension; Obsolete>] 
         member this.SetItem index value = 
             if index<0 then this.[this.Count+index]<-value   else this.[index]<-value  // only on IList
+        *)
 
 
         /// Gets the index of the last item in the IList.
@@ -144,8 +151,7 @@ module TypeExtensionsIList =
                this.[2]
            and set (v:'T) =
                if this.Count < 3 then IndexOutOfRangeException.Raise "IList.Third: Failed to set third item of %s to %A" (NiceString.toNiceStringFull this) v
-               this.[2] <- v          
-
+               this.[2] <- v 
 
 
         /// Gets a subrange of the IList

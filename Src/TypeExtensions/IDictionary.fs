@@ -5,8 +5,10 @@ open System.Runtime.CompilerServices
 open System.Collections.Generic
 
 
-[<AutoOpen>]
-module TypeExtensionsIDictionary =   
+//[<AutoOpen>]
+
+
+module ExtensionsIDictionary =   //TODO add Docstring
 
     
     type IDictionary<'K,'V> with           
@@ -42,9 +44,9 @@ module TypeExtensionsIDictionary =
         member inline d.Items =
             seq { for KeyValue(k, v) in d -> k, v}
         
-        [<Extension>]  
         /// A property like the ToString() method, 
         /// But with richer formationg for collections
+        [<Extension>]  
         member obj.ToNiceString = NiceString.toNiceString obj
 
 

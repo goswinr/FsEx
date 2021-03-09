@@ -20,25 +20,25 @@ module String =
     /// Trimm strings to 30 chars for showing in in one line 
     //  it returns the input string trimmed to 30 Chars, a count of skiped characters and the last 5 characters
     /// Replace line breaks with \r\n literal
-    /// Does not include sourrounding quotes
+    /// Does not include surrounding quotes
     /// If stirng is null returns "-null string-"
     let truncateFormatedInOneLine (stringToTrim:string) =
         if isNull stringToTrim then "-null string-"
         else
             let s = 
                 let maxChars = 30
-                if stringToTrim.Length <= maxChars + 20 then sprintf "\"%s\"" stringToTrim
+                if stringToTrim.Length <= maxChars + 20 then  stringToTrim
                 else 
                     let len   = stringToTrim.Length
                     let st    = stringToTrim.Substring(0,maxChars) 
                     let last5 = stringToTrim.Substring(len-6) 
-                    sprintf "\"%s[..%d more Chars..]%s\"" st (len - maxChars - 5) last5
+                    sprintf "%s[..%d more Chars..]%s" st (len - maxChars - 5) last5
             s.Replace("\r","\\r").Replace("\n","\\n")
     
     /// for  string formating in exceptions below.
     /// Inclouding sourounding quotes
     let internal exnf s = 
-        if isNull s then "-null string-"  else "\"" + truncateFormatedInOneLine s + "\"" //separate null check so noull value is not in quotes
+        if isNull s then "-null string-"  else "\"" + truncateFormatedInOneLine s + "\"" //separate null check so null value is not in quotes
 
     /// TODO remove inline to get compile times down in FSI ?
    
