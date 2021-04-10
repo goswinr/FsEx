@@ -1,5 +1,6 @@
 
 <!-- in VS Code press Ctrl+K and then V to see a preview-->
+![Logo](Media/logo.png "Logo")
 # FsEx
 FsEx is an FSharp extension and utility library. 
 
