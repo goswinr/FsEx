@@ -5,8 +5,7 @@
 # FsEx
 FsEx is an FSharp extension and utility library. 
 
-![Nuget](https://img.shields.io/nuget/v/FsEx)
-
+[![Nuget](https://img.shields.io/nuget/v/FsEx)](https://www.nuget.org/packages/FsEx/)
 
 
 
