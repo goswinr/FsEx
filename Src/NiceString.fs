@@ -154,19 +154,26 @@ module NiceFormat  =
         if start = -1 then s
         else s.Substring(0, start )
     
-
+    /// Includes GenericArguments types if available
     /// remove tick at end e.g. List`1  to  Collections.Generic.List
-    let typeName (nameSpace:string) name = 
-        let name = name |> before '`' |> before '@' 
-        let fullPath = if String.IsNullOrEmpty nameSpace then name else nameSpace  + "." + name 
-        if fullPath.StartsWith "System." then 
-            fullPath.Substring(7)
-        else 
-            fullPath
-                .Replace("Microsoft.FSharp.Collections.mkSeq","seq")
-                .Replace("Microsoft.FSharp.Collections.","")
-                .Replace("Microsoft.FSharp.Core.","")
-    
+    let rec typeName (typ:Type) =
+        let name = typ.Name |> before '`' |> before '@' 
+        let fullPath = if String.IsNullOrEmpty typ.Namespace then name else typ.Namespace   + "." + name 
+        let cleaned = 
+            if fullPath.StartsWith "System." then 
+                fullPath.Substring(7)
+            else 
+                fullPath
+                    .Replace("Microsoft.FSharp.Collections.mkSeq","seq")
+                    .Replace("Microsoft.FSharp.Collections.","")
+                    .Replace("Microsoft.FSharp.Core.","")
+        let param =     
+            match typ.GetGenericArguments() with 
+            | null   -> ""
+            | [| |]  -> ""
+            | ts     -> "<" + (ts |> Array.map typeName |> String.concat "," ) + ">" // recursive call
+        cleaned+param
+
 
 
 module internal NiceStringImplementation  =
@@ -177,8 +184,7 @@ module internal NiceStringImplementation  =
     open Microsoft.FSharp.Quotations.DerivedPatterns
     open Microsoft.FSharp.Quotations.Patterns   
     
-    // TODO use 
-    // http://www.fssnip.net/cV/title/A-Generic-PrettyPrinter-for-Record-types 
+ 
 
     type SeqCount = Counted of int | More of int
  
@@ -199,45 +205,26 @@ module internal NiceStringImplementation  =
     and getCollection depth (x:obj) (xs:Collections.ICollection) :Lines = // non generic ICollection
         // count is always available 
         let typ = xs.GetType()
-        let name =   NiceFormat.typeName   typ.Namespace   typ.Name   
-        let collTyO = typ.GetInterfaces()|> Array.tryFind( fun x -> x.IsGenericType && x.GetGenericTypeDefinition() = typedefof<ICollection<_>> ) // generic ICollection
-        let desc = // the header line of a collection 
-            match collTyO with
-            |Some collTy ->
-                match collTy.GetGenericArguments() |> Array.tryHead with 
-                |Some elTyp -> 
-                    let elName = NiceFormat.typeName elTyp.Namespace elTyp.Name
-                    sprintf "%s with %d items of %s" name xs.Count elName
-                |None -> sprintf "%s with %d items"  name xs.Count
-            |None ->     sprintf "%s with %d items"  name xs.Count
+        let name =  NiceFormat.typeName   typ
+        let desc = 
+            if xs.Count = 0 then sprintf "empty %s "  name 
+            else                 sprintf "%s with %d items"  name xs.Count
         if depth = maxDepth then Element desc else Head (desc, getItemsInSeq (depth+1) xs )
+
 
     and getSeq depth (x:obj) (xs:Collections.IEnumerable) :Lines = // non generic IEnumerable
         // count may not be available , sequences are not only iterated till NiceStringSettings.maxItemsPerSeq
         let typ = xs.GetType()
-        let name =   NiceFormat.typeName   typ.Namespace   typ.Name   
+        let name =   NiceFormat.typeName   typ   
         let seqTyO = typ.GetInterfaces()|> Array.tryFind( fun x -> x.IsGenericType && x.GetGenericTypeDefinition() = typedefof<IEnumerable<_>> )//  generic IEnumerable        
         let ls = getItemsInSeq (depth+1) xs
-        let count = if ls.Count = 0 then Counted 0 elif ls.[ls.Count-1] = EarlyEnd then More (ls.Count-1) else  Counted ls.Count
-        let desc = // the header line of a collection 
-            match seqTyO with
-            |Some seqTy ->                 
-                match seqTy.GetGenericArguments() |> Array.tryHead  with 
-                |Some elTyp -> 
-                    let elName = NiceFormat.typeName elTyp.Namespace elTyp.Name
-                    match count with 
-                    |More    i -> sprintf "%s with more than %d items of %s" name i elName
-                    |Counted i -> sprintf "%s with %d items of %s" name i elName
-                |None -> 
-                    match count with 
-                    |More    i -> sprintf "%s with more than %d items" name i 
-                    |Counted i -> sprintf "%s with %d items" name i                
-            |None ->  
-                match count with 
-                |More    i -> sprintf "%s with more than %d items" name i 
-                |Counted i -> sprintf "%s with %d items" name i
+        let desc = 
+            if ls.Count = 0 then                 sprintf "empty %s " name 
+            elif ls.[ls.Count-1] = EarlyEnd then sprintf "%s with more than %d items" name  (ls.Count-1) 
+            else                                 sprintf "%s with %d items" name  ls.Count
         if depth = maxDepth then Element desc else Head (desc, ls )
-
+        
+        
 
     ///  x is boxed already
     and getLines depth (x:obj) : Lines =        
@@ -258,20 +245,23 @@ module internal NiceStringImplementation  =
             | _ ->  
                 let t = x.GetType()
                 if FSharpType.IsTuple(t) then // TODO test
+                    let tyStr = NiceFormat.typeName  t
                     let fields = FSharpValue.GetTupleFields(x)
-                    let desc =  sprintf "Tuple of %d items" fields.Length
+                    let desc =  sprintf "%s of %d items" tyStr fields.Length
                     if depth = maxDepth then Element desc else Head (desc, getItemsInSeq (depth+1) fields)
                 
                 elif FSharpType.IsUnion(t) then // TODO test
                     let union, fields =  FSharpValue.GetUnionFields(x, t)
                     let declTy = union.DeclaringType
-                    let mainType = NiceFormat.typeName  declTy.Namespace declTy.Name
-                    let desc =  sprintf "a %s of case %s" mainType union.Name
+                    let mainType = NiceFormat.typeName  declTy
+                    let desc =  sprintf "a %s of case %s" mainType union.Name 
                     if depth = maxDepth then Element desc else Head (desc, getItemsInSeq (depth+1) fields) // TODO test what are the fields
                 
                 else
                     sprintf "%A" x |> Element
-    
+                
+                // TODO use 
+                // http://www.fssnip.net/cV/title/A-Generic-PrettyPrinter-for-Record-types 
 
     let formatLines (lines:Lines) = 
         let sb = Text.StringBuilder()        
@@ -287,50 +277,7 @@ module internal NiceStringImplementation  =
         loop 0 lines
         sb.ToString()
 
-
     (*
-
-    open Microsoft.FSharp.Reflection
-    open Microsoft.FSharp.Quotations
-    open Microsoft.FSharp.Quotations.DerivedPatterns
-    open Microsoft.FSharp.Quotations.Patterns    
-
-    open System.Reflection
-    open Microsoft.FSharp.Reflection
-    
-    let explore x =
-        let t = x.GetType()
-        if FSharpType.IsTuple(t) then
-            let fields =
-                FSharpValue.GetTupleFields(x)
-                |> Array.map string
-                |> fun strings -> System.String.Join(", ", strings)
-            
-            printfn "Tuple: (%s)" fields
-        elif FSharpType.IsUnion(t) then
-            let union, fields =  FSharpValue.GetUnionFields(x, t)
-            
-            printfn "Union: %s(%A)" union.Name fields
-        else
-            printfn "Got another type"
-
-
-
-    //reflection fails for extension members?
-    let (|StructToNiceString|_|) (x : obj) = // for structs that hav a ToNiceString property 
-        let typ = x.GetType() 
-        if typ.IsValueType then            
-            let prop = typ.GetProperty("ToNiceString")
-            if isNull prop then None
-            else
-                let txt = prop.GetValue(x)
-                try
-                    Some (txt :?> string)
-                with | _ -> None
-        else
-            None
-
-
     let (|UC|_|) e o =
         match e with /// https://stackoverflow.com/questions/3151099/is-there-a-way-in-f-to-type-test-against-a-generic-type-without-specifying-the
         | Lambdas(_,NewUnionCase(uc,_)) | NewUnionCase(uc,[]) ->
