@@ -107,12 +107,12 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
     /// Determines whether the dictionary contains a specific value.
     member _.ContainsValue(v) = baseDict.ContainsValue(v)    
 
-    /// Removes the value with the specified key from the dictionary
-    /// see also .Pop(key) method to get the contained value too.
+    /// Removes the value with the specified key from the dictionary.
+    /// See also .Pop(key) method to get the contained value too.
     member _.Remove(k) = baseDict.Remove(k)
 
-    ///Gets the value associated with the specified key.
-    ///As oppsed to Get(key) this does not creat a key if it is missing.
+    /// Gets the value associated with the specified key.
+    /// As opposed to Get(key) this does not create a key if it is missing.
     member _.TryGetValue(k) = baseDict.TryGetValue(k)
 
     /// Returns an enumerator that iterates through the dictionary.

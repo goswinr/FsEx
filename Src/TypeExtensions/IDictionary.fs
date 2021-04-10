@@ -52,7 +52,7 @@ module ExtensionsIDictionary =   //TODO add Docstring
 
 
 
-/// static functions on IDictionary Interface
+/// Static Functions on IDictionary Interface
 module Dict = 
     
     /// Get value at key from IDictionary, with nicer Error messages

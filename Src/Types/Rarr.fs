@@ -269,7 +269,7 @@ type Rarr<'T> private (xs:List<'T>) =
 
     /// calls .ToString() on the underlaying Collections.Generic.List<'T> 
     override _.ToString() = 
-        "FsEx.Rarr containing: " + xs.ToString() //TODO fix ?
+        "FsEx.Rarr containing: " + xs.ToString() //TODO use nice string , test ?
 
 
     /// A property like the ToString() method, 
@@ -593,8 +593,8 @@ type Rarr<'T> private (xs:List<'T>) =
     // list.TrimExcess();
     member _.TrimExcess() =                                                                  xs.TrimExcess() 
     
-    ///Determines whether every element in the List 
-    ///matches the conditions defined by the specified predicate.
+    /// Determines whether every element in the List
+    /// matches the conditions defined by the specified predicate.
     member _.TrueForAll(matchValue : Predicate<'T>) =                                        xs.TrueForAll(matchValue) 
     
 

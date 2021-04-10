@@ -51,16 +51,17 @@ module ExtensionsSeq =
             | :? InvalidOperationException  as ex -> failwithf "seq.GetNeg(%d): Failed to get %dth item of %s : %s" index index (NiceString.toNiceStringFull this) ex.Message
             | ex -> raise ex //some other error raised while constructing lazy seq
 
-        
+        (*
         /// Gets an item by index position in the Seq
         /// Allows for negtive index too (like Python)
         [<Extension;Obsolete>] 
         member this.GetItem (index) = this.GetNeg (index) // TODO Delete          
+        *)
 
         ///Returns Seq.length - 1
         [<Extension>]
         member this.LastIndex = 
-            if Seq.isEmpty this then failwithf "seq.LastIndex: Failed to get LastIndex of empty Seq" //TODO fix Exeption type
+            if Seq.isEmpty this then failwithf "seq.LastIndex: Failed to get LastIndex of empty Seq" //TODO fix Exception type
             (Seq.length this) - 1
         
         /// Gets the last item in the Seq
@@ -189,17 +190,19 @@ module Seq =
             while e.MoveNext() && k <= count do  k <- k+1
             k <= count
 
-    /// faster implemetation of Seq.last till F# 4.8  or 5.0 is out
-    let lastFast (source : seq<'T>) = indexFromBack 0  source // TODO keep this until https://github.com/dotnet/fsharp/pull/7765/files is part of fsharp core
+    // faster implemetation of Seq.last till F# 4.8  or 5.0 is out //TODO delete
+    // let lastFast (source : seq<'T>) = indexFromBack 0  source // TODO keep this until https://github.com/dotnet/fsharp/pull/7765/files is part of fsharp core
 
     /// Allows for negative indices too, -1 is the last element.
     /// The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
     let slice startIdx endIdx (xs:seq<_>) =  xs.Slice(startIdx,endIdx) 
 
+    (*
     /// Gets an item by index position in the Seq
     /// Allows for negtive index too (like Python)  
     [<Obsolete>]
     let getItem index  (xs:seq<_>) = xs.GetNeg(index) //TODO delete
+    *)
 
 
     /// Gets an item by index position in the Seq

@@ -17,7 +17,7 @@ open Microsoft.FSharp.Reflection
 
     // The operator takes just instance and a name. Depending on how it is used
     // it either calls method (when 'R is function) or accesses a property
-    let (?) (o:obj) name : 'R =
+    let (?) (o:obj) (name:string) : 'R =
       // The return type is a function, which means that we want to invoke a method
       if FSharpType.IsFunction(typeof<'R>) then
 
@@ -54,8 +54,8 @@ open Microsoft.FSharp.Reflection
         
           // If we find suitable method or constructor to call, do it!
           match methods with 
-          | [] -> failwithf "No method '%s' with %d arguments found" name args.Length
-          | _::_::_ -> failwithf "Multiple methods '%s' with %d arguments found" name args.Length
+          | [] -> failwithf "FsEx.DynamicOperator: No method '%s' with %d arguments found" name args.Length
+          | _::_::_ -> failwithf "FsEx.DynamicOperator: Multiple methods '%s' with %d arguments found" name args.Length
           | [:? ConstructorInfo as c] -> c.Invoke(args)
           | [ m ] -> m.Invoke(instance, args) ) |> unbox<'R>
 
@@ -74,14 +74,14 @@ open Microsoft.FSharp.Reflection
           let nested = typ.Assembly.GetType(typ.FullName + "+" + name)
           // Return nested type if we found one
           if nested |> isNull then 
-            failwithf "Property or nested type '%s' not found in '%s'." name typ.Name 
+            failwithf "FsEx.DynamicOperator: Property or nested type '%s' not found in '%s'." name typ.Name 
           elif not ((typeof<'R>).IsAssignableFrom(typeof<System.Type>)) then
             let rname = (typeof<'R>.Name)
-            failwithf "Failed to return nested type '%s' as a type '%s'." nested.Name rname
+            failwithf "FsEx.DynamicOperator: Failed to return nested type '%s' as a type '%s'." nested.Name rname
           else nested |> box |> unbox<'R>
         else
           // Call property and return result if we found some
           let meth = prop.GetGetMethod(true)
-          if prop |> isNull then failwithf "Property '%s' found, but doesn't have 'get' method." name
+          if prop |> isNull then failwithf "FsEx.DynamicOperator: Property '%s' found, but doesn't have 'get' method." name
           try meth.Invoke(instance, [| |]) |> unbox<'R>
-          with _ -> failwithf "Failed to get value of '%s' property (of type '%s')" name typ.Name
+          with _ -> failwithf "FsEx.DynamicOperator: Failed to get value of '%s' property (of type '%s')" name typ.Name

@@ -40,7 +40,7 @@ module String =
     let internal exnf s = 
         if isNull s then "-null string-"  else "\"" + truncateFormatedInOneLine s + "\"" //separate null check so null value is not in quotes
 
-    /// TODO remove inline to get compile times down in FSI ?
+    /// TODO removed inline to get compile times down in FSI ?
    
     /// removes substring from a string. same as:
     /// fromString.Replace(textToRemove, "")

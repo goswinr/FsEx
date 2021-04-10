@@ -4,30 +4,34 @@ open System
 open System.Runtime.CompilerServices
 
 
-//[<AutoOpen>]
-
-module ExtensionsArray =  //TODO add Docstring
+/// Adds Extension Members on Collections.Generic.Array<'T>
+/// for geting and setting first, second, last and similar indices.
+/// Also adds functionality for negative indices
+module ExtensionsArray =  
 
     
     type ``[]``<'T>  with //Generic Array
         
-        /// Gets an item at index 
-        /// (use Array.GetNeg(i) member if you want to use negative indices too)
+        /// Gets an item at index. 
+        /// Use Array.GetNeg(i) member if you want to use negative indices too.
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.Get index = 
             if index >= this.Length then ArgumentOutOfRangeException.Raise "Cant get index %d from Array of %d items: %A" index this.Length this
             this.[index]
             
-        /// Sets an item at index 
-        /// (use Array.SetNeg(i) member if you want to use negative indices too)
+        /// Sets an item at index. 
+        /// Use Array.SetNeg(i) member if you want to use negative indices too.
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.Set index value = 
             if index >= this.Length then ArgumentOutOfRangeException.Raise "Cant set index %d to %A in Array of %d items: %A " index value this.Length  this
             this.[index] <- value
 
         /// Gets an item in the Array by index.
-        /// Allows for negtive index too ( -1 is last item,  like Python)
-        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        /// Allows for negtive index too ( -1 is last item,  like in Python).
+        /// Alternative: from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item.
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.GetNeg index = 
             let len = this.Length
@@ -36,8 +40,9 @@ module ExtensionsArray =  //TODO add Docstring
             this.[ii]        
 
         /// Sets an item in the Array by index.
-        /// Allows for negtive index too ( -1 is last item,  like Python)
-        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        /// Allows for negtive index too ( -1 is last item,  like in Python).
+        /// Alternative: from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item.
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.SetNeg index value = 
             let len = this.Length
@@ -46,7 +51,8 @@ module ExtensionsArray =  //TODO add Docstring
             this.[ii] <- value        
    
         /// Any index will return a value.
-        /// Array is treated as an endless loop in positive and negative direction
+        /// Array is treated as an endless loop in positive and negative direction.
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.GetLooped index = 
             let len = this.Length
@@ -56,7 +62,8 @@ module ExtensionsArray =  //TODO add Docstring
             this.[ii]              
 
         /// Any index will set a value.
-        /// Array is treated as an endless loop in positive and negative direction   
+        /// Array is treated as an endless loop in positive and negative direction
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.SetLooped index value  = 
             let len = this.Length
@@ -83,6 +90,7 @@ module ExtensionsArray =  //TODO add Docstring
 
         /// Get (or set) the last item in the Array.
         /// equal to this.[this.Length - 1]
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.Last
             with get() = 
@@ -94,6 +102,7 @@ module ExtensionsArray =  //TODO add Docstring
 
         /// Get (or set) the second last item in the Array.
         /// equal to this.[this.Length - 2]
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.SecondLast 
             with get() = 
@@ -106,6 +115,7 @@ module ExtensionsArray =  //TODO add Docstring
 
         /// Get (or set) the third last item in the Array.
         /// equal to this.[this.Length - 3]
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.ThirdLast 
             with get() =  
@@ -117,6 +127,7 @@ module ExtensionsArray =  //TODO add Docstring
             
         /// Get (or set) Sets the first item in the Array.
         /// equal to this.[0]
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.First 
             with get() =  
@@ -128,6 +139,7 @@ module ExtensionsArray =  //TODO add Docstring
 
         /// Get (or set) the second item in the Array.
         /// equal to this.[1]
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.Second 
             with get() = 
@@ -139,6 +151,7 @@ module ExtensionsArray =  //TODO add Docstring
 
         /// Get (or set) the third item in the Array.
         /// equal to this.[2]
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.Third     
             with get() =
@@ -154,10 +167,12 @@ module ExtensionsArray =  //TODO add Docstring
         // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164                
         // member this.GetSlice(startIdx, endIdx) = 
 
+
         /// Allows for negative indices too. ( -1 is last item, like Python)
         /// The resulting array includes the end index.
         /// The built in slicing notaion (e.g. a.[1..3]) for arrays does not allow for negative indices. (and can't be overwritten)
-        /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
+        /// Alternative: from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item.
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.Slice(startIdx:int , endIdx: int ) : 'T array=
             let count = this.Length
@@ -182,6 +197,7 @@ module ExtensionsArray =  //TODO add Docstring
 
          
         /// A property like the ToString() method, 
-        /// But with richer formationg for collections
+        /// But with richer formationg for collections.
+        /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>] 
         member this.ToNiceString = NiceString.toNiceString this

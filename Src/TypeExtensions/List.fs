@@ -1,13 +1,12 @@
 ﻿namespace FsEx
 
 
-
-[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies (should consider for other extension modules as well)
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide C# List class in C# assemblies (should consider for other extension modules as well)
 module List = 
     open ExtensionsArray
 
     let internal indexFromBack ix (xs: 'T list) =
-        if List.isEmpty xs then failwithf "List.indexFromBack: can't get index from back %d from empty list" ix //TODO fix error type
+        if List.isEmpty xs then failwithf "List.indexFromBack: can't get index from back %d from empty list" ix //TODO use appropiete excepton 
         else        
             // there are two ways to get an item indexed from the back:
             // (1) iterate all items and keep a buffer
