@@ -10,9 +10,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NeutralLanguage>en</NeutralLanguage>  
 
-    <Version>0.4.0.0</Version>
-    <AssemblyVersion>0.4.0.0</AssemblyVersion>
-    <FileVersion>0.4.0.0</FileVersion>
+    <Version>0.4.1.0</Version>
+    <AssemblyVersion>0.4.1.0</AssemblyVersion>
+    <FileVersion>0.4.1.0</FileVersion>
 
     <Authors>Goswin Rothenthal</Authors>
     <Product>FsEx</Product> 
@@ -22,7 +22,7 @@
     <!-- $(OtherFlags)  warnon:3390 to verify xml docstrings https://devblogs.microsoft.com/dotnet/announcing-f-5/#improved-compiler-analysis-for-library-authors -->
     <OtherFlags>$(OtherFlags)--warnon:3390</OtherFlags>
 
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageTags>fsharp</PackageTags>
     <RepositoryType>Library</RepositoryType>
     <PackageProjectUrl>https://github.com/goswinr/FsEx</PackageProjectUrl>

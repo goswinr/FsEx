@@ -156,19 +156,26 @@ module NiceFormat  =
     
 
     /// remove tick at end e.g. List`1  to  Collections.Generic.List
-    let typeName nameSpace name = 
+    let typeName (nameSpace:string) name = 
         let name = name |> before '`' |> before '@' 
-        let fullPath = nameSpace  + "." + name 
+        let fullPath = if String.IsNullOrEmpty nameSpace then name else nameSpace  + "." + name 
         if fullPath.StartsWith "System." then 
             fullPath.Substring(7)
         else 
-            fullPath.Replace("Microsoft.FSharp.Collections.mkSeq","seq")
+            fullPath
+                .Replace("Microsoft.FSharp.Collections.mkSeq","seq")
+                .Replace("Microsoft.FSharp.Collections.","")
+                .Replace("Microsoft.FSharp.Core.","")
     
 
 
 module internal NiceStringImplementation  =
     open System.Collections.Generic 
-    open NiceStringSettings    
+    open NiceStringSettings 
+    open Microsoft.FSharp.Reflection
+    open Microsoft.FSharp.Quotations
+    open Microsoft.FSharp.Quotations.DerivedPatterns
+    open Microsoft.FSharp.Quotations.Patterns   
     
     // TODO use 
     // http://www.fssnip.net/cV/title/A-Generic-PrettyPrinter-for-Record-types 
@@ -200,9 +207,9 @@ module internal NiceStringImplementation  =
                 match collTy.GetGenericArguments() |> Array.tryHead with 
                 |Some elTyp -> 
                     let elName = NiceFormat.typeName elTyp.Namespace elTyp.Name
-                    sprintf "%s with %d items of %s:" name xs.Count elName
-                |None -> sprintf "%s with %d items:"  name xs.Count
-            |None ->     sprintf "%s with %d items:"  name xs.Count
+                    sprintf "%s with %d items of %s" name xs.Count elName
+                |None -> sprintf "%s with %d items"  name xs.Count
+            |None ->     sprintf "%s with %d items"  name xs.Count
         if depth = maxDepth then Element desc else Head (desc, getItemsInSeq (depth+1) xs )
 
     and getSeq depth (x:obj) (xs:Collections.IEnumerable) :Lines = // non generic IEnumerable
@@ -219,8 +226,8 @@ module internal NiceStringImplementation  =
                 |Some elTyp -> 
                     let elName = NiceFormat.typeName elTyp.Namespace elTyp.Name
                     match count with 
-                    |More    i -> sprintf "%s with more than %d items of %s:" name i elName
-                    |Counted i -> sprintf "%s with %d items of %s:" name i elName
+                    |More    i -> sprintf "%s with more than %d items of %s" name i elName
+                    |Counted i -> sprintf "%s with %d items of %s" name i elName
                 |None -> 
                     match count with 
                     |More    i -> sprintf "%s with more than %d items" name i 
@@ -244,11 +251,26 @@ module internal NiceStringImplementation  =
             | :? single     as v   -> v |> NiceFormat.single  |> Element 
             | :? decimal    as d   -> d |> NiceFormat.decimal |> Element 
             | :? Char       as c   -> c.ToString()            |> Element // "'" + c.ToString() + "'" // or add qotes?
-            | :? string     as s   -> NiceFormat.truncateString  s  |> Element    // is  in quotes, s.ToString() also adds a " at start and end
+            | :? string     as s   -> NiceFormat.truncateString  s  |> Element   
             | :? Guid       as g   -> sprintf "Guid[%O]" g    |> Element 
             | :? Collections.ICollection as xs -> getCollection depth x xs
-            | :? Collections.IEnumerable as xs -> getSeq depth x xs
-            | _ ->  sprintf "%A" x |> Element
+            | :? Collections.IEnumerable as xs -> getSeq depth x xs            
+            | _ ->  
+                let t = x.GetType()
+                if FSharpType.IsTuple(t) then // TODO test
+                    let fields = FSharpValue.GetTupleFields(x)
+                    let desc =  sprintf "Tuple of %d items" fields.Length
+                    if depth = maxDepth then Element desc else Head (desc, getItemsInSeq (depth+1) fields)
+                
+                elif FSharpType.IsUnion(t) then // TODO test
+                    let union, fields =  FSharpValue.GetUnionFields(x, t)
+                    let declTy = union.DeclaringType
+                    let mainType = NiceFormat.typeName  declTy.Namespace declTy.Name
+                    let desc =  sprintf "a %s of case %s" mainType union.Name
+                    if depth = maxDepth then Element desc else Head (desc, getItemsInSeq (depth+1) fields) // TODO test what are the fields
+                
+                else
+                    sprintf "%A" x |> Element
     
 
     let formatLines (lines:Lines) = 
@@ -257,9 +279,10 @@ module internal NiceStringImplementation  =
             if depth <= maxDepth then 
                 match lns with
                 |Element s    -> sb.Append(String(' ', 4 * depth)).AppendLine(s)      |> ignoreObj 
-                |EarlyEnd     -> sb.Append(String(' ', 4 * depth)).AppendLine("...")  |> ignoreObj  
-                |Head (h,xs)  -> 
-                                 sb.Append(String(' ', 4 * depth)).AppendLine(h)      |> ignoreObj  
+                |EarlyEnd     -> sb.Append(String(' ', 4 * depth)).AppendLine("(...)")  |> ignoreObj  
+                |Head (h,xs)  ->                                  
+                                 sb.Append(String(' ', 4 * depth)).Append(h)     |> ignoreObj  
+                                 (if xs.Count=0 then sb.AppendLine() else sb.AppendLine(":"))  |> ignoreObj  // only add colon if items follow
                                  for x in xs do loop (depth+1) x
         loop 0 lines
         sb.ToString()
