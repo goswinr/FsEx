@@ -393,24 +393,3 @@ module FloatRef =
     /// set ref cell to given int if it is smaller than current value
     let inline setMin i (x:float) = if x < !i then i := x
 
-
-type FSharpFuncUtil = 
-    // from https://blog.paranoidcoding.com/2010/07/27/converting-system-func-lt-t1-tn-gt-to-fsharpfunc-lt-t-tresult-gt.html
-
-    static member ToFSharpFunc<'a> (func : System.Func<'a>) = fun () -> func.Invoke()
-
-    static member ToFSharpFunc<'a,'b> (func : System.Func<'a,'b>) = fun x -> func.Invoke(x)
-
-    static member ToFSharpFunc<'a,'b,'c> (func : System.Func<'a,'b,'c>) = fun x y -> func.Invoke(x,y)
-
-    static member ToFSharpFunc<'a,'b,'c,'d> (func : System.Func<'a,'b,'c,'d>) = fun x y z -> func.Invoke(x,y,z)
-
-    static member ToFSharpFunc<'a> (func : System.Action) = fun () -> func.Invoke()
- 
-    static member ToFSharpFunc<'a> (func : System.Action<'a>) = fun x -> func.Invoke(x)
-
-    static member Create<'a,'b> (func : System.Func<'a,'b>) = FSharpFuncUtil.ToFSharpFunc func
-
-    static member Create<'a,'b,'c> (func : System.Func<'a,'b,'c>) = FSharpFuncUtil.ToFSharpFunc func
-
-    static member Create<'a,'b,'c,'d> (func : System.Func<'a,'b,'c,'d>) = FSharpFuncUtil.ToFSharpFunc func
