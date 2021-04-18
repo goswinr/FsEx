@@ -61,13 +61,13 @@ module TypeExtensionsBclStructs =
         [<Extension>] member x.AsStringDE = x.ToString( "0.###############",deDE)   
 
         /// Format without digits behind coma
-        [<Extension>] member x.AsString0 = x.ToString( "#") 
+        [<Extension>] member x.AsString0 = x.ToString( "0") 
 
         /// Format with one digits behind coma
-        [<Extension>] member x.AsString1 = x.ToString( "0.#",invC) 
+        [<Extension>] member x.AsString1 = x.ToString( "0.0",invC) 
 
         /// Format with two digits behind coma
-        [<Extension>] member x.AsString2 = x.ToString( "0.##",invC) 
+        [<Extension>] member x.AsString2 = x.ToString( "0.00",invC) 
 
     type Single with  
 
@@ -89,13 +89,13 @@ module TypeExtensionsBclStructs =
         [<Extension>] member x.AsStringDE = x.ToString( "0.#######" , deDE)
     
         /// Format without digits behind coma
-        [<Extension>] member x.AsString0 = x.ToString( "#") 
+        [<Extension>] member x.AsString0 = x.ToString( "0") 
 
         /// Format with one digits behind coma
-        [<Extension>] member x.AsString1 = x.ToString( "0.#" , invC)
+        [<Extension>] member x.AsString1 = x.ToString( "0.0" , invC)
 
         /// Format with two digits behind coma
-        [<Extension>] member x.AsString2 = x.ToString( "0.##" , invC)
+        [<Extension>] member x.AsString2 = x.ToString( "0.00" , invC)
     
     type Decimal with  
            
@@ -121,13 +121,13 @@ module TypeExtensionsBclStructs =
         [<Extension>] member x.AsStringDE = x.ToString( "0.###############" , deDE)
 
         /// Format without digits behind coma
-        [<Extension>] member x.AsString0 = x.ToString( "#") 
+        [<Extension>] member x.AsString0 = x.ToString( "0") 
 
         /// Format with one digits behind coma
-        [<Extension>] member x.AsString1 = x.ToString( "0.#" , invC)
+        [<Extension>] member x.AsString1 = x.ToString( "0.0" , invC)
 
         /// Format with two digits behind coma
-        [<Extension>] member x.AsString2 = x.ToString( "0.##" , invC)
+        [<Extension>] member x.AsString2 = x.ToString( "0.00" , invC)
 
     type DateTime with
         

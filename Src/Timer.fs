@@ -59,13 +59,13 @@ type Timer() =
     /// since last tic (or toc) as string, then reset and restart timer
     member this.TocEx = tocWithGC stopWatch kGC
     
-    ///Returns only time since last tic (or toc) as string, then reset and restart timer
+    /// Returns only time since last tic (or toc) as string, then reset and restart timer
     member this.Toc = tocNoGC stopWatch
     
-    ///Reset and start Timer
+    /// Reset and start Timer
     member this.Tic() =  ticWithGC stopWatch kGC
 
-    ///Stops Timer
+    /// Stops Timer
     member this.Stop() =  stopWatch.Stop()
 
     
