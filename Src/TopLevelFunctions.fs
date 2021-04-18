@@ -15,7 +15,7 @@ type EXT = Runtime.CompilerServices.ExtensionAttribute
 /// Static Extension methods on Exceptions to cal Excn.Raise "%A" x with F# printf string formating
 /// module is set to auto open
 [<AutoOpen>]
-module  Exceptions =    
+module TypeExtensionsExceptions =    
 
     type ArgumentException with
         /// Raise ArgumentException with F# printf string formating
@@ -91,7 +91,7 @@ module IO =
 
     /// Returns all files in folder and subfolders that fit pattern (e.g. "*.pdf" ) 
     /// may fail on IOExceptions
-    let rec getAllFilesByPattern (dir:string) pattern =
+    let rec getAllFilesByPattern (dir:string) (pattern:string) =
         seq {   yield! Directory.EnumerateFiles(dir, pattern)
                 for d in Directory.EnumerateDirectories(dir) do
                     yield! getAllFilesByPattern d pattern }
@@ -104,8 +104,7 @@ module IO =
 /// General Utility functions
 /// module is set to auto open
 [<AutoOpen>]
-module  Util = 
-    
+module  Util =     
     
     /// a quick way to throw an exception.
     /// for use in temporary scripts when you are too lazy to do a proper exception.
@@ -153,6 +152,7 @@ module  Util =
     /// Returns maybeNullValue if it is NOT null, else alternativeValue. 
     let inline ifNull (alternativeValue:'T) (maybeNullValue:'T)  = match maybeNullValue with null -> alternativeValue | _ -> maybeNullValue  
 
+    /// Null coalesceing:
     /// Returns the value on the left unless it is null, then it returns the value on the right.
     let inline (|?) (a:'T) (b:'T)  = // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs
         match a with 
@@ -339,7 +339,6 @@ module IntRef =
 
     /// set ref cell to given int if it is smaller than current value
     let inline setMin i (x:int) = if x < !i then i := x
-
 
 
 
