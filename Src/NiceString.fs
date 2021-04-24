@@ -73,11 +73,14 @@ module NiceFormat  =
 
     /// Formating with automatic precision 
     /// e.g.: 0 digits behind comma if above 1000 
+    /// if there are more than 15 zeros behind the comma just '~0.0' will be displayed
+    /// if the value is smaller than NiceStringSettings.roundToZeroBelow '0.0' will be shown.
+    /// this is Double.Epsilon by default
     let float  (x:float) =
         if   Double.IsNaN x then "NaN"
         elif x = Double.NegativeInfinity then "Negative Infinity"
         elif x = Double.PositiveInfinity then "Positive Infinity"
-        elif x = -1.23432101234321e+308 then "-1.23432e+308 ( = RhinoMath.UnsetValue)" // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetValue.htm
+        elif x = -1.23432101234321e+308 then "-1.23432e+308 (=RhinoMath.UnsetValue)" // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetValue.htm
         elif x = 0.0 then "0.0" // not "0" as in sprintf "%g"
         else
             let  a = abs x
@@ -91,7 +94,10 @@ module NiceFormat  =
             elif a > 0.01   then x.ToString("0.#####" , invC)
             elif a > 0.001  then x.ToString("0.######" , invC)
             elif a > 0.0001 then x.ToString("0.#######" , invC)
-            else                  x.ToString("0.###############" , invC)// 15 decimal paces for doubles
+            elif a > 0.000000000000001 then x.ToString("0.###############" , invC)// 15 decimal paces for doubles
+            else "~0.0"
+
+           
     
     /// Formating with automatic precision 
     /// e.g.: 0 digits behind comma if above 1000 
