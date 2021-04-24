@@ -5,16 +5,17 @@ open System.Globalization
 
 
 /// Math Utils
-/// Shadows the built in trigonometric asin and acos function to include clamping if values are slightly above -1.0 or 1.0
+/// when opened shadows the built in trigonometric asin and acos function to include clamping if values are slightly above -1.0 or 1.0
 module UtilMath =
     
     /// American Englisch culture (used for float parsing)
     let enUs = CultureInfo.GetCultureInfo("en-us")
+    
     /// German culture (used for float parsing)
     let deAt = CultureInfo.GetCultureInfo("de-at")
     
-    /// First tries to parses english float (period as decimal separator),
-    /// if this fails tries to parse german floats,(comma as decimal separator)
+    /// First tries to parses float with En-Us CultureInfo (period as decimal separator),
+    /// if this fails tries to parse parses float with De-At CultureInfo (comma as decimal separator)
     let tryParseFloatEnDe (x:string) : float option=
         match Double.TryParse(x, NumberStyles.Float, enUs) with
         | true, f -> Some f
@@ -22,39 +23,56 @@ module UtilMath =
                 | true, f -> Some f
                 | _ -> None
     
-    /// First tries to parses english float (period as decimal separator),
-    /// if this fails tries to parse german floats,(comma as decimal separator)
+    /// First tries to parses float with En-Us CultureInfo (period as decimal separator),
+    /// if this fails tries to parse parses float with De-At CultureInfo (comma as decimal separator)
     let parseFloatEnDe (x:string) : float =
         match tryParseFloatEnDe x  with
         | Some f -> f
-        | None ->   failwithf "Could not parse '%s' into a floating point number using englisch and german culture settings" x
+        | None ->   failwithf "Could not parse '%s' into a floating point number using englisch and german culture settings" x    
 
-        
-    /// Get Float from any input. This helper enables more generic code in parsing sequences
-    let inline floatOfObj (o:^T) = 
-        match box o with 
-        | :? float   as x -> x
-        | :? int     as x -> float (x)
-        | :? single  as x -> float (x)
-        | :? int64   as x -> float (x)
-        | :? decimal as x -> float (x)
-        | :? string  as x -> parseFloatEnDe (x)
-        | _               -> 
 
-            try 
-                float(o)
-            with _ -> 
-                failwithf "Could not convert %s '%A' into a floating point number" (o.GetType().Name) o   
-    
-    
+    /// A very tolerant custom float parser
+    /// ignores all non numeric characters ( expect leading '-' )
+    /// and considers '.' and  ',' as decimal point
+    /// does not allow for scientific notation
+    let tryParseFloatTolerant(s:string) =
+        let sb = Text.StringBuilder(s.Length)
+        for c in s do
+            if c >= '0' && c <= '9' then sb.Append(c) |> ignore
+            elif c = '.' then sb.Append(c) |> ignore
+            elif c = '-' && sb.Length = 0  then sb.Append(c) |> ignore //only add minus at start
+            elif c = ',' then sb.Append('.') |> ignore // german formating
+        match Double.TryParse(sb.ToString(), NumberStyles.Float, enUs) with
+        | true, f -> Some f
+        | _ ->   None 
 
-    /// Allows ints to be multiplied by floats
-    /// <c>int(round(float(i) * f))</c> 
-    let inline ( *. ) (i:int) (f:float) = int(round(float(i) * f)) // or do it like this:https://stackoverflow.com/questions/2812084/overload-operator-in-f/2812306#2812306
     
-    /// Gives a float from int / int division
-    /// <c>(float(i)) / (float(j))</c> 
-    let inline ( ./. ) (i:int) (j:int) = (float(i)) / (float(j)) // or do it like this:https://stackoverflow.com/questions/2812084/overload-operator-in-f/2812306#2812306
+    // never used::
+
+    // Get Float from any input. This helper enables more generic code in parsing sequences
+    //let inline floatOfObj (o:^T) = 
+    //    match box o with 
+    //    | :? float   as x -> x
+    //    | :? int     as x -> float (x)
+    //    | :? single  as x -> float (x)
+    //    | :? int64   as x -> float (x)
+    //    | :? decimal as x -> float (x)
+    //    | :? string  as x -> parseFloatEnDe (x)
+    //    | _               -> 
+    //        try 
+    //            float(o)
+    //        with _ -> 
+    //            failwithf "Could not convert %s '%A' into a floating point number" (o.GetType().Name) o   
+    
+    // better define yourself when needed:
+
+    // Allows ints to be multiplied by floats, returns int
+    // <c>int(round(float(i) * f))</c> 
+    //let inline ( *. ) (i:int) (f:float) = int(round(float(i) * f)) // or do it like this:https://stackoverflow.com/questions/2812084/overload-operator-in-f/2812306#2812306
+    
+    // Gives a float from int / int division
+    // <c>(float(i)) / (float(j))</c> 
+    //let inline ( ./. ) (i:int) (j:int) = (float(i)) / (float(j)) // or do it like this:https://stackoverflow.com/questions/2812084/overload-operator-in-f/2812306#2812306
 
     
     /// Test is a floating point value is Infinity or Not a Number
