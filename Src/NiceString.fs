@@ -33,9 +33,9 @@ module NiceStringSettings =
     let mutable maxCharsInString = 5000
 
 
-    // if the absolut value of a float is below this, display just Zero
-    // default = Double.Epsilon = no rounding down
-    // let mutable roundToZeroBelow = Double.Epsilon
+    /// if the absolut value of a float is below this, display ±0.0
+    /// default = Double.Epsilon = no rounding down
+    let mutable roundToZeroBelow = Double.Epsilon
  
 
     /// Allows to inject an optional formater that gets called befor main formater
@@ -43,9 +43,39 @@ module NiceStringSettings =
     /// use externalFormater for types defined in other assemblies 
     let mutable externalFormater : obj -> option<Lines> = 
         fun _ -> None   
+
     
 
 module NiceFormat  = 
+    
+    module Literals = 
+        
+        /// string for RhinoMath.UnsetDouble -1.23432101234321e+308
+        [<Literal>]
+        let RhinoMathUnsetDouble = "RhinoMath.UnsetDouble" // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetValue.htm
+
+        /// string for RhinoMath.UnsetSingle -1.234321e+38f 
+        [<Literal>]
+        let RhinoMathUnsetSingle = "RhinoMath.UnsetSingle" // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetSingle.htm
+        
+        [<Literal>]
+        let PositiveInfinity = "∞"
+        
+        [<Literal>]
+        let NegativeInfinity = "-∞"
+        
+        [<Literal>]
+        let NaN = "NaN"
+
+        [<Literal>]
+        let AlmostZero = "~0.0"
+
+        [<Literal>]
+        let AlmostZeroNeg = "-~0.0"
+
+        [<Literal>]
+        let RoundedToZero = "±0.0"
+    
     open NiceStringSettings
 
     //let internal deDE = Globalization.CultureInfo("de-DE")
@@ -68,8 +98,7 @@ module NiceFormat  =
             for i=st+1 to en do // dont go to last one becaus it shal never get a separator                       
                 let pos = i-st
                 if pos % 3 = 0 then add thousandSeparator            
-                add s.[i]
-        
+                add s.[i]        
         
         let start = 
             if s.[0] = '-' then  add '-'; 1 /// add minus if present and move start location
@@ -83,22 +112,34 @@ module NiceFormat  =
             if i < s.Length then doAfterComma (i+1) (s.Length-1)
 
         b.ToString() 
-
-    let parseNiceFloat (s:string)=
+    
+    /// NaN -> None
+    /// PositiveInfinity -> None
+    /// NegativeInfinity-> None
+    /// RhinoMathUnsetDouble -> None 
+    /// RhinoMathUnsetSingle -> None 
+    /// AlmostZero ->    Some 0.0
+    /// AlmostZeroNeg->  Some 0.0
+    /// RoundedToZero -> Some 0.0
+    let tryParseNiceFloat (s:string)=
         match s with 
-        |"NaN" -> Double.NaN
-        |"Negative Infinity" -> Double.NegativeInfinity
-        |"Positive Infinity" -> Double.PositiveInfinity
-        |"-1.23432e+308 (=RhinoMath.UnsetValue)" -> -1.23432101234321e+308 // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetValue.htm
-        |"~0.0" ->   0.0000000000000001
-        |"~-0.0"->  -0.0000000000000001
+        |Literals.NaN -> None
+        |Literals.PositiveInfinity -> None
+        |Literals.NegativeInfinity-> None
+        |Literals.RhinoMathUnsetDouble -> None //Some -1.23432101234321e+308  // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetValue.htm
+        |Literals.RhinoMathUnsetSingle -> None //Some -1.234321e+38f // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetSingle.htm
+        |Literals.AlmostZero ->    Some 0.0
+        |Literals.AlmostZeroNeg->  Some 0.0
+        |Literals.RoundedToZero -> Some 0.0
         | _ -> 
-            match Double.TryParse(s.Replace(string(thousandSeparator),""),NumberStyles.Float,invC) with 
-            | true, v -> v
-            | _ -> failwithf "Failed to parse NiceString float '%s' " s
+            let cleanFloat = s.Replace(string(thousandSeparator),"") // no need to take care of decimal comma here. nice string never has one
+            match Double.TryParse(cleanFloat, NumberStyles.Float, invC) with 
+            | true, v -> Some v
+            | _ -> None
+
     
     let int (x:int) = 
-        // abs(Int32.MinValue) would fail !!
+        // because abs(Int32.MinValue) would fail !!
         if x = Int32.MinValue || abs (x) >= 1000 then x.ToString() |> addThousandSeparators 
         else                                          x.ToString()  
 
@@ -108,19 +149,19 @@ module NiceFormat  =
     /// if the value is smaller than NiceStringSettings.roundToZeroBelow '0.0' will be shown.
     /// this is Double.Epsilon by default
     let float  (x:float) =
-        if   Double.IsNaN x then "NaN"
-        elif x = Double.NegativeInfinity then "Negative Infinity"
-        elif x = Double.PositiveInfinity then "Positive Infinity"
-        elif x = -1.23432101234321e+308 then "-1.23432e+308 (=RhinoMath.UnsetValue)" // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetValue.htm
+        if   Double.IsNaN x then Literals.NaN
+        elif x = Double.NegativeInfinity then Literals.NegativeInfinity
+        elif x = Double.PositiveInfinity then Literals.PositiveInfinity
+        elif x = -1.23432101234321e+308 then Literals.RhinoMathUnsetDouble // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetValue.htm        
         elif x = 0.0 then "0.0" // not "0" as in sprintf "%g"
         else
             let  a = abs x
             if   a >= 10000.     then x.ToString("#")|> addThousandSeparators 
+            elif a <  roundToZeroBelow then Literals.RoundedToZero
             elif a >= 1000.      then x.ToString("#")
             elif a >= 100.       then x.ToString("#.#" , invC)
             elif a >= 10.        then x.ToString("#.##" , invC)
             elif a >= 1.         then x.ToString("#.###" , invC)
-            //elif   a < roundToZeroBelow then "0.0"
             elif a >= 0.1        then x.ToString("0.####" , invC)|> addThousandSeparators 
             elif a >= 0.01       then x.ToString("0.#####" , invC)|> addThousandSeparators 
             elif a >= 0.001      then x.ToString("0.######" , invC)|> addThousandSeparators 
@@ -141,37 +182,37 @@ module NiceFormat  =
         else
             let  a = abs x
             if   a >= 10000M then x.ToString("#")|> addThousandSeparators 
-            elif a >= 1000M  then x.ToString("#")
-            elif a >= 100M   then x.ToString("#.#" , invC)
-            elif a >= 10M    then x.ToString("#.##" , invC)
-            elif a >= 1M     then x.ToString("#.###" , invC)
-            // elif  a < decimal(roundToZeroBelow) then "0.0"
+            elif a <  decimal(roundToZeroBelow) then Literals.RoundedToZero
+            elif a >= 1000M   then x.ToString("#")
+            elif a >= 100M    then x.ToString("#.#" , invC)
+            elif a >= 10M     then x.ToString("#.##" , invC)
+            elif a >= 1M      then x.ToString("#.###" , invC)
             elif a >= 0.1M    then x.ToString("0.####" , invC)
             elif a >= 0.01M   then x.ToString("0.#####" , invC)
             elif a >= 0.001M  then x.ToString("0.######" , invC)
             elif a >= 0.0001M then x.ToString("0.#######" , invC)
-            else                  x.ToString("0.########" , invC)  
+            else                   x.ToString("0.########" , invC)  
 
     /// Formating with automatic precision 
     /// e.g.: 0 digits behind comma if above 1000
     let single (x:float32) =
-        if   Single.IsNaN x then "NaN"
-        elif x = Single.NegativeInfinity then "Negative Infinity"
-        elif x = Single.PositiveInfinity then "Positive Infinity"            
-        elif x = -1.234321e+38f then "-1.2343e+38 ( = RhinoMath.UnsetSingle)" // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetSingle.htm
+        if   Single.IsNaN x then Literals.NaN
+        elif x = Single.NegativeInfinity then Literals.PositiveInfinity
+        elif x = Single.PositiveInfinity then Literals.NegativeInfinity            
+        elif x = -1.234321e+38f then Literals.RhinoMathUnsetSingle // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetSingle.htm
         elif x = 0.0f then "0.0" // not "0" as in sprintf "%g"
         else
             let  a = abs x
-            if   a > 10000.f then x.ToString("#")|> addThousandSeparators 
-            elif a > 1000.f  then x.ToString("#")
-            elif a > 100.f   then x.ToString("#.#" , invC)
-            elif a > 10.f    then x.ToString("#.##" , invC)
-            elif a > 1.f     then x.ToString("0.###" , invC)
-            // elif   a < float32(roundToZeroBelow) then "0.0"
-            elif a > 0.1f    then x.ToString("0.####" , invC)
-            elif a > 0.01f   then x.ToString("0.#####" , invC)
-            elif a > 0.001f  then x.ToString("0.######" , invC)
-            else                  x.ToString("0.#######" , invC) // 7 decimal paces for singles
+            if   a >= 10000.f then x.ToString("#")|> addThousandSeparators 
+            elif a <  float32(roundToZeroBelow) then Literals.RoundedToZero
+            elif a >= 1000.f  then x.ToString("#")
+            elif a >= 100.f   then x.ToString("#.#" , invC)
+            elif a >= 10.f    then x.ToString("#.##" , invC)
+            elif a >= 1.f     then x.ToString("0.###" , invC)
+            elif a >= 0.1f    then x.ToString("0.####" , invC)
+            elif a >= 0.01f   then x.ToString("0.#####" , invC)
+            elif a >= 0.001f  then x.ToString("0.######" , invC)
+            else                   x.ToString("0.#######" , invC) // 7 decimal paces for singles
     
 
     /// If the input string is longer than maxChars + 20 then 

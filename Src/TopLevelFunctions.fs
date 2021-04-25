@@ -221,8 +221,6 @@ module IntRef =
     /// set ref cell to given int if it is smaller than current value
     let inline setMin i (x:int) = if x < !i then i := x
 
-
-
     // Increment a ref cell and return new incremented integer value
     //[<Obsolete>]
     //let inline (!++)  i = incr i; !i 
