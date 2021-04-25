@@ -7,9 +7,8 @@ open System.Runtime.CompilerServices
 /// Adds Extension Members on Collections.Generic.Array<'T>
 /// for geting and setting first, second, last and similar indices.
 /// Also adds functionality for negative indices
-module ExtensionsArray =  
+module ExtensionsArray = 
 
-    
     type ``[]``<'T>  with //Generic Array
         
         /// Gets an item at index. 

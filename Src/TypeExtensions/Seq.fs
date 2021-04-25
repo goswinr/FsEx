@@ -8,7 +8,7 @@ open System.Runtime.CompilerServices
 
 /// provides Extension methods on Collections.Generic.IEnumerable 
 module ExtensionsSeq = 
-    
+
     open ExtensionsIList // for a.GetNeg
 
     let internal indexFromBack ix (xs: 'T seq) =     
@@ -28,17 +28,16 @@ module ExtensionsSeq =
                 let mutable i = 0
                 let mutable k = 0 
                 while (e.MoveNext()) do 
-                    k <-i % (ix+1)//loop index
-                    ar.[k]<- e.Current 
+                    k <-i % (ix+1) //loop index
+                    ar.[k] <- e.Current 
                     i <- i+1
-                if ix > i then failwithf "can't get index from back %d from  seq of %d items" ix (i+1)
+                if ix > i then IndexOutOfRangeException.Raise "Seq.indexFromBack: Can't get index from back %d from  seq of %d items" ix (i+1)
                 ar.GetNeg(k-ix) 
             else
-                failwithf "can't get index from back %d from empty seq" ix    
+                IndexOutOfRangeException.Raise "Seq.indexFromBack: Can't get index from back %d from empty seq" ix    
 
     
-    type Collections.Generic.IEnumerable<'T>  with 
-        
+    type IEnumerable<'T>  with         
         
         /// Gets an item by index position in the Seq
         /// Allows for negtive index too (like Python)
@@ -48,7 +47,7 @@ module ExtensionsSeq =
                 if index >= 0 then Seq.item index this
                 else indexFromBack ( 1 - index ) this
             with 
-            | :? InvalidOperationException  as ex -> failwithf "seq.GetNeg(%d): Failed to get %dth item of %s : %s" index index (NiceString.toNiceStringFull this) ex.Message
+            | :? InvalidOperationException  as ex -> IndexOutOfRangeException.Raise "seq.GetNeg(%d): Failed to get %dth item of %s : %s" index index (NiceString.toNiceStringFull this) ex.Message
             | ex -> raise ex //some other error raised while constructing lazy seq
 
         (*
@@ -61,7 +60,7 @@ module ExtensionsSeq =
         ///Returns Seq.length - 1
         [<Extension>]
         member this.LastIndex = 
-            if Seq.isEmpty this then failwithf "seq.LastIndex: Failed to get LastIndex of empty Seq" //TODO fix Exception type
+            if Seq.isEmpty this then IndexOutOfRangeException.Raise "seq.LastIndex: Failed to get LastIndex of empty Seq" //TODO fix Exception type
             (Seq.length this) - 1
         
         /// Gets the last item in the Seq
@@ -79,7 +78,7 @@ module ExtensionsSeq =
         /// Gets the first item in the Seq
         [<Extension>]
         member this.First = 
-            if Seq.isEmpty this then failwithf "seq.First: Failed to get LastIndex of empty Seq"
+            if Seq.isEmpty this then IndexOutOfRangeException.Raise "seq.First: Failed to get LastIndex of empty Seq"
             Seq.head this
         
         /// Gets the second item in the Seq
@@ -88,7 +87,7 @@ module ExtensionsSeq =
             try 
                 this|> Seq.skip 1 |> Seq.head
             with 
-            | :? InvalidOperationException  as ex -> failwithf "seq.Second: Failed to get second item of %s : %s"  (NiceString.toNiceStringFull this) ex.Message
+            | :? InvalidOperationException  as ex -> IndexOutOfRangeException.Raise "seq.Second: Failed to get second item of %s : %s"  (NiceString.toNiceStringFull this) ex.Message
             | ex -> raise ex  //some other error raised while constructing lazy seq          
         
         /// Gets the third item in the Seq
@@ -97,7 +96,7 @@ module ExtensionsSeq =
             try 
                 this|> Seq.skip 2 |> Seq.head
             with 
-            | :? InvalidOperationException  as ex -> failwithf "seq.Third: Failed to get third item of %s : %s"  (NiceString.toNiceStringFull this) ex.Message
+            | :? InvalidOperationException  as ex -> IndexOutOfRangeException.Raise "seq.Third: Failed to get third item of %s : %s"  (NiceString.toNiceStringFull this) ex.Message
             | ex -> raise ex   //some other error raised while constructing lazy seq         
         
         /// Seq.Slice
@@ -113,7 +112,7 @@ module ExtensionsSeq =
             with 
             | :? InvalidOperationException  as ex -> 
                 let en =  if endIdx < 0 then count.Value + endIdx else endIdx
-                failwithf "seq.GetSlice: Start index '%A' (= %d) and end index '%A'(= %d) for Seq of %d items failed for %s : %s" startIdx st endIdx en  count.Value (NiceString.toNiceStringFull this) ex.Message
+                IndexOutOfRangeException.Raise "seq.GetSlice: Start index '%A' (= %d) and end index '%A'(= %d) for Seq of %d items failed for %s : %s" startIdx st endIdx en  count.Value (NiceString.toNiceStringFull this) ex.Message
             | ex -> raise ex //some other error raised while constructing lazy seq
             
         
@@ -122,7 +121,7 @@ module ExtensionsSeq =
         [<Extension>]  
         member obj.ToNiceString = NiceString.toNiceString obj
             
-[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies (should consider for other extension modules as well)
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies 
 module Seq =   
     
     open ExtensionsSeq
@@ -223,7 +222,7 @@ module Seq =
                 yield  prev
                 prev <- e.Current
         else
-            failwith "skipLast: Empty Input Sequence"}
+            IndexOutOfRangeException.Raise "skipLast: Empty Input Sequence"}
     
     /// splits seq in two, like Seq.filter but returning both
     /// the first Rarr has all elements where the filter function returned 'true'
@@ -255,9 +254,9 @@ module Seq =
                             prev <- e.Current
                         yield prev, first
                 else
-                    failwithf "Seq.thisNext: Input Sequence only had one element %A" xs.ToNiceString
+                    IndexOutOfRangeException.Raise "Seq.thisNext: Input Sequence only had one element %A" xs.ToNiceString
             else
-                failwith "Seq.thisNext: Empty Input Sequence"}
+                IndexOutOfRangeException.Raise "Seq.thisNext: Empty Input Sequence"}
     
     /// Yields a Seq from (first, second)  upto (second last, last)
     /// The length of the resulting seq is one shorter than input seq.
@@ -273,9 +272,9 @@ module Seq =
                         yield  prev, e.Current 
                         prev <- e.Current                        
                 else
-                    failwithf "Seq.windowed2: Input Sequence only had one element %A" xs.ToNiceString
+                    IndexOutOfRangeException.Raise "Seq.windowed2: Input Sequence only had one element %A" xs.ToNiceString
             else
-                failwith "Seq.windowed2: Empty Input Sequence"}  
+                IndexOutOfRangeException.Raise "Seq.windowed2: Empty Input Sequence"}  
 
 
     /// Yields looped Seq from (0, first, second)  upto (lastIndex, last, first)
@@ -297,9 +296,9 @@ module Seq =
                         kk <- kk + 1 
                         yield kk, prev, first
                 else
-                    failwith "thisNextLooped: Input Sequence only had one element"
+                    IndexOutOfRangeException.Raise "thisNextLooped: Input Sequence only had one element"
             else
-                failwith "thisNextLooped: Empty Input Sequence"}
+                IndexOutOfRangeException.Raise "thisNextLooped: Empty Input Sequence"}
 
     /// Yields a Seq from (0,first, second) upto (secondLastIndex, second last, last)
     /// The length of the resulting seq is one shorter than input seq.
@@ -317,9 +316,9 @@ module Seq =
                         yield  kk, prev, e.Current 
                         prev <- e.Current  
                 else
-                    failwithf "Seq.windowed2i: Input Sequence only had one element %A" xs.ToNiceString
+                    IndexOutOfRangeException.Raise "Seq.windowed2i: Input Sequence only had one element %A" xs.ToNiceString
             else
-                failwith "Seq.windowed2i: Empty Input Sequence"}  
+                IndexOutOfRangeException.Raise "Seq.windowed2i: Empty Input Sequence"}  
 
 
     /// Yields a looped Seq from (last, first, second)  upto (second-last, last, first)
@@ -343,11 +342,11 @@ module Seq =
                         this <- e.Current                            
                     yield prev, this, first
                 else                     
-                    failwithf "Seq.prevThisNextLooped: Input Sequence only had two elements: %s" xs.ToNiceString
+                    IndexOutOfRangeException.Raise "Seq.prevThisNextLooped: Input Sequence only had two elements: %s" xs.ToNiceString
             else
-                failwithf "Seq.prevThisNextLooped: Input Sequence only had one element: %s" xs.ToNiceString
+                IndexOutOfRangeException.Raise "Seq.prevThisNextLooped: Input Sequence only had one element: %s" xs.ToNiceString
         else
-            failwithf "Seq.prevThisNextLooped: Empty Input Sequence %A" xs} 
+            IndexOutOfRangeException.Raise "Seq.prevThisNextLooped: Empty Input Sequence %A" xs} 
 
 
     /// Yields a Seq from (first, second, third)  upto (third-last, second-last, last)
@@ -368,11 +367,11 @@ module Seq =
                         prev <- this 
                         this <- e.Current
                 else                     
-                    failwithf "Seq.windowed3: Input Sequence only had two elements: %s" xs.ToNiceString
+                    IndexOutOfRangeException.Raise "Seq.windowed3: Input Sequence only had two elements: %s" xs.ToNiceString
             else
-                failwithf "Seq.windowed3: Input Sequence only had one element: %s" xs.ToNiceString
+                IndexOutOfRangeException.Raise "Seq.windowed3: Input Sequence only had one element: %s" xs.ToNiceString
         else
-            failwithf "Seq.windowed3: Empty Input Sequence %A" xs} 
+            IndexOutOfRangeException.Raise "Seq.windowed3: Empty Input Sequence %A" xs} 
 
 
     /// Yields looped Seq from (0, last, first, second)  upto (lastIndex, second-last, last, first)
@@ -398,11 +397,11 @@ module Seq =
                         this <- e.Current                            
                     yield kk, prev, this, first
                 else                     
-                    failwithf "prevThisNextLooped: Input Sequence %s only had two elements" xs.ToNiceString
+                    IndexOutOfRangeException.Raise "prevThisNextLooped: Input Sequence %s only had two elements" xs.ToNiceString
             else
-                failwithf "prevThisNextLooped: Input Sequence %s only had one element" xs.ToNiceString
+                IndexOutOfRangeException.Raise "prevThisNextLooped: Input Sequence %s only had one element" xs.ToNiceString
         else
-            failwithf "prevThisNextLooped: Empty Input Sequence %A" xs} 
+            IndexOutOfRangeException.Raise "prevThisNextLooped: Empty Input Sequence %A" xs} 
 
     /// Yields a Seq from (1, first, second, third)  upto (secondLastIndex, third-last, second-last, last)
     /// The length of the resulting seq is two shorter than the input seq.
@@ -423,8 +422,8 @@ module Seq =
                         prev <- this 
                         this <- e.Current
                 else                     
-                    failwithf "Seq.windowed3i: Input Sequence only had two elements: %s" xs.ToNiceString
+                    IndexOutOfRangeException.Raise "Seq.windowed3i: Input Sequence only had two elements: %s" xs.ToNiceString
             else
-                failwithf "Seq.windowed3i: Input Sequence only had one element: %s" xs.ToNiceString
+                IndexOutOfRangeException.Raise "Seq.windowed3i: Input Sequence only had one element: %s" xs.ToNiceString
         else
-            failwithf "Seq.windowed3i: Empty Input Sequence %A" xs} 
+            IndexOutOfRangeException.Raise "Seq.windowed3i: Empty Input Sequence %A" xs} 

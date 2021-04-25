@@ -199,7 +199,7 @@ module Rarr =
     
             *)
 
-    /// retuns an empty Rarr
+    /// returns an empty Rarr
     let inline empty() = Rarr<'T>()
 
     /// returns a Rarr that has at most k items, can be less too.

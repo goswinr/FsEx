@@ -6,10 +6,7 @@ open System.Collections.Generic
 
 
 //[<AutoOpen>]
-
-
 module ExtensionsIDictionary =   //TODO add Docstring
-
     
     type IDictionary<'K,'V> with           
         
@@ -47,12 +44,14 @@ module ExtensionsIDictionary =   //TODO add Docstring
         /// A property like the ToString() method, 
         /// But with richer formationg for collections
         [<Extension>]  
-        member obj.ToNiceString = NiceString.toNiceString obj
+        member obj.ToNiceString = 
+            NiceString.toNiceString obj
 
 
 
 
 /// Static Functions on IDictionary Interface
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Dict alias class in C# assemblies 
 module Dict = 
     
     /// Get value at key from IDictionary, with nicer Error messages
@@ -64,8 +63,7 @@ module Dict =
     /// Set value at key from IDictionary
     // just d.[k]<-v
     let set (value:'V) (key:'K) (dict:IDictionary<'K,'V>) =  
-        dict.[key]<-value
-
+        dict.[key] <- value
     
     let tryGet (k:'K) (d:IDictionary<'K,'V>) : 'V option= 
         let ok, v = d.TryGetValue(k)

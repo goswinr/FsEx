@@ -44,7 +44,7 @@ module ExtensionsString =
             s.[s.Length - 3]
 
 
-        /// retuns the last x(int) characters of the string
+        /// returns the last x(int) characters of the string
         /// same as string.LastN
         [<Extension>]
         member inline s.LastX x = 

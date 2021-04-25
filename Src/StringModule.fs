@@ -6,7 +6,7 @@ open System.Runtime.CompilerServices
 open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
 
-[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide String class in C# assemblies (should consider for other extension modules as well)
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide String class in C# assemblies
 module String =   
            
     /// An Exception for the string functions defined in FsEx
@@ -35,9 +35,9 @@ module String =
                     sprintf "%s[..%d more Chars..]%s" st (len - maxChars - 5) last5
             s.Replace("\r","\\r").Replace("\n","\\n")
     
-    /// for  string formating in exceptions below.
-    /// Inclouding sourounding quotes
-    let internal exnf s = 
+    /// For string formating in exceptions below.
+    /// Including surounding quotes
+    let private exnf s = 
         if isNull s then "-null string-"  else "\"" + truncateFormatedInOneLine s + "\"" //separate null check so null value is not in quotes
 
     /// TODO removed inline to get compile times down in FSI ?
@@ -46,7 +46,7 @@ module String =
     /// fromString.Replace(textToRemove, "")
     let (*inline*) delete (textToRemove:string) (fromString:string)=
         if isNull fromString   then FsExStringException.Raise "String.delete: fromString is null (textToRemove:%s)" (exnf textToRemove)
-        if isNull textToRemove then FsExStringException.Raise "String.delete: textToRemove is null (fromString:%s)"  (exnf fromString)
+        if isNull textToRemove then FsExStringException.Raise "String.delete: textToRemove is null (fromString:%s)" (exnf fromString)
         fromString.Replace(textToRemove, "")
 
     // Ensures all lines end on System.Environment.NewLine

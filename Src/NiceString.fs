@@ -32,6 +32,7 @@ module NiceStringSettings =
     /// default = 5000
     let mutable maxCharsInString = 5000
 
+
     // if the absolut value of a float is below this, display just Zero
     // default = Double.Epsilon = no rounding down
     // let mutable roundToZeroBelow = Double.Epsilon
@@ -97,8 +98,9 @@ module NiceFormat  =
             | _ -> failwithf "Failed to parse NiceString float '%s' " s
     
     let int (x:int) = 
-        if abs(x) > 1000 then x.ToString() |> addThousandSeparators
-        else                  x.ToString()  
+        // abs(Int32.MinValue) would fail !!
+        if x = Int32.MinValue || abs (x) >= 1000 then x.ToString() |> addThousandSeparators 
+        else                                          x.ToString()  
 
     /// Formating with automatic precision 
     /// e.g.: 0 digits behind comma if above 1000 
@@ -113,21 +115,21 @@ module NiceFormat  =
         elif x = 0.0 then "0.0" // not "0" as in sprintf "%g"
         else
             let  a = abs x
-            if   a > 10000.     then x.ToString("#")|> addThousandSeparators 
-            elif a > 1000.      then x.ToString("#")
-            elif a > 100.       then x.ToString("#.#" , invC)
-            elif a > 10.        then x.ToString("#.##" , invC)
-            elif a > 1.         then x.ToString("#.###" , invC)
+            if   a >= 10000.     then x.ToString("#")|> addThousandSeparators 
+            elif a >= 1000.      then x.ToString("#")
+            elif a >= 100.       then x.ToString("#.#" , invC)
+            elif a >= 10.        then x.ToString("#.##" , invC)
+            elif a >= 1.         then x.ToString("#.###" , invC)
             //elif   a < roundToZeroBelow then "0.0"
-            elif a > 0.1        then x.ToString("0.####" , invC)|> addThousandSeparators 
-            elif a > 0.01       then x.ToString("0.#####" , invC)|> addThousandSeparators 
-            elif a > 0.001      then x.ToString("0.######" , invC)|> addThousandSeparators 
-            elif a > 0.0001     then x.ToString("0.#######" , invC)|> addThousandSeparators 
-            elif a > 0.00001    then x.ToString("0.########" , invC)|> addThousandSeparators 
-            elif a > 0.000001   then x.ToString("0.#########" , invC)|> addThousandSeparators 
-            elif a > 0.0000001  then x.ToString("0.##########" , invC)|> addThousandSeparators 
-            elif a > 0.000000000000001 then x.ToString("0.###############" , invC)|> addThousandSeparators // 15 decimal paces for doubles
-            elif x > 0.0 then "~0.0"
+            elif a >= 0.1        then x.ToString("0.####" , invC)|> addThousandSeparators 
+            elif a >= 0.01       then x.ToString("0.#####" , invC)|> addThousandSeparators 
+            elif a >= 0.001      then x.ToString("0.######" , invC)|> addThousandSeparators 
+            elif a >= 0.0001     then x.ToString("0.#######" , invC)|> addThousandSeparators 
+            elif a >= 0.00001    then x.ToString("0.########" , invC)|> addThousandSeparators 
+            elif a >= 0.000001   then x.ToString("0.#########" , invC)|> addThousandSeparators 
+            elif a >= 0.0000001  then x.ToString("0.##########" , invC)|> addThousandSeparators 
+            elif a >= 0.000000000000001 then x.ToString("0.###############" , invC)|> addThousandSeparators // 15 decimal paces for doubles
+            elif x >= 0.0 then "~0.0"
             else "~-0.0"
 
            
@@ -138,16 +140,16 @@ module NiceFormat  =
         if x = 0M then "0.0" // not "0" as in sprintf "%g"
         else
             let  a = abs x
-            if   a > 10000M then x.ToString("#")|> addThousandSeparators 
-            elif a > 1000M  then x.ToString("#")
-            elif a > 100M   then x.ToString("#.#" , invC)
-            elif a > 10M    then x.ToString("#.##" , invC)
-            elif a > 1M     then x.ToString("#.###" , invC)
-            // elif   a < decimal(roundToZeroBelow) then "0.0"
-            elif a > 0.1M    then x.ToString("0.####" , invC)
-            elif a > 0.01M   then x.ToString("0.#####" , invC)
-            elif a > 0.001M  then x.ToString("0.######" , invC)
-            elif a > 0.0001M then x.ToString("0.#######" , invC)
+            if   a >= 10000M then x.ToString("#")|> addThousandSeparators 
+            elif a >= 1000M  then x.ToString("#")
+            elif a >= 100M   then x.ToString("#.#" , invC)
+            elif a >= 10M    then x.ToString("#.##" , invC)
+            elif a >= 1M     then x.ToString("#.###" , invC)
+            // elif  a < decimal(roundToZeroBelow) then "0.0"
+            elif a >= 0.1M    then x.ToString("0.####" , invC)
+            elif a >= 0.01M   then x.ToString("0.#####" , invC)
+            elif a >= 0.001M  then x.ToString("0.######" , invC)
+            elif a >= 0.0001M then x.ToString("0.#######" , invC)
             else                  x.ToString("0.########" , invC)  
 
     /// Formating with automatic precision 

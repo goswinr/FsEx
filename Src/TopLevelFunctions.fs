@@ -11,11 +11,12 @@ type EXT = Runtime.CompilerServices.ExtensionAttribute
 [<assembly:EXT>] do() // mark this assembly as extension assembly http://www.latkin.org/blog/2014/04/30/f-extension-methods-in-roslyn/
 
 
-
+/// This module is set to auto open. 
 /// Static Extension methods on Exceptions to cal Excn.Raise "%A" x with F# printf string formating
-/// module is set to auto open
-[<AutoOpen>]
-module TypeExtensionsExceptions =    
+[<AutoOpen>] // so that extension become availale on opening FsEx
+module ExtensionsExceptions =    
+    
+    // type FsExStringException is now defined in String Module
 
     type ArgumentException with
         /// Raise ArgumentException with F# printf string formating
@@ -45,65 +46,12 @@ module TypeExtensionsExceptions =
     type DirectoryNotFoundException with
         /// Raise DirectoryNotFoundException with F# printf string formating
         [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (DirectoryNotFoundException(s))) msg
-   
 
-    // type FsExStringException is defined in String Module
-
-[<AutoOpen>]
-module IO = 
-    open System.Runtime.InteropServices
     
-    module private Kernel32 = 
-        //https://stackoverflow.com/questions/6375599/is-this-pinvoke-code-correct-and-reliable
-        //https://stackoverflow.com/questions/1689460/f-syntax-for-p-invoke-signature-using-marshalas
-        [<DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)>]        
-        extern [<MarshalAs(UnmanagedType.Bool)>] bool DeleteFile (string name ); // dont rename! must be called 'DeleteFile'
-    
-    /// Removes the blocking of dll files from untrusted sources, e.g. the internet
-    /// calls pInvoke  kernel32.dll DeleteFile() to remove Zone.Identifier
-    /// Raises an exception if file does not exist
-    /// Returns true if Zone.Identifier where removed from the file stream. Else false
-    let unblockFile(filePath:string ) : bool =
-        if IO.File.Exists(filePath) then 
-            Kernel32.DeleteFile(filePath + ":Zone.Identifier") 
-        else 
-            FileNotFoundException.Raise "FsEx.IO.unblock cant find file %s" filePath    
 
-    /// Raises an FileNotFoundException if the file path does not exist
-    let checkIfFileExists s = 
-        if not (IO.File.Exists s) then  raise (FileNotFoundException("File missing or path worng: '" + s + "'"))
-     
-     /// Raises an DirectoryNotFoundException if the directory path does not exist
-    let checkIfDirectoryExists s = 
-        if not (IO.Directory.Exists s) then  raise (DirectoryNotFoundException("Directory missing or path worng: '" + s + "'"))     
-    
-    /// Returns all files in folder and subfolders
-    /// Ignores all errors and moves on to next folder
-    let rec getAllFiles (dir:string) = 
-        seq { if Directory.Exists dir then 
-                let files = try Directory.GetFiles(dir) with _ -> [||]
-                Array.sortInPlace files
-                yield! files
-                let dirs = try Directory.GetDirectories(dir) with _ -> [||]
-                Array.sortInPlace dirs
-                for subdir in dirs do 
-                    yield! getAllFiles subdir }
-
-    /// Returns all files in folder and subfolders that fit pattern (e.g. "*.pdf" ) 
-    /// may fail on IOExceptions
-    let rec getAllFilesByPattern (dir:string) (pattern:string) =
-        seq {   yield! Directory.EnumerateFiles(dir, pattern)
-                for d in Directory.EnumerateDirectories(dir) do
-                    yield! getAllFilesByPattern d pattern }
-
-    /// returns the path to the current Desktop
-    /// Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
-    let desktop = 
-        Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
-
+/// This module is set to auto open. 
 /// General Utility functions
-/// module is set to auto open
-[<AutoOpen>]
+[<AutoOpen>] // so that extension become availale on opening FsEx
 module  Util =     
     
     /// a quick way to throw an exception.
@@ -134,18 +82,18 @@ module  Util =
         if guidToCheck = Guid.Empty then 
             ArgumentException.RaiseBase "Empty Guid in  FsEx.Util.failIfEmptyGuid: %s" failMsg
  
-    /// retuns false if the value is null.
+    /// returns false if the value is null.
     /// the opposit of isNull
     let inline notNull (value :'T when 'T: null) = // Fsharp core does it like this too. don't use Obejct.RefrenceEquals (because of Generics)
         match value with 
         | null -> false  
         | _ -> true    
     
-    /// retuns false if the Guid is Empty.
+    /// returns false if the Guid is Empty.
     let inline notEmptyGuid (g :Guid) = 
         g <> Guid.Empty
     
-    /// retuns true if the Guid is Empty.
+    /// returns true if the Guid is Empty.
     let inline isEmptyGuid (g :Guid) = 
         g = Guid.Empty
 

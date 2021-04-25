@@ -4,9 +4,9 @@ open System
 open System.Runtime.CompilerServices
 
 
-
-[<AutoOpen>]
-module TypeExtensionsBclStructs =      
+/// This module is set to auto open. 
+[<AutoOpen>] // so that extension become availale on opening FsEx
+module ExtensionsBclStructs =      
     
     let internal deDE = Globalization.CultureInfo("de-DE")
     let internal invC = Globalization.CultureInfo.InvariantCulture
