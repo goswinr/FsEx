@@ -37,9 +37,9 @@ module Color =
         // from http://stackoverflow.com/questions/2942/hsl-in-net
         // or http://bobpowell.net/RGBHSB.aspx
         // allow some numerical error:
-        if -0.001 >. H .> 1.001 then ArgumentOutOfRangeException.Raise "FsEx.Color.fromHSL: H is bigger than 1.0 or smaller than 0.0: %f" H
-        if -0.001 >. S .> 1.001 then ArgumentOutOfRangeException.Raise "FsEx.Color.fromHSL: S is bigger than 1.0 or smaller than 0.0: %f" S
-        if -0.001 >. L .> 1.001 then ArgumentOutOfRangeException.Raise "FsEx.Color.fromHSL: L is bigger than 1.0 or smaller than 0.0: %f" L
+        if not (-0.001 <. H .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.fromHSL: H is bigger than 1.0 or smaller than 0.0: %f" H
+        if not (-0.001 <. S .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.fromHSL: S is bigger than 1.0 or smaller than 0.0: %f" S
+        if not (-0.001 <. L .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.fromHSL: L is bigger than 1.0 or smaller than 0.0: %f" L
         let H = UtilMath.clamp 0. 1. H
         let S = UtilMath.clamp 0. 1. S
         let L = UtilMath.clamp 0. 1. L
@@ -72,7 +72,7 @@ module Color =
     /// Will fail on to small or too big values,
     /// but up to a tolerance of 0.001 values wil be clamped to 0 or 1.
     let fromInterval v =  
-        if -0.001 >. v .> 1.001 then ArgumentOutOfRangeException.Raise " FsEx.Color.FromInterval: v is bigger than 1.0 or smaller than 0.0: %f" v
+        if not (-0.001 <. v .< 1.001) then ArgumentOutOfRangeException.Raise " FsEx.Color.FromInterval: v is bigger than 1.0 or smaller than 0.0: %f" v
         let v = UtilMath.clamp 0. 1. v  
         let v = (1.0 - v) * 0.7 // 0.66666666 // to NOT make full color cirle, that means to exclude the purple values.
         fromHSL (v,1.0,0.5)
@@ -100,15 +100,15 @@ module Color =
         
     /// Make a color lighter by perecentage (value between 0.0 to 1.0) (1.0 = white, 0.0 = current color) 
     let makeLighter v c =
-        if -0.001 >. v .> 1.001 then ArgumentOutOfRangeException.Raise "FsEx.Color.makeLighter: v is bigger than 1.0 or smaller than 0.0: %f" v
+        if not (-0.001 <. v .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.makeLighter: v is bigger than 1.0 or smaller than 0.0: %f" v
         let v = UtilMath.clamp 0. 1. v            
         let h,s,l = HSLfromColor c
         let delta = 1.0 - l
-        fromHSL (h,s,l + delta * v)
+        fromHSL (h,s,l + delta * v ) // TODO test if 0.0 really returns full white 
 
     /// Make a color darker by perecentage (value between 0.0 to 1.0) (1.0 = black, 0.0 = current color) 
     let makeDarker v c =
-        if -0.001 >. v .> 1.001 then ArgumentOutOfRangeException.Raise "FsEx.Color.makeDarker: v is bigger than 1.0 or smaller than 0.0: %f" v
+        if not (-0.001 <. v .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.makeDarker: v is bigger than 1.0 or smaller than 0.0: %f" v
         let v = UtilMath.clamp 0. 1. v 
         let h,s,l = HSLfromColor c            
-        fromHSL (h,s, l - l * v)
+        fromHSL (h,s, l - l * v) // TODO test if 0.0 really returns full black 

@@ -88,41 +88,50 @@ module MinMaxSort =
 
 /// Operators for chaining compare operations like: <c> 1 <. x .< 9 </c>
 /// or <c> 0 <. x .<. y .< 99 </c>
+/// Each chained comparison operator will be combined with the previous result via AND (&&) logic
 module CompareOperators = 
 
     /// Point must be at middle of expression: like this: min <=. x .<= max
     let inline (<=.) left middle = (left <= middle, middle)
 
-    /// Point must be at middle of expression: like this: min <=. x .<= max
-    let inline (>=.) left middle = (left >= middle, middle)
+    /// Point must be at middle of expression: like this: min <. x .< max
+    let inline (<.) left middle = (left < middle, middle)
+
+    /// Point must be at middle of expression: like this: min <. x .< max
+    let inline (.<) (leftResult, middle) right = leftResult && (middle < right)
 
     /// Point must be at middle of expression: like this: min <=. x .<= max
     let inline (.<=) (leftResult, middle) right = leftResult && (middle <= right)
+
+    /// For inner expressions: like this: min <. x .<. y .< max
+    let inline (.<.) (leftResult, middle) right = leftResult && (middle < right), right
+
+    /// for inner expressions: like this: min <. x .<. y .< max
+    let inline (.<=.) (leftResult, middle) right = leftResult && (middle <= right), right
+
+
+    (* 
+    this reversed order does not realy make sense since the combinig logic is always AND (&&)
+
+    let x = 2
+    10 >. x .> 20  // to test if x is outside of range would return false, but true could be expected (OR logic)
+
+    /// Point must be at middle of expression: like this: min <. x .< max
+    let inline (>.) left middle = (left > middle, middle)
+
+    /// Point must be at middle of expression: like this: min <=. x .<= max
+    let inline (>=.) left middle = (left >= middle, middle)
+
+    /// Point must be at middle of expression: like this: min <. x .< max
+    let inline (.>) (leftResult, middle) right = leftResult && (middle > right)
 
     /// Point must be at middle of expression: like this: min <=. x .<= max
     let inline (.>=) (leftResult, middle) right = leftResult && (middle >= right)
 
     /// for inner expressions: like this: min <. x .<. y .< max
-    let inline (.<=.) (leftResult, middle) right = leftResult && (middle <= right), right
-
-    /// for inner expressions: like this: min <. x .<. y .< max
     let inline (.>=.) (leftResult, middle) right = leftResult && (middle >= right), right
-
-    /// Point must be at middle of expression: like this: min <. x .< max
-    let inline (<.) left middle = (left < middle, middle)
-
-    /// Point must be at middle of expression: like this: min <. x .< max
-    let inline (>.) left middle = (left > middle, middle)
-
-    /// Point must be at middle of expression: like this: min <. x .< max
-    let inline (.<) (leftResult, middle) right = leftResult && (middle < right)
-
-    /// Point must be at middle of expression: like this: min <. x .< max
-    let inline (.>) (leftResult, middle) right = leftResult && (middle > right)
-
-    /// For inner expressions: like this: min <. x .<. y .< max
-    let inline (.<.) (leftResult, middle) right = leftResult && (middle < right), right
 
     /// For inner expressions: like this: min <. x .<. y .< max
     let inline (.>.) (leftResult, middle) right = leftResult && (middle > right), right
+    *)
     
