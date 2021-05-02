@@ -84,6 +84,12 @@ module UtilMath =
         if max < min then failwithf "clamp: max value %g must be bigger than min %g" max min
         if value > max then max elif value < min then min else value
 
+    /// To make sure a value is between 0.0 and 1.0 range    
+    let inline clamp01 value =         
+        if   value > 1.0 then 1.0
+        elif value < 0.0 then 0.0 
+        else value
+
     let internal rand = System.Random () 
 
     /// given mean  and standardDeviation returns a random value from this Gaussian distribution
