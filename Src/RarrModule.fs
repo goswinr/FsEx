@@ -2,10 +2,12 @@
 
 open System
 
+#nowarn "44" // to disable the obsolete warning on accessing Rarr.List
+
 /// Generic operations on Rarr which is like a System.Collections.Generic.List<'T> but with nicer error messages.
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Rarr class in C# assemblies (should consider for other extension modules as well)
 module Rarr =    
-        
+    
     //---------------------------------------------------
     // extensions added only in FsEx:
     //----------------------------------------------------
@@ -46,7 +48,7 @@ module Rarr =
         let len = rarr.Count
         let ii =  if index < 0 then len + index else index
         if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "Rarr.GetNeg: Failed to get index %d from Rarr of %d items: %A" index rarr.Count rarr
-        rarr.[ii]        
+        rarr.List.[ii] // access List directly to not check index twice       
 
     /// Sets an item in the Rarr by index.
     /// Allows for negtive index too ( -1 is last item,  like Python)
@@ -55,7 +57,7 @@ module Rarr =
         let len = rarr.Count
         let ii =  if index < 0 then len + index else index
         if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "Rarr.SetNeg: Failed to set index %d to %A rom Rarr of %d items: %A" index value rarr.Count rarr
-        rarr.[ii] <- value        
+        rarr.List.[ii] <- value     // access List directly to not check index twice      
    
     /// Any index will return a value.
     /// Rarr is treated as an endless loop in positive and negative direction   
@@ -64,7 +66,7 @@ module Rarr =
         if len=0 then ArgumentOutOfRangeException.Raise "Rarr.GetLooped: Failed to get index %d from Rarr of 0 items" index
         let t = index % len
         let ii = if t >= 0 then t  else t + len 
-        rarr.[ii]              
+        rarr.List.[ii]   // access List directly to not check index twice             
 
     /// Any index will set a value.
     /// Rarr is treated as an endless loop in positive and negative direction   
@@ -73,51 +75,51 @@ module Rarr =
         if len=0 then ArgumentOutOfRangeException.Raise "Rarr.SetLooped: Failed to Set index %d to %A in Rarr of 0 items" index value
         let t = index % len
         let ii = if t >= 0 then t  else t + len 
-        rarr.[ii] <- value
+        rarr.List.[ii] <- value // access List directly to not check index twice  
 
     /// Get and remove last item from Rarr
     let inline pop  (rarr: Rarr<'T>)  =
         if rarr.Count=0 then ArgumentOutOfRangeException.Raise "Failed to pop from empty Rarr"
         let i = rarr.Count - 1        
-        let v = rarr.[i]
-        rarr.RemoveAt(i)
+        let v = rarr.List.[i] // access List directly to not check index twice  
+        rarr.List.RemoveAt(i)
         v
 
     /// Gets the last item in the Rarr.
     /// equal to this.[this.Count - 1]
     let inline last  (rarr: Rarr<'T>) = 
         if rarr.Count = 0 then IndexOutOfRangeException.Raise "Rarr.last: Failed to get last item of empty List"
-        rarr.[rarr.Count - 1]
+        rarr.List.[rarr.Count - 1]
     
     /// Gets the second last item in the Rarr.
     /// equal to this.[this.Count - 2]
     let inline secondLast  (rarr: Rarr<'T>)= 
         if rarr.Count < 2 then  IndexOutOfRangeException.Raise "Rarr.secondLast: Failed to get second last item of %s"   (NiceString.toNiceStringFull rarr)
-        rarr.[rarr.Count - 2]
+        rarr.List.[rarr.Count - 2]
 
     /// Gets the third last item in the Rarr.
     /// equal to this.[this.Count - 3]
     let inline thirdLast  (rarr: Rarr<'T>)= 
         if rarr.Count < 3 then  IndexOutOfRangeException.Raise "Rarr.thirdLast: Failed to get third last item of %s"  (NiceString.toNiceStringFull rarr)
-        rarr.[rarr.Count - 3]
+        rarr.List.[rarr.Count - 3]
                 
     /// Gets the first item in the Rarr.
     /// equal to this.[0]
     let inline first  (rarr: Rarr<'T>)= 
         if rarr.Count = 0 then IndexOutOfRangeException.Raise "Rarr.first: Failed to get first item of empty Rarr List"
-        rarr.[0]
+        rarr.List.[0]
 
     /// Gets the second item in the Rarr.
     /// equal to this.[1]
     let inline second  (rarr: Rarr<'T>)= 
         if rarr.Count < 2 then IndexOutOfRangeException.Raise  "Rarr.second: Failed to get second item of %s"   (NiceString.toNiceStringFull rarr)
-        rarr.[1]
+        rarr.List.[1]
 
     /// Gets the third item in the Rarr.
     /// equal to this.[2]
     let inline third  (rarr: Rarr<'T>)= 
         if rarr.Count < 3 then IndexOutOfRangeException.Raise "Rarr.third: Failed to get third item of %s"  (NiceString.toNiceStringFull rarr)
-        rarr.[2]
+        rarr.List.[2]
 
     /// Allows for negative indices too. ( -1 is last item, like Python) 
     /// The resulting Rarr includes the end index.
@@ -283,9 +285,10 @@ module Rarr =
         if i<>j then  
             if j < 0 then IndexOutOfRangeException.Raise "Rarr.swap: index j cant be less than 0: %d (i: %d)" j i 
             if j >= xs.Count then IndexOutOfRangeException.Raise "Rarr.swap: index j cant be bigge than %d but is %d (i: %d)" xs.LastIndex j i
-            let ti = xs.[i]
-            xs.[i] <- xs.[j]
-            xs.[j] <- ti
+            // operate on underlaying list since indixes are checked
+            let ti = xs.List.[i]
+            xs.List.[i] <- xs.List.[j]
+            xs.List.[j] <- ti
     
 
     /// internal only for finding 
@@ -296,15 +299,15 @@ module Rarr =
             if xs.Count < 1 then ArgumentException.RaiseBase "Empty %A in Rarr max / min" xs
             let mutable m = xs.[0]
             for i=1 to xs.Count-1 do
-                if cmpF xs.[i] m then m <- xs.[i]
+                if cmpF xs.List.[i] m then m <- xs.List.[i]
             m 
             
         let inline simple2 cmpF (xs:Rarr<'T>) =
             if xs.Count < 2 then ArgumentException.RaiseBase "Only %d elements in %A, for Rarr first+second max / min" xs.Count xs
-            let mutable m1 = xs.[0]
-            let mutable m2 = xs.[1] 
+            let mutable m1 = xs.List.[0]
+            let mutable m2 = xs.List.[1] 
             for i=1 to xs.Count-1 do
-                let this = xs.[i]
+                let this = xs.List.[i]
                 if cmpF this m1 then 
                     m2 <- m1
                     m1 <- this
@@ -345,9 +348,9 @@ module Rarr =
 
         let inline simple3 cmpF (xs:Rarr<'T>) =
             if xs.Count < 3 then ArgumentException.RaiseBase "Only %d elements in %A, for Rarr first+second+third max / min" xs.Count xs
-            let e1 = xs.[0]
-            let e2 = xs.[1]
-            let e3 = xs.[2]
+            let e1 = xs.List.[0]
+            let e2 = xs.List.[1]
+            let e3 = xs.List.[2]
             // sort first 3
             let mutable m1, m2, m3 =  sort3 cmpF e1 e2 e3   // otherwise would fail on sorting first 3, test on Rarr([5;6;3;1;2;0])|> Rarr.max3 
             for i=3 to xs.Count-1 do
@@ -365,11 +368,11 @@ module Rarr =
                                     
         let inline indexByFun cmpF func (xs:Rarr<'T>) = 
             if xs.Count < 1 then ArgumentException.RaiseBase "Empty %A, Rarr  max / min IndexByFun" xs
-            let mutable f = func xs.[0]
+            let mutable f = func xs.List.[0]
             let mutable mf = f
             let mutable ii = 0
             for i=1 to xs.Count-1 do
-                f <- func xs.[i] 
+                f <- func xs.List.[i] 
                 if cmpF f mf then 
                     ii <- i
                     mf <- f
@@ -379,8 +382,8 @@ module Rarr =
             if xs.Count < 2 then ArgumentException.RaiseBase "Only %d elements in %A, for Rarr index2ByFun max / min" xs.Count xs            
             let mutable i1 = 0
             let mutable i2 = 1 
-            let mutable mf1 = func xs.[i1]
-            let mutable mf2 = func xs.[i2]
+            let mutable mf1 = func xs.List.[i1]
+            let mutable mf2 = func xs.List.[i2]
             let mutable f = mf1 // placeholder
             for i=1 to xs.Count-1 do
                 f <- func xs.[i] 
@@ -399,12 +402,12 @@ module Rarr =
             if xs.Count < 3 then ArgumentException.RaiseBase "Only %d elements in %A, for Rarr index3ByFun max / min" xs.Count xs 
             // sort first 3
             let mutable i1,i2,i3 =  indexOfSort3By byFun cmpOp xs.[0] xs.[1] xs.[2] // otherwise would fail on sorting first 3, test on Rarr([5;6;3;1;2;0])|> Rarr.max3 
-            let mutable e1 =  byFun xs.[i1]
-            let mutable e2 =  byFun xs.[i2]
-            let mutable e3 =  byFun xs.[i3] 
+            let mutable e1 =  byFun xs.List.[i1]
+            let mutable e2 =  byFun xs.List.[i2]
+            let mutable e3 =  byFun xs.List.[i3] 
             let mutable f = e1 // placeholder
             for i=3 to xs.Count-1 do
-                f <- byFun xs.[i] 
+                f <- byFun xs.List.[i] 
                 if cmpOp f e1 then
                     i3 <- i2 
                     i2 <- i1 
@@ -461,14 +464,15 @@ module Rarr =
     /// If they are equal after function is applied then the the order is kept
     let inline min2By f rarr = 
         let i,ii = rarr |> MinMax.index2ByFun (<) f 
-        rarr.[i],rarr.[ii]
+        rarr.List.[i],rarr.List.[ii]
         
     /// Returns the biggest two elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the the order is kept
     let inline max2By f rarr = 
         let i,ii = rarr |> MinMax.index2ByFun (>) f 
-        rarr.[i],rarr.[ii]
+        rarr.List.[i],
+        rarr.List.[ii]
 
     /// Returns the indices of the two smallest elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
@@ -493,14 +497,18 @@ module Rarr =
     /// If they are equal after function is applied then the the order is kept
     let inline min3By f rarr = 
         let i,ii,iii = rarr |> MinMax.index3ByFun (<) f 
-        rarr.[i],rarr.[ii],rarr.[iii]
+        rarr.List.[i],
+        rarr.List.[ii],
+        rarr.List.[iii]
 
     /// Returns the biggest three elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the the order is kept
     let inline max3By f rarr = 
         let i,ii,iii = rarr |> MinMax.index3ByFun (>) f 
-        rarr.[i],rarr.[ii],rarr.[iii]
+        rarr.List.[i],
+        rarr.List.[ii],
+        rarr.List.[iii]
 
     /// Returns the indices of the three smallest elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
@@ -544,7 +552,7 @@ module Rarr =
     let inline countIf (predicate : 'T -> bool) (rarr : Rarr<'T>) : int = //countBy is something else !!
         let mutable k = 0
         for i=0 to rarr.Count - 1 do
-            if predicate rarr.[i] then 
+            if predicate rarr.List.[i] then 
                 k <- k + 1
         k
 
@@ -619,7 +627,7 @@ module Rarr =
     let inline toList (rarr : Rarr<'T>) : 'T list =        
         let mutable res = []
         for i = length rarr - 1 downto 0 do
-            res <- rarr.[i] :: res
+            res <- rarr.List.[i] :: res
         res
 
     /// Return a fixed-length Rarr containing the elements of the input Rarr.
@@ -669,20 +677,14 @@ module Rarr =
 
     /// Build a new Rarr that contains the given subrange specified by
     /// starting index and length.
-    let inline sub (rarr : Rarr<'T>) start count : Rarr<'T> =        
-        if start < 0 then
-            invalidArg "start" "The start index cannot be less than zero (0)."
-        elif count < 0 then
-            invalidArg "count" "The number of elements to copy cannot be less than zero (0)."
-        elif start + count > length rarr then
-            invalidArg "count" "There are fewer than 'count' elements between the 'start' index and the end of the collection."
-    
-        rarr.GetRange (start, count)
+    let inline sub (rarr : Rarr<'T>) start count : Rarr<'T> =  
+        rarr.GetRange (start, count) // no erro checking needed here 
+        
 
     /// Fill a range of the collection with the given element.
     let inline fill (rarr : Rarr<'T>) start count value : unit =        
         if start < 0 then
-            invalidArg "start" "The start index cannot be less than zero (0)."
+            invalidArg "start" "The start index cannot be less than zero (0)." //TODO: improve error message with actual values 
         elif count < 0 then
             invalidArg "count" "The number of elements to copy cannot be less than zero (0)."
         elif start + count > length rarr then
@@ -690,20 +692,20 @@ module Rarr =
     
         // Overwrite the items within the range using the specified value.
         for i = start to start + count - 1 do
-            rarr.[i] <- value
+            rarr.List.[i] <- value
 
     /// Return a new Rarr with the elements in reverse order.
     let inline rev (rarr : Rarr<'T>) : Rarr<'T> =        
         let len = length rarr
         let result = Rarr (len)
         for i = len - 1 downto 0 do
-            result.Add rarr.[i]
+            result.Add rarr.List.[i]
         result
 
     /// Read a range of elements from the first Rarr and write them into the second.
     let inline blit (source : Rarr<'T>) sourceIndex (target : Rarr<'T>) targetIndex count : unit =
         if sourceIndex < 0 then
-            invalidArg "sourceIndex" "The source index cannot be negative."
+            invalidArg "sourceIndex" "The source index cannot be negative."//TODO: improve error message with actual values 
         elif targetIndex < 0 then
             invalidArg "targetIndex" "The target index cannot be negative."
         elif count < 0 then
@@ -714,7 +716,7 @@ module Rarr =
             invalidArg "sourceIndex" "There are fewer than 'count' elements between 'sourceIndex' and the end of the target Rarr."
 
         for i = 0 to count - 1 do
-            target.[targetIndex + i] <- source.[sourceIndex + i]
+            target.List.[targetIndex + i] <- source.List.[sourceIndex + i]
 
     /// Combine the two Rarrs into a Rarr of pairs.
     /// The two Rarrs must have equal lengths, otherwise an <c>ArgumentException</c> is raised.
@@ -724,7 +726,7 @@ module Rarr =
             ArgumentException.RaiseBase "Rarr.zip: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count              
         let results = Rarr (len)
         for i = 0 to len - 1 do
-            results.Add (rarr1.[i], rarr2.[i])
+            results.Add (rarr1.List.[i], rarr2.List.[i])
         results
 
     /// Split a Rarr of pairs into two Rarrs.
@@ -733,7 +735,7 @@ module Rarr =
         let results1 = Rarr (len)
         let results2 = Rarr (len)
         for i = 0 to len - 1 do
-            let x, y = rarr.[i]
+            let x, y = rarr.List.[i]
             results1.Add x
             results2.Add y
         results1, results2
@@ -755,7 +757,7 @@ module Rarr =
         let mutable index = 0
         let mutable foundMatch = false
         while index < len && not foundMatch do
-            foundMatch <- predicate.Invoke (rarr1.[index], rarr2.[index])
+            foundMatch <- predicate.Invoke (rarr1.List.[index], rarr2.List.[index])
             index <- index + 1
         foundMatch
 
@@ -776,7 +778,7 @@ module Rarr =
         let mutable index = 0
         let mutable allMatch = true
         while index < len && allMatch do
-            allMatch <- predicate.Invoke (rarr1.[index], rarr2.[index])
+            allMatch <- predicate.Invoke (rarr1.List.[index], rarr2.List.[index])
             index <- index + 1
         allMatch
 
@@ -798,7 +800,7 @@ module Rarr =
             let count = rarr.Count
 
             for i = 0 to count - 1 do
-                match chooser rarr.[i] with
+                match chooser rarr.List.[i] with
                 | None -> ()
                 | Some value ->
                     result.Add value
@@ -825,7 +827,7 @@ module Rarr =
         | -1 ->
             KeyNotFoundException.Raise "Rarr.find did not find for predicate  %A in Rarr of %d items %A" predicate rarr.Count rarr            
         | index ->
-            rarr.[index]
+            rarr.List.[index]
 
     /// Return the index of the first element in the Rarr
     /// that satisfies the given predicate.
@@ -884,7 +886,7 @@ module Rarr =
         let mutable result = None
         let mutable index = 0
         while index < count && Option.isNone result do
-            result <- picker rarr.[index]
+            result <- picker rarr.List.[index]
             index <- index + 1
         result
 
@@ -897,7 +899,7 @@ module Rarr =
         let mutable result = None
         let mutable index = 0
         while index < count && Option.isNone result do
-            result <- picker rarr.[index]
+            result <- picker rarr.List.[index]
             index <- index + 1
         match result with
         | Some result ->
@@ -910,7 +912,7 @@ module Rarr =
     let inline iter (action : 'T -> unit) (rarr : Rarr<'T>) : unit =  
         let count = rarr.Count
         for i = 0 to count - 1 do
-            action rarr.[i]
+            action rarr.List.[i]
 
     /// Apply the given function to each element of the Rarr. The integer passed to the
     /// function indicates the index of element.
@@ -918,7 +920,7 @@ module Rarr =
         let action = FSharpFunc<_,_,_>.Adapt action
         let count = rarr.Count
         for i = 0 to count - 1 do
-            action.Invoke (i, rarr.[i])
+            action.Invoke (i, rarr.List.[i])
 
     /// <summary>
     /// Apply the given function to two Rarrs simultaneously. The two Rarrs
@@ -929,7 +931,7 @@ module Rarr =
             ArgumentException.RaiseBase "Rarr.iter2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count 
         let action = FSharpFunc<_,_,_>.Adapt action
         for i = 0 to len - 1 do
-            action.Invoke (rarr1.[i], rarr2.[i])
+            action.Invoke (rarr1.List.[i], rarr2.List.[i])
 
     /// <summary>
     /// Apply the given function to pair of elements drawn from matching indices in two Rarrs,
@@ -941,7 +943,7 @@ module Rarr =
             ArgumentException.RaiseBase "Rarr.iteri2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count 
         let action = FSharpFunc<_,_,_,_>.Adapt action
         for i = 0 to len - 1 do
-            action.Invoke (i, rarr1.[i], rarr2.[i])
+            action.Invoke (i, rarr1.List.[i], rarr2.List.[i])
 
     /// <summary>
     /// Build a new Rarr whose elements are the results of applying the given function
@@ -959,7 +961,7 @@ module Rarr =
         let count = rarr.Count
         let result = Rarr (count)
         for i = 0 to count - 1 do
-            result.Add <| mapping.Invoke (i, rarr.[i])
+            result.Add <| mapping.Invoke (i, rarr.List.[i])
         result
 
     /// <summary>
@@ -973,7 +975,7 @@ module Rarr =
         let mapping = FSharpFunc<_,_,_>.Adapt mapping
         let results = Rarr (len)
         for i = 0 to len - 1 do
-            mapping.Invoke (rarr1.[i], rarr2.[i])
+            mapping.Invoke (rarr1.List.[i], rarr2.List.[i])
             |> results.Add
         results
 
@@ -990,7 +992,7 @@ module Rarr =
         let results = Rarr (len)
 
         for i = 0 to len - 1 do
-            mapping.Invoke (i, rarr1.[i], rarr2.[i])
+            mapping.Invoke (i, rarr1.List.[i], rarr2.List.[i])
             |> results.Add
         results
 
@@ -1003,7 +1005,7 @@ module Rarr =
         let mutable state = state
         let count = rarr.Count
         for i = 0 to count - 1 do
-            state <- folder.Invoke (state, rarr.[i])
+            state <- folder.Invoke (state, rarr.List.[i])
         state
 
     /// <summary>foldSub on just part of teh Rarr</summary>
@@ -1021,7 +1023,7 @@ module Rarr =
         // Fold over the specified range of items.
         let mutable state = state
         for i = startIndex to endIndex do
-            state <- folder.Invoke (state, rarr.[i])
+            state <- folder.Invoke (state, rarr.List.[i])
         state
 
     /// <summary>
@@ -1033,7 +1035,7 @@ module Rarr =
         let mutable state = state
         let count = rarr.Count
         for i = 0 to count - 1 do
-            state <- folder.Invoke (state, i, rarr.[i])
+            state <- folder.Invoke (state, i, rarr.List.[i])
         state
 
     /// <summary>
@@ -1047,7 +1049,7 @@ module Rarr =
         let folder = FSharpFunc<_,_,_,_>.Adapt folder
         let mutable state = state
         for i = 0 to len - 1 do
-            state <- folder.Invoke (state, rarr1.[i], rarr2.[i])
+            state <- folder.Invoke (state, rarr1.List.[i], rarr2.List.[i])
         state
 
     /// <summary>
@@ -1058,7 +1060,7 @@ module Rarr =
         let folder = FSharpFunc<_,_,_>.Adapt folder
         let mutable state = state
         for i = rarr.Count - 1 downto 0 do
-            state <- folder.Invoke (rarr.[i], state)
+            state <- folder.Invoke (rarr.List.[i], state)
         state
 
     /// <summary>foldBackSub</summary>
@@ -1076,7 +1078,7 @@ module Rarr =
         // Fold over the specified range of items.
         let mutable state = state
         for i = endIndex downto startIndex do
-            state <- folder.Invoke (rarr.[i], state)
+            state <- folder.Invoke (rarr.List.[i], state)
         state
 
     /// <summary>foldiBack</summary>
@@ -1084,7 +1086,7 @@ module Rarr =
         let folder = FSharpFunc<_,_,_,_>.Adapt folder
         let mutable state = state
         for i = rarr.Count - 1 downto 0 do
-            state <- folder.Invoke (i, rarr.[i], state)
+            state <- folder.Invoke (i, rarr.List.[i], state)
         state
 
     /// <summary>
@@ -1099,7 +1101,7 @@ module Rarr =
         let folder = FSharpFunc<_,_,_,_>.Adapt folder
         let mutable state = state
         for i = len - 1 downto 0 do
-            state <- folder.Invoke (rarr1.[i], rarr2.[i], state)
+            state <- folder.Invoke (rarr1.List.[i], rarr2.List.[i], state)
         state
 
     /// <summary>
@@ -1112,10 +1114,10 @@ module Rarr =
             invalidArg "rarr" "The Rarr is empty."
         let reduction = FSharpFunc<_,_,_>.Adapt reduction
 
-        let mutable state = rarr.[0]
+        let mutable state = rarr.List.[0]
         let count = rarr.Count
         for i = 1 to count - 1 do
-            state <- reduction.Invoke (state, rarr.[i])
+            state <- reduction.Invoke (state, rarr.List.[i])
         state
 
     /// <summary>
@@ -1128,9 +1130,9 @@ module Rarr =
             invalidArg "rarr" "The Rarr is empty."
         let reduction = FSharpFunc<_,_,_>.Adapt reduction
         let count = rarr.Count
-        let mutable state = rarr.[count - 1]
+        let mutable state = rarr.List.[count - 1]
         for i = count - 2 downto 0 do
-            state <- reduction.Invoke (rarr.[i], state)
+            state <- reduction.Invoke (rarr.List.[i], state)
         state
 
     /// <summary>scanSub</summary>
@@ -1151,7 +1153,7 @@ module Rarr =
         // Fold over the specified range of items.
         let mutable state = state
         for i = startIndex to endIndex do
-            state <- folder.Invoke (state, rarr.[i])
+            state <- folder.Invoke (state, rarr.List.[i])
             results.Add state
         results
 
@@ -1177,7 +1179,7 @@ module Rarr =
         // Fold over the specified range of items.
         let mutable state = state
         for i = endIndex downto startIndex do
-            state <- folder.Invoke (rarr.[i], state)
+            state <- folder.Invoke (rarr.List.[i], state)
             results.Insert (0, state)
         results
 
@@ -1193,7 +1195,7 @@ module Rarr =
         let falseResults = Rarr ()
         let len = length rarr
         for i = 0 to len - 1 do
-            let el = rarr.[i]
+            let el = rarr.List.[i]
             if predicate el then
                 trueResults.Add el
             else
@@ -1209,7 +1211,7 @@ module Rarr =
         let results2 = Rarr ()
         let len = length rarr
         for i = 0 to len - 1 do
-            match partitioner rarr.[i] with
+            match partitioner rarr.List.[i] with
             | Choice1Of2 value ->
                 results1.Add value
             | Choice2Of2 value ->
@@ -1223,7 +1225,7 @@ module Rarr =
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.sum: The input Rarr is empty."
         let mutable acc = LanguagePrimitives.GenericZero< (^T) >  
         for i = 0 to rarr.Count - 1 do
-            acc <- Checked.(+) acc rarr.[i]
+            acc <- Checked.(+) acc rarr.List.[i]
         acc
 
     /// <summary>Returns the sum of the results generated by applying the function to each element of the Rarr.</summary>
@@ -1234,7 +1236,7 @@ module Rarr =
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.sumBy: The input Rarr is empty."
         let mutable acc = LanguagePrimitives.GenericZero< (^U) >    
         for i = 0 to rarr.Count - 1 do
-            acc <- Checked.(+) acc (projection rarr.[i])
+            acc <- Checked.(+) acc (projection rarr.List.[i])
         acc
 
     /// <summary>Returns the lowest of all elements of the Rarr, compared via Operators.min.</summary>
@@ -1243,9 +1245,9 @@ module Rarr =
     /// <exception cref="System.ArgumentException">Thrown when <paramref name="rarr"/> is empty.</exception>
     let inline min (rarr : Rarr<'T>) =        
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.min: The input Rarr is empty."
-        let mutable acc = rarr.[0]
+        let mutable acc = rarr.List.[0]
         for i = 1 to rarr.Count - 1 do
-            let curr = rarr.[i]
+            let curr = rarr.List.[i]
             if curr < acc then
                 acc <- curr
         acc
@@ -1257,10 +1259,10 @@ module Rarr =
     /// <exception cref="System.ArgumentException">Thrown when <paramref name="rarr"/> is empty.</exception>
     let inline minBy (projection : 'T -> 'U) (rarr : Rarr<'T>) =        
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.minBy: The input Rarr is empty."
-        let mutable accv = rarr.[0]
+        let mutable accv = rarr.List.[0]
         let mutable acc = projection accv
         for i = 1 to rarr.Count - 1 do
-            let currv = rarr.[i]
+            let currv = rarr.List.[i]
             let curr = projection currv
             if curr < acc then
                 acc <- curr
@@ -1273,9 +1275,9 @@ module Rarr =
     /// <exception cref="System.ArgumentException">Thrown when <paramref name="rarr"/> is empty.</exception>
     let inline max (rarr : Rarr<'T>) : ^T=        
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.max: The input Rarr is empty."
-        let mutable acc = rarr.[0]
+        let mutable acc = rarr.List.[0]
         for i = 1 to rarr.Count - 1 do
-            let curr = rarr.[i]
+            let curr = rarr.List.[i]
             if curr > acc then
                 acc <- curr
         acc
@@ -1287,10 +1289,10 @@ module Rarr =
     /// <exception cref="System.ArgumentException">Thrown when <paramref name="rarr"/> is empty.</exception>
     let inline  maxBy (projection : 'T -> 'U) (rarr : Rarr<'T>): ^T =        
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.maxBy: The input Rarr is empty."
-        let mutable accv = rarr.[0]
+        let mutable accv = rarr.List.[0]
         let mutable acc = projection accv
         for i = 1 to rarr.Count - 1 do
-            let currv = rarr.[i]
+            let currv = rarr.List.[i]
             let curr = projection currv
             if curr > acc then
                 acc <- curr
