@@ -275,7 +275,18 @@ module Rarr =
     /// Returns true if the given Rarr has equal or less than count items.
     let inline hasMaximumItems count (rarr : Rarr<'T>) : bool =
         rarr.Count <= count
-
+    
+    /// swap the values of two given indices in Rarr
+    let inline swap i j (xs:Rarr<'T>) : unit = 
+        if i < 0 then IndexOutOfRangeException.Raise "Rarr.swap: index i cant be less than 0: %d (j: %d)" i j
+        if i >= xs.Count then IndexOutOfRangeException.Raise "Rarr.swap: index i cant be bigge than %d but is %d (j: %d)" xs.LastIndex i j 
+        if i<>j then  
+            if j < 0 then IndexOutOfRangeException.Raise "Rarr.swap: index j cant be less than 0: %d (i: %d)" j i 
+            if j >= xs.Count then IndexOutOfRangeException.Raise "Rarr.swap: index j cant be bigge than %d but is %d (i: %d)" xs.LastIndex j i
+            let ti = xs.[i]
+            xs.[i] <- xs.[j]
+            xs.[j] <- ti
+    
 
     /// internal only for finding 
     module internal MinMax =
