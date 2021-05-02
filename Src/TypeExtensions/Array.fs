@@ -8,9 +8,26 @@ open System.Runtime.CompilerServices
 /// for geting and setting first, second, last and similar indices.
 /// Also adds functionality for negative indices
 module ExtensionsArray = 
+    
+    // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164      
 
     type ``[]``<'T>  with //Generic Array
         
+        /// Checks if this.Count = 0 
+        [<Extension>]
+        member this.IsEmpty =  this.Length = 0 
+
+        /// Checks if this.Count = 1
+        member this.IsSingelton =  this.Length = 1   
+           
+        /// Checks if this.Count > 0 
+        [<Extension>]
+        member this.IsNotEmpty =  this.Length > 0 
+
+        /// Checks if this.Count > 0 
+        [<Extension>]
+        member this.HasItems =  this.Length > 0 
+
         /// Gets an item at index. 
         /// Use Array.GetNeg(i) member if you want to use negative indices too.
         /// (this is an Extension Member from FsEx.ExtensionsArray)
@@ -162,11 +179,6 @@ module ExtensionsArray =
 
        
 
-
-        // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164                
-        // member this.GetSlice(startIdx, endIdx) = 
-
-
         /// Allows for negative indices too. ( -1 is last item, like Python)
         /// The resulting array includes the end index.
         /// The built in slicing notaion (e.g. a.[1..3]) for arrays does not allow for negative indices. (and can't be overwritten)
@@ -174,6 +186,10 @@ module ExtensionsArray =
         /// (this is an Extension Member from FsEx.ExtensionsArray)
         [<Extension>]
         member this.Slice(startIdx:int , endIdx: int ) : 'T array=
+            
+            // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164                
+            // member this.GetSlice(startIdx, endIdx) = 
+            
             let count = this.Length
             let st  = if startIdx< 0 then count + startIdx        else startIdx
             let len = if endIdx  < 0 then count + endIdx - st + 1 else endIdx - st + 1
