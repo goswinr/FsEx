@@ -9,6 +9,8 @@ open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
 module ExtensionsString =      
     
+    // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164      
+
     type System.String with
         
         /// returns the last valid index in the string

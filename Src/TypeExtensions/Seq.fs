@@ -8,6 +8,8 @@ open System.Runtime.CompilerServices
 
 /// provides Extension methods on Collections.Generic.IEnumerable 
 module ExtensionsSeq = 
+    
+    // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164      
 
     open ExtensionsIList // for a.GetNeg
 

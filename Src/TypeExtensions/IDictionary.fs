@@ -8,6 +8,8 @@ open System.Collections.Generic
 //[<AutoOpen>]
 module ExtensionsIDictionary =   //TODO add Docstring
     
+    // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164      
+
     type IDictionary<'K,'V> with           
         
         /// Set value at key, with nicer error messages
