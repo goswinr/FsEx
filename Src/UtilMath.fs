@@ -92,6 +92,16 @@ module UtilMath =
 
     let internal rand = System.Random () 
 
+    /// Checks if a number is between or on a lower and upper bound value . 
+    /// x >= minVal && x <= maxVal
+    let inline isInRange minVal maxVal x  = 
+        x >= minVal && x <= maxVal
+
+    /// Checks if a number is bigger or smaller than a lower and upper bound value . 
+    /// x < minVal || x > maxVal
+    let inline isNotInRange minVal maxVal x  = 
+        x < minVal || x > maxVal
+
     /// given mean  and standardDeviation returns a random value from this Gaussian distribution
     /// if mean is 0 and stDev is 1 then 99% of values are  are within -2.3 to +2.3 ; 70% within -1 to +1
     let randomStandardDeviation mean standardDeviation =
@@ -100,18 +110,18 @@ module UtilMath =
         let randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2) //random normal(0, 1)
         //random normal(mean, stdDev^2)
         mean + standardDeviation * randStdNormal 
-
       
     /// Compares two floating point numbers within a relative tolerance for equality. 
     /// The comparing tolerance is calculated as:  
     /// let mi = min (abs a) (abs b)
-    /// abs(a-b) < relativeTolerance*mi
-    let inline areSameRel relativeTolerance (a:float) (b:float)  = 
+    /// abs(a-b) < relativeTolerance * mi
+    let inline equalsWithRelativeTolerance relativeTolerance a b  = 
         let mi = min (abs a) (abs b)
-        abs(a-b) < relativeTolerance*mi
+        abs(a-b) < relativeTolerance * mi
     
-    /// Compares two floating point numbers to be within a tolerance for equality
-    let inline areSame absoluteTolerance (a:float) (b:float)  = 
+    /// Compares two numbers to be within a tolerance for equality
+    /// abs(a-b) < absoluteTolerance
+    let inline equalsWithTolerance absoluteTolerance a b  = 
         abs(a-b) < absoluteTolerance
     
     /// Shadows the built in 'acos' (Invers Cosine) function to include clamping if values are slightly above -1.0 or 1.0
@@ -130,7 +140,6 @@ module UtilMath =
         if x < -1.00001 then failwithf "asin failed on %f , input must be between -1.00001 and +1.00001" x
         if x >  1.00001 then failwithf "asin failed on %f , input must be between -1.00001 and +1.00001" x
         else x |> clamp -1.0 1.0 |> System.Math.Asin
-
 
     /// Converts Angels from Degrees to Radians
     let inline toRadians degrees = 0.0174532925199433 * degrees // 0.0174532925199433 = Math.PI / 180. 

@@ -59,7 +59,7 @@ module PrintDistribution =
                     for v in vs do            
                         if lb <= v && v < ub then kk <- kk+ 1
                         elif i = last then // on last loop check count upper bound elements too
-                            if UtilMath.areSameRel 0.0001 v ub then kk <- kk+ 1 // within 0.1% for float errors
+                            if UtilMath.equalsWithTolerance 0.0001 v ub then kk <- kk+ 1 // within 0.1% for float errors
             
         
                     let percent = 100.* (float kk)/(float len)
