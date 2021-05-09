@@ -19,15 +19,17 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
             let v = defaultOfKeyFun(k) 
             baseDict.[k] <- v
             v
-   
+ 
+  
     /// <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
     /// If accessing a non exiting key , the default function is called on ther key to create the value and set it. 
     /// Similar to  defaultdict in Python</summary>    
     /// <param name="defaultOfKeyFun">(&apos;K-&gt;&apos;V): The function to create a default value from the key</param>
     new (defaultOfKeyFun: 'K -> 'V) = 
         let d = new  Dictionary<'K,'V>()
-        DefaultDict( defaultOfKeyFun, d )     
-  
+        DefaultDict( defaultOfKeyFun, d )    
+
+    
 
     /// Constructs a new DefaultDict by using the supplied Dictionary<'K,'V> directly, without any copying of items
     static member CreateDirectly (defaultOfKeyFun: 'K->'V) (di:Dictionary<'K,'V> ) =
@@ -37,7 +39,9 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
 
 
     /// Access the underlying Collections.Generic.Dictionary<'K,'V>
-    /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of DefaultDict!
+    /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of DefaultDict!    
+    /// use #nowarn "44" to disable the obsolete warning
+    [<Obsolete("It is not actually obsolete but unsafe to use, so hidden from editor tools. In F# use #nowarn \"44\" to disable the obsolete warning")>]
     member _.Dictionary = baseDict
 
     /// For Index operator: get or set the value for given key
