@@ -94,15 +94,15 @@ module UtilMath =
 
     /// Checks if a number is between or on a lower and upper bound value . 
     /// x >= minVal && x <= maxVal
-    let inline isInRange minVal maxVal x  = 
+    let inline isInRange (minVal:'T) (maxVal:'T) (x:'T) = 
         x >= minVal && x <= maxVal
 
     /// Checks if a number is bigger or smaller than a lower and upper bound value . 
     /// x < minVal || x > maxVal
-    let inline isNotInRange minVal maxVal x  = 
+    let inline isNotInRange (minVal:'T) (maxVal:'T) (x:'T)  = 
         x < minVal || x > maxVal
 
-    /// given mean  and standardDeviation returns a random value from this Gaussian distribution
+    /// Given mean and standardDeviation returns a random value from this Gaussian distribution
     /// if mean is 0 and stDev is 1 then 99% of values are  are within -2.3 to +2.3 ; 70% within -1 to +1
     let randomStandardDeviation mean standardDeviation =
         let u1 = rand.NextDouble()
@@ -111,18 +111,18 @@ module UtilMath =
         //random normal(mean, stdDev^2)
         mean + standardDeviation * randStdNormal 
       
-    /// Compares two floating point numbers within a relative tolerance for equality. 
+    /// Compares two numbers within a relative tolerance for equality. 
     /// The comparing tolerance is calculated as:  
     /// let mi = min (abs a) (abs b)
     /// abs(a-b) < relativeTolerance * mi
-    let inline equalsWithRelativeTolerance relativeTolerance a b  = 
-        let mi = min (abs a) (abs b)
-        abs(a-b) < relativeTolerance * mi
+    let inline equalsWithRelativeTolerance (relativeTolerance:'T) (valueA:'T) (valueB:'T)  = 
+        let mi = min (abs valueA) (abs valueB)
+        abs(valueA - valueB) < relativeTolerance * mi
     
     /// Compares two numbers to be within a tolerance for equality
     /// abs(a-b) < absoluteTolerance
-    let inline equalsWithTolerance absoluteTolerance a b  = 
-        abs(a-b) < absoluteTolerance
+    let inline equalsWithTolerance (absoluteTolerance:'T) (valueA:'T) (valueB:'T)   = 
+        abs(valueA - valueB) < absoluteTolerance
     
     /// Shadows the built in 'acos' (Invers Cosine) function to include clamping if values are slightly above -1.0 or 1.0
     /// Tolerance: 0.00001 
