@@ -346,18 +346,32 @@ module internal NiceStringImplementation  =
                 // http://www.fssnip.net/cV/title/A-Generic-PrettyPrinter-for-Record-types 
 
     let formatLines (lines:Lines) = 
-        let sb = Text.StringBuilder()        
-        let rec loop depth (lns:Lines) = 
-            if depth <= maxDepth then 
-                match lns with
-                |Element s    -> sb.Append(String(' ', 4 * depth)).AppendLine(s)      |> ignoreObj 
-                |EarlyEnd     -> sb.Append(String(' ', 4 * depth)).AppendLine("(...)")  |> ignoreObj  
-                |Head (h,xs)  ->                                  
-                                 sb.Append(String(' ', 4 * depth)).Append(h)     |> ignoreObj  
-                                 (if xs.Count=0 then sb.AppendLine() else sb.AppendLine(":"))  |> ignoreObj  // only add colon if items follow
-                                 for x in xs do loop (depth+1) x
-        loop 0 lines
-        sb.ToString()
+        match lines with
+        |Element s    -> s //without adding a new line at end
+        |EarlyEnd     -> eprintf "EarlyEnd schould not be at root of Lines tree" ; "..."
+        |Head (h0,xs0)  -> 
+            let sb = Text.StringBuilder(h0).AppendLine()             
+            let rec loop depth (lns:Lines) = 
+                if depth <= maxDepth then 
+                    match lns with
+                    |Element s    -> sb.Append(String(' ', 4 * depth)).AppendLine(s)        |> ignoreObj 
+                    |EarlyEnd     -> sb.Append(String(' ', 4 * depth)).AppendLine("(...)")  |> ignoreObj  
+                    |Head (h,xs)  ->                                  
+                                     // header:
+                                     sb.Append(String(' ', 4 * depth)).Append(h)     |> ignoreObj  
+                                     (if xs.Count=0 then sb.AppendLine() else sb.AppendLine(":"))  |> ignoreObj  // only add colon if items follow
+                                     // items
+                                     for x in xs do 
+                                        loop (depth+1) x
+            
+            for x0 in xs0 do 
+                loop (1) x0
+            
+            //finally trimm of line return at end
+            let len = sb.Length
+            if sb.Chars(len-2) = '\r' then 
+                sb.Remove(len-2 , 2) |> ignoreObj  
+            sb.ToString()
 
     (*
     let (|UC|_|) e o =
