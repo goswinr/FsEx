@@ -85,9 +85,9 @@ module UtilMath =
         if value > max then max elif value < min then min else value
 
     /// To make sure a value is between 0.0 and 1.0 range    
-    let inline clamp01 value =         
-        if   value > 1.0 then 1.0
-        elif value < 0.0 then 0.0 
+    let inline clamp01 (value:float<'T>)  =         
+        if   value > 1.0<_> then 1.0<_> 
+        elif value < 0.0<_> then 0.0<_> 
         else value
 
     let internal rand = System.Random () 
@@ -115,13 +115,13 @@ module UtilMath =
     /// The comparing tolerance is calculated as:  
     /// let mi = min (abs a) (abs b)
     /// abs(a-b) < relativeTolerance * mi
-    let inline equalsWithRelativeTolerance (relativeTolerance:'T) (valueA:'T) (valueB:'T)  = 
+    let inline equalsWithRelativeTolerance (relativeTolerance:float) (valueA:float<'T>) (valueB:float<'T>)  = 
         let mi = min (abs valueA) (abs valueB)
         abs(valueA - valueB) < relativeTolerance * mi
     
     /// Compares two numbers to be within a tolerance for equality
     /// abs(a-b) < absoluteTolerance
-    let inline equalsWithTolerance (absoluteTolerance:'T) (valueA:'T) (valueB:'T)   = 
+    let inline equalsWithTolerance (absoluteTolerance:float<'T>) (valueA:float<'T>) (valueB:float<'T>)  = 
         abs(valueA - valueB) < absoluteTolerance
     
     /// Shadows the built in 'acos' (Invers Cosine) function to include clamping if values are slightly above -1.0 or 1.0
@@ -148,7 +148,9 @@ module UtilMath =
     let inline toDegrees radians = 57.2957795130823 * radians // 57.2957795130823 = 180. / Math.PI
 
     /// start + ( (ende-start) * rel )
-    let inline interpolate start ende (rel:float) = start + ( (ende-start) * rel )
+    let inline interpolate (start:float<'T>)  (ende:float<'T>)  (rel:float) = 
+        start + ( (ende-start) * rel )
+        
 
     /// Given the min and max value and a test value,  (val-min) / (max-min)
     /// Returns the relative  position  of the test value between min (= 0.0) and (max = 1.0),
@@ -217,23 +219,25 @@ module UtilMath =
     /// Always rounding mid point  like the round function)
     /// =  (round (v / prec)) * prec
     let inline stepedFloatMid (prec:float) (v:float) : float = (round (v / prec)) * prec
-    
+  
     /// This float range function ensures that the end is always included.
     /// The F# build in range fails for example on [0.0 .. 0.1 .. 0.2 ] , it equals [0.0 .. 0.1 .. 0.3 ]
     /// It increases the stop value by the smallest step possible 5 times, to ensure end value is included.
-    let floatRange (start, step, stop) =
-        if step = 0.0 then  failwithf "UtilMath.floatRange:stepsize cannot be zero: start: %g step: %g stop: %g " start step stop
+    let floatRange (start:float<'T>, step:float<'T> , stop:float<'T>) : seq<float<'T>> =        
+        if step = LanguagePrimitives.FloatWithMeasure<'T> 0.0 then  failwithf "UtilMath.floatRange:stepsize cannot be zero: start: %f step: %f stop: %f " start step stop
         let range = stop - start 
+                    |> float
                     |> BitConverter.DoubleToInt64Bits 
                     |> (+) 5L 
                     |> BitConverter.Int64BitsToDouble
-        let steps = range/step
-        if steps < 0.0 then failwithf "UtilMath.floatRange:stop value cannot be reached: start: %g step: %g stop: %g " start step stop
+                    |> LanguagePrimitives.FloatWithMeasure
+        let steps = range/step //
+        if steps < 0.0 then failwithf "UtilMath.floatRange:stop value cannot be reached: start: %f step: %f stop: %f " start step stop
         let rec frange (start, i, steps) =
             seq { if i <= steps then 
                     yield start + i*step
-                    yield! frange (start, (i + 1.0), steps) }
-        frange (start, 0.0, steps)   
+                    yield! frange (start, (i + 1.0 ), steps) }
+        frange (start, 0.0 , steps)   
 
         
 
