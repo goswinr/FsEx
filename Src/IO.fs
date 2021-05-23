@@ -8,13 +8,35 @@ open System.Threading
 //[<AutoOpen>]
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide IO namespace in C# assemblies 
 module IO = 
-    open System.Runtime.InteropServices
+    
     
     module private Kernel32 = 
+        open System.Runtime.InteropServices
+
         //https://stackoverflow.com/questions/6375599/is-this-pinvoke-code-correct-and-reliable
         //https://stackoverflow.com/questions/1689460/f-syntax-for-p-invoke-signature-using-marshalas
         [<DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)>]        
         extern [<MarshalAs(UnmanagedType.Bool)>] bool DeleteFile (string name ); // dont rename! must be called 'DeleteFile'
+
+
+        //https://christoph.ruegg.name/blog/loading-native-dlls-in-fsharp-interactive.html        
+        [<DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)>]
+        extern IntPtr LoadLibrary(string lpFileName); // to load native dlls
+
+        //https://stackoverflow.com/a/2445558/969070
+        [<DllImport("kernel32.dll", CharSet = CharSet.Unicode)>]
+        extern bool FreeLibrary(IntPtr hModule);
+
+    /// To load a native (C++) dll in FSI. Because #r statment does not work for native dlls in fsi
+    /// If you were writing this in a long running process where the DLL is used in a well defined section only, 
+    /// then you'd better unload the library once no longer needed with the symmetric FreeLibrary routine on kernel32.dll. 
+    /// But for quick experiments in F# Interactive it's probably fine.
+    let loadLibrary (fullPath:string)= 
+        if IO.File.Exists(fullPath) then 
+            Kernel32.LoadLibrary(fullPath) |> ignore<IntPtr>
+        else 
+            FileNotFoundException.Raise "FsEx.IO.loadNativeDll cant find file %s" fullPath     
+
     
     /// Removes the blocking of dll files from untrusted sources, e.g. the internet
     /// calls pInvoke  kernel32.dll DeleteFile() to remove Zone.Identifier
@@ -58,44 +80,7 @@ module IO =
     let desktop = 
         Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
     
-    
-    /// Writes Async and with Lock, 
-    /// Optionally only once after a delay in which it might be called several times
-    type SaveWriterOLD () = // TODO Delete
-        // this class also exist in FsEx.Wpf
-        
-        let counter = ref 0L // for atomic writing back to file
-        
-        let lockObj = new Object()
-    
-        /// File will be written async and with a Lock.
-        /// If it fails an Error is printed to the Error stream via eprintfn
-        member this.Write (path, text) =        
-            async{
-                lock lockObj (fun () -> // lock is using Monitor class : https://github.com/dotnet/fsharp/blob/6d91b3759affe3320e48f12becbbbca493574b22/src/fsharp/FSharp.Core/prim-types.fs#L4793
-                    try  IO.File.WriteAllText(path,text)
-                    with ex ->  eprintfn "SaveWriter.Write failed with: %A \r\n while writing:\r\n%s" ex (NiceFormat.truncateString text) // use %A to trimm long text        
-                    )       
-                } |> Async.Start
-    
-          
-        /// GetString will be called in sync on calling thread, but file will be written async.
-        /// Only if after the delay the counter value is the same as before. 
-        /// That means no more recent calls to this function have been made during the delay.
-        /// If other calls to this function have been made then only the last call will be written as file
-        /// If it fails an Error is printed to the Error stream via eprintfn
-        member this.WriteIfLast (path, getText: unit->string, delayMillisSeconds:int) =
-            async{
-                let k = Interlocked.Increment counter
-                do! Async.Sleep(delayMillisSeconds) // delay to see if this is the last of many events (otherwise there is a noticable lag in dragging window around, for example, when saving window position)
-                if !counter = k then //k > 2L &&   //do not save on startup && only save last event after a delay if there are many save events in a row ( eg from window size change)(ignore first two event from creating window)
-                    try 
-                        let text = getText()               
-                        this.Write (path, text) // this should never fail since exeptiona are caught inside 
-                    with ex -> 
-                        eprintfn "SaveWriter.WriteIfLast: getText() for path (%s) failed with: %A" path ex                 
-                } |> Async.StartImmediate
-  
+     
     
     /// Reads and Writes with Lock, 
     /// Optionally only once after a delay in which it might be called several times
