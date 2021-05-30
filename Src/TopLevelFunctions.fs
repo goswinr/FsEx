@@ -1,4 +1,4 @@
-namespace FsEx
+﻿namespace FsEx
 
 open System
 open System.IO
@@ -61,7 +61,7 @@ module  Util =
     
     /// throws an exception with 'msg' as Error message if 'value' is false.
     /// this function is usefull to follow up on any methods that return booleans indication sucess or failure
-    let inline failIfFalse (msg:string) (value :bool) :unit = 
+    let inline failIfFalse (msg:string) (value :bool) : unit = 
         if not value then failwithf "failIfFalse: %s " msg 
     
     /// throws an exception with 'msg' as Error message if 'value' is null.
@@ -99,32 +99,28 @@ module  Util =
         g = Guid.Empty
 
     /// Returns maybeNullValue if it is NOT null, else alternativeValue. 
-    let inline ifNull (alternativeValue:'T) (maybeNullValue:'T)  = match maybeNullValue with null -> alternativeValue | _ -> maybeNullValue  
+    let inline ifNull (alternativeValue:'T) (maybeNullValue:'T)  = 
         match maybeNullValue with 
         |null -> alternativeValue 
         | _   -> maybeNullValue  
 
     /// Null coalesceing:
     /// Returns the value on the left unless it is null, then it returns the value on the right.
-    let inline (|?) (a:'T) (b:'T)  = // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs
+    let inline (|?) (a:'T) (b:'T)  = 
         // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs
         match a with 
         | null -> b  
         | _    -> a // if Object.ReferenceEquals(a, null) then b else a   
 
-    /// use |>! instead
-    /// Apply function, like |> , but ignore result. 
-    /// Return original input
-    /// let inline (|>>) x f =  f x |> ignore ; x 
-    [<Obsolete>]
-    let inline (|>>) x f =  f x |> ignore ; x 
-
+    
     /// Apply function, like |> , but ignore result. 
     /// Return original input
     /// let inline (|>!) x f =  f x |> ignore ; x 
     /// be aware of correct indenting see:
     /// https://stackoverflow.com/questions/64784154/indentation-change-after-if-else-expression-not-taken-into-account
-    let inline (|>!) x f =  f x |> ignore ; x  //https://twitter.com/GoswinR/status/1316988132932407296
+    let inline (|>!) x f =  
+        f x |> ignore //https://twitter.com/GoswinR/status/1316988132932407296
+        x  
 
     /// Get first element of Triple (Tuple of three elements)
     let inline t1 (a,_,_) = a
@@ -155,10 +151,10 @@ module  Util =
 
     /// Any int will give a valid index for given collection size.
     /// division remainder will be used i % len
-    /// e.g.: -1 is  last item 
+    /// e.g.: -1 is last item 
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
-    let inline saveIdx i len = negIdxLooped i len 
-      
+    let inline saveIdx i len = 
+        negIdxLooped i len       
     
     /// If condition is true return f(x) else just x
     let inline ifDo condition (f:'T->'T)  (x:'T) = 
@@ -194,7 +190,6 @@ module  Util =
         else ArgumentException.RaiseBase "Failed to parse %A to a %A" x (res.GetType())
 
 
-
 /// Shadows the ignore function to only accept structs
 /// This is to prevent accidetially ignoring partially aplied functions that would return struct
 module SaveIgnore = 
@@ -225,32 +220,11 @@ module IntRef =
     /// Decrement a ref cell by a given int    
     let inline decrBy i (x:int<'UoM>) = i := !i - x        
     
-    /// Increment a ref cell by two
-    [<Obsolete>]
-    let inline incr2 i = i := !i+2
+    /// set ref cell to given int if it is bigger than current ref cell  value
+    let inline setMax i (x:int<'UoM>) = if x > !i then i := x
 
-    /// Increment a ref cell by three 
-    [<Obsolete>]
-    let inline incr3 i = i := !i+3
-
-    /// Increment a ref cell by four
-    [<Obsolete>]
-    let inline incr4 i = i := !i+4
-
-    //let inline incrByR (x:int) i = i := !i + x  // useful ?
-    //let inline decrByR (x:int) i = i := !i - x   // useful ?
-
-    /// Decrement a ref cell by two
-    [<Obsolete>]
-    let inline decr2 i = i := !i-2
-    
-    /// Decrement a ref cell by three
-    [<Obsolete>]
-    let inline decr3 i = i := !i-3
-    
-    /// Decrement a ref cell by four
-    [<Obsolete>]
-    let inline decr4 i = i := !i-4
+    /// set ref cell to given int if it is smaller than current ref cell  value
+    let inline setMin i (x:int<'UoM>) = if x < !i then i := x
 
    
 
