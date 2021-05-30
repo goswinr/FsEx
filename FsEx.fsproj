@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks> 
+    <TargetFramework>netstandard2.0</TargetFramework> 
     <LangVersion>preview</LangVersion>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages> <!--to only have the english resources of Fsharp.Core--> 
     <RootNamespace>FsEx</RootNamespace>
@@ -10,9 +10,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NeutralLanguage>en</NeutralLanguage>  
 
-    <Version>0.4.1.0</Version>
-    <AssemblyVersion>0.4.1.0</AssemblyVersion>
-    <FileVersion>0.4.1.0</FileVersion>
+    <Version>0.5.0.0</Version>
+    <AssemblyVersion>0.5.0.0</AssemblyVersion>
+    <FileVersion>0.5.0.0</FileVersion>
 
     <Authors>Goswin Rothenthal</Authors>
     <Product>FsEx</Product> 
@@ -40,11 +40,11 @@
 
   <ItemGroup>
     <Compile Include="Src/TopLevelFunctions.fs" />
-    <Compile Include="Src\Timer.fs" />
+    <Compile Include="Src/Timer.fs" />
     <Compile Include="Src/UtilMath.fs" />
     <Compile Include="Src/MinMaxSortCompare.fs" />
     <Compile Include="Src/NiceString.fs" />
-    <Compile Include="Src\IO.fs" />
+    <Compile Include="Src/IO.fs" />
     
     <Compile Include="Src/Types/Rarr.fs" />
     <Compile Include="Src/Types/Dict.fs" />
