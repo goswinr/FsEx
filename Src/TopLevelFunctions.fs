@@ -1,4 +1,4 @@
-﻿namespace FsEx
+namespace FsEx
 
 open System
 open System.IO
@@ -56,7 +56,8 @@ module  Util =
     
     /// a quick way to throw an exception.
     /// for use in temporary scripts when you are too lazy to do a proper exception.
-    let inline fail() = failwith "Quick fail (inner exception should show more helpful message)" 
+    let inline fail() = 
+        raise <| Exception "Quick fail (inner exception should show more helpful message)" 
     
     /// throws an exception with 'msg' as Error message if 'value' is false.
     /// this function is usefull to follow up on any methods that return booleans indication sucess or failure
@@ -99,10 +100,14 @@ module  Util =
 
     /// Returns maybeNullValue if it is NOT null, else alternativeValue. 
     let inline ifNull (alternativeValue:'T) (maybeNullValue:'T)  = match maybeNullValue with null -> alternativeValue | _ -> maybeNullValue  
+        match maybeNullValue with 
+        |null -> alternativeValue 
+        | _   -> maybeNullValue  
 
     /// Null coalesceing:
     /// Returns the value on the left unless it is null, then it returns the value on the right.
     let inline (|?) (a:'T) (b:'T)  = // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs
+        // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs
         match a with 
         | null -> b  
         | _    -> a // if Object.ReferenceEquals(a, null) then b else a   
@@ -204,27 +209,22 @@ module SaveIgnore =
     let inline ignoreObj (x:obj) = ()
 
 /// Functions to deal with integer ref objects
+/// Also works with ints agmented with Units of Measure (UoM)
 module IntRef = 
-
-    /// Increment a ref cell by a given int
-    let inline incrBy i (x:int) = i := !i + x
     
+    /// Increment a ref cell by one
+    /// Schadows built in 'incr' to allow Units of Measure (UoM)
+    let inline incr i (x:int<'UoM>) = i := !i + 1<_>
+
     /// Decrement a ref cell by one
-    let inline decr  i = i := !i-1 
+    let inline decr (i:ref<int<'UoM>>) = i := !i - 1<_> 
+    
+    /// Increment a ref cell by a given int
+    let inline incrBy i (x:int<'UoM>) = i := !i + x    
     
     /// Decrement a ref cell by a given int    
-    let inline decrBy i (x:int) = i := !i - x        
+    let inline decrBy i (x:int<'UoM>) = i := !i - x        
     
-    /// set ref cell to given int if it is bigger than current value
-    let inline setMax i (x:int) = if x > !i then i := x
-
-    /// set ref cell to given int if it is smaller than current value
-    let inline setMin i (x:int) = if x < !i then i := x
-
-    // Increment a ref cell and return new incremented integer value
-    //[<Obsolete>]
-    //let inline (!++)  i = incr i; !i 
-
     /// Increment a ref cell by two
     [<Obsolete>]
     let inline incr2 i = i := !i+2
@@ -255,19 +255,18 @@ module IntRef =
    
 
 /// Functions to deal with float ref objects
+/// Also works with floats agmented with Units of Measure (UoM)
 module FloatRef = 
         
-    /// Increment a ref cell by a given int
-    let inline incrBy i (x:float) = i := !i + x
+    /// Increment a ref cell by a given float
+    let inline incrBy i (x:float<'UoM>) = i := !i + x
         
-    /// Decrement a ref cell by a given int    
-    let inline decrBy i (x:float) = i := !i - x    
-        
-    //let inline decrByR (x:int) i = i := !i - x           // useful ?
-        
-    /// set ref cell to given int if it is bigger than current value
-    let inline setMax i (x:float) = if x > !i then i := x
+    /// Decrement a ref cell by a given float    
+    let inline decrBy i (x:float<'UoM>) = i := !i - x    
+                
+    /// set ref cell to given float if it is bigger than current ref cell  value
+    let inline setMax i (x:float<'UoM>) = if x > !i then i := x
     
-    /// set ref cell to given int if it is smaller than current value
-    let inline setMin i (x:float) = if x < !i then i := x
+    /// set ref cell to given float if it is smaller than current ref cell  value
+    let inline setMin i (x:float<'UoM>) = if x < !i then i := x
 
