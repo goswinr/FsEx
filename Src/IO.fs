@@ -8,45 +8,6 @@ open System.Threading
 //[<AutoOpen>]
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide IO namespace in C# assemblies 
 module IO = 
-    
-    
-    module private Kernel32 = 
-        open System.Runtime.InteropServices
-
-        //https://stackoverflow.com/questions/6375599/is-this-pinvoke-code-correct-and-reliable
-        //https://stackoverflow.com/questions/1689460/f-syntax-for-p-invoke-signature-using-marshalas
-        [<DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)>]        
-        extern [<MarshalAs(UnmanagedType.Bool)>] bool DeleteFile (string name ); // dont rename! must be called 'DeleteFile'
-
-
-        //https://christoph.ruegg.name/blog/loading-native-dlls-in-fsharp-interactive.html        
-        [<DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)>]
-        extern IntPtr LoadLibrary(string lpFileName); // to load native dlls
-
-        //https://stackoverflow.com/a/2445558/969070
-        [<DllImport("kernel32.dll", CharSet = CharSet.Unicode)>]
-        extern bool FreeLibrary(IntPtr hModule);
-
-    /// To load a native (C++) dll in FSI. Because #r statment does not work for native dlls in fsi
-    /// If you were writing this in a long running process where the DLL is used in a well defined section only, 
-    /// then you'd better unload the library once no longer needed with the symmetric FreeLibrary routine on kernel32.dll. 
-    /// But for quick experiments in F# Interactive it's probably fine.
-    let loadLibrary (fullPath:string)= 
-        if IO.File.Exists(fullPath) then 
-            Kernel32.LoadLibrary(fullPath) |> ignore<IntPtr>
-        else 
-            FileNotFoundException.Raise "FsEx.IO.loadNativeDll cant find file %s" fullPath     
-
-    
-    /// Removes the blocking of dll files from untrusted sources, e.g. the internet
-    /// calls pInvoke  kernel32.dll DeleteFile() to remove Zone.Identifier
-    /// Raises an exception if file does not exist
-    /// Returns true if Zone.Identifier where removed from the file stream. Else false
-    let unblockFile(filePath:string ) : bool =
-        if IO.File.Exists(filePath) then 
-            Kernel32.DeleteFile(filePath + ":Zone.Identifier") 
-        else 
-            FileNotFoundException.Raise "FsEx.IO.unblock cant find file %s" filePath    
 
     /// Raises an FileNotFoundException if the file path does not exist
     let checkIfFileExists s = 
