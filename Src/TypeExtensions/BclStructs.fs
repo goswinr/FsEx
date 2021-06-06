@@ -144,3 +144,19 @@ module ExtensionsBclStructs =
         /// Current UTC date and time as yyyy-MM-dd_HH-mm-fff
         /// (inludes 3 digits of miliseconds)
         [<Extension>]static member nowStrLong =   DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss-fff")
+        
+        /// Formats with .ToString("yyyy-MM-dd_HH-mm-ss-fff")
+        /// (inludes 3 digits of miliseconds)
+        [<Extension>]member t.formatYMDHMSF =  t.ToString("yyyy-MM-dd_HH-mm-ss-fff")
+
+        /// Formats with .ToString("yyyy-MM-dd_HH-mm-ss")
+        /// including seconds
+        [<Extension>]member t.formatYMDHMS =  t.ToString("yyyy-MM-dd_HH-mm-ss")
+        
+        /// Formats with .ToString("yyyy-MM-dd_HH-mm")
+        /// including minutes
+        [<Extension>]member t.formatYMDHM =  t.ToString("yyyy-MM-dd_HH-mm")
+        
+        /// Formats with .ToString("yyyy-MM-dd")
+        /// Date only, no time of day
+        [<Extension>]member t.formatYMD =  t.ToString("yyyy-MM-dd")
