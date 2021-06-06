@@ -29,8 +29,8 @@ module NiceStringSettings =
     let mutable maxItemsPerSeq = 5
 
     /// set this to change how many characters of a string might be printed at onece.
-    /// default = 5000
-    let mutable maxCharsInString = 5000
+    /// default = 2000
+    let mutable maxCharsInString = 2000
 
 
     /// if the absolut value of a float is below this, display ±0.0
@@ -225,8 +225,8 @@ module NiceFormat  =
         else 
             let len   = stringToTrim.Length
             let st    = stringToTrim.Substring(0, maxCharsInString) 
-            let last6 = stringToTrim.Substring(len-7) 
-            sprintf "\"%s[..%d more Chars..]%s\"" st (len - maxCharsInString - 6) last6
+            let last20 = stringToTrim.Substring(len-21) 
+            sprintf "\"%s[<< ...... %d more chars ...... >>]%s\"" st (len - maxCharsInString - 20) last20
 
     
     /// return the string befor a splitter
@@ -320,7 +320,8 @@ module internal NiceStringImplementation  =
             | :? single     as v   -> v |> NiceFormat.single  |> Element 
             | :? decimal    as d   -> d |> NiceFormat.decimal |> Element 
             | :? Char       as c   -> c.ToString()            |> Element // "'" + c.ToString() + "'" // or add qotes?
-            | :? string     as s   -> NiceFormat.truncateString  s  |> Element   
+            | :? string     as s   -> if depth=0 && maxItemsPerSeq = Int32.MaxValue then s |> Element // dont truncate string if toplevel and printFull
+                                      else  NiceFormat.truncateString s  |> Element   
             | :? Guid       as g   -> sprintf "Guid[%O]" g    |> Element 
             | :? Collections.ICollection as xs -> getCollection depth x xs
             | :? Collections.IEnumerable as xs -> getSeq depth x xs            
@@ -337,8 +338,7 @@ module internal NiceStringImplementation  =
                     let declTy = union.DeclaringType
                     let mainType = NiceFormat.typeName  declTy
                     let desc =  sprintf "a %s of case %s" mainType union.Name 
-                    if depth = maxDepth then Element desc else Head (desc, getItemsInSeq (depth+1) fields) // TODO test what are the fields
-                
+                    if depth = maxDepth then Element desc else Head (desc, getItemsInSeq (depth+1) fields) // TODO test what are the fields                
                 else
                     sprintf "%A" x |> Element
                 
@@ -427,7 +427,7 @@ module NiceString  =
         maxDepth        <- Int32.MaxValue
         maxItemsPerSeq  <- Int32.MaxValue
         let res = x |> box |> getLines 0 |> formatLines
-        maxDepth        <- pervDepth
+        maxDepth        <- pervDepth  // TODO if format lines fails values dont get reset !
         maxItemsPerSeq  <- prevMaxItems
         res
 
