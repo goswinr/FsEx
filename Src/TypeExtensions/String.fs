@@ -1,7 +1,6 @@
 namespace FsEx
 
 open System
-open System.Text
 open System.Runtime.CompilerServices
 open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 

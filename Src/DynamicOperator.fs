@@ -5,7 +5,7 @@ open System.Reflection
 open Microsoft.FSharp.Reflection
 
       
- module DynamicOperator =
+module DynamicOperator =
     // taken from http://www.fssnip.net/2V/title/Dynamic-operator-using-Reflection   
 
     // Various flags that specify what members can be called 

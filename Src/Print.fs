@@ -1,9 +1,7 @@
 ﻿namespace FsEx
 
-
 open System
 open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
-open System.Linq.Expressions
 
 
 [<AutoOpen>] // to have print functions at end of module auto opened

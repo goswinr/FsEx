@@ -1,7 +1,8 @@
 ﻿namespace FsEx
+
 open System
-open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 open System.Text
+open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
 module ComputationalExpressionsBuilders =    
     let mutable csvSepEn = ','

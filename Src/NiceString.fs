@@ -1,9 +1,9 @@
 ﻿namespace FsEx
 
 open System
-open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
-open System
 open System.Globalization
+
+open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
 
 /// exposes the settings used in toNiceString pretty printing function

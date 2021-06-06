@@ -3,7 +3,6 @@
 open System
 
 
-
 /// For getting a formated string that has bars to show the ditribution
 /// of given float values.
 [<RequireQualifiedAccess>]

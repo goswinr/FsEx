@@ -1,6 +1,5 @@
 ﻿namespace FsEx
 
-open System
 open System.Runtime.CompilerServices
 open System.Collections.Generic
 

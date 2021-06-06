@@ -1,7 +1,7 @@
 ﻿namespace FsEx
 
-open System.Collections.Generic
 open System
+open System.Collections.Generic
 
 // Of course it would be simpler to just override the .Item method on System.Collections.Generic.List<'T> but unfortunatly it is sealed
 
