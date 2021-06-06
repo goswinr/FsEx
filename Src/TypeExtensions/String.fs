@@ -7,7 +7,55 @@ open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
 //[<AutoOpen>]
 
-module ExtensionsString =      
+
+/// Extensions for StringBuilder
+[<AutoOpen>]
+module ExtensionsStringBuilder =   
+    type Text.StringBuilder with
+        
+        /// like .Append(string) but returnig unit
+        member inline sb.append (s:string) = sb.Append(s) |> ignoreObj 
+        
+        /// like .Append(char) but returnig unit
+        member inline sb.append (c:char) = sb.Append(c) |> ignoreObj 
+
+        /// like .AppendLine(string) but returnig unit
+        member inline sb.appendLine (s:string) = sb.AppendLine(s) |> ignoreObj 
+        
+        /// like .AppendLine() but returnig unit
+        member inline sb.appendLine() = sb.AppendLine() |> ignoreObj 
+
+        /// like .IndexOf for strings, returns -1 if not found
+        member sb.IndexOf (c:char) :int = 
+            let rec find i = 
+                if   i = sb.Length then -1
+                elif sb.[i] = c    then i
+                else find (i+1)
+            find(0)
+        
+        /// like .IndexOf for strings, returns -1 if not found
+        member sb.IndexOf (t:string):int= 
+            // or https://stackoverflow.com/questions/12261344/fastest-search-method-in-stringbuilder
+            let ls = sb.Length
+            let lt = t.Length
+            //printfn "sb :%d t:%d" ls lt
+            let rec find ib it = // index in stringbuilder and index in search string
+                //printfn "Search at ib:%d %c for it:%d %c" ib sb.[ib] it  t.[it] 
+                if  ib > ls-lt+it then -1 // not found! not enough chars left in stringbuilder to match remaining search string
+                elif sb.[ib] = t.[it]  then 
+                    if it = lt-1 then ib - lt + 1 // found !
+                    else find (ib+1) (it+1)
+                else find (ib+1-it) 0            
+            find 0 0
+        
+        member inline sb.Contains (c:char) :bool = 
+            sb.IndexOf c <> -1
+
+        member inline sb.Contains (s:string) :bool = 
+            sb.IndexOf s <> -1
+
+/// Extensions for String 
+module ExtensionsString =     
     
     // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164      
 
@@ -124,6 +172,5 @@ module ExtensionsString =
             if len < 0 then
                 let en = if endIdx<0 then count+endIdx else endIdx
                 String.FsExStringException.Raise "string.GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for String '%s' of %d chars" startIdx st endIdx en s count
-              
-            
+             
             s.Substring(st,len) 
