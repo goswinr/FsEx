@@ -150,7 +150,14 @@ module UtilMath =
     /// start + ( (ende-start) * rel )
     let inline interpolate (start:float<'T>)  (ende:float<'T>)  (rel:float) = 
         start + ( (ende-start) * rel )
-        
+    
+    /// multiplicative inverse or reciprocal:
+    /// 1/x
+    let inline reciprocal (x:float<'T>) : float</'T> = 1. / x
+
+    /// multiplicative inverse or reciprocal:
+    /// 1/x
+    let inline inverse (x:float<'T>) : float</'T> = 1. / x
 
     /// Given the min and max value and a test value,  (val-min) / (max-min)
     /// Returns the relative  position  of the test value between min (= 0.0) and (max = 1.0),
