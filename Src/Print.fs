@@ -11,7 +11,7 @@ module Print =
     
     open NiceString
 
-    /// Exposes functionality liek print and clear of the Seff Editor, when FsEx is loaded there
+    /// Exposes functionality like print and clear of the Seff Editor, when FsEx is loaded there
     type internal Seff private () = // no public constructor  
                   
         static let mutable printColor : int-> int -> int -> string -> unit = //set via reflection below from Seff
@@ -39,7 +39,7 @@ module Print =
                     printnColor  <- printModule.GetProperty("printnColor").GetValue(seffAssembly)  :?>  int-> int -> int -> string -> unit
                     clear        <- printModule.GetProperty("clear").GetValue(seffAssembly)        :?>  unit -> unit
                 with ex ->
-                    eprintfn "Failed to get Seff.Model.ISeffLog.printnColor via Reflection, If you are not using the Seff Editor Plugin this is normal. The function 'printfnColor' will behave just as 'printfn'\r\nMessage: %A" ex     
+                    eprintfn "Failed to get Seff.Model.ISeffLog.printnColor via Reflection, If you are not using the Seff Editor Plugin this is normal. The function 'fnColor' will behave just as 'printfn'\r\nMessage: %A" ex     
                 
             |None -> ()
                 //eprintfn "Only found:"
@@ -50,15 +50,15 @@ module Print =
             
     
         static member PrintColor r g b s = 
-            if doInit then init() // to delay reflection calls to lates possible moment
+            if doInit then init() // to delay reflection calls to latest possible moment
             printColor r g b s
         
         static member PrintnColor r g b s = 
-            if doInit then init() // to delay reflection calls to lates possible moment
+            if doInit then init() // to delay reflection calls to latest possible moment
             printnColor r g b s
 
         static member Clear () = 
-            if doInit then init() // to delay reflection calls to lates possible moment
+            if doInit then init() // to delay reflection calls to latest possible moment
             clear()
     
     /// Nice formating for numbers including thousand Separator and (nested) sequences, first five items are printed out.
@@ -77,27 +77,17 @@ module Print =
     let printFull x = Console.WriteLine (toNiceStringFull x)
     
 
-    /// Pprints two values separated by a space using FsEx.NiceString.toNiceString
-    let print2 x y = printfn "%s %s" (toNiceString x) (toNiceString y)
+    // Pprints two values separated by a space using FsEx.NiceString.toNiceString
+    //let print2 x y = printfn "%s %s" (toNiceString x) (toNiceString y)
     
-    /// Prints three values separated by a space using FsEx.NiceString.toNiceString
-    let print3 x y z = printfn "%s %s %s" (toNiceString x) (toNiceString y) (toNiceString z) 
+    // Prints three values separated by a space using FsEx.NiceString.toNiceString
+    //let print3 x y z = printfn "%s %s %s" (toNiceString x) (toNiceString y) (toNiceString z) 
     
-    /// Prints four values separated by a space using FsEx.NiceString.toNiceString
-    let print4 w x y z = printfn "%s %s %s %s" (toNiceString w) (toNiceString x) (toNiceString y) (toNiceString z) 
-
-    /// Print with rgb colors if running in Seff Editor. Else just normal printf 
-    /// Does NOT add a new line
-    /// red -> green -> blue -> string -> unit
-    let printfColor red green blue msg =  Printf.kprintf (fun s -> Seff.PrintColor red green blue s)  msg
-
-    /// Print with rgb colors if running in Seff Editor. Else just normal printfn
-    /// Adds a new line at end
-    /// red -> green -> blue -> string -> unit
-    let printfnColor red green blue msg = Printf.kprintf (fun s -> Seff.PrintnColor red green blue s)  msg
+    // Prints four values separated by a space using FsEx.NiceString.toNiceString
+    //let print4 w x y z = printfn "%s %s %s %s" (toNiceString w) (toNiceString x) (toNiceString y) (toNiceString z) 
 
 
-    /// Highligths the given word in the line to print 
+    /// Highligths the given word in black in the line to print in grey
     /// Adds line return at end
     let printWithHighlight (word:string) (fullLine:string)=        
         if String.IsNullOrWhiteSpace word then 
@@ -126,3 +116,54 @@ module Print =
     let clearSeffLog() = Seff.Clear()
 
 
+    module PrintColor = 
+        
+        /// Print with rgb colors if running in Seff Editor. Else just normal printf 
+        /// Does NOT add a new line
+        /// red -> green -> blue -> string -> unit
+        let fColor red green blue msg =  Printf.kprintf (fun s -> Seff.PrintColor red green blue s)  msg
+
+        /// Print with rgb colors if running in Seff Editor. Else just normal printfn
+        /// Adds a new line at end
+        /// red -> green -> blue -> string -> unit
+        let fnColor red green blue msg = Printf.kprintf (fun s -> Seff.PrintnColor red green blue s)  msg
+        
+        /// Like printf but in Red if used from Seff Editor. Does not add a new line at end.              
+        let fRed msg =  
+            Printf.kprintf (fun s -> fColor 220 0 0 "%s" s)  msg 
+            
+        /// Like printfn but in Red if used from Seff Editor. Adds a new line at end.
+        let fnRed msg =  
+            Printf.kprintf (fun s -> fnColor 220 0 0 "%s" s)  msg 
+
+        /// Like printf but in Green if used from Seff Editor. Does not add a new line at end.
+        let fGreen msg =  
+            Printf.kprintf (fun s -> fColor 0 180 0 "%s" s )  msg 
+            
+        /// Like printfn but in Green if used from Seff Editor. Adds a new line at end.
+        let fnGreen msg =  
+            Printf.kprintf (fun s -> fnColor 0 180 0 "%s" s )  msg 
+
+        /// Like printf but in Light Blue if used from Seff Editor. Does not add a new line at end.
+        let fLightBlue msg =  
+            Printf.kprintf (fun s -> fColor 173 216 230  "%s" s)  msg 
+
+        /// Like printfn but in Light Blue if used from Seff Editor. Adds a new line at end.
+        let fnLightBlue msg =  
+            Printf.kprintf (fun s -> fnColor 173 216 230  "%s" s)  msg 
+
+        /// Like printf but in Blue if used from Seff Editor. Does not add a new line at end.
+        let fBlue msg = 
+            Printf.kprintf (fun s -> fColor 0 0 220 "%s" s)  msg 
+
+        /// Like printfn but in Blue if used from Seff Editor. Adds a new line at end.
+        let fnBlue msg =  
+            Printf.kprintf (fun s -> fnColor 0 0 220 "%s" s)  msg 
+
+        /// Like printf but in Grey if used from Seff Editor. Does not add a new line at end.
+        let fGrey msg =  
+            Printf.kprintf (fun s -> fColor 150 150 150 "%s" s )  msg 
+
+        /// Like printfn but in Grey if used from Seff Editor. Adds a new line at end.
+        let fnGrey msg =  
+            Printf.kprintf (fun s -> fnColor 150 150 150 "%s" s)  msg 
