@@ -214,7 +214,7 @@ module ComputationalExpressionsBuilders =
   
   
 [<AutoOpen>]
-module ComputationalExpressions  =
+module AutoOpenComputationalExpressions  =
     open ComputationalExpressionsBuilders 
     
     /// A maybe monad for option types. 

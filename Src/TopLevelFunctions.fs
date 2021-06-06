@@ -13,7 +13,7 @@ type EXT = Runtime.CompilerServices.ExtensionAttribute
 /// This module is set to auto open. 
 /// Static Extension methods on Exceptions to cal Excn.Raise "%A" x with F# printf string formating
 [<AutoOpen>] // so that extension become availale on opening FsEx
-module ExtensionsExceptions =    
+module AutoOpenExtensionsExceptions =    
     
     // type FsExStringException is now defined in String Module
 
@@ -51,7 +51,7 @@ module ExtensionsExceptions =
 /// This module is set to auto open. 
 /// General Utility functions
 [<AutoOpen>] // so that extension become availale on opening FsEx
-module  Util =     
+module  AutoOpenUtil =     
     
     /// a quick way to throw an exception.
     /// for use in temporary scripts when you are too lazy to do a proper exception.

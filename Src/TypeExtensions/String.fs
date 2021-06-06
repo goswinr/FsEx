@@ -9,7 +9,7 @@ open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
 /// Extensions for StringBuilder
 [<AutoOpen>]
-module ExtensionsStringBuilder =   
+module AutoOpenExtensionsStringBuilder =   
     type Text.StringBuilder with
         
         /// like .Append(string) but returnig unit

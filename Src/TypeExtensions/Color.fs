@@ -8,7 +8,7 @@ open System.Runtime.CompilerServices
 /// This module is set to auto open. 
 /// It provides EqualsARGB member
 [<AutoOpen>]
-module ExtensionsColor =   
+module AutoOpenExtensionsColor =   
     
     type Drawing.Color with        
         

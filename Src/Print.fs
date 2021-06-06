@@ -5,7 +5,7 @@ open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
 
 [<AutoOpen>] // to have print functions at end of module auto opened
-module Print =
+module AutoOpenPrint =
     
     open NiceString
 
@@ -75,18 +75,8 @@ module Print =
     let printFull x = Console.WriteLine (toNiceStringFull x)
     
 
-    // Pprints two values separated by a space using FsEx.NiceString.toNiceString
-    //let print2 x y = printfn "%s %s" (toNiceString x) (toNiceString y)
-    
-    // Prints three values separated by a space using FsEx.NiceString.toNiceString
-    //let print3 x y z = printfn "%s %s %s" (toNiceString x) (toNiceString y) (toNiceString z) 
-    
-    // Prints four values separated by a space using FsEx.NiceString.toNiceString
-    //let print4 w x y z = printfn "%s %s %s %s" (toNiceString w) (toNiceString x) (toNiceString y) (toNiceString z) 
-
-
-    /// Highligths the given word in black in the line to print in gray
-    /// Adds line return at end
+    /// Highligths the given word in red in the line to print in gray.
+    /// Adds line return at end.
     let printWithHighlight (word:string) (fullLine:string)=        
         if String.IsNullOrWhiteSpace word then 
             Seff.PrintnColor 180 180 180 (fullLine)// adds line return 
@@ -99,9 +89,9 @@ module Print =
                     if beforeLen > 0 then Seff.PrintColor 180 180 180 (fullLine.Substring(fromIdx,beforeLen))
                 
                     if i + word.Length = fullLine.Length then                    
-                        Seff.PrintnColor 0   0   0 (fullLine.Substring(i,word.Length)) // adds line return 
+                        Seff.PrintnColor 240   0   0 (fullLine.Substring(i,word.Length)) // adds line return 
                     else                                            
-                        Seff.PrintColor  0   0   0 (fullLine.Substring(i,word.Length)) // no line return
+                        Seff.PrintColor  240   0   0 (fullLine.Substring(i,word.Length)) // no line return
                         loop (i + word.Length)
             loop 0
         
