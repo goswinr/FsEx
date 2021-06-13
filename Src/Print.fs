@@ -1,4 +1,4 @@
-﻿namespace FsEx
+namespace FsEx
 
 open System
 open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
@@ -134,6 +134,12 @@ module Printf =
     /// Like printf but in Gray if used in Seff Editor. Does not add a new line at end.
     let lightGray msg = Printf.kprintf (fun s -> Seff.PrintColor 200 200 200 s)  msg  
 
+    /// Like printf but in Random Color if used in Seff Editor. Does not add a new line at end.
+    let colorRnd msg = 
+        let c = Color.randomForRhino()
+        Printf.kprintf (fun s -> Seff.PrintColor c.R.ToInt c.G.ToInt c.B.ToInt s)  msg  
+
+
 /// Tries to printfn with colors if running in Seff Editor. 
 /// Else just normal printf  
 /// Adds a new line at end.
@@ -163,3 +169,8 @@ module Printfn =
 
     /// Like printfn but in Gray if used in Seff Editor. Adds a new line at end.
     let lightGray msg = Printf.kprintf (fun s -> Seff.PrintnColor 200 200 200 s)  msg  
+    
+    /// Like printfn but in random Color if used in Seff Editor. Adds a new line at end.
+    let colorRnd msg = 
+        let c = Color.randomForRhino()
+        Printf.kprintf (fun s -> Seff.PrintnColor c.R.ToInt c.G.ToInt c.B.ToInt s)  msg  
