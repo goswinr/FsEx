@@ -1,4 +1,4 @@
-﻿namespace FsEx
+namespace FsEx
 
 open System
 open System.Runtime.CompilerServices
@@ -103,6 +103,14 @@ module ExtensionsArray =
             this.[i] <- value 
         *)
 
+
+        /// Returns the last valid index in the array
+        /// same as: arr.Length - 1
+        [<Extension>]
+        member this.LastIndex = 
+            if isNull this     then IndexOutOfRangeException.Raise "thistringToSearchIn.LastIndex: Failed to get LastIndex of null Array" 
+            if this.Length = 0 then IndexOutOfRangeException.Raise "thistringToSearchIn.LastIndex: Failed to get LastIndex of empty Array" // TODO or use ArgumentOutOfRangeException ?
+            this.Length - 1
 
         /// Get (or set) the last item in the Array.
         /// equal to this.[this.Length - 1]
