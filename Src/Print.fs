@@ -59,19 +59,20 @@ module AutoOpenPrint =
             if doInit then init() // to delay reflection calls to latest possible moment
             clear()
     
-    /// Nice formating for numbers including thousand Separator and (nested) sequences, first five items are printed out.
+
+    /// Print to standard out including nice formating for numbers including thousand Separator and (nested) sequences, first five items are printed out.
     /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
-    /// • thousandSeparator          = '\'' (this is just one quote: ')  ; set this to change the printing of floats and integers larger than 10'000
-    /// • toNiceStringMaxDepth       = 3                                 ; set this to change how deep the content of nested seq is printed (printFull ignores this)
-    /// • toNiceStringMaxItemsPerSeq = 5                                 ; set this to change how how many items per seq are printed (printFull ignores this)
-    /// • maxCharsInString           = 5000                              ; set this to change how many characters of a string might be printed at once.  
+    /// • thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
+    /// • maxNestingDepth         = 3     ; set this to change how deep the content of nested seq is printed (printFull ignores this)
+    /// • maxNestingDepth         = 6     ; set this to change how how many items per seq are printed (printFull ignores this)
+    /// • maxCharsInString        = 2000  ; set this to change how many characters of a string might be printed at once.  
     let print x = 
         Console.WriteLine (toNiceString x)// Console.WriteLine is about 2-3 times faster than printf "%s"
     
-    /// Nice formating for numbers including thousand Separator, all items of sequences, including nested items, are printed out.
+    /// Print to standard out including nice formating for numbers including thousand Separator, all items of sequences, including nested items, are printed out.
     /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
-    /// • thousandSeparator          = '\'' (this is just one quote: ')  ; set this to change the printing of floats and integers larger than 10'000
-    /// • maxCharsInString           = 5000                              ; set this to change how many characters of a string might be printed at once.
+    /// • thousandSeparator       = '      ; set this to change the printing of floats and integers larger than 10'000   
+    /// • maxCharsInString        = 2000   ; set this to change how many characters of a string might be printed at once. 
     let printFull x = Console.WriteLine (toNiceStringFull x)
     
 
