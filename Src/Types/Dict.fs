@@ -18,8 +18,14 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
          let mutable out = Unchecked.defaultof<'V>         
          let found = dic.TryGetValue(key, &out)
          if found then out
-         else KeyNotFoundException.Raise "Dict.Get failed to find key %A in %A of %d items" key dic dic.Count
+         else 
+            let keys = NiceString.toNiceString dic.Keys
+            KeyNotFoundException.Raise "Dict.Get failed to find key %A in %A  of %d items. Keys: %s" key dic dic.Count keys
 
+    let set key value =
+         match box key with 
+         | null -> ArgumentNullException.Raise  "Dict.Set key is null for value %A"  value
+         | _ -> dic.[key] <- value
     
     /// create a new empty Dict<'K,'V>
     /// A Dict is a thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys
@@ -43,13 +49,13 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
     /// For Index operator .[i]: get or set the value for given key
     member _.Item 
         with get k   = get k        
-        and  set k v = dic.[k] <- v
+        and  set k v = set k v //dic.[k] <- v
     
     /// Get value for given key
     member _.Get key = get key 
 
     /// Set value for given key
-    member _.Set key value = dic.[key] <- value
+    member _.Set key value = set key value // dic.[key] <- value
     
     /// Get a value and remove key and value it from dictionary, like *.pop() in Python 
     /// Will fail if key does not exist
@@ -107,7 +113,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
     // -------------------------------------methods:-------------------------------
 
     /// Add the specified key and value to the dictionary.
-    member _.Add(key, value) = dic.Add(key, value)
+    member _.Add(key, value) = set key value //dic.Add(key, value)
 
     /// Removes all keys and values from the dictionary
     member _.Clear() = dic.Clear()
@@ -171,7 +177,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
     interface IDictionary<'K,'V> with 
         member _.Item 
             with get k = get k
-            and  set k v = dic.[k] <- v 
+            and  set k v = set k v // dic.[k] <- v 
        
         member _.Keys = (dic:>IDictionary<'K,'V>).Keys 
 
