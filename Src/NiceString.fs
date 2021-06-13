@@ -264,9 +264,7 @@ module internal NiceStringImplementation  =
     open Microsoft.FSharp.Reflection
     open Microsoft.FSharp.Quotations
     open Microsoft.FSharp.Quotations.DerivedPatterns
-    open Microsoft.FSharp.Quotations.Patterns   
-    
- 
+    open Microsoft.FSharp.Quotations.Patterns  
 
     type SeqCount = Counted of int | More of int
  
@@ -326,21 +324,31 @@ module internal NiceStringImplementation  =
             | :? Collections.ICollection as xs -> getCollection depth x xs
             | :? Collections.IEnumerable as xs -> getSeq depth x xs            
             | _ ->  
-                let t = x.GetType()
-                if FSharpType.IsTuple(t) then // TODO test
-                    let tyStr = NiceFormat.typeName  t
-                    let fields = FSharpValue.GetTupleFields(x)
-                    let desc =  sprintf "%s of %d items" tyStr fields.Length
-                    if depth = maxDepth then Element desc else Head (desc, getItemsInSeq (depth+1) fields)
-                
-                elif FSharpType.IsUnion(t) then // TODO test
-                    let union, fields =  FSharpValue.GetUnionFields(x, t)
-                    let declTy = union.DeclaringType
-                    let mainType = NiceFormat.typeName  declTy
-                    let desc =  sprintf "a %s of case %s" mainType union.Name 
-                    if depth = maxDepth then Element desc else Head (desc, getItemsInSeq (depth+1) fields) // TODO test what are the fields                
+                let typ = x.GetType()
+                if depth = 0 then                 
+                    if FSharpType.IsTuple(typ) then     // just to trim brackerts off              
+                        let tyStr = NiceFormat.typeName typ
+                        let formatA = (sprintf "%A" x) .[1.. ^1] // trim enclosing in brackets ?
+                        Element (sprintf "%s: %s" tyStr formatA) 
+                        //let fields = FSharpValue.GetTupleFields(x)
+                        //let desc =  sprintf "%s of %d items" tyStr fields.Length
+                        //if depth = maxDepth then Element desc else Head (desc, getItemsInSeq (depth+1) fields)
+                    
+                    elif FSharpType.IsUnion(typ) then // just to include declaring type
+                        let union, fields =  FSharpValue.GetUnionFields(x, typ)
+                        let declTy = union.DeclaringType
+                        let mainType = NiceFormat.typeName  declTy                    
+                        Element (sprintf "%s.%A" mainType x ) 
+                        //let desc =  sprintf "a %s of case %s" mainType union.Name 
+                        //if depth = maxDepth then Element desc else Head (desc, getItemsInSeq (depth+1) fields) // TODO test what are the fields     
+                    
+                    else
+                        sprintf "%A" x |> Element
                 else
-                    sprintf "%A" x |> Element
+                    if FSharpType.IsTuple(typ) then                    
+                        Element (sprintf "%A" x) .[1.. ^1] // trim enclosing in brackets ?
+                    else
+                        sprintf "%A" x |> Element
                 
                 // TODO use 
                 // http://www.fssnip.net/cV/title/A-Generic-PrettyPrinter-for-Record-types 
