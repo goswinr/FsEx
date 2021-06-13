@@ -1,4 +1,4 @@
-namespace FsEx
+﻿namespace FsEx
 
 open System
 open System.Runtime.CompilerServices
@@ -10,6 +10,8 @@ open System.Runtime.CompilerServices
 module ExtensionsArray = 
     
     // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164      
+
+    // TODO make all inline ??
 
     type ``[]``<'T>  with //Generic Array
         

@@ -201,10 +201,10 @@ module Rarr =
     
             *)
 
-    /// returns an empty Rarr
+    /// Returns an empty Rarr
     let inline empty() = Rarr<'T>()
 
-    /// returns a Rarr that has at most k items, can be less too.
+    /// Returns a Rarr that has at most k items, can be less too.
     let inline truncate k (rarr: Rarr<'T>) =
         if rarr.Count >= k then rarr.GetRange(0,k)
         else                    rarr.GetRange(0,rarr.Count)

@@ -1,8 +1,9 @@
-namespace FsEx
+﻿namespace FsEx
 
 open System
 open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
+// TODO check with https://github.com/eiriktsarpalis/TypeShape/blob/main/samples/TypeShape.Samples/printer.fs
 
 [<AutoOpen>] // to have print functions at end of module auto opened
 module AutoOpenPrint =
@@ -53,7 +54,7 @@ module AutoOpenPrint =
         
         static member PrintnColor r g b s = 
             if doInit then init() // to delay reflection calls to latest possible moment
-            printnColor r g b s
+            printnColor r g b s   
 
         static member Clear () = 
             if doInit then init() // to delay reflection calls to latest possible moment
@@ -103,6 +104,10 @@ module AutoOpenPrint =
     /// else does nothing.
     /// Can be called from any thread.
     let clearSeffLog() = Seff.Clear()
+
+
+
+
 
 /// Tries to printf with colors if running in Seff Editor. 
 /// Else just normal printf  

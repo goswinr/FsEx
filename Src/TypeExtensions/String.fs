@@ -60,7 +60,7 @@ module ExtensionsString =
 
     type System.String with
         
-        /// returns the last valid index in the string
+        /// Returns the last valid index in the string
         /// same as: s.Length - 1
         [<Extension>]
         member inline s.LastIndex = 
@@ -68,7 +68,7 @@ module ExtensionsString =
             if s.Length = 0 then String.FsExStringException.Raise "thistringToSearchIn.LastIndex: Failed to get LastIndex of empty String" // TODO or use ArgumentOutOfRangeException ?
             s.Length - 1
         
-        /// returns the last character of the string
+        /// Returns the last character of the string
         /// fails if string is empty
         [<Extension>]
         member inline s.Last = 
@@ -76,7 +76,7 @@ module ExtensionsString =
             if s.Length = 0 then String.FsExStringException.Raise "string.Last: Failed to get last character of empty String"
             s.[s.Length - 1]  
         
-        /// returns the second last character of the string
+        /// Returns the second last character of the string
         /// fails if string has less than two characters
         [<Extension>]
         member inline s.SecondLast = 
@@ -84,7 +84,7 @@ module ExtensionsString =
             if s.Length < 2 then String.FsExStringException.Raise "string.SecondLast: Failed to get second last character of '%s'" s
             s.[s.Length - 2]
         
-        /// returns the third last character of the string
+        /// Returns the third last character of the string
         /// fails if string has less than three characters
         [<Extension>]
         member inline s.ThirdLast = 
@@ -93,7 +93,7 @@ module ExtensionsString =
             s.[s.Length - 3]
 
 
-        /// returns the last x(int) characters of the string
+        /// Returns the last x(int) characters of the string
         /// same as string.LastN
         [<Extension>]
         member inline s.LastX x = 
@@ -101,7 +101,7 @@ module ExtensionsString =
             if s.Length < x then String.FsExStringException.Raise "string.LastX: Failed to get last %d character of too short String '%s' " x s
             s.Substring(s.Length-x,x) 
          
-        /// returns then first character of the string
+        /// Returns then first character of the string
         /// fails if string is empty
         [<Extension>]
         member inline s.First = 
@@ -109,7 +109,7 @@ module ExtensionsString =
             if s.Length = 0 then String.FsExStringException.Raise "string.First: Failed to get first character of empty String"
             s.[0]
         
-        /// returns the second character of the string
+        /// Returns the second character of the string
         /// fails if string has less than two characters
         [<Extension>]
         member inline s.Second = 
@@ -117,7 +117,7 @@ module ExtensionsString =
             if s.Length < 2 then String.FsExStringException.Raise "string.Second: Failed to get second character of '%s'" s
             s.[1]
 
-        /// returns the third character of the string
+        /// Returns the third character of the string
         /// fails if string has less than three characters
         [<Extension>]
         member inline s.Third = 

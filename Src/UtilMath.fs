@@ -127,7 +127,7 @@ module UtilMath =
     /// Shadows the built in 'acos' (Invers Cosine) function to include clamping if values are slightly above -1.0 or 1.0
     /// Tolerance: 0.00001 
     /// This is useful on dot products from unit vectors
-    /// returns angel in Radians
+    /// Returns angel in Radians
     let acos x =
         if x < -1.00001 then failwithf "acos failed on %f , input must be between -1.00001 and +1.00001" x
         if x >  1.00001 then failwithf "acos failed on %f , input must be between -1.00001 and +1.00001" x
@@ -135,7 +135,7 @@ module UtilMath =
 
     /// Shadows the built in 'asin' (Invers Sine) function to include clamping if values are slightly above -1.0 or 1.0
     /// Tolerance: 0.00001 
-    /// returns angel in Radians
+    /// Returns angel in Radians
     let asin x =
         if x < -1.00001 then failwithf "asin failed on %f , input must be between -1.00001 and +1.00001" x
         if x >  1.00001 then failwithf "asin failed on %f , input must be between -1.00001 and +1.00001" x

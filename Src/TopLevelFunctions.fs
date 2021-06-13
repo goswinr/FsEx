@@ -82,18 +82,18 @@ module  AutoOpenUtil =
         if guidToCheck = Guid.Empty then 
             ArgumentException.RaiseBase "Empty Guid in  FsEx.Util.failIfEmptyGuid: %s" failMsg
  
-    /// returns false if the value is null.
+    /// Returns false if the value is null.
     /// the opposit of isNull
     let inline notNull (value :'T when 'T: null) = // Fsharp core does it like this too. don't use Obejct.RefrenceEquals (because of Generics)
         match value with 
         | null -> false  
         | _ -> true    
     
-    /// returns false if the Guid is Empty.
+    /// Returns false if the Guid is Empty.
     let inline notEmptyGuid (g :Guid) = 
         g <> Guid.Empty
     
-    /// returns true if the Guid is Empty.
+    /// Returns true if the Guid is Empty.
     let inline isEmptyGuid (g :Guid) = 
         g = Guid.Empty
 
@@ -142,7 +142,7 @@ module  AutoOpenUtil =
     
     /// Any int will give a valid index for given collection size.
     /// Converts negative indices to positive ones and loops to start after last index is reached
-    /// returns a valid index for a colcction of 'len' items for any integer
+    /// Returns a valid index for a colcction of 'len' items for any integer
     let inline negIdxLooped i len =        
         let t = i % len
         if t >= 0 then t 

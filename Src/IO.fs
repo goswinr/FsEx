@@ -36,7 +36,7 @@ module IO =
                 for d in Directory.EnumerateDirectories(dir) do
                     yield! getAllFilesByPattern d pattern }
 
-    /// returns the path to the current Desktop
+    /// Returns the path to the current Desktop
     /// Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
     let desktop = 
         Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
