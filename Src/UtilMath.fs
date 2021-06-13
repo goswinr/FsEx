@@ -229,16 +229,16 @@ module UtilMath =
   
     /// This float range function ensures that the end is always included.
     /// The F# build in range fails for example on [0.0 .. 0.1 .. 0.2 ] , it equals [0.0 .. 0.1 .. 0.3 ]
-    /// It increases the stop value by the smallest step possible 5 times, to ensure end value is included.
+    /// It increases the stop value by the smallest step possible 15 times, to ensure end value is included in returned seq.
     let floatRange (start:float<'T>, step:float<'T> , stop:float<'T>) : seq<float<'T>> =        
         if step = LanguagePrimitives.FloatWithMeasure<'T> 0.0 then  failwithf "UtilMath.floatRange:stepsize cannot be zero: start: %f step: %f stop: %f " start step stop
         let range = stop - start 
                     |> float
-                    |> BitConverter.DoubleToInt64Bits 
-                    |> (+) 5L 
+                    |> BitConverter.DoubleToInt64Bits //https://float.exposed/0x3ff0000000000000
+                    |> (+) 15L 
                     |> BitConverter.Int64BitsToDouble
                     |> LanguagePrimitives.FloatWithMeasure
-        let steps = range/step //
+        let steps = range/step 
         if steps < 0.0 then failwithf "UtilMath.floatRange:stop value cannot be reached: start: %f step: %f stop: %f " start step stop
         let rec frange (start, i, steps) =
             seq { if i <= steps then 
