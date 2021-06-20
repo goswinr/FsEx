@@ -51,6 +51,7 @@
     <Compile Include="Src/Types/Dict.fs" />
     <Compile Include="Src/Types/DefaultDict.fs" />
     <Compile Include="Src/Types/StuctTuples.fs" />
+    <Compile Include="Src\ArrayModule.fs" />
     
     <Compile Include="Src/RarrModule.fs" />
     <Compile Include="Src/StringModule.fs" />
