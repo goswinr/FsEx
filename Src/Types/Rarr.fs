@@ -11,10 +11,10 @@ open System.Collections.Generic
 /// but with nicer error messages on bad indices, negative slicing operator like in Python
 /// and some more useful methods like this.First or this.Last
 /// It's just a very thin wrapper over a System.Collections.Generic.List<'T>
-/// and has all its members and interfaces implemented.
+/// and has all it's members and interfaces implemented.
 /// The name Rarr is derived from of the F# type ResizeArray
 /// There is a hidden member called "List" to access the underlaying List<'T> directly
-/// In F# use #nowarn "44" to disable the obsolete warning
+/// In F# use #nowarn "44" to disable the obsolete warning for this hidden member.
 type Rarr<'T> private (xs:List<'T>) =     
 
     /// Constructs a new FsEx.Rarr. 
@@ -65,7 +65,7 @@ type Rarr<'T> private (xs:List<'T>) =
     /// Access the underlying Collections.Generic.List<'T>
     /// ATTENTION! This is NOT even a shallow copy, mutating it will also change this Instance of FsEx.Rarr!
     /// use #nowarn "44" to disable the obsolete warning
-    [<Obsolete("It is not actually obsolete but unsafe to use, so hidden from editor tools. In F# use #nowarn \"44\" to disable the obsolete warning")>]
+    [<Obsolete("It is not actually obsolete, but normally not used, so hidden from editor tools. In F# use #nowarn \"44\" to disable the obsolete warning")>]
     member _.List:List<'T> = xs
     
     /// Access the underlying Collections.Generic.List<'T>
