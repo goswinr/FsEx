@@ -84,7 +84,7 @@ module AutoOpenPrint =
             Seff.PrintnColor 180 180 180 (fullLine)// adds line return 
         else
             let rec loop (fromIdx:int) =
-                match fullLine.IndexOf(word, fromIdx) with 
+                match fullLine.IndexOf(word, fromIdx, StringComparison.Ordinal) with 
                 | -1 -> Seff.PrintnColor 180 180 180 (fullLine.Substring(fromIdx))// adds line return 
                 | i  -> 
                     let beforeLen = i - fromIdx
@@ -131,7 +131,7 @@ module Printf =
     let blue msg = Printf.kprintf (fun s -> Seff.PrintColor 0 0 220 s)  msg         
 
     /// Like printf but in Yellow if used in Seff Editor.  Does not add a new line at end.
-    let yellow msg = Printf.kprintf (fun s -> Seff.PrintColor 255 230 0 s)  msg   
+    let yellow msg = Printf.kprintf (fun s -> Seff.PrintColor 235 220 0 s)  msg   
 
     /// Like printf but in Gray if used in Seff Editor. Does not add a new line at end.
     let gray msg = Printf.kprintf (fun s -> Seff.PrintColor 150 150 150 s)  msg  
@@ -139,6 +139,18 @@ module Printf =
     /// Like printf but in Gray if used in Seff Editor. Does not add a new line at end.
     let lightGray msg = Printf.kprintf (fun s -> Seff.PrintColor 200 200 200 s)  msg  
 
+    /// Like printf but in Orchid purple if used in Seff Editor. Does not add a new line at end.
+    let orchid msg = Printf.kprintf (fun s -> Seff.PrintColor 218 112 214 s)  msg  
+
+    /// Like printf but in Purple if used in Seff Editor. Does not add a new line at end.
+    let purple msg = Printf.kprintf (fun s -> Seff.PrintColor 128 0 128 s)  msg 
+
+    /// Like printf but in Orange if used in Seff Editor. Does not add a new line at end.
+    let orange msg = Printf.kprintf (fun s -> Seff.PrintColor 255 140 0 s)  msg     
+    
+    /// Like printf but in Cyan if used in Seff Editor. Does not add a new line at end.
+    let cyan msg = Printf.kprintf (fun s -> Seff.PrintColor 0 150 150 s)  msg 
+    
     /// Like printf but in Random Color if used in Seff Editor. Does not add a new line at end.
     let colorRnd msg = 
         let c = Color.randomForRhino()
@@ -167,14 +179,26 @@ module Printfn =
     let blue msg = Printf.kprintf (fun s -> Seff.PrintnColor 0 0 220 s)  msg      
     
     /// Like printfn but in Yellow if used in Seff Editor. Adds a new line at end.
-    let yellow msg = Printf.kprintf (fun s -> Seff.PrintnColor 255 230 0 s)  msg     
+    let yellow msg = Printf.kprintf (fun s -> Seff.PrintnColor 235 220 0 s)  msg     
 
     /// Like printfn but in Gray if used in Seff Editor. Adds a new line at end.
     let gray msg = Printf.kprintf (fun s -> Seff.PrintnColor 150 150 150 s)  msg  
-
+    
     /// Like printfn but in Gray if used in Seff Editor. Adds a new line at end.
     let lightGray msg = Printf.kprintf (fun s -> Seff.PrintnColor 200 200 200 s)  msg  
     
+    /// Like printfn but in Orchid (light Purple) if used in Seff Editor. Adds a new line at end.
+    let orchid msg = Printf.kprintf (fun s -> Seff.PrintnColor 218 112 214  s)  msg  
+    
+    /// Like printfn but in Purple if used in Seff Editor. Adds a new line at end.
+    let purple msg = Printf.kprintf (fun s -> Seff.PrintnColor 128 0 128 s)  msg  
+    
+    /// Like printfn but in Orange if used in Seff Editor. Adds a new line at end.
+    let orange msg = Printf.kprintf (fun s -> Seff.PrintnColor 255 140 0 s)  msg  
+    
+    /// Like printfn but in Cyan if used in Seff Editor. Adds a new line at end.
+    let cyan msg = Printf.kprintf (fun s -> Seff.PrintnColor 0 150 150 s)  msg
+
     /// Like printfn but in random Color if used in Seff Editor. Adds a new line at end.
     let colorRnd msg = 
         let c = Color.randomForRhino()
