@@ -8,23 +8,27 @@ open System.Collections.Generic
 /// ( with a lowercase 's')
 type Hashset<'T> = HashSet<'T>
 
-/// A thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys
+/// A thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys.
 /// (not the same as lowercase 'dict' in F#)
+/// There is a hidden member called "Dictionary" to access the underlaying Collections.Generic.Dictionary<'K,'V> directly.
+/// In F# use #nowarn "44" to disable the obsolete warning for this hidden member.
 type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
     
     //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
 
     let get key  =
-         let mutable out = Unchecked.defaultof<'V>         
-         let found = dic.TryGetValue(key, &out)
-         if found then out
-         else 
-            let keys = NiceString.toNiceString dic.Keys
-            KeyNotFoundException.Raise "Dict.Get failed to find key %A in %A  of %d items. Keys: %s" key dic dic.Count keys
+         match box key with // or https://stackoverflow.com/a/864860/969070
+         | null -> ArgumentNullException.Raise "Dict.get key is null "
+         | _ ->
+             match dic.TryGetValue(key) with 
+             |true, v-> v
+             |false, _ ->
+                 let keys = NiceString.toNiceString dic.Keys
+                 KeyNotFoundException.Raise "Dict.get failed to find key %A in %A  of %d items. Keys: %s" key dic dic.Count keys
 
     let set key value =
-         match box key with 
-         | null -> ArgumentNullException.Raise  "Dict.Set key is null for value %A"  value
+         match box key with // or https://stackoverflow.com/a/864860/969070
+         | null -> ArgumentNullException.Raise  "Dict.set key is null for value %A" value
          | _ -> dic.[key] <- value
     
     /// create a new empty Dict<'K,'V>
@@ -43,7 +47,9 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
         Dict(dic)
 
     /// Access the underlying Collections.Generic.Dictionary<'K,'V>)
-    /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of Dict!
+    /// ATTENTION! This is not even a shallow copy, mutating it will also change this instance of Dict!    
+    /// use #nowarn "44" to disable the obsolete warning
+    [<Obsolete("It is not actually obsolete, but normally not used, so hidden from editor tools. In F# use #nowarn \"44\" to disable the obsolete warning")>]
     member _.Dictionary = dic
 
     /// For Index operator .[i]: get or set the value for given key
@@ -60,12 +66,15 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
     /// Get a value and remove key and value it from dictionary, like *.pop() in Python 
     /// Will fail if key does not exist
     member _.Pop(key:'K) =
-        let ok, v = dic.TryGetValue(key)
-        if ok then
-            dic.Remove key |>ignore
-            v
-        else 
-            KeyNotFoundException.Raise "Dict.Pop(key): Failed to pop key %A in %A of %d items" key dic dic.Count
+        match box key with // or https://stackoverflow.com/a/864860/969070
+        | null -> ArgumentNullException.Raise "Dict.Pop(key) key is null"
+        | _ ->        
+            let ok, v = dic.TryGetValue(key)
+            if ok then
+                dic.Remove key |>ignore
+                v
+            else 
+                KeyNotFoundException.Raise "Dict.Pop(key): Failed to pop key %A in %A of %d items" key dic dic.Count
       
     /// Returns a (lazy) sequence of key and value tuples
     member _.Items =

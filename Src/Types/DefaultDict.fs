@@ -11,14 +11,22 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
     
     //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
 
-    let dGet(k) = // apart form this getter the rest is the same as in System.Collections.Generic.Dictionary
-        let ok, v = baseDict.TryGetValue(k)
-        if ok then 
-            v
-        else 
-            let v = defaultOfKeyFun(k) 
-            baseDict.[k] <- v
-            v
+    let dGet key  = 
+        match box key with // or https://stackoverflow.com/a/864860/969070
+        | null -> ArgumentNullException.Raise "DefaultDict.get key is null "
+        | _ ->
+            match baseDict.TryGetValue(key) with 
+            |true, v-> v
+            |false, _ -> 
+                let v = defaultOfKeyFun(key) 
+                baseDict.[key] <- v
+                v         
+
+    let set key value =
+        match box key with // or https://stackoverflow.com/a/864860/969070
+        | null -> ArgumentNullException.Raise  "DefaultDict.set key is null for value %A" value
+        | _ -> baseDict.[key] <- value
+
  
   
     /// <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
@@ -27,7 +35,7 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
     /// <param name="defaultOfKeyFun">(&apos;K-&gt;&apos;V): The function to create a default value from the key</param>
     new (defaultOfKeyFun: 'K -> 'V) = 
         let d = new  Dictionary<'K,'V>()
-        DefaultDict( defaultOfKeyFun, d )    
+        DefaultDict( defaultOfKeyFun, d )   
 
     
 
@@ -47,7 +55,7 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
     /// For Index operator: get or set the value for given key
     member _.Item 
         with get k   = dGet k        
-        and  set k v = baseDict.[k] <- v
+        and  set k v = set k v
     
     /// Get value for given key. 
     /// Calls defaultFun to get value if key not found.
@@ -59,12 +67,15 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
     /// Will fail if key does not exist
     /// Does not set any new key if key is missing
     member _.Pop(k:'K) =
-        let ok, v = baseDict.TryGetValue(k)
-        if ok then
-            baseDict.Remove k |>ignore
-            v
-        else 
-            raise <|  KeyNotFoundException( sprintf "DefaultDict.Pop(key): Failed to pop key %A in %A of %d items" k baseDict baseDict.Count)
+        match box k with // or https://stackoverflow.com/a/864860/969070
+        | null -> ArgumentNullException.Raise "DefaultDict.Pop(key) key is null"
+        | _ -> 
+            let ok, v = baseDict.TryGetValue(k)
+            if ok then
+                baseDict.Remove k |>ignore
+                v
+            else 
+                raise <|  KeyNotFoundException( sprintf "DefaultDict.Pop(key): Failed to pop key %A in %A of %d items" k baseDict baseDict.Count)
 
     /// Returns a (lazy) sequence of key and value tuples
     member _.Items =
@@ -158,7 +169,7 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
     interface IDictionary<'K,'V> with 
         member _.Item 
             with get k = dGet k
-            and  set k v = baseDict.[k] <- v 
+            and  set k v = set k v 
        
         member _.Keys = (baseDict:>IDictionary<'K,'V>).Keys 
 
