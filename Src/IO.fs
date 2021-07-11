@@ -2,6 +2,7 @@
 
 open System
 open System.IO
+open System.Text
 open System.Threading
 
 
@@ -41,10 +42,36 @@ module IO =
     let desktop = 
         Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
     
-     
+    
+
+
+    /// Determines a text file's encoding by analyzing its byte order mark (BOM).
+    /// Returns None  when detection of the text file's endianness fails.( might be ASCII or UTF-8 without BOM)
+    /// (Encoding.Unicode = UTF-16LE)
+    let getEncoding(filename:string)=
+        // https://stackoverflow.com/a/19283954/969070 
+        // Read the BOM
+        let bom = Array.zeroCreate 4
+        use  file = new FileStream(filename, FileMode.Open, FileAccess.Read)        
+        if file.Read(bom, 0, 4) <> 4 then None else
+         
+            // Analyze the BOM
+            if   bom.[0] = 0x2buy && bom.[1] = 0x2fuy && bom.[2] = 0x76uy then  Some  Encoding.UTF7
+            elif bom.[0] = 0xefuy && bom.[1] = 0xbbuy && bom.[2] = 0xbfuy then  Some  Encoding.UTF8
+            elif bom.[0] = 0xffuy && bom.[1] = 0xfeuy && bom.[2] = 0uy && bom.[3] = 0uy then  Some  Encoding.UTF32 //UTF-32LE
+            elif bom.[0] = 0xffuy && bom.[1] = 0xfeuy then  Some  Encoding.Unicode; //UTF-16LE
+            elif bom.[0] = 0xfeuy && bom.[1] = 0xffuy then  Some  Encoding.BigEndianUnicode; //UTF-16BE
+            elif bom.[0] = 0uy    && bom.[1] = 0uy    && bom.[2] = 0xfeuy && bom.[3] = 0xffuy then Some  ( UTF32Encoding(true, true) :> Encoding)   //UTF-32BE
+            else 
+                // We actually have no idea what the encoding is if we reach this point, so
+                // you may wish to return null instead of defaulting to ASCII
+                //return Encoding.ASCII;
+                None
+
     
     /// Reads and Writes with Lock, 
     /// Optionally only once after a delay in which it might be called several times
+    /// using Text.Encoding.UTF8
     type SaveReadWriter (path:string)= 
         // similar class also exist in FsEx , FsEx.Wpf and Seff
        
@@ -60,14 +87,14 @@ module IO =
         /// Ensures that no writing happens while reading.
         member this.ReadAllText () : string =
             // lock is using Monitor class : https://github.com/dotnet/fsharp/blob/6d91b3759affe3320e48f12becbbbca493574b22/src/fsharp/FSharp.Core/prim-types.fs#L4793
-            lock lockObj (fun () -> IO.File.ReadAllText(path))            
+            lock lockObj (fun () -> IO.File.ReadAllText(path, Text.Encoding.UTF8))            
                 
     
         /// Save reading.
         /// Ensures that no writing happens while reading.
         member this.ReadAllLines () : string[] =
             // lock is using Monitor class : https://github.com/dotnet/fsharp/blob/6d91b3759affe3320e48f12becbbbca493574b22/src/fsharp/FSharp.Core/prim-types.fs#L4793
-            lock lockObj (fun () -> IO.File.ReadAllLines(path))
+            lock lockObj (fun () -> IO.File.ReadAllLines(path, Text.Encoding.UTF8))
         
         
         /// File will be written async and with a Lock.
@@ -76,7 +103,7 @@ module IO =
         member this.WriteAsync (text) =        
             async{
                 lock lockObj (fun () -> // lock is using Monitor class : https://github.com/dotnet/fsharp/blob/6d91b3759affe3320e48f12becbbbca493574b22/src/fsharp/FSharp.Core/prim-types.fs#L4793
-                    try  IO.File.WriteAllText(path,text)
+                    try  IO.File.WriteAllText(path,text, Text.Encoding.UTF8)
                     // try & with is needed because exceptions on threadpool cannot be caught otherwise !!
                     with ex ->  eprintfn "SaveWriter.WriteAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path text // use %A to trimm long text        
                     )       
@@ -88,7 +115,7 @@ module IO =
         member this.WriteAllLinesAsync (texts) =        
             async{
                 lock lockObj (fun () -> // lock is using Monitor class : https://github.com/dotnet/fsharp/blob/6d91b3759affe3320e48f12becbbbca493574b22/src/fsharp/FSharp.Core/prim-types.fs#L4793
-                    try  IO.File.WriteAllLines(path,texts)
+                    try  IO.File.WriteAllLines(path,texts, Text.Encoding.UTF8)
                     // try & with is needed because exceptions on threadpool cannot be caught otherwise !!
                     with ex ->  eprintfn "SaveWriter.WriteAllLinesAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path texts // use %A to trimm long text        
                     )       
