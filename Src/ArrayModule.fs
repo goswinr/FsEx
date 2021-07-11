@@ -63,6 +63,8 @@ module Array =
                 else find (i + 1) (f + 1)
             else find (i + 1 - f) 0    // set back search to i+1  before first match      
         find fromIdx 0 
+
+ 
     
     /// Find last index where searchFor array occures in searchIn array. Searching from end.
     /// Give lower and upper bound index for search space.

@@ -9,7 +9,7 @@ open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
 /// Extensions for StringBuilder
 [<AutoOpen>]
-module AutoOpenExtensionsStringBuilder =   
+module AutoOpenExtensionsStringBuilder =  
     type Text.StringBuilder with
         
         /// like .Append(string) but returnig unit
@@ -24,16 +24,19 @@ module AutoOpenExtensionsStringBuilder =
         /// like .AppendLine() but returnig unit
         member inline sb.appendLine() = sb.AppendLine() |> ignoreObj 
 
-        /// like .IndexOf for strings, returns -1 if not found
-        member sb.IndexOf (c:char) :int = 
+        /// like .IndexOf for strings, returns -1 if not found        
+        member sb.IndexOf (c:char,from:int ) :int = 
             let rec find i = 
                 if   i = sb.Length then -1
                 elif sb.[i] = c    then i
                 else find (i+1)
-            find(0)
+            find(from)
         
         /// like .IndexOf for strings, returns -1 if not found
-        member sb.IndexOf (t:string):int= 
+        /// always StringComparison.Ordinal
+        member sb.IndexOf (t:string,from:int):int= 
+            // could in theory be improved be using a rolling hash value
+            // see also Arra.findArray implementation
             // or https://stackoverflow.com/questions/12261344/fastest-search-method-in-stringbuilder
             let ls = sb.Length
             let lt = t.Length
@@ -45,13 +48,46 @@ module AutoOpenExtensionsStringBuilder =
                     if it = lt-1 then ib - lt + 1 // found !
                     else find (ib+1) (it+1)
                 else find (ib+1-it) 0            
-            find 0 0
+            find from 0
+
+        /// like .IndexOf for strings, returns -1 if not found        
+        member inline sb.IndexOf (c:char) :int =
+            sb.IndexOf(c,0)
+
+        /// like .IndexOf for strings, returns -1 if not found
+        /// always StringComparison.Ordinal
+        member inline sb.IndexOf (t:string):int= 
+            sb.IndexOf(t,0)
         
         member inline sb.Contains (c:char) :bool = 
             sb.IndexOf c <> -1
 
         member inline sb.Contains (s:string) :bool = 
-            sb.IndexOf s <> -1
+            sb.IndexOf s <> -1 // 
+
+/// AutoOpen Extensions for String 
+/// provides DoesNotContain methods
+[<AutoOpen>]
+module AutoOpenExtensionsString =       
+    
+    // This type extension should be alway availabe that s why it is in this Auitoopen module 
+    type System.String with            
+        
+        /// s.IndexOf(subString,StringComparison.Ordinal) = -1        
+        [<Extension>]
+        member inline s.DoesNotContain(subString:string) =  
+            s.IndexOf(subString,StringComparison.Ordinal) = -1
+        
+        /// s.IndexOf(chr) = -1       
+        [<Extension>]
+        member inline s.DoesNotContain(chr:char) =  
+            s.IndexOf(chr) = -1
+
+        /// s.IndexOf(char) <> -1    
+        [<Extension>]
+        member inline s.Contains(chr:char) =  // this overload does not exist by default
+            s.IndexOf(chr) <> -1
+
 
 /// Extensions for String 
 module ExtensionsString =     
