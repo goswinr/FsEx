@@ -16,16 +16,16 @@ module String =
         static member inline Raise msg = Printf.kprintf (fun s -> raise (new FsExStringException(s))) msg 
 
     
-    /// Trimm strings to 30 chars for showing in in one line 
-    //  it returns the input string trimmed to 30 Chars, a count of skiped characters and the last 5 characters
-    /// Replace line breaks with \r\n literal
+    /// Trimm strings to 80 chars for showing in in one line 
+    /// it returns the input string trimmed to 30 Chars, a count of skiped characters and the last 5 characters
+    /// Replace line breaks with '\r\n' literal
     /// Does not include surrounding quotes
-    /// If stirng is null returns "-null string-"
+    /// If string is null returns "-null string-"
     let truncateFormatedInOneLine (stringToTrim:string) =
         if isNull stringToTrim then "-null string-"
         else
             let s = 
-                let maxChars = 30
+                let maxChars = 80
                 if stringToTrim.Length <= maxChars + 20 then  stringToTrim
                 else 
                     let len   = stringToTrim.Length
@@ -39,7 +39,9 @@ module String =
     let private exnf s = 
         if isNull s then "-null string-"  else "\"" + truncateFormatedInOneLine s + "\"" //separate null check so null value is not in quotes
 
-    /// TODO removed inline to get compile times down in FSI ?
+    // TODO removed inline to get compile times down in FSI ?
+
+    // TODO clean up unused and similar functions 
    
     /// removes substring from a string. same as:
     /// fromString.Replace(textToRemove, "")
@@ -48,8 +50,8 @@ module String =
         if isNull textToRemove then FsExStringException.Raise "String.delete: textToRemove is null (fromString:%s)" (exnf fromString)
         fromString.Replace(textToRemove, "")
 
-    // Ensures all lines end on System.Environment.NewLine
-    // code: StringBuilder(s).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine).ToString()
+    /// Ensures all lines end on System.Environment.NewLine
+    /// code: StringBuilder(s).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine).ToString()
     let (*inline*) unifyLineEndings (txt:string) =             
         if isNull txt then FsExStringException.Raise "String.unifyLineEndings: input is null "
         StringBuilder(txt).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine).ToString()
