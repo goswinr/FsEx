@@ -38,7 +38,6 @@ module AutoOpenExtensionsHashset =
 
 
 /// A thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys.
-/// (not the same as lowercase 'dict' in F#)
 /// There is a hidden member called "Dictionary" to access the underlaying Collections.Generic.Dictionary<'K,'V> directly.
 /// In F# use #nowarn "44" to disable the obsolete warning for this hidden member.
 type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
@@ -60,14 +59,12 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
          | null -> ArgumentNullException.Raise  "Dict.set key is null for value %A" value
          | _ -> dic.[key] <- value
     
-    /// create a new empty Dict<'K,'V>
-    /// A Dict is a thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys
-    /// (not the same as lowercase 'dict' in F#)
+    /// Create a new empty Dict<'K,'V>.
+    /// A Dict is a thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys.
     new () = Dict(new Dictionary<'K,'V>())
     
-    /// create a new empty Dict<'K,'V> with an IEqualityComparer like HashIdentity.Structural
-    /// A Dict is a thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys
-    /// (not the same as lowercase 'dict' in F#)
+    /// Create a new empty Dict<'K,'V> with an IEqualityComparer like HashIdentity.Structural.
+    /// A Dict is a thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys.
     new (iEqCmp:IEqualityComparer<'K>) = Dict(new Dictionary<'K,'V>(iEqCmp))     
 
     /// Constructs a new Dict by using the supplied Dictionary<'K,'V> directly, without any copying of items
@@ -92,7 +89,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
     /// Set value for given key
     member _.Set key value = set key value // dic.[key] <- value
     
-    /// Get a value and remove key and value it from dictionary, like *.pop() in Python 
+    /// Get a value and remove key and value it from dictionary, like *.pop() in Python. 
     /// Will fail if key does not exist
     member _.Pop(key:'K) =
         match box key with // or https://stackoverflow.com/a/864860/969070
@@ -166,8 +163,8 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
     /// Determines whether the dictionary contains a specific value.
     member _.ContainsValue(value) = dic.ContainsValue(value)    
 
-    /// Removes the value with the specified key from the dictionary
-    /// see also .Pop(key) method to get the contained value too.
+    /// Removes the value with the specified key from the dictionary.
+    /// See also .Pop(key) method that gets the contained value too.
     member _.Remove(key) = dic.Remove(key)
 
     /// <summary>Lookup an element in the Dict, assigning it to <c>refValue</c> if the element is in the Dict and return true. Otherwise returning <c>false</c> .</summary>

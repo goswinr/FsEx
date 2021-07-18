@@ -7,11 +7,11 @@ open System.Collections.Generic
 
 // doc string taken from comments here: https://referencesource.microsoft.com/#mscorlib/system/collections/generic/list.cs
 
-/// A mutable list like Collections.Generic.List<'T> 
-/// but with nicer error messages on bad indices, negative slicing operator like in Python
+/// A mutable list. Just like Collections.Generic.List<'T> 
+/// but with nicer error messages on bad indices, negative slicing operator (like in Python)
 /// and some more useful methods like this.First or this.Last
-/// It's just a very thin wrapper over a System.Collections.Generic.List<'T>
-/// and has all it's members and interfaces implemented.
+/// It's a very thin wrapper over a System.Collections.Generic.List<'T>
+/// It has all members and interfaces of List<'T> implemented.
 /// The name Rarr is derived from of the F# type ResizeArray
 /// There is a hidden member called "List" to access the underlaying List<'T> directly
 /// In F# use #nowarn "44" to disable the obsolete warning for this hidden member.
