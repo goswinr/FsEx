@@ -222,12 +222,13 @@ module Rarr =
     /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a]
     let inline rotate k (rarr: Rarr<'T>)  =  init rarr.Count (fun i -> rarr.[negIdxLooped (i-k) rarr.Count])
 
-
     /// Returns a Rarr of the index and the item. (like enumerate in Python)
     let inline indexed (rarr: Rarr<'T>)  =  init rarr.Count (fun i -> i,rarr.[i])
 
-    /// Splits a Rarr in two, like Rarr.filter but returning both
+    /// Splits a Rarr in two, like Rarr.filter but returning two Lists
     /// The first Rarr has all elements where the filter function returned 'true'
+    /// renamed to  Rarr.partition
+    [<Obsolete("renamed to  Rarr.partition")>] 
     let inline splitBy filter (rarr:Rarr<'T>) =  
         let t=Rarr()
         let f=Rarr()
@@ -235,8 +236,7 @@ module Rarr =
             if filter x then t.Add(x)
             else             f.Add(x)
         t,f
-    
-    
+
     /// Structural equality
     /// compares each element in both lists for eqality . Rarrs must also be of same Count
     let inline equals (rarr1: Rarr<'T>) (rarr2: Rarr<'T>) =
@@ -562,6 +562,7 @@ module Rarr =
     //-------------------------------------------------------------------------------------------------------------------------------
     // alternative: https://github.com/fsprojects/FSharpx.Collections/blob/master/src/FSharpx.Collections/ResizeArray.fs
     
+    // TODO get doc text from Array module
 
     open Microsoft.FSharp.Core
     open Microsoft.FSharp.Core.OptimizedClosures
@@ -574,7 +575,6 @@ module Rarr =
     let inline length (rarr : Rarr<'T>) : int =
         rarr.Count
 
-
     /// Return true if the given Rarr is empty, otherwise false.
     let inline isEmpty (rarr : Rarr<'T>) : bool =
         rarr.Count = 0
@@ -586,7 +586,6 @@ module Rarr =
         for i = 0 to count - 1 do
             rarr.Add value
         rarr
-
 
     /// Adds an object to the end of the Rarr.
     let inline add item (rarr : Rarr<'T>) : unit =
