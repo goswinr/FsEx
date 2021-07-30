@@ -8,8 +8,7 @@
 
 FsEx is an FSharp extension and utility library. 
 
-![Logo](https://raw.githubusercontent.com/goswinr/FsEx/main/Doc/logo.png)
-
+![Logo](Doc/logo.png "Logo")
 
 
 #### It Includes 
