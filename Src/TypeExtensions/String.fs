@@ -4,68 +4,8 @@ open System
 open System.Runtime.CompilerServices
 open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
-//[<AutoOpen>]
 
-
-/// Extensions for StringBuilder
-[<AutoOpen>]
-module AutoOpenExtensionsStringBuilder =  
-    type Text.StringBuilder with
-        
-        /// like .Append(string) but returnig unit
-        member inline sb.append (s:string) = sb.Append(s) |> ignoreObj 
-        
-        /// like .Append(char) but returnig unit
-        member inline sb.append (c:char) = sb.Append(c) |> ignoreObj 
-
-        /// like .AppendLine(string) but returnig unit
-        member inline sb.appendLine (s:string) = sb.AppendLine(s) |> ignoreObj 
-        
-        /// like .AppendLine() but returnig unit
-        member inline sb.appendLine() = sb.AppendLine() |> ignoreObj 
-
-        /// like .IndexOf for strings, returns -1 if not found        
-        member sb.IndexOf (c:char,from:int ) :int = 
-            let rec find i = 
-                if   i = sb.Length then -1
-                elif sb.[i] = c    then i
-                else find (i+1)
-            find(from)
-        
-        /// like .IndexOf for strings, returns -1 if not found
-        /// always StringComparison.Ordinal
-        member sb.IndexOf (t:string,from:int):int= 
-            // could in theory be improved be using a rolling hash value
-            // see also Arra.findArray implementation
-            // or https://stackoverflow.com/questions/12261344/fastest-search-method-in-stringbuilder
-            let ls = sb.Length
-            let lt = t.Length
-            //printfn "sb :%d t:%d" ls lt
-            let rec find ib it = // index in stringbuilder and index in search string
-                //printfn "Search at ib:%d %c for it:%d %c" ib sb.[ib] it  t.[it] 
-                if  ib > ls-lt+it then -1 // not found! not enough chars left in stringbuilder to match remaining search string
-                elif sb.[ib] = t.[it]  then 
-                    if it = lt-1 then ib - lt + 1 // found !
-                    else find (ib+1) (it+1)
-                else find (ib+1-it) 0            
-            find from 0
-
-        /// like .IndexOf for strings, returns -1 if not found        
-        member inline sb.IndexOf (c:char) :int =
-            sb.IndexOf(c,0)
-
-        /// like .IndexOf for strings, returns -1 if not found
-        /// always StringComparison.Ordinal
-        member inline sb.IndexOf (t:string):int= 
-            sb.IndexOf(t,0)
-        
-        member inline sb.Contains (c:char) :bool = 
-            sb.IndexOf c <> -1
-
-        member inline sb.Contains (s:string) :bool = 
-            sb.IndexOf s <> -1 // 
-
-/// AutoOpen Extensions for String 
+/// AutoOpen Extensions for String, 
 /// provides DoesNotContain methods
 [<AutoOpen>]
 module AutoOpenExtensionsString =       
@@ -87,12 +27,25 @@ module AutoOpenExtensionsString =
         [<Extension>]
         member inline s.Contains(chr:char) =  // this overload does not exist by default
             s.IndexOf(chr) <> -1
+        
+        /// Splits a string into substrings.
+        /// Empty entries are included.
+        /// s.Split( [|chr|] )
+        [<Extension>]
+        member inline s.Split(chr:char) =  // this overload does not exist by default
+            s.Split([|chr|])
 
+/// Adds extension members on System.String
+/// for geting first, second, last and similar indices.
+/// Also adds functionality for negative indices and s.Slice(startIdx:int , endIdx: int) that works  with negative numbers
+module ExtensionsString = 
 
-/// Extensions for String 
-module ExtensionsString =     
-    
-    // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164      
+    /// An Exception for the string functions defined in FsEx
+    type FsExStringException(txt:string)=
+        inherit Exception(txt)            
+        /// Raise the exception with F# printf string formating
+        static member inline Raise msg = 
+            Printf.kprintf (fun s -> raise (new FsExStringException(s))) msg 
 
     type System.String with
         
@@ -100,32 +53,32 @@ module ExtensionsString =
         /// same as: s.Length - 1
         [<Extension>]
         member inline s.LastIndex = 
-            if isNull s     then String.FsExStringException.Raise "thistringToSearchIn.LastIndex: Failed to get LastIndex of null String" 
-            if s.Length = 0 then String.FsExStringException.Raise "thistringToSearchIn.LastIndex: Failed to get LastIndex of empty String" // TODO or use ArgumentOutOfRangeException ?
+            if isNull s     then FsExStringException.Raise "FsEx.ExtensionsString: string.LastIndex: Failed to get LastIndex of null String" 
+            if s.Length = 0 then FsExStringException.Raise "FsEx.ExtensionsString: string.LastIndex: Failed to get LastIndex of empty String" 
             s.Length - 1
         
         /// Returns the last character of the string
         /// fails if string is empty
         [<Extension>]
         member inline s.Last = 
-            if isNull s     then String.FsExStringException.Raise "string.Last: Failed to get last character of null String"
-            if s.Length = 0 then String.FsExStringException.Raise "string.Last: Failed to get last character of empty String"
+            if isNull s     then FsExStringException.Raise "FsEx.ExtensionsString: string.Last: Failed to get last character of null String"
+            if s.Length = 0 then FsExStringException.Raise "FsEx.ExtensionsString: string.Last: Failed to get last character of empty String"
             s.[s.Length - 1]  
         
         /// Returns the second last character of the string
         /// fails if string has less than two characters
         [<Extension>]
         member inline s.SecondLast = 
-            if isNull s     then String.FsExStringException.Raise "string.SecondLast: Failed to get second last character from null string."
-            if s.Length < 2 then String.FsExStringException.Raise "string.SecondLast: Failed to get second last character of '%s'" s
+            if isNull s     then FsExStringException.Raise "FsEx.ExtensionsString: string.SecondLast: Failed to get second last character from null string."
+            if s.Length < 2 then FsExStringException.Raise "FsEx.ExtensionsString: string.SecondLast: Failed to get second last character of '%s'" s
             s.[s.Length - 2]
         
         /// Returns the third last character of the string
         /// fails if string has less than three characters
         [<Extension>]
         member inline s.ThirdLast = 
-            if isNull s     then String.FsExStringException.Raise "string.ThirdLast: Failed to get third last character from null string."
-            if s.Length < 3 then String.FsExStringException.Raise "string.ThirdLast: Failed to get third last character of '%s'" s
+            if isNull s     then FsExStringException.Raise "FsEx.ExtensionsString: string.ThirdLast: Failed to get third last character from null string."
+            if s.Length < 3 then FsExStringException.Raise "FsEx.ExtensionsString: string.ThirdLast: Failed to get third last character of '%s'" s
             s.[s.Length - 3]
 
 
@@ -133,32 +86,32 @@ module ExtensionsString =
         /// same as string.LastN
         [<Extension>]
         member inline s.LastX x = 
-            if isNull s     then String.FsExStringException.Raise "string.LastX: Failed to get last %d character from null string." x
-            if s.Length < x then String.FsExStringException.Raise "string.LastX: Failed to get last %d character of too short String '%s' " x s
+            if isNull s     then FsExStringException.Raise "FsEx.ExtensionsString: string.LastX: Failed to get last %d character from null string." x
+            if s.Length < x then FsExStringException.Raise "FsEx.ExtensionsString: string.LastX: Failed to get last %d character of too short String '%s' " x s
             s.Substring(s.Length-x,x) 
          
         /// Returns then first character of the string
         /// fails if string is empty
         [<Extension>]
         member inline s.First = 
-            if isNull s     then String.FsExStringException.Raise "string.First: Failed to get first character from null string."
-            if s.Length = 0 then String.FsExStringException.Raise "string.First: Failed to get first character of empty String"
+            if isNull s     then FsExStringException.Raise "FsEx.ExtensionsString: string.First: Failed to get first character from null string."
+            if s.Length = 0 then FsExStringException.Raise "FsEx.ExtensionsString: string.First: Failed to get first character of empty String"
             s.[0]
         
         /// Returns the second character of the string
         /// fails if string has less than two characters
         [<Extension>]
         member inline s.Second = 
-            if isNull s     then String.FsExStringException.Raise "string.Second: Failed to get second character from null string."
-            if s.Length < 2 then String.FsExStringException.Raise "string.Second: Failed to get second character of '%s'" s
+            if isNull s     then FsExStringException.Raise "FsEx.ExtensionsString: string.Second: Failed to get second character from null string."
+            if s.Length < 2 then FsExStringException.Raise "FsEx.ExtensionsString: string.Second: Failed to get second character of '%s'" s
             s.[1]
 
         /// Returns the third character of the string
         /// fails if string has less than three characters
         [<Extension>]
         member inline s.Third = 
-            if isNull s     then String.FsExStringException.Raise "string.Third: Failed to get third character from null string."
-            if s.Length < 3 then String.FsExStringException.Raise "string.Third: Failed to get third character of '%s'" s
+            if isNull s     then FsExStringException.Raise "FsEx.ExtensionsString: string.Third: Failed to get third character from null string."
+            if s.Length < 3 then FsExStringException.Raise "FsEx.ExtensionsString: string.Third: Failed to get third character of '%s'" s
             s.[2]
         
 
@@ -167,19 +120,19 @@ module ExtensionsString =
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         [<Extension>]
         member s.GetNeg index = 
-            if isNull s then String.FsExStringException.Raise "string.GetNeg: Failed to get character at index %d from string from null string." index 
+            if isNull s then FsExStringException.Raise "FsEx.ExtensionsString: string.GetNeg: Failed to get character at index %d from string from null string." index 
             let len = s.Length
             let ii =  if index < 0 then len + index else index
-            if ii<0 || ii >= len then String.FsExStringException.Raise "string.GetNeg: Failed to get character at index %d from string of %d items: %s" index s.Length s
+            if ii<0 || ii >= len then FsExStringException.Raise "FsEx.ExtensionsString: string.GetNeg: Failed to get character at index %d from string of %d items: %s" index s.Length s
             s.[ii]   
 
         /// Any index will return a value.
         /// Rarr is treated as an endless loop in positive and negative direction   
         [<Extension>]
         member s.GetLooped index = 
-            if isNull s then String.FsExStringException.Raise "string.GetLooped: Failed to get character at index %d from string from null string." index 
+            if isNull s then FsExStringException.Raise "FsEx.ExtensionsString: string.GetLooped: Failed to get character at index %d from string from null string." index 
             let len = s.Length
-            if len=0 then ArgumentOutOfRangeException.Raise "string.GetLooped: Failed to get character at index %d from string of 0 items" index
+            if len=0 then ArgumentOutOfRangeException.Raise "FsEx.ExtensionsString: string.GetLooped: Failed to get character at index %d from string of 0 items" index
             let t = index % len
             let ii = if t >= 0 then t  else t + len 
             s.[ii] 
@@ -191,21 +144,22 @@ module ExtensionsString =
         /// for example str.Slice(0,-3) will trim off the last two character from the string 
         [<Extension>]
         member s.Slice(startIdx:int , endIdx:int):string =
-            if isNull s then String.FsExStringException.Raise "string.GetSlice: Failed to string.Slice(%d,%d) null string" startIdx  endIdx
+             // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164    
+            if isNull s then FsExStringException.Raise "FsEx.ExtensionsString: string.GetSlice: Failed to string.Slice(%d,%d) null string" startIdx  endIdx
             let count = s.Length
             let st  = if startIdx<0 then count+startIdx else startIdx
             let len = if endIdx<0 then count+endIdx-st+1 else endIdx-st+1
     
             if st < 0 || st > count-1 then 
-                String.FsExStringException.Raise "string.GetSlice: Start index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
+                FsExStringException.Raise "FsEx.ExtensionsString: string.GetSlice: Start index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
                 
     
             if st+len > count then 
-                String.FsExStringException.Raise "string.GetSlice: End index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
+                FsExStringException.Raise "FsEx.ExtensionsString: string.GetSlice: End index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
                 
             
             if len < 0 then
                 let en = if endIdx<0 then count+endIdx else endIdx
-                String.FsExStringException.Raise "string.GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for String '%s' of %d chars" startIdx st endIdx en s count
+                FsExStringException.Raise "FsEx.ExtensionsString: string.GetSlice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for String '%s' of %d chars" startIdx st endIdx en s count
              
             s.Substring(st,len) 
