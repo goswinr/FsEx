@@ -3,22 +3,14 @@ namespace FsEx
 open System
 open System.Text
 open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
-
+open FsEx.ExtensionsString // for FsExStringException
 
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide String class in C# assemblies
-module String =   
-           
-    /// An Exception for the string functions defined in FsEx
-    type FsExStringException(txt:string)=
-        inherit Exception(txt)
-            
-        /// Raise the exception with F# printf string formating
-        static member inline Raise msg = Printf.kprintf (fun s -> raise (new FsExStringException(s))) msg 
-
+module String =              
     
-    /// Trimm strings to 80 chars for showing in in one line. 
-    /// It returns the input string trimmed to 30 Chars, a count of skiped characters and the last 5 characters
-    /// Replace line breaks with '\r\n' literal
+    /// Trims strings to 80 chars for showing in in one line. 
+    /// It returns the input string trimmed to 80 chars, a count of skiped characters and the last 5 characters
+    /// Replace line breaks with '\r\n' or '\n' literal
     /// Does not include surrounding quotes
     /// If string is null returns "-null string-"
     let truncateFormatedInOneLine (stringToTrim:string) =
@@ -39,9 +31,7 @@ module String =
     let private exnf s = 
         if isNull s then "-null string-"  else "\"" + truncateFormatedInOneLine s + "\"" //separate null check so null value is not in quotes
 
-    // TODO removed inline to get compile times down in FSI ?
-
-    // TODO clean up unused and similar functions 
+    // TODO removed inline to get compile times down in FSI ?  
    
     /// removes substring from a string. same as:
     /// fromString.Replace(textToRemove, "")
@@ -127,20 +117,7 @@ module String =
         let start = stringToSearchIn.IndexOf(splitter) 
         if start = -1 then stringToSearchIn
         else stringToSearchIn.Substring(start+1)//cant be out of bounds!
-
-    /// split string, Remove Empty Entries
-    /// like: string.Split([| splitter |], StringSplitOptions.RemoveEmptyEntries)
-    let (*inline*) split (splitter:string) (stringToSplit:string) = 
-        if isNull stringToSplit then FsExStringException.Raise "String.split: stringToSplit is null (splitter:%s)" (exnf splitter)
-        if isNull splitter      then FsExStringException.Raise "String.split: splitter is null (stringToSplit:%s)" (exnf stringToSplit)
-        stringToSplit.Split([|splitter|], StringSplitOptions.RemoveEmptyEntries)
-    
-    /// split string, Keep Empty Entries
-    /// like : string.Split([| splitter |], StringSplitOptions.None)  
-    let (*inline*) splitKeep (splitter:string) (stringToSplit:string) = 
-        if isNull stringToSplit then FsExStringException.Raise "String.splitKeep: stringToSplit is null (splitter:%s)" (exnf splitter)
-        if isNull splitter      then FsExStringException.Raise "String.splitKeep: splitter is null (stringToSplit:%s)" (exnf stringToSplit)
-        stringToSplit.Split([|splitter|], StringSplitOptions.None)    
+ 
     
     /// Split string into two elements, 
     /// Fails if  splitter is not found.
@@ -229,18 +206,6 @@ module String =
             FsExStringException.Raise "String.slice: Start index '%A' (= %d) is bigger than end index '%A'(= %d) for String %s of %d items" startIdx st endIdx en (exnf txt) count                    
         txt.Substring(st,len) 
     
-    /// Fills the beginning of a string with the filler character 
-    /// until it has reached the desired length
-    /// (usefull to add zeros at the beginning of numbers for sorting)
-    let (*inline*) prefixToLength desiredLength (fillerChar:char) strToFill = 
-        if isNull strToFill then FsExStringException.Raise "String.prefixToLength: strToFill is null" 
-        let len = String.length strToFill
-        if len>desiredLength then 
-            strToFill // FsExStringException.Raise "String.prefixToLength %s cant be filled to length %d because it is already %d long." strToFill desiredLength len
-        elif len = desiredLength then 
-            strToFill
-        else 
-            new String(fillerChar, desiredLength-len) + strToFill
 
     /// Counts how offten a substring appears in a string
     /// (using StringComparison.Ordinal)
@@ -264,15 +229,7 @@ module String =
         |> String.Concat
         |> fun s -> txt.Normalize(NormalizationForm.FormC)
     
-    /// Returns true if specified character occurs within this string.
-    let (*inline*) containsChar (charToFind:char) (stringToSearchIn:string) = 
-        if isNull stringToSearchIn then FsExStringException.Raise "String.containsChar: stringToSearchIn is null, char: '%c'" charToFind 
-        stringToSearchIn.IndexOf(charToFind) <> -1
 
-    /// Returns true if specified charcter does NOT occurs within this string.
-    let (*inline*) notContainsChar (charToFind:char) (stringToSearchIn:string) = 
-        if isNull stringToSearchIn then FsExStringException.Raise "String.notContainsChar: stringToSearchIn is null, char: '%c'" charToFind 
-        stringToSearchIn.IndexOf(charToFind) = -1
 
     /// Ensures string is maximum maxChars long
     let (*inline*) truncate (maxChars:int) (stringToTrim:string) =
@@ -323,6 +280,16 @@ module String =
         if isNull stringToSearchIn then FsExStringException.Raise "String.notContains: stringToSearchIn is null, stringToFind: %s"     (exnf stringToFind)
         if isNull stringToFind     then FsExStringException.Raise "String.notContains: stringToFind     is null, stringToSearchIn: %s" (exnf stringToSearchIn)        
         not (stringToSearchIn.Contains(stringToFind))
+    
+    /// Returns true if specified character occurs within this string.
+    let (*inline*) containsChar (charToFind:char) (stringToSearchIn:string) = 
+        if isNull stringToSearchIn then FsExStringException.Raise "String.containsChar: stringToSearchIn is null, char: '%c'" charToFind 
+        stringToSearchIn.IndexOf(charToFind) <> -1
+
+    /// Returns true if specified charcter does NOT occurs within this string.
+    let (*inline*) notContainsChar (charToFind:char) (stringToSearchIn:string) = 
+        if isNull stringToSearchIn then FsExStringException.Raise "String.notContainsChar: stringToSearchIn is null, char: '%c'" charToFind 
+        stringToSearchIn.IndexOf(charToFind) = -1
 
     /// Compares two specified String objects and returns an integer that indicates their relative position in the sort order, u
     /// using StringComparison.Ordinal.
@@ -350,11 +317,18 @@ module String =
         if isNull stringSerachInAtEnd then FsExStringException.Raise "String.endsWithIgnoreCase: stringSerachInAtEnd is null. (stringToFindAtEnd:%s) " (exnf stringToFindAtEnd)
         stringSerachInAtEnd.EndsWith(stringToFindAtEnd, StringComparison.OrdinalIgnoreCase)
 
-    // Determines whether the end of this string instance matches the specified string when compared using the specified culture.
-    // let (*inline*) endsWith' stringToFindAtEnd ignoreCase culture (txt:string) = txt.EndsWith(stringToFindAtEnd, ignoreCase, culture)
-    // Determines whether the end of this string instance matches the specified string when compared using the specified comparison option.
-    // let (*inline*) endsWith'' stringToFindAtEnd comparisonType (txt:string) = txt.EndsWith(charToFind, comparisonType)
-    
+    /// Determines whether the beginning of this string instance matches the specified string, using StringComparison.Ordinal..
+    let (*inline*) startsWith (stringToFindAtStart:string) (stringToSearchIn:string)  =
+        if isNull stringToFindAtStart then FsExStringException.Raise "String.startsWith: stringToFindAtStart is null. (stringToSearchIn:%s) " (exnf stringToSearchIn)
+        if isNull stringToSearchIn then FsExStringException.Raise "String.startsWith: stringToSearchIn is null. (stringToFindAtStart:%s) " (exnf stringToFindAtStart)
+        stringToSearchIn.StartsWith(stringToFindAtStart, StringComparison.Ordinal)
+
+    /// Determines whether the beginning of this string instance matches the specified string when compared using StringComparison.OrdinalIgnoreCase.
+    let (*inline*) startsWithIgnoreCase (stringToFindAtStart:string) (stringToSearchIn:string)  =
+        if isNull stringToFindAtStart then FsExStringException.Raise "String.startsWithIgnoreCase: stringToFindAtStart is null.  (stringToSearchIn:%s) "  (exnf stringToSearchIn)
+        if isNull stringToSearchIn then FsExStringException.Raise "String.startsWithIgnoreCase: stringToSearchIn is null. (stringToFindAtStart:%s)  " (exnf stringToFindAtStart) 
+        stringToSearchIn.StartsWith(stringToFindAtStart, StringComparison.OrdinalIgnoreCase)
+
     /// Determines whether two specified String objects have the same value, using StringComparison.Ordinal.(=fastest comparison)
     let (*inline*) equals strA strB  =
         String.Equals(strA, strB, StringComparison.Ordinal)
@@ -369,13 +343,13 @@ module String =
         stringToSearchIn.IndexOf(charToFind)
 
     /// Reports the zero-based index of the first occurrence of the specified Unicode character in this string. The search starts at a specified character position.
-    let (*inline*) indexOfChar' (charToFind:char) startIndex (stringToSearchIn:string)  =
-        if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfChar': stringToSearchIn is null. (charToFind:%c)  (startIndex:%d) " charToFind startIndex
+    let (*inline*) indexOfCharFrom (charToFind:char) startIndex (stringToSearchIn:string)  =
+        if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfCharFrom: stringToSearchIn is null. (charToFind:%c)  (startIndex:%d) " charToFind startIndex
         stringToSearchIn.IndexOf(charToFind, startIndex)
 
     /// Reports the zero-based index of the first occurrence of the specified character in this instance. The search starts at a specified character position and examines a specified number of character positions.
-    let (*inline*) indexOfChar'' (charToFind:char) startIndex count (stringToSearchIn:string)  =
-        if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfChar'': stringToSearchIn is null. (charToFind:%c)  (startIndex:%d)  (count:%d) " charToFind startIndex count
+    let (*inline*) indexOfCharFromFor (charToFind:char) startIndex count (stringToSearchIn:string)  =
+        if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfCharFromFor : stringToSearchIn is null. (charToFind:%c)  (startIndex:%d)  (count:%d) " charToFind startIndex count
         stringToSearchIn.IndexOf(charToFind, startIndex, count)
 
     /// Reports the zero-based index of the first occurrence of the specified string in this instance, using StringComparison.Ordinal.
@@ -386,32 +360,18 @@ module String =
 
     /// Reports the zero-based index of the first occurrence of the specified string in this instance. 
     /// The search starts at a specified character position, using StringComparison.Ordinal.
-    let (*inline*) indexOfString' (stringToFind:string) (startIndex:int) (stringToSearchIn:string)  =
-        if isNull stringToFind then FsExStringException.Raise "String.indexOfString': stringToFind is null. (startIndex:%d)  (stringToSearchIn:%s) " startIndex (exnf stringToSearchIn)
-        if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfString': stringToSearchIn is null. (stringToFind:%s)  (startIndex:%d) " (exnf stringToFind) startIndex
+    let (*inline*) indexOfStringFrom (stringToFind:string) (startIndex:int) (stringToSearchIn:string)  =
+        if isNull stringToFind then FsExStringException.Raise "String.indexOfStringFrom: stringToFind is null. (startIndex:%d)  (stringToSearchIn:%s) " startIndex (exnf stringToSearchIn)
+        if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfStringFrom: stringToSearchIn is null. (stringToFind:%s)  (startIndex:%d) " (exnf stringToFind) startIndex
         stringToSearchIn.IndexOf(stringToFind, startIndex,StringComparison.Ordinal)
 
     /// Reports the zero-based index of the first occurrence of the specified string in this instance. 
     /// The search starts at a specified character position and examines a specified number of character positions, using StringComparison.Ordinal.
-    let (*inline*) indexOfString'' (stringToFind:string) (startIndex:int) (count:int) (stringToSearchIn:string)  =
-        if isNull stringToFind then FsExStringException.Raise "String.indexOfString'': stringToFind is null. (startIndex:%d)  (count:%d)  (stringToSearchIn:%s) " startIndex count (exnf stringToSearchIn)
-        if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfString'': stringToSearchIn is null. (stringToFind:%s)  (startIndex:%d)  (count:%d) " (exnf stringToFind) startIndex count
+    let (*inline*) indexOfStringFromFor (stringToFind:string) (startIndex:int) (count:int) (stringToSearchIn:string)  =
+        if isNull stringToFind then FsExStringException.Raise "String.indexOfStringFromFor: stringToFind is null. (startIndex:%d)  (count:%d)  (stringToSearchIn:%s) " startIndex count (exnf stringToSearchIn)
+        if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfStringFromFor: stringToSearchIn is null. (stringToFind:%s)  (startIndex:%d)  (count:%d) " (exnf stringToFind) startIndex count
         stringToSearchIn.IndexOf(stringToFind, startIndex, count, StringComparison.Ordinal)
-
-    // Reports the zero-based index of the first occurrence of the specified string in the current String object. 
-    // A parameter specifies the type of search to use for the specified string.
-    // let (*inline*) indexOfStringWithComparison value (comparisonType:StringComparison) (stringToSearchIn:string) = stringToSearchIn.IndexOf(value, comparisonType)    
-    // Reports the zero-based index of the first occurrence of the specified string in the current String object. 
-    // Parameters specify the starting search position in the current string and the type of search to use for the specified string.
-    // let (*inline*) indexOfStringWithComparison' value startIndex (comparisonType:StringComparison) (stringToSearchIn:string) = stringToSearchIn.IndexOf(value, startIndex, comparisonType)
-
-    /// Reports the zero-based index of the first occurrence of the specified string in the current String object. 
-    /// Parameters specify the starting search position in the current string, the number of characters in the current string to search, and the type of search to use for the specified string.
-    let (*inline*) indexOfStringWithComparison'' (stringToFind:string) startIndex count comparison (stringToSearchIn:string)  =
-        if isNull stringToFind then FsExStringException.Raise "String.indexOfStringWithComparison'': stringToFind is null. (startIndex:%d)  (count:%d)  (comparison:%A)  (stringToSearchIn:%s) " startIndex count comparison (exnf stringToSearchIn)
-        if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfStringWithComparison'': stringToSearchIn is null. (stringToFind:%s)  (startIndex:%d)  (count:%d)  (comparison:%A) " (exnf stringToFind) startIndex count comparison
-        stringToSearchIn.IndexOf(stringToFind, startIndex, count, comparison)
-
+    
     /// Reports the zero-based index of the first occurrence in this instance of any character in a specified array of Unicode characters.
     let (*inline*) indexOfAny (anyOf:char[]) (stringToSearchIn:string)  =
         if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfAny: stringToSearchIn is null. (anyOf:%A) " anyOf
@@ -419,13 +379,14 @@ module String =
 
     /// Reports the zero-based index of the first occurrence in this instance of any character in a specified array of Unicode characters. 
     /// The search starts at a specified character position.
-    let (*inline*) indexOfAny' (anyOf:char[]) startIndex (stringToSearchIn:string)  =
-        if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfAny': stringToSearchIn is null. (anyOf:%A)  (startIndex:%d) " anyOf startIndex
+    let (*inline*) indexOfAnyFrom (anyOf:char[]) startIndex (stringToSearchIn:string)  =
+        if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfAnyFrom: stringToSearchIn is null. (anyOf:%A)  (startIndex:%d) " anyOf startIndex
         stringToSearchIn.IndexOfAny(anyOf, startIndex)
 
-    /// Reports the zero-based index of the first occurrence in this instance of any character in a specified array of Unicode characters. The search starts at a specified character position and examines a specified number of character positions.
-    let (*inline*) indexOfAny'' (anyOf:char[]) startIndex count (stringToSearchIn:string)  =
-        if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfAny'': stringToSearchIn is null. (anyOf:%A)  (startIndex:%d)  (count:%d) " anyOf startIndex count
+    /// Reports the zero-based index of the first occurrence in this instance of any character in a specified array of Unicode characters. 
+    /// The search starts at a specified character position and examines a specified number of character positions.
+    let (*inline*) indexOfAnyFromFor (anyOf:char[]) startIndex count (stringToSearchIn:string)  =
+        if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfAnyFromFor: stringToSearchIn is null. (anyOf:%A)  (startIndex:%d)  (count:%d) " anyOf startIndex count
         stringToSearchIn.IndexOfAny(anyOf, startIndex, count)
 
     /// Returns a new string in which a specified string is inserted at a specified index position in this instance.
@@ -439,14 +400,16 @@ module String =
         if isNull stringToSearchIn then FsExStringException.Raise "String.lastIndexOfChar: stringToSearchIn is null. (charToFind:%c) " charToFind
         stringToSearchIn.LastIndexOf(charToFind)
 
-    /// Reports the zero-based index position of the last occurrence of a specified Unicode character within this instance. The search starts at a specified character position and proceeds backward toward the beginning of the string.
-    let (*inline*) lastIndexOfChar' (charToFind:char) startIndex (stringToSearchIn:string) =
-        if isNull stringToSearchIn then FsExStringException.Raise "String.lastIndexOfChar': stringToSearchIn is null. (charToFind:%c)  (startIndex:%d) " charToFind startIndex
+    /// Reports the zero-based index position of the last occurrence of a specified Unicode character within this instance. 
+    /// The search starts at a specified character position and proceeds backward toward the beginning of the string.
+    let (*inline*) lastIndexOfCharFrom (charToFind:char) startIndex (stringToSearchIn:string) =
+        if isNull stringToSearchIn then FsExStringException.Raise "String.lastIndexOfCharFrom : stringToSearchIn is null. (charToFind:%c)  (startIndex:%d) " charToFind startIndex
         stringToSearchIn.LastIndexOf(charToFind, startIndex)
 
-    /// Reports the zero-based index position of the last occurrence of the specified Unicode character in a substring within this instance. The search starts at a specified character position and proceeds backward toward the beginning of the string for a specified number of character positions.
-    let (*inline*) lastIndexOfChar'' (charToFind:char) startIndex count (stringToSearchIn:string)  =
-        if isNull stringToSearchIn then FsExStringException.Raise "String.lastIndexOfChar'': stringToSearchIn is null. (charToFind:%c)  (startIndex:%d)  (count:%d) " charToFind startIndex count
+    /// Reports the zero-based index position of the last occurrence of the specified Unicode character in a substring within this instance. 
+    /// The search starts at a specified character position and proceeds backward toward the beginning of the string for a specified number of character positions.
+    let (*inline*) lastIndexOfCharFromFor  (charToFind:char) startIndex count (stringToSearchIn:string)  =
+        if isNull stringToSearchIn then FsExStringException.Raise "String.lastIndexOfCharFromFor: stringToSearchIn is null. (charToFind:%c)  (startIndex:%d)  (count:%d) " charToFind startIndex count
         stringToSearchIn.LastIndexOf(charToFind, startIndex, count)
 
     /// Reports the zero-based index position of the last occurrence of a specified string within this instance, using StringComparison.Ordinal.
@@ -457,44 +420,27 @@ module String =
 
     /// Reports the zero-based index position of the last occurrence of a specified string within this instance. 
     /// The search starts at a specified character position and proceeds backward toward the beginning of the string, using StringComparison.Ordinal.
-    let (*inline*) lastIndexOfString' (stringToFind:string) (startIndex:int) (stringToSearchIn:string)  =
-        if isNull stringToFind then FsExStringException.Raise "String.lastIndexOfString': stringToFind is null. (startIndex:%d)  (stringToSearchIn:%s) " startIndex (exnf stringToSearchIn)
+    let (*inline*) lastIndexOfStringFrom (stringToFind:string) (startIndex:int) (stringToSearchIn:string)  =
+        if isNull stringToFind then FsExStringException.Raise "String.lastIndexOfStringFrom: stringToFind is null. (startIndex:%d)  (stringToSearchIn:%s) " startIndex (exnf stringToSearchIn)
         if isNull stringToSearchIn then FsExStringException.Raise "String.lastIndexOfString': stringToSearchIn is null. (stringToFind:%s)  (startIndex:%d) " (exnf stringToFind) startIndex
         stringToSearchIn.LastIndexOf(stringToFind, startIndex, StringComparison.Ordinal)
 
     /// Reports the zero-based index position of the last occurrence of a specified string within this instance. 
     /// The search starts at a specified character position and proceeds backward toward the beginning of the string for a specified number of character positions, using StringComparison.Ordinal.
-    let (*inline*) lastIndexOfString'' (stringToFind:string) (startIndex:int) (count:int) (stringToSearchIn:string)  =
-        if isNull stringToFind then FsExStringException.Raise "String.lastIndexOfString'': stringToFind is null. (startIndex:%d)  (count:%d)  (stringToSearchIn:%s) " startIndex count (exnf stringToSearchIn)
-        if isNull stringToSearchIn then FsExStringException.Raise "String.lastIndexOfString'': stringToSearchIn is null. (stringToFind:%s)  (startIndex:%d)  (count:%d) " (exnf stringToFind) startIndex count
+    let (*inline*) lastIndexOfStringFromFor  (stringToFind:string) (startIndex:int) (count:int) (stringToSearchIn:string)  =
+        if isNull stringToFind then FsExStringException.Raise "String.lastIndexOfStringFromFor : stringToFind is null. (startIndex:%d)  (count:%d)  (stringToSearchIn:%s) " startIndex count (exnf stringToSearchIn)
+        if isNull stringToSearchIn then FsExStringException.Raise "String.lastIndexOfStringFromFor : stringToSearchIn is null. (stringToFind:%s)  (startIndex:%d)  (count:%d) " (exnf stringToFind) startIndex count
         stringToSearchIn.LastIndexOf(stringToFind, startIndex, count, StringComparison.Ordinal)
 
-    // Reports the zero-based index of the last occurrence of a specified string within the current String object. A parameter specifies the type of search to use for the specified string.
-    // let (*inline*) lastIndexOfStringWithComparison (stringToFind:string) (comparisonType:StringComparison) (stringToSearchIn:string) = stringToSearchIn.LastIndexOf(stringToFind, comparisonType)
-    // Reports the zero-based index of the last occurrence of a specified string within the current String object. The search starts at a specified character position and proceeds backward toward the beginning of the string. A parameter specifies the type of comparison to perform when searching for the specified string.
-    // let (*inline*) lastIndexOfStringWithComparison' (stringToFind:string) startIndex (comparisonType:StringComparison) (stringToSearchIn:string) = stringToSearchIn.LastIndexOf(stringToFind, startIndex, comparisonType)
-    // Reports the zero-based index position of the last occurrence of a specified string within this instance. The search starts at a specified character position and proceeds backward toward the beginning of the string for the specified number of character positions. A parameter specifies the type of comparison to perform when searching for the specified string.
-    // let (*inline*) lastIndexOfStringWithComparison'' (stringToFind:string) startIndex count (comparisonType:StringComparison) (stringToSearchIn:string) = stringToSearchIn.LastIndexOf(stringToFind, startIndex, count, comparisonType)
-
-
-    // Returns a new string whose textual value is the same as this string, but whose binary representation is in Unicode normalization form C.
-    // let (*inline*) normalize (txt:string) = txt.Normalize() // see more advanced implementation at top
-    // Returns a new string whose textual value is the same as this string, but whose binary representation is in the specified Unicode normalization form.
-    // let (*inline*) normalize' normalizationForm (txt:string) = txt.Normalize(normalizationForm)
-    // Indicates whether this string is in Unicode normalization form C.
-    // let (*inline*) isNormalized (txt:string) = txt.IsNormalized()
-    // Indicates whether this string is in the specified Unicode normalization form.
-    // let (*inline*) isNormalized' normalizationForm (txt:string) = txt.IsNormalized(normalizationForm)
-
-
+   
     /// Returns a new string that right-aligns the characters in this instance by padding them with spaces on the left, for a specified total length.
     let (*inline*) padLeft totalWidth (txt:string)  =
         if isNull txt then FsExStringException.Raise "String.padLeft: txt is null. (totalWidth:%d) " totalWidth
         txt.PadLeft(totalWidth)
 
     /// Returns a new string that right-aligns the characters in this instance by padding them on the left with a specified Unicode character, for a specified total length.
-    let (*inline*) padLeft' totalWidth (paddingChar:char) (txt:string)  =
-        if isNull txt then FsExStringException.Raise "String.padLeft': txt is null. (totalWidth:%d)  (paddingChar:%c) " totalWidth paddingChar
+    let (*inline*) padLeftWith totalWidth (paddingChar:char) (txt:string)  =
+        if isNull txt then FsExStringException.Raise "String.padLeftWith: txt is null. (totalWidth:%d)  (paddingChar:%c) " totalWidth paddingChar
         txt.PadLeft(totalWidth, paddingChar)
 
     /// Returns a new string that left-aligns the characters in this string by padding them with spaces on the right, for a specified total length.
@@ -503,8 +449,8 @@ module String =
         txt.PadRight(totalWidth)
 
     /// Returns a new string that left-aligns the characters in this string by padding them on the right with a specified Unicode character, for a specified total length.
-    let (*inline*) padRight' totalWidth (paddingChar:char) (txt:string)  =
-        if isNull txt then FsExStringException.Raise "String.padRight': txt is null. (totalWidth:%d)  (paddingChar:%c) " totalWidth paddingChar
+    let (*inline*) padRightWith totalWidth (paddingChar:char) (txt:string)  =
+        if isNull txt then FsExStringException.Raise "String.padRightWith: txt is null. (totalWidth:%d)  (paddingChar:%c) " totalWidth paddingChar
         txt.PadRight(totalWidth, paddingChar)
 
     /// Returns a new string in which all the characters in the current instance, beginning at a specified position and continuing through the last position, have been deleted.
@@ -513,12 +459,12 @@ module String =
         txt.Remove(startIndex)
 
     /// Returns a new string in which a specified number of characters in the current instance beginning at a specified position have been deleted.
-    let (*inline*) remove' startIndex count (txt:string)  =
-        if isNull txt then FsExStringException.Raise "String.remove': txt is null. (startIndex:%d)  (count:%d) " startIndex count
+    let (*inline*) removeFrom startIndex count (txt:string)  =
+        if isNull txt then FsExStringException.Raise "String.removeFrom : txt is null. (startIndex:%d)  (count:%d) " startIndex count
         txt.Remove(startIndex, count)
 
     /// Returns a new string in which all occurrences of a specified Unicode character in this instance are replaced with another specified Unicode character.
-    let (*inline*) replace' (oldChar:char) (newChar:char) (txt:string)  =
+    let (*inline*) replaceChar (oldChar:char) (newChar:char) (txt:string)  =
         if isNull txt then FsExStringException.Raise "String.replace': txt is null. (oldChar:%c)  (newChar:%c) " oldChar newChar
         txt.Replace(oldChar, newChar) //modified for FsEx: use apostrophe here
 
@@ -528,65 +474,62 @@ module String =
         if isNull newValue then FsExStringException.Raise "String.replace: newValue is null. (oldValue:%s)  (txt:%s) " (exnf oldValue) (exnf txt)
         if isNull txt then FsExStringException.Raise "String.replace: txt is null. (oldValue:%s)  (newValue:%s) " (exnf oldValue) (exnf newValue)
         txt.Replace(oldValue, newValue) //modified for FsEx: dont use apostrophe here
+    
+    
+    
+    //-----------split by string overloads --------------
 
-    /// Splits a string into substrings that are based on the characters in an array.
+    /// Split string, Remove Empty Entries
+    /// Like: string.Split([| splitter |], StringSplitOptions.RemoveEmptyEntries)
+    let (*inline*) split (splitter:string) (stringToSplit:string) = 
+        if isNull stringToSplit then FsExStringException.Raise "String.split: stringToSplit is null (splitter:%s)" (exnf splitter)
+        if isNull splitter      then FsExStringException.Raise "String.split: splitter is null (stringToSplit:%s)" (exnf stringToSplit)
+        stringToSplit.Split([|splitter|], StringSplitOptions.RemoveEmptyEntries)
+    
+    /// Split string, Keep Empty Entries
+    /// Like : string.Split([| splitter |], StringSplitOptions.None)  
+    let (*inline*) splitKeep (splitter:string) (stringToSplit:string) = 
+        if isNull stringToSplit then FsExStringException.Raise "String.splitKeep: stringToSplit is null (splitter:%s)" (exnf splitter)
+        if isNull splitter      then FsExStringException.Raise "String.splitKeep: splitter is null (stringToSplit:%s)" (exnf stringToSplit)
+        stringToSplit.Split([|splitter|], StringSplitOptions.None)   
+
+    //-----------split by Char overloads --------------
+
+    /// Split string by a Char, Remove Empty Entries
+    /// Like: string.Split([| splitter |], StringSplitOptions.RemoveEmptyEntries)
     let (*inline*) splitChar (separator:char) (stringToSplit:string)  =
         if isNull stringToSplit then FsExStringException.Raise "String.splitChar: stringToSplit is null. (separator:%c) " separator
+        stringToSplit.Split([| separator|] , StringSplitOptions.RemoveEmptyEntries)
+
+    /// Split string by any of multiple Chars, Remove Empty Entries
+    /// Like: string.Split([| splitter |], StringSplitOptions.RemoveEmptyEntries)
+    let (*inline*) splitChars(separators:char[]) (stringToSplit:string)  =
+        if isNull stringToSplit then FsExStringException.Raise "String.splitByChars: stringToSplit is null. (separators:%A)  " separators 
+        stringToSplit.Split(separators, StringSplitOptions.RemoveEmptyEntries)
+
+    /// Split string by any of multiple Chars, Keep Empty Entries
+    /// Like : string.Split([| splitter |], StringSplitOptions.None)  
+    let (*inline*) splitCharKeep (separator:char) (stringToSplit:string)  =
+        if isNull stringToSplit then FsExStringException.Raise "String.splitCharKeep: stringToSplit is null. (separator:%c) " separator
         stringToSplit.Split(separator)
+    
+    /// Split string by a Char, Keep Empty Entries
+    /// Like : string.Split([| splitter |], StringSplitOptions.None)  
+    let (*inline*) splitCharsKeep (separators:char[]) (stringToSplit:string)  =
+        if isNull stringToSplit then FsExStringException.Raise "String.splitCharsKeep: stringToSplit is null. (separators:%A)" separators
+        stringToSplit.Split(separators)
+    
+    //---------------------------- end split -----------------
 
-    /// Splits a string into a maximum number of substrings based on the characters in an array. You also specify the maximum number of substrings to return.
-    let (*inline*) splitChar' (separator:char[]) (count:int) (stringToSplit:string)  =
-        if isNull stringToSplit then FsExStringException.Raise "String.splitChar': stringToSplit is null. (separator:%A)  (count:%d) " separator count
-        stringToSplit.Split(separator, count)
-
-    /// Splits a string into substrings based on the characters in an array. You can specify whether the substrings include empty array elements.
-    let (*inline*) splitCharWithOptions (separator:char[]) (options:StringSplitOptions) (stringToSplit:string)  =
-        if isNull stringToSplit then FsExStringException.Raise "String.splitCharWithOptions: stringToSplit is null. (separator:%A)  (options:%A) " separator options
-        stringToSplit.Split(separator, options)
-
-    /// Splits a string into a maximum number of substrings based on the characters in an array.
-    let (*inline*) splitCharWithOptions' (separator:char[]) count (options:StringSplitOptions) (stringToSplit:string)  =
-        if isNull stringToSplit then FsExStringException.Raise "String.splitCharWithOptions': stringToSplit is null. (separator:%A)  (count:%d)  (options:%A) " separator count options
-        stringToSplit.Split(separator, count, options)
-
-    /// Splits a string into substrings based on the strings in an array. You can specify whether the substrings include empty array elements.
-    let (*inline*) splitString (separator:string[]) (options:StringSplitOptions) (stringToSplit:string)  =
-        if isNull separator then FsExStringException.Raise "String.splitString: separator is null.  (options:%A)  (stringToSplit:%s) "  options (exnf stringToSplit)
-        if isNull stringToSplit then FsExStringException.Raise "String.splitString: stringToSplit is null.  (separator:%A)  (options:%A) " separator  options
-        stringToSplit.Split(separator, options)
-
-    /// Splits a string into a maximum number of substrings based on the strings in an array. You can specify whether the substrings include empty array elements.
-    let (*inline*) splitString' (separator:string[]) count (options:StringSplitOptions) (stringToSplit:string)  =
-        if isNull separator then FsExStringException.Raise "String.splitString': separator is null.   (count:%d)  (options:%A)  (stringToSplit:%s) "  count options (exnf stringToSplit)
-        if isNull stringToSplit then FsExStringException.Raise "String.splitString': stringToSplit is null. (separator:%A) (count:%d)  (options:%A) " separator  count options
-        stringToSplit.Split(separator, count, options)
-
-    /// Determines whether the beginning of this string instance matches the specified string, using StringComparison.Ordinal..
-    let (*inline*) startsWith (stringToFindAtStart:string) (stringToSearchIn:string)  =
-        if isNull stringToFindAtStart then FsExStringException.Raise "String.startsWith: stringToFindAtStart is null. (stringToSearchIn:%s) " (exnf stringToSearchIn)
-        if isNull stringToSearchIn then FsExStringException.Raise "String.startsWith: stringToSearchIn is null. (stringToFindAtStart:%s) " (exnf stringToFindAtStart)
-        stringToSearchIn.StartsWith(stringToFindAtStart, StringComparison.Ordinal)
-
-    /// Determines whether the beginning of this string instance matches the specified string when compared using the specified comparison option.
-    let (*inline*) startsWith' (stringToFindAtStart:string)  comparisonType (stringToSearchIn:string)  =
-        if isNull stringToFindAtStart then FsExStringException.Raise "String.startsWith': stringToFindAtStart is null. (comparisonType:%A)  (stringToSearchIn:%s) " comparisonType (exnf stringToSearchIn)
-        if isNull stringToSearchIn then FsExStringException.Raise "String.startsWith': stringToSearchIn is null. (stringToFindAtStart:%s)  (comparisonType:%A) " (exnf stringToFindAtStart) comparisonType
-        stringToSearchIn.StartsWith(stringToFindAtStart, comparisonType)
-
-    /// Determines whether the beginning of this string instance matches the specified string when compared using the specified culture.
-    let (*inline*) startsWith'' (stringToFindAtStart:string)  ignoreCase culture (stringToSearchIn:string)  =
-        if isNull stringToFindAtStart then FsExStringException.Raise "String.startsWith'': stringToFindAtStart is null. (ignoreCase:%b)  (culture:%A)  (stringToSearchIn:%s) " ignoreCase culture (exnf stringToSearchIn)
-        if isNull stringToSearchIn then FsExStringException.Raise "String.startsWith'': stringToSearchIn is null. (stringToFindAtStart:%s)  (ignoreCase:%b)  (culture:%A) " (exnf stringToFindAtStart) ignoreCase culture
-        stringToSearchIn.StartsWith(stringToFindAtStart, ignoreCase, culture)
 
     /// Retrieves a substring from this instance. The substring starts at a specified character position and continues to the end of the string.
-    let (*inline*) substring startIndex (txt:string)  =
-        if isNull txt then FsExStringException.Raise "String.substring: txt is null. (startIndex:%d) " startIndex
+    let (*inline*) substringFrom startIndex (txt:string)  =
+        if isNull txt then FsExStringException.Raise "String.substringFrom: txt is null. (startIndex:%d) " startIndex
         txt.Substring(startIndex)
 
     /// Retrieves a substring from this instance. The substring starts at a specified character position and has a specified length.
-    let (*inline*) substring' startIndex length (txt:string)  =
-        if isNull txt then FsExStringException.Raise "String.substring': txt is null. (startIndex:%d)  (length:%d) " startIndex length
+    let (*inline*) substringFromFor startIndex length (txt:string)  =
+        if isNull txt then FsExStringException.Raise "String.substringFromFor : txt is null. (startIndex:%d)  (length:%d) " startIndex length
         txt.Substring(startIndex, length)
 
     /// Copies the characters in this instance to a Unicode character array.
@@ -595,58 +538,65 @@ module String =
         txt.ToCharArray()
 
     /// Copies the characters in a specified substring in this instance to a Unicode character array.
-    let (*inline*) toCharArray' startIndex length (txt:string)  =
-        if isNull txt then FsExStringException.Raise "String.toCharArray': txt is null. (startIndex:%d)  (length:%d) " startIndex length
+    let (*inline*) toCharArrayFromFor  startIndex length (txt:string)  =
+        if isNull txt then FsExStringException.Raise "String.toCharArrayFromFor : txt is null. (startIndex:%d)  (length:%d) " startIndex length
         txt.ToCharArray(startIndex, length)
 
-    /// Returns a copy of this string converted to lowercase.
+    /// Returns a copy of this String object converted to lowercase using the casing rules of the invariant culture.
     let (*inline*) toLower (txt:string)  =
         if isNull txt then FsExStringException.Raise "String.toLower: txt is null."
-        txt.ToLower()
-
-    /// Returns a copy of this string converted to lowercase, using the casing rules of the specified culture.
-    let (*inline*) toLower' culture (txt:string)  =
-        if isNull txt then FsExStringException.Raise "String.toLower': txt is null. (culture:%A) " culture
-        txt.ToLower(culture)
-
-    /// Returns a copy of this String object converted to lowercase using the casing rules of the invariant culture.
-    let (*inline*) toLowerInvariant (txt:string)  =
-        if isNull txt then FsExStringException.Raise "String.toLowerInvariant: txt is null."
         txt.ToLowerInvariant()
 
-    /// Returns a copy of this string converted to uppercase.
+    /// Returns a copy of this String object converted to uppercase using the casing rules of the invariant culture.
     let (*inline*) toUpper (txt:string)  =
         if isNull txt then FsExStringException.Raise "String.toUpper: txt is null."
-        txt.ToUpper()
+        txt.ToUpperInvariant()    
 
-    /// Returns a copy of this string converted to uppercase, using the casing rules of the specified culture.
-    let (*inline*) toUpper' culture (txt:string)  =
-        if isNull txt then FsExStringException.Raise "String.toUpper': txt is null. (culture:%A) " culture
-        txt.ToUpper(culture)
-
-    /// Returns a copy of this String object converted to uppercase using the casing rules of the invariant culture.
-    let (*inline*) toUpperInvariant (txt:string)  =
-        if isNull txt then FsExStringException.Raise "String.toUpperInvariant: txt is null."
-        txt.ToUpperInvariant()
+    // -------------------------trim familly-------------
 
     /// Removes all leading and trailing white-space characters from the current String object.
     let (*inline*) trim (txt:string)  =
         if isNull txt then FsExStringException.Raise "String.trim: txt is null."
         txt.Trim()
+    
+    /// Removes all leading and trailing occurrences of a set of characters specified in an array from the current String object.
+    let (*inline*) trimChar (trimChar:char) (txt:string)  =
+        if isNull txt then FsExStringException.Raise "String.trimChar: txt is null."
+        txt.Trim([|trimChar|])
 
     /// Removes all leading and trailing occurrences of a set of characters specified in an array from the current String object.
-    let (*inline*) trim' (trimChars:char[]) (txt:string)  =
-        if isNull txt then FsExStringException.Raise "String.trim': txt is null. (trimChars:%A) " trimChars
+    let (*inline*) trimChars (trimChars:char[]) (txt:string)  =
+        if isNull txt then FsExStringException.Raise "String.trimChars: txt is null. (trimChars:%A) " trimChars
         txt.Trim(trimChars)
 
-    /// Removes all trailing occurrences of a set of characters specified in an array from the current String object.
-    let (*inline*) trimEnd (trimChars:char[]) (txt:string)  =
+    /// Removes all trailing whitespace.
+    let (*inline*) trimEnd (txt:string)  =
         if isNull txt then FsExStringException.Raise "String.trimEnd: txt is null. (trimChars:%A) " trimChars
+        txt.TrimEnd()
+
+    /// Removes all trailing occurrences of a  characters specified in an array from the current String object.
+    let (*inline*) trimEndChar (trimChar:char) (txt:string)  =
+        if isNull txt then FsExStringException.Raise "String.trimEndChar: txt is null. (trimChars:%A) " trimChars
+        txt.TrimEnd([|trimChar|])
+
+    /// Removes all trailing occurrences of a set of characters specified in an array from the current String object.
+    let (*inline*) trimEndChars (trimChars:char[]) (txt:string)  =
+        if isNull txt then FsExStringException.Raise "String.trimEndChars: txt is null. (trimChars:%A) " trimChars
         txt.TrimEnd(trimChars)
 
-    /// Removes all leading occurrences of a set of characters specified in an array from the current String object.
-    let (*inline*) trimStart (trimChars:char[]) (txt:string)  =
+    /// Removes all leading whitespace.
+    let (*inline*) trimStart (txt:string)  =
         if isNull txt then FsExStringException.Raise "String.trimStart: txt is null. (trimChars:%A) " trimChars
+        txt.TrimStart()
+
+    /// Removes all leading occurrences of a characters specified in an array from the current String object.
+    let (*inline*) trimStartChar (trimChar:char) (txt:string)  =
+        if isNull txt then FsExStringException.Raise "String.trimStartChar: txt is null. (trimChars:%A) " trimChars
+        txt.TrimStart(trimChar)
+
+    /// Removes all leading occurrences of a set of characters specified in an array from the current String object.
+    let (*inline*) trimStartChars (trimChars:char[]) (txt:string)  =
+        if isNull txt then FsExStringException.Raise "String.trimStartChars: txt is null. (trimChars:%A) " trimChars
         txt.TrimStart(trimChars)
 
 
