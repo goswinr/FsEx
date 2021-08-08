@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
@@ -49,7 +49,7 @@
 
   <ItemGroup>
     <None Include="README.md" />   
-    <None Include="Doc/READMEnuget.md"  Pack="true" PackagePath="" />
+    <None Include="Doc/READMEnuget.md" Pack="true" PackagePath="" />
     <None Include="Doc/logo128.png" Pack="true" PackagePath="" /> <!--PackagePath = "" makes the file availabe to nuget pack tool-->
 
     <Compile Include="Src/TopLevelFunctions.fs" />
@@ -64,24 +64,22 @@
     <Compile Include="Src/Types/Dict.fs" />
     <Compile Include="Src/Types/DefaultDict.fs" />
     <Compile Include="Src/Types/StuctTuples.fs" />
-    <Compile Include="Src/ArrayModule.fs" />
-    
-    <Compile Include="Src/RarrModule.fs" />
-    <Compile Include="Src/StringModule.fs" />
 
     <Compile Include="Src/TypeExtensions/BclStructs.fs" />
     <Compile Include="Src/TypeExtensions/Color.fs" />
     <Compile Include="Src/TypeExtensions/String.fs" />
+    <Compile Include="Src/TypeExtensions/StringBuilder.fs" />
     <Compile Include="Src/TypeExtensions/Array.fs" />
     <Compile Include="Src/TypeExtensions/IDictionary.fs" />
-    <Compile Include="Src/TypeExtensions/List.fs" />
     <Compile Include="Src/TypeExtensions/IList.fs" />
-    <Compile Include="Src/TypeExtensions/Seq.fs" /> 
+    <Compile Include="Src/TypeExtensions/Seq.fs" />
+    <Compile Include="Src/RarrModule.fs" />
+    <Compile Include="Src/StringModule.fs" />
+    <Compile Include="Src/ArrayModule.fs" />
+    <Compile Include="Src/SeqModule.fs" /> 
 
     <Compile Include="Src/ComputationalExpressions.fs" />
-    <Compile Include="Src/DynamicOperator.fs" />
     <Compile Include="Src/Print.fs" />
-    <Compile Include="Src/PrintDistribution.fs" />
   </ItemGroup>
 
 </Project>
