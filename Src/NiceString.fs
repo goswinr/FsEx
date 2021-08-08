@@ -47,9 +47,9 @@ module NiceStringSettings =
     type NiceStringLength = {maxDepth:int ; maxItems:int}
 
 
-module internal NiceFormat  = 
+module NiceFormat  =  // used by Rhino.Scripting
     
-    module Literals = 
+    module private Literals = 
         
         /// string for RhinoMath.UnsetDouble -1.23432101234321e+308
         [<Literal>]
@@ -80,10 +80,10 @@ module internal NiceFormat  =
     open NiceStringSettings
 
     //let internal deDE = Globalization.CultureInfo("de-DE")
-    let internal invC = Globalization.CultureInfo.InvariantCulture
+    let private invC = Globalization.CultureInfo.InvariantCulture
 
     /// Assumes a string that represent a float or int with '.' as decimal serapator and no other input formating
-    let addThousandSeparators (s:string) =
+    let private addThousandSeparators (s:string) =
         let b = Text.StringBuilder(s.Length + s.Length / 3 + 1)
         let inline add (c:char) = b.Append(c) |> ignoreObj
     
@@ -122,7 +122,7 @@ module internal NiceFormat  =
     /// AlmostZero ->    Some 0.0
     /// AlmostZeroNeg->  Some 0.0
     /// RoundedToZero -> Some 0.0
-    let tryParseNiceFloat (s:string)=
+    let private tryParseNiceFloat (s:string)=
         match s with 
         |Literals.NaN -> None
         |Literals.PositiveInfinity -> None
@@ -231,14 +231,14 @@ module internal NiceFormat  =
     
     /// return the string befor a splitter
     /// if splitter is missing return full string 
-    let inline before (splitter:Char) (s:string) = 
+    let inline private before (splitter:Char) (s:string) = 
         let start = s.IndexOf(splitter) 
         if start = -1 then s
         else s.Substring(0, start )
     
     /// Includes GenericArguments types if available
     /// remove tick at end e.g. List`1  to  Collections.Generic.List
-    let rec typeName (typ:Type) =
+    let rec internal typeName (typ:Type) =
         let name = typ.Name |> before '`' |> before '@' 
         let fullPath = if String.IsNullOrEmpty typ.Namespace then name else typ.Namespace   + "." + name 
         let cleaned = 
@@ -259,8 +259,7 @@ module internal NiceFormat  =
 module internal NiceStringImplementation  =
     open System.Collections.Generic 
     open Microsoft.FSharp.Reflection
-    open NiceStringSettings 
-    
+    open NiceStringSettings     
 
     type SeqCount = Counted of int | More of int
  
