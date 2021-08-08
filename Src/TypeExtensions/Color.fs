@@ -104,11 +104,11 @@ module Color =
         let v = UtilMath.clamp 0. 1. v            
         let h,s,l = HSLfromColor c
         let delta = 1.0 - l
-        fromHSL (h,s,l + delta * v ) // TODO test if 0.0 really returns full white 
+        fromHSL (h,s,l + delta * v ) 
 
     /// Make a color darker by perecentage (value between 0.0 to 1.0) (1.0 = black, 0.0 = current color) 
     let makeDarker v c =
         if not (-0.001 <. v .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.makeDarker: v is bigger than 1.0 or smaller than 0.0: %f" v
         let v = UtilMath.clamp 0. 1. v 
         let h,s,l = HSLfromColor c            
-        fromHSL (h,s, l - l * v) // TODO test if 0.0 really returns full black 
+        fromHSL (h,s, l - l * v) 

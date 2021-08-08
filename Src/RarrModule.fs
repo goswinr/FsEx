@@ -160,8 +160,8 @@ module Rarr =
             /// the resulting seq is two elements shorter than the input Rarr
             let windowed3 (a:_ Rarr) = 
                 checkCount 3 "windowed3" a 
-                seq {   for i = 0 to a.Count-3 do yield a.[i], a.[i+1], a.[i+2] } //TODO keep prev in mutabe value to avoid accessing the same item 3 times
-    
+                seq {   for i = 0 to a.Count-3 do yield a.[i], a.[i+1], a.[i+2] } 
+
             /// Yields looped Seq of  from (last, first, second)  upto (second-last, last, first)
             /// the resulting seq has the same element count as the input Rarr
             let prevThisNext (a:_ Rarr) =  
@@ -210,7 +210,6 @@ module Rarr =
         else                    rarr.GetRange(0,rarr.Count)
 
     /// Create a Rarr by calling the given generator on each index.
-
     let inline init count initializer : Rarr<'T> =
         if count < 0 then ArgumentException.RaiseBase "Rarr.init: The count can't be %d" count   
         let rarr = Rarr (count)
@@ -220,22 +219,13 @@ module Rarr =
     /// Considers List cirular and move elements up or down
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
     /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a]
-    let inline rotate k (rarr: Rarr<'T>)  =  init rarr.Count (fun i -> rarr.[negIdxLooped (i-k) rarr.Count])
+    let inline rotate k (rarr: Rarr<'T>)  =  
+        init rarr.Count (fun i -> rarr.[negIdxLooped (i-k) rarr.Count])
 
     /// Returns a Rarr of the index and the item. (like enumerate in Python)
-    let inline indexed (rarr: Rarr<'T>)  =  init rarr.Count (fun i -> i,rarr.[i])
+    let inline indexed (rarr: Rarr<'T>)  =  
+        init rarr.Count (fun i -> i,rarr.[i])
 
-    /// Splits a Rarr in two, like Rarr.filter but returning two Lists
-    /// The first Rarr has all elements where the filter function returned 'true'
-    /// renamed to  Rarr.partition
-    [<Obsolete("renamed to  Rarr.partition")>] 
-    let inline splitBy filter (rarr:Rarr<'T>) =  
-        let t=Rarr()
-        let f=Rarr()
-        for x in rarr do
-            if filter x then t.Add(x)
-            else             f.Add(x)
-        t,f
 
     /// Structural equality
     /// compares each element in both lists for eqality . Rarrs must also be of same Count

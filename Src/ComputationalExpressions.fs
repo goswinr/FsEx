@@ -8,9 +8,9 @@ module ComputationalExpressionsBuilders =
     let mutable csvSepEn = ','
     let mutable csvSepDe = ';'
 
-    let inline private addchr   (b: StringBuilder) (c:char)   = b.Append      c                                          |> ignoreObj
-    let inline private add      (b: StringBuilder) (s:string) = b.Append      s                                          |> ignoreObj
-    let inline private addLn    (b: StringBuilder) (s:string) = b.AppendLine  s                                          |> ignoreObj
+    let inline private addchr     (b: StringBuilder) (c:char)   = b.Append      c                                          |> ignoreObj
+    let inline private add        (b: StringBuilder) (s:string) = b.Append      s                                          |> ignoreObj
+    let inline private addLn      (b: StringBuilder) (s:string) = b.AppendLine  s                                          |> ignoreObj
     let inline private addCsvEn   (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepEn)                               |> ignoreObj
     let inline private addCsvEnLn (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepEn).Append(Environment.NewLine)   |> ignoreObj
     let inline private addCsvDe   (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepDe)                               |> ignoreObj
@@ -72,9 +72,7 @@ module ComputationalExpressionsBuilders =
         member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addLn b (f.AsString) // thousand separators not desired ? (NiceString.Floats.floatToString f)
         member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addLn b (i.ToString())  
         member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addLn b (g.ToString())  
-
-        //member inline _.YieldFrom (f: StringBuffer) = f // use for new line instead
-        
+       
         member inline _.Yield (strings: seq<string>) =
             fun (b: StringBuilder) -> 
                 for s in strings do 

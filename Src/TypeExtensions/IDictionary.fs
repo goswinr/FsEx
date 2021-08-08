@@ -4,8 +4,7 @@ open System.Runtime.CompilerServices
 open System.Collections.Generic
 
 
-//[<AutoOpen>]
-module ExtensionsIDictionary =   //TODO add Docstring
+module ExtensionsIDictionary =  
     
     // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164      
 
@@ -66,6 +65,7 @@ module Dict =
     let set (value:'V) (key:'K) (dict:IDictionary<'K,'V>) =  
         dict.[key] <- value
     
+    /// Tries to get a value from a IDictionary
     let tryGet (k:'K) (d:IDictionary<'K,'V>) : 'V option= 
         let ok, v = d.TryGetValue(k)
         if ok then  Some v
