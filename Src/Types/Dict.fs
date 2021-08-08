@@ -18,18 +18,18 @@ module AutoOpenExtensionsHashset =
     // This type extension should be alway availabe that s why it is in this Auitoopen module 
     type HashSet<'T> with            
         
-        /// not (set.Contains(key))
+        /// Returns: not (set.Contains(key))
         [<Extension>]
         member inline h.DoesNotContain(key:'T) = 
             not (h.Contains(key))
         
-        /// like this.Add(key), but returning unit.
+        /// Like this.Add(key), but returning unit.
         /// h.Add(key)|> ignore
         [<Extension>]
         member inline h.add(key:'T) = 
             h.Add(key)|> ignore
         
-        /// like this.Remove(key), but returning unit.
+        /// Like this.Remove(key), but returning unit.
         /// h.Remove(key)|> ignore
         [<Extension>]
         member inline h.remove(key:'T) = 
