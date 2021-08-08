@@ -47,7 +47,7 @@ module NiceStringSettings =
     type NiceStringLength = {maxDepth:int ; maxItems:int}
 
 
-module NiceFormat  = 
+module internal NiceFormat  = 
     
     module Literals = 
         
@@ -409,7 +409,7 @@ module NiceString  =
     open NiceStringImplementation
     open NiceStringSettings
 
-    //TODO sync the docstring here with print and printfull in module Print and the shadowing one in Rhino.scripting 
+    //TODO sync the docstring here with print and printfull in module Print and the shadowing one in Rhino.Scripting 
 
 
     /// Nice formating for numbers including thousand Separator and (nested) sequences, first five items are printed out.

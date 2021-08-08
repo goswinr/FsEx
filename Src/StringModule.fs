@@ -16,8 +16,8 @@ module String =
         static member inline Raise msg = Printf.kprintf (fun s -> raise (new FsExStringException(s))) msg 
 
     
-    /// Trimm strings to 80 chars for showing in in one line 
-    /// it returns the input string trimmed to 30 Chars, a count of skiped characters and the last 5 characters
+    /// Trimm strings to 80 chars for showing in in one line. 
+    /// It returns the input string trimmed to 30 Chars, a count of skiped characters and the last 5 characters
     /// Replace line breaks with '\r\n' literal
     /// Does not include surrounding quotes
     /// If string is null returns "-null string-"
@@ -53,8 +53,8 @@ module String =
     /// Ensures all lines end on System.Environment.NewLine
     /// code: StringBuilder(s).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine).ToString()
     let (*inline*) unifyLineEndings (txt:string) =             
-        if isNull txt then FsExStringException.Raise "String.unifyLineEndings: input is null "
-        StringBuilder(txt).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine).ToString()
+        if isNull txt then FsExStringException.Raise "String.unifyLineEndings: input is null"
+        StringBuilder(txt).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine).ToString() // TODO correct but not performance optimised
 
     /// Returns everytrhing before first occurence of a given splitting string.
     /// Or fails if splitter is not found

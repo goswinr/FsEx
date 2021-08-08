@@ -5,10 +5,9 @@ open System.IO
 
 
 
-[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide IO namespace in C# assemblies 
 module Kernel32 = 
     
-
+    /// For Exceptions that happen while calling native kernel32 functions
     type Kernel32Exception(s)=
         inherit Exception(s)
         static member inline Raise msg =  Printf.kprintf (fun s -> raise (Kernel32Exception(s))) msg 

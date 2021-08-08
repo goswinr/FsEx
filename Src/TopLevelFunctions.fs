@@ -5,9 +5,8 @@ open System.IO
 open System.Runtime.CompilerServices
 open System.Collections.Generic
 
-type EXT = Runtime.CompilerServices.ExtensionAttribute
 
-[<assembly:EXT>] do() // mark this assembly as extension assembly http://www.latkin.org/blog/2014/04/30/f-extension-methods-in-roslyn/
+[<assembly:Extension>] do() // mark this assembly as extension assembly http://www.latkin.org/blog/2014/04/30/f-extension-methods-in-roslyn/
 
 
 /// This module is set to auto open. 
@@ -60,14 +59,14 @@ module  AutoOpenUtil =
     
     /// throws an exception with 'msg' as Error message if 'value' is false.
     /// this function is usefull to follow up on any methods that return booleans indication sucess or failure
-    let inline failIfFalse (msg:string) (value :bool) : unit = 
-        if not value then failwithf "failIfFalse: %s " msg 
+    let inline failIfFalse (failMsg:string) (value :bool) : unit = 
+        if not value then failwithf "failIfFalse: %s " failMsg 
     
     /// throws an exception with 'msg' as Error message if 'value' is null.
     /// this function is usefull to doing many null checks without adding lots if clauses and lots of indenting
-    let inline failIfNull (msg:string) (value :'T when 'T: null) : unit = 
+    let inline failIfNull (failMsg:string) (value :'T when 'T: null) : unit = 
         match value with 
-        | null -> ArgumentNullException.Raise "<null> in FsEx.Util.failIfNull: %s" msg  
+        | null -> ArgumentNullException.Raise "<null> in FsEx.Util.failIfNull: %s" failMsg  
         | _ -> ()
 
     /// throws an exception with 'msg' as Error message if string is null or empty    
@@ -90,10 +89,12 @@ module  AutoOpenUtil =
         | _ -> true    
     
     /// Returns false if the Guid is Empty.
+    /// g <> Guid.Empty
     let inline notEmptyGuid (g :Guid) = 
         g <> Guid.Empty
     
     /// Returns true if the Guid is Empty.
+    /// g = Guid.Empty
     let inline isEmptyGuid (g :Guid) = 
         g = Guid.Empty
 
@@ -159,11 +160,11 @@ module  AutoOpenUtil =
     let inline ifDo condition (f:'T->'T)  (x:'T) = 
         if condition then f x else x
     
-    /// Caches the results of a function in Map
-    /// the arument to thge function will be used as key in the Map
-    /// can be unit or null too
+    /// Caches the results of a function in a Map.
+    /// The arument to the function will be used as key in the Map.
+    /// The argument can be unit or null(=None) too.
     let memoize f =
-        let cache = ref Map.empty
+        let cache = ref Map.empty // using a Dictionary would faill on a null or unit key
         fun x ->
             match (!cache).TryFind(x) with
             | Some res -> res
@@ -171,7 +172,6 @@ module  AutoOpenUtil =
                 let res = f x
                 cache := (!cache).Add(x,res)
                 res
-
 
     /// generic parser that infers desired return type 
     let inline tryParse<'a when 'a: (static member TryParse: string * byref<'a> -> bool)> x =
@@ -219,10 +219,10 @@ module IntRef =
     /// Decrement a ref cell by a given int    
     let inline decrBy i (x:int<'UoM>) = i := !i - x        
     
-    /// set ref cell to given int if it is bigger than current ref cell  value
+    /// Set ref cell to given int if it is bigger than current ref cell  value
     let inline setMax i (x:int<'UoM>) = if x > !i then i := x
 
-    /// set ref cell to given int if it is smaller than current ref cell  value
+    /// Set ref cell to given int if it is smaller than current ref cell  value
     let inline setMin i (x:int<'UoM>) = if x < !i then i := x
 
    
@@ -237,9 +237,9 @@ module FloatRef =
     /// Decrement a ref cell by a given float    
     let inline decrBy i (x:float<'UoM>) = i := !i - x    
                 
-    /// set ref cell to given float if it is bigger than current ref cell  value
+    /// Set ref cell to given float if it is bigger than current ref cell  value
     let inline setMax i (x:float<'UoM>) = if x > !i then i := x
     
-    /// set ref cell to given float if it is smaller than current ref cell  value
+    /// Set ref cell to given float if it is smaller than current ref cell  value
     let inline setMin i (x:float<'UoM>) = if x < !i then i := x
 

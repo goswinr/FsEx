@@ -280,11 +280,11 @@ module Rarr =
     
     /// swap the values of two given indices in Rarr
     let inline swap i j (xs:Rarr<'T>) : unit = 
-        if i < 0 then IndexOutOfRangeException.Raise "Rarr.swap: index i cant be less than 0: %d (j: %d)" i j
-        if i >= xs.Count then IndexOutOfRangeException.Raise "Rarr.swap: index i cant be bigge than %d but is %d (j: %d)" xs.LastIndex i j 
+        if i < 0 then IndexOutOfRangeException.Raise "Rarr.swap: index i can't be less than 0: %d (j: %d)" i j
+        if i >= xs.Count then IndexOutOfRangeException.Raise "Rarr.swap: index i can't be bigger than %d but is %d (j: %d)" xs.LastIndex i j 
         if i<>j then  
-            if j < 0 then IndexOutOfRangeException.Raise "Rarr.swap: index j cant be less than 0: %d (i: %d)" j i 
-            if j >= xs.Count then IndexOutOfRangeException.Raise "Rarr.swap: index j cant be bigge than %d but is %d (i: %d)" xs.LastIndex j i
+            if j < 0 then IndexOutOfRangeException.Raise "Rarr.swap: index j can't be less than 0: %d (i: %d)" j i 
+            if j >= xs.Count then IndexOutOfRangeException.Raise "Rarr.swap: index j can't be bigger than %d but is %d (i: %d)" xs.LastIndex j i
             // operate on underlaying list since indixes are checked
             let ti = xs.List.[i]
             xs.List.[i] <- xs.List.[j]
@@ -543,7 +543,6 @@ module Rarr =
 
     /// Return the length or count of the collection.
     /// same as Rarr.length
-
     let inline count (rarr : Rarr<'T>) : int =
         rarr.Count
     
@@ -571,7 +570,6 @@ module Rarr =
 
     /// Return the length or count of the collection.
     /// same as Rarr.count
-
     let inline length (rarr : Rarr<'T>) : int =
         rarr.Count
 
@@ -597,7 +595,6 @@ module Rarr =
 
     /// Build a Rarr from the given sequence.
     /// if input is a Rarr or Generic.List it is returned directly
-
     let inline ofSeq (sequence : seq<'T>) : Rarr<'T> =
         match sequence with
         | :? Rarr<'T> as r -> r
@@ -625,7 +622,7 @@ module Rarr =
     /// Build a list from the given Rarr.
     let inline toList (rarr : Rarr<'T>) : 'T list =        
         let mutable res = []
-        for i = length rarr - 1 downto 0 do
+        for i = rarr.Count - 1 downto 0 do
             res <- rarr.List.[i] :: res
         res
 
@@ -686,7 +683,7 @@ module Rarr =
             invalidArg "start" "The start index cannot be less than zero (0)." //TODO: improve error message with actual values 
         elif count < 0 then
             invalidArg "count" "The number of elements to copy cannot be less than zero (0)."
-        elif start + count > length rarr then
+        elif start + count > rarr.Count then
             invalidArg "count" "There are fewer than 'count' elements between the 'start' index and the end of the collection."
     
         // Overwrite the items within the range using the specified value.
@@ -695,7 +692,7 @@ module Rarr =
 
     /// Return a new Rarr with the elements in reverse order.
     let inline rev (rarr : Rarr<'T>) : Rarr<'T> =        
-        let len = length rarr
+        let len = rarr.Count
         let result = Rarr (len)
         for i = len - 1 downto 0 do
             result.Add rarr.List.[i]
@@ -730,7 +727,7 @@ module Rarr =
 
     /// Split a Rarr of pairs into two Rarrs.
     let inline unzip (rarr : Rarr<'T1 * 'T2>) : Rarr<'T1> * Rarr<'T2> =        
-        let len = length rarr
+        let len = rarr.Count
         let results1 = Rarr (len)
         let results2 = Rarr (len)
         for i = 0 to len - 1 do
@@ -784,26 +781,21 @@ module Rarr =
     /// Return a new collection containing only the elements of the collection
     /// for which the given predicate returns <c>true</c>.
     let inline filter (predicate : 'T -> bool) (rarr : Rarr<'T>) : Rarr<'T> =        
-        rarr.FindAll (System.Predicate predicate)
-       
+        rarr.FindAll (System.Predicate predicate)       
 
-    /// <summary>
+    
     /// Apply the given function to each element of the Rarr. Return
     /// the Rarr comprised of the results "x" for each element where
-    /// the function returns <c>Some(x)</c>.</summary>
+    /// the function returns Some(x)
     let inline choose (chooser : 'T -> 'U option) (rarr : Rarr<'T>) : Rarr<'U> =                
-        if isEmpty rarr then // OPTIMIZATION : If the input list is empty return immediately.
-            Rarr ()
-        else
-            let result = Rarr ()
-            let count = rarr.Count
-
-            for i = 0 to count - 1 do
-                match chooser rarr.List.[i] with
-                | None -> ()
-                | Some value ->
-                    result.Add value
-            result
+        let result = Rarr ()
+        let count = rarr.Count
+        for i = 0 to count - 1 do
+            match chooser rarr.List.[i] with
+            | None -> ()
+            | Some value ->
+                result.Add value
+        result
 
     /// <summary>
     /// Return the first element for which the given function returns <c>true</c>.
@@ -854,7 +846,7 @@ module Rarr =
     /// that satisfies the given predicate.
     let inline tryFindIndexi predicate (rarr : Rarr<'T>) : int option =        
         let predicate = FSharpFunc<_,_,_>.Adapt predicate
-        let lastIndex = length rarr - 1
+        let lastIndex = rarr.Count - 1
         let mutable index = -1
         let mutable foundMatch = false
         while index < lastIndex && not foundMatch do
@@ -985,11 +977,9 @@ module Rarr =
     let inline mapi2 mapping (rarr1 : Rarr<'T1>) (rarr2 : Rarr<'T2>) : Rarr<'U> =
         let len = length rarr1
         if len <> length rarr2 then
-            ArgumentException.RaiseBase "Rarr.mapi2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count 
-
+            ArgumentException.RaiseBase "Rarr.mapi2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count
         let mapping = FSharpFunc<_,_,_,_>.Adapt mapping
         let results = Rarr (len)
-
         for i = 0 to len - 1 do
             mapping.Invoke (i, rarr1.List.[i], rarr2.List.[i])
             |> results.Add
@@ -1009,15 +999,11 @@ module Rarr =
 
     /// <summary>foldSub on just part of teh Rarr</summary>
     let inline foldSub folder (state : 'State) (rarr : Rarr<'T>) startIndex endIndex : 'State =        
-        if startIndex < 0 then
-            IndexOutOfRangeException.Raise "The starting index cannot be negative. but is %d" startIndex
-        elif endIndex > 0 then
-            IndexOutOfRangeException.Raise "The ending index cannot be negative. but is %d" endIndex    
-        let len = length rarr
-        if startIndex >= len then
-            IndexOutOfRangeException.Raise  "The starting index is outside the bounds of the Rarr: %d of %d" startIndex len
-        elif endIndex >= len then
-            IndexOutOfRangeException.Raise  "The ending index is outside the bounds of the Rarr: %d of %d" endIndex len
+        if startIndex < 0 then           IndexOutOfRangeException.Raise "Rarr.foldSub: The starting index cannot be negative. but is %d" startIndex
+        elif endIndex > 0 then           IndexOutOfRangeException.Raise "Rarr.foldSub: The ending index cannot be negative. but is %d" endIndex    
+        let len = rarr.Count
+        if startIndex >= len then            IndexOutOfRangeException.Raise  "Rarr.foldSub: The starting index is outside the bounds of the Rarr: %d of %d" startIndex len
+        elif endIndex >= len then            IndexOutOfRangeException.Raise  "Rarr.foldSub: The ending index is outside the bounds of the Rarr: %d of %d" endIndex len
         let folder = FSharpFunc<_,_,_>.Adapt folder
         // Fold over the specified range of items.
         let mutable state = state
@@ -1064,15 +1050,11 @@ module Rarr =
 
     /// <summary>foldBackSub</summary>
     let inline foldBackSub folder (rarr : Rarr<'T>) startIndex endIndex (state : 'State) : 'State =        
-        if startIndex < 0 then
-            IndexOutOfRangeException.Raise "The starting index cannot be negative. but is %d" startIndex
-        elif endIndex > 0 then
-            IndexOutOfRangeException.Raise "The ending index cannot be negative. but is %d" endIndex    
-        let len = length rarr
-        if startIndex >= len then
-            IndexOutOfRangeException.Raise  "The starting index is outside the bounds of the Rarr: %d of %d" startIndex len
-        elif endIndex >= len then
-            IndexOutOfRangeException.Raise  "The ending index is outside the bounds of the Rarr: %d of %d" endIndex len
+        if startIndex < 0 then       IndexOutOfRangeException.Raise "Rarr.foldBackSub: The starting index cannot be negative. but is %d" startIndex
+        elif endIndex > 0 then       IndexOutOfRangeException.Raise "Rarr.foldBackSub: The ending index cannot be negative. but is %d" endIndex    
+        let len = rarr.Count
+        if startIndex >= len then    IndexOutOfRangeException.Raise  "Rarr.foldBackSub: The starting index is outside the bounds of the Rarr: %d of %d" startIndex len
+        elif endIndex >= len then    IndexOutOfRangeException.Raise  "Rarr.foldBackSub: The ending index is outside the bounds of the Rarr: %d of %d" endIndex len
         let folder = FSharpFunc<_,_,_>.Adapt folder
         // Fold over the specified range of items.
         let mutable state = state
@@ -1095,8 +1077,7 @@ module Rarr =
     /// </summary>
     let inline foldBack2 folder (rarr1 : Rarr<'T1>) (rarr2 : Rarr<'T2>) (state : 'State) : 'State =
         let len = length rarr1
-        if len <> length rarr2 then
-            ArgumentException.RaiseBase "Rarr.foldBack2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count 
+        if len <> length rarr2 then    ArgumentException.RaiseBase "Rarr.foldBack2: The Rarrs have different lengths. %d and %d" rarr1.Count rarr2.Count 
         let folder = FSharpFunc<_,_,_,_>.Adapt folder
         let mutable state = state
         for i = len - 1 downto 0 do
@@ -1109,10 +1090,8 @@ module Rarr =
     /// then computes <c>f (... (f i0 i1)...) iN</c>.
     /// Raises <c>ArgumentException</c> if the Rarr is empty.</summary> 
     let inline reduce (reduction : 'T -> 'T -> 'T) (rarr : Rarr<'T>) =        
-        if isEmpty rarr then
-            invalidArg "rarr" "The Rarr is empty."
+        if isEmpty rarr then ArgumentException.RaiseBase "Rarr.reduce: The given Rarr is empty"
         let reduction = FSharpFunc<_,_,_>.Adapt reduction
-
         let mutable state = rarr.List.[0]
         let count = rarr.Count
         for i = 1 to count - 1 do
@@ -1125,8 +1104,7 @@ module Rarr =
     /// computes <c>f i0 (...(f iN-1 iN))</c>.
     /// Raises <c>ArgumentException</c> if the Rarr has size zero.</summary>
     let inline reduceBack (reduction : 'T -> 'T -> 'T) (rarr : Rarr<'T>) : 'T =        
-        if isEmpty rarr then
-            invalidArg "rarr" "The Rarr is empty."
+        if isEmpty rarr then ArgumentException.RaiseBase "Rarr.reduceBack: The given Rarr is empty"
         let reduction = FSharpFunc<_,_,_>.Adapt reduction
         let count = rarr.Count
         let mutable state = rarr.List.[count - 1]
@@ -1136,15 +1114,11 @@ module Rarr =
 
     /// <summary>scanSub</summary>
     let inline scanSub folder (state : 'State) (rarr : Rarr<'T>) startIndex endIndex : Rarr<'State> =        
-        if startIndex < 0 then
-            IndexOutOfRangeException.Raise "The starting index cannot be negative. but is %d" startIndex
-        elif endIndex > 0 then
-            IndexOutOfRangeException.Raise "The ending index cannot be negative. but is %d" endIndex    
-        let len = length rarr
-        if startIndex >= len then
-            IndexOutOfRangeException.Raise  "The starting index is outside the bounds of the Rarr: %d of %d" startIndex len
-        elif endIndex >= len then
-            IndexOutOfRangeException.Raise  "The ending index is outside the bounds of the Rarr: %d of %d" endIndex len
+        if startIndex < 0 then       IndexOutOfRangeException.Raise "Rarr.scanSub: The starting index cannot be negative. but is %d" startIndex
+        elif endIndex > 0 then       IndexOutOfRangeException.Raise "Rarr.scanSub: The ending index cannot be negative. but is %d" endIndex    
+        let len = rarr.Count
+        if startIndex >= len then    IndexOutOfRangeException.Raise  "Rarr.scanSub: The starting index is outside the bounds of the Rarr: %d of %d" startIndex len
+        elif endIndex >= len then    IndexOutOfRangeException.Raise  "Rarr.scanSub: The ending index is outside the bounds of the Rarr: %d of %d" endIndex len
         let folder = FSharpFunc<_,_,_>.Adapt folder
         // Holds the initial and intermediate state values.
         let results = Rarr (endIndex - startIndex + 2)
@@ -1158,19 +1132,15 @@ module Rarr =
 
     /// <summary> Like <c>fold</c>, but return the intermediary and final results. </summary>
     let inline scan folder (state : 'State) (rarr : Rarr<'T>) : Rarr<'State> =        
-        scanSub folder state rarr 0 (length rarr - 1)
+        scanSub folder state rarr 0 (rarr.Count - 1)
 
     /// <summary>scanBackSub</summary>
     let inline scanBackSub folder (rarr : Rarr<'T>) startIndex endIndex (state : 'State) : Rarr<'State> =        
-        if startIndex < 0 then
-            IndexOutOfRangeException.Raise "The starting index cannot be negative. but is %d" startIndex
-        elif endIndex > 0 then
-            IndexOutOfRangeException.Raise "The ending index cannot be negative. but is %d" endIndex    
-        let len = length rarr
-        if startIndex >= len then
-            IndexOutOfRangeException.Raise  "The starting index is outside the bounds of the Rarr: %d of %d" startIndex len
-        elif endIndex >= len then
-            IndexOutOfRangeException.Raise  "The ending index is outside the bounds of the Rarr: %d of %d" endIndex len
+        if startIndex < 0 then            IndexOutOfRangeException.Raise "Rarr.scanBackSub: The starting index cannot be negative. but is %d" startIndex
+        elif endIndex > 0 then            IndexOutOfRangeException.Raise "Rarr.scanBackSub: The ending index cannot be negative. but is %d" endIndex    
+        let len = rarr.Count
+        if startIndex >= len then            IndexOutOfRangeException.Raise  "Rarr.scanBackSub: The starting index is outside the bounds of the Rarr: %d of %d" startIndex len
+        elif endIndex >= len then            IndexOutOfRangeException.Raise  "Rarr.scanBackSub: The ending index is outside the bounds of the Rarr: %d of %d" endIndex len
         let folder = FSharpFunc<_,_,_>.Adapt folder
         // Holds the initial and intermediate state values.
         let results = Rarr (endIndex - startIndex + 2)
@@ -1184,7 +1154,7 @@ module Rarr =
 
     /// <summary> Like <c>foldBack</c>, but return both the intermediary and final results. </summary>
     let inline scanBack folder (rarr : Rarr<'T>) (state : 'State) : Rarr<'State> =        
-        scanBackSub folder rarr 0 (length rarr - 1) state
+        scanBackSub folder rarr 0 (rarr.Count - 1) state
 
     /// <summary>
     /// Split the collection into two collections, containing the elements for which
@@ -1192,7 +1162,7 @@ module Rarr =
     let inline partition predicate (rarr : Rarr<'T>) : Rarr<'T> * Rarr<'T> =        
         let trueResults = Rarr ()
         let falseResults = Rarr ()
-        let len = length rarr
+        let len = rarr.Count
         for i = 0 to len - 1 do
             let el = rarr.List.[i]
             if predicate el then
@@ -1208,7 +1178,7 @@ module Rarr =
     let inline mapPartition partitioner (rarr : Rarr<'T>) : Rarr<'U1> * Rarr<'U2> =        
         let results1 = Rarr ()
         let results2 = Rarr ()
-        let len = length rarr
+        let len = rarr.Count
         for i = 0 to len - 1 do
             match partitioner rarr.List.[i] with
             | Choice1Of2 value ->
