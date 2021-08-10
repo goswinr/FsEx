@@ -228,7 +228,10 @@ type Rarr<'T> private (xs:List<'T>) =
     /// Creates a shallow copy of the list
     // (for a FsEx.Rarr of structs this is like a deep copy)
     member _.Clone() = new Rarr<'T>(xs.GetRange(0,xs.Count)) // fastest way to create a shallow copy
-        
+    
+    /// To support F# indexing from back: ^0 is last item, ^1 is second last
+    member _.GetReverseIndex( _ , offset: int) =
+        xs.Count - offset
     
     /// Defines F# slicing notation operator use including negative indices. ( -1 is last item, like Python)
     /// The resulting FsEx.Rarr includes the end index.
@@ -269,13 +272,13 @@ type Rarr<'T> private (xs:List<'T>) =
         new Rarr<'T>(xs.GetRange(stIdx,enIdx - stIdx + 1))                
         
   
-    /// LikeFsEx.Rarr.filter but modifying theFsEx.Rarr in place.
-    /// Removes Items formFsEx.Rarr if predicate returns true.
-    member _.Filter (predicate: 'T -> bool) :unit =
-        for i = xs.Count - 1 downto 0 do // reverse order important
-            if predicate xs.[i] then 
-                xs.RemoveAt(i)
-        
+    // LikeFsEx.Rarr.filter but modifying theFsEx.Rarr in place.
+    // Removes Items formFsEx.Rarr if predicate returns true.
+    //member _.FilterInPlace (predicate: 'T -> bool) :unit =
+    //    for i = xs.Count - 1 downto 0 do // reverse order, important
+    //        if predicate xs.[i] then 
+    //            xs.RemoveAt(i)
+       
 
     /// calls .ToString() on the underlaying Collections.Generic.List<'T> 
     override _.ToString() = 
@@ -284,21 +287,59 @@ type Rarr<'T> private (xs:List<'T>) =
 
     /// A property like the ToString() method, 
     /// But with richer formationg for collections
-    member  this.ToNiceString = NiceString.toNiceString this
+    member  this.ToNiceString = 
+        NiceString.toNiceString this
 
+    (* 
+    https://docs.microsoft.com/en-us/dotnet/fsharp/whats-new/fsharp-50#preview-reverse-indexes
+    open System
+    
+    type Span<'T> with
+        member sp.GetSlice(startIdx, endIdx) =
+            let s = defaultArg startIdx 0
+            let e = defaultArg endIdx sp.Length
+            sp.Slice(s, e - s)
+    
+        member sp.GetReverseIndex(_, offset: int) =
+            sp.Length - offset
+    
+    let printSpan (sp: Span<int>) =
+        let arr = sp.ToArray()
+        printfn $"{arr}"
+    
+    let run () =
+        let sp = [| 1; 2; 3; 4; 5 |].AsSpan()
+    
+        // Pre-# 5.0 slicing on a Span<'T>
+        printSpan sp.[0..] // [|1; 2; 3; 4; 5|]
+        printSpan sp.[..3] // [|1; 2; 3|]
+        printSpan sp.[1..3] // |2; 3|]
+    
+        // Same slices, but only using from-the-end index
+        printSpan sp.[..^0] // [|1; 2; 3; 4; 5|]
+        printSpan sp.[..^2] // [|1; 2; 3|]
+        printSpan sp.[^4..^2] // [|2; 3|]
+    
+    run() // Prints the same thing twice
+    *)
+
+    // TODO add structural equality to Rarr like in list and 'T[]
+
+    // TODO test F# style negative indices
 
     //--------------------------------------------------------------------------------------------------------------------------
     //---------------------------- member of  System.Collections.Generic.List --------------------------------------------------
     //-------------------------https://referencesource.microsoft.com/#mscorlib/system/collections/generic/list.cs---------------
     
 
+
     /// Sets or Gets the element at the given index. With nice error messages on bad indices.
     member this.Item // overriding this is the main purpose off all of this class
         with get index  = 
-            if index >= xs.Count then ArgumentOutOfRangeException.Raise "Failed to get rarr.[%d] from FsEx.Rarr of %d items:\r\n%s" index xs.Count (NiceString.toNiceStringFull this)
+            if index >= xs.Count then IndexOutOfRangeException.Raise "Failed to get rarr.[%d] from FsEx.Rarr of %d items:\r\n%s" index xs.Count (NiceString.toNiceStringFull this)
             xs.[index]
         and  set index value = 
-            if index >= xs.Count then ArgumentOutOfRangeException.Raise "Failed to set rarr.[%d] <- %A in FsEx.Rarr of %d items:\r\n%s " index value xs.Count (NiceString.toNiceStringFull this)
+            if index >= xs.Count then IndexOutOfRangeException.Raise "Failed to set rarr.[%d] <- %A in FsEx.Rarr of %d items:\r\n%s " index value xs.Count (NiceString.toNiceStringFull this)
             xs.[index] <- value
     
     /// Gets and sets the capacity of this list.  The capacity is the size of
