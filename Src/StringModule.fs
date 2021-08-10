@@ -213,14 +213,14 @@ module String =
     let (*inline*) up1 (txt:string)  = 
         if isNull txt then FsExStringException.Raise "String.up1: string is null" 
         if txt="" || Char.IsUpper txt.[0] then txt 
-        elif Char.IsLetter txt.[0] then  Char.ToUpper(txt.[0]).ToString() + txt.Substring(1) 
+        elif Char.IsLetter txt.[0] then  String(Char.ToUpper(txt.[0]),1) + txt.Substring(1) 
         else txt
     
     /// Makes First letter of string to Lowercase if possible.
     let (*inline*) low1 (txt:string) = 
         if isNull txt then FsExStringException.Raise "String.low11: string is null" 
         if txt="" || Char.IsLower txt.[0] then txt 
-        elif Char.IsLetter txt.[0] then  Char.ToLower(txt.[0]).ToString() + txt.Substring(1) 
+        elif Char.IsLetter txt.[0] then  String(Char.ToLower(txt.[0]),1) + txt.Substring(1) 
         else txt
     
     /// Allows for negative indices too. -1 is last character
