@@ -8,8 +8,8 @@ open System.Runtime.CompilerServices
 [<AutoOpen>] // so that extension become availale on opening FsEx
 module ExtensionsBclStructs =      
     
-    let internal deDE = Globalization.CultureInfo("de-DE")
-    let internal invC = Globalization.CultureInfo.InvariantCulture
+    let private deDE = Globalization.CultureInfo("de-DE")
+    let private invC = Globalization.CultureInfo.InvariantCulture
 
  
     type Int32 with  
@@ -25,8 +25,59 @@ module ExtensionsBclStructs =
         [<Extension>] member inline x.AsString = x.ToString()
         
         /// With thousands separators
-        [<Extension>] member x.ToNiceString = NiceFormat.int x         
+        [<Extension>] member x.ToNiceString = NiceFormat.int x 
 
+        
+        /// Converts an Int32 to a string of 32 characters of '█' and '-'.
+        [<Extension>] 
+        member x.AsBinaryString: string =  
+            // or System.Convert.ToString (n,2)
+            let b = Array.zeroCreate 32
+            let mutable pos = 31
+            let mutable i = 0
+            while i < 32 do  
+                if ((x &&& (1 <<< i)) <> 0) then  b.[pos] <- '█'               
+                else                              b.[pos] <- '-'                
+                pos <- pos - 1
+                i   <- i + 1        
+            (* // testing :
+            for i = 0 to 100 do
+                //printfn "%08d: %s" i <| asBinaryString i
+                //printfn "%08d: %s" i <| asBinaryString -i
+                printfn "%08d: %s" i <| asBinaryString (i <<< 16)
+                printfn "%08d: %s" i <| asBinaryString (-i <<< 16)                
+                *)
+            new System.String(b)
+
+ 
+    type Int64 with  
+        
+        /// Calls float(x)
+        [<Extension>] member inline x.ToFloat = float(x)
+        
+        /// Calls byte(x)
+        [<Extension>] member inline x.ToByte = byte(x)
+        
+        /// Same as i.ToString() but as propertry, not method.
+        /// So without the need for the brackets. (for nicer inlining)
+        [<Extension>] member inline x.AsString = x.ToString()
+        
+        /// With thousands separators
+        [<Extension>] member x.ToNiceString = NiceFormat.int64 x 
+
+        /// Converts an Int64 to a string of 64 characters of '█' and '-'.
+        [<Extension>] 
+        member x.AsBinaryString: string =  
+            // or System.Convert.ToString (n,2)
+            let b = Array.zeroCreate 64
+            let mutable pos = 63
+            let mutable i = 0
+            while i < 64 do  
+                if ((x &&& (1L <<< i)) <> 0L) then  b.[pos] <- '█'                
+                else                                b.[pos] <- '-'                
+                pos <- pos - 1
+                i   <- i + 1 
+            new System.String(b)
  
     type Byte with  
 
@@ -57,7 +108,7 @@ module ExtensionsBclStructs =
         /// but with German culture using comma (,) as decimal separator
         /// with automatic formating to never use scientific notation
         /// will have maximum 15 decimal places
-        /// f.ToString( "0.###############" , InvariantCulture )
+        /// f.ToString( "0.###############" , CultureInfo("de-DE") )
         [<Extension>] member x.AsStringDE = x.ToString( "0.###############",deDE)   
 
         /// Format without digits behind coma
@@ -85,7 +136,7 @@ module ExtensionsBclStructs =
         /// but with German culture using comma (,) as decimal separator
         /// with automatic formating to never use scientific notation
         /// will have maximum 7 decimal places
-        /// f.ToString( "0.###############" , InvariantCulture)
+        /// f.ToString( "0.###############" , CultureInfo("de-DE"))
         [<Extension>] member x.AsStringDE = x.ToString( "0.#######" , deDE)
     
         /// Format without digits behind coma
@@ -117,7 +168,7 @@ module ExtensionsBclStructs =
         /// but with German culture using comma (,) as decimal separator
         /// with automatic formating to never use scientific notation
         /// will have maximum 15 decimal places
-        /// f.ToString( "0.###############" , de-DE)
+        /// f.ToString( "0.###############" , CultureInfo("de-DE"))
         [<Extension>] member x.AsStringDE = x.ToString( "0.###############" , deDE)
 
         /// Format without digits behind coma
@@ -132,18 +183,18 @@ module ExtensionsBclStructs =
     type DateTime with
         
         /// Current local date as yyyy-MM-dd
-        [<Extension>]static member todayStr =    DateTime.Now.ToString("yyyy-MM-dd")
+        [<Extension>]static member todayStr =    let n= DateTime.Now in n.ToString("yyyy-MM-dd")
         
         /// Current local date and time as yyyy-MM-dd_HH-mm
-        [<Extension>]static member nowStr =      DateTime.Now.ToString("yyyy-MM-dd_HH-mm")
+        [<Extension>]static member nowStr =      let n= DateTime.Now in n.ToString("yyyy-MM-dd_HH-mm")
         
         /// Current UTC date and time as yyyy-MM-dd_HH-mm_UTC
         /// (with _UTC suffix)
-        [<Extension>]static member nowStrUtc =   DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm_UTC")
+        [<Extension>]static member nowStrUtc =   let n= DateTime.UtcNow in n.ToString("yyyy-MM-dd_HH-mm_UTC")
         
         /// Current UTC date and time as yyyy-MM-dd_HH-mm-fff
         /// (inludes 3 digits of miliseconds)
-        [<Extension>]static member nowStrLong =   DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss-fff")
+        [<Extension>]static member nowStrLong =  let n= DateTime.UtcNow in n.ToString("yyyy-MM-dd_HH-mm-ss-fff")
         
         /// Formats with .ToString("yyyy-MM-dd_HH-mm-ss-fff")
         /// (inludes 3 digits of miliseconds)

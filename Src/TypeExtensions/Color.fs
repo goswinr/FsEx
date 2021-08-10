@@ -27,10 +27,14 @@ module AutoOpenExtensionsColor =
 module Color =
     open FsEx.CompareOperators
 
-    let private Rand = new Random(int <| DateTime.Now.TimeOfDay.TotalMilliseconds * 0.00129547) // random seed different than other modules
+    let private Rand = 
+        let now = DateTime.Now
+        let seed = now.TimeOfDay
+        new Random(int <| seed.TotalMilliseconds * 0.001295473) // random seed different than other modules
     
     /// Compares two colors only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor
-    let isEqualARGB (this:Color) (other:Color) = this.EqualsARGB(other)
+    let isEqualARGB (this:Color) (other:Color) = 
+        this.EqualsARGB(other)
 
     /// Given Hue,Saturation,Luminance in range of 0.0 to 1.0, returns a Drawing.Color 
     let fromHSL (H,S,L) = 
@@ -61,7 +65,7 @@ module Color =
                     | 3 -> m,   mid2,    v
                     | 4 -> mid1,   m,    v
                     | 5 -> v,      m, mid2
-                    | x -> failwithf "FsEx.Color.fromHSL: Error in HLS Transform, sextant is %A at HSL %A" x (H,S,L)
+                    | x -> ArgumentException.RaiseBase "FsEx.Color.fromHSL: Error in internal HLS Transform, sextant is %A at HSL %A" x (H,S,L)
             else
                 L,L,L // default to gray value
 
@@ -78,19 +82,21 @@ module Color =
         fromHSL (v,1.0,0.5)
 
     /// Given a Drawing.Color , returns Hue,Saturation,Luminance in range of 0.0 to 1.0
-    let HSLfromColor (color:Color) = color.GetHue()/360.0f |> float, 
-                                     color.GetSaturation() |> float, 
-                                     color.GetBrightness() |> float
+    let HSLfromColor (color:Color) = 
+            color.GetHue()/360.0f |> float, 
+            color.GetSaturation() |> float, 
+            color.GetBrightness() |> float
     
     /// Generates a Random color 
-    let random() =  Color.FromArgb (Rand.Next(0,256), Rand.Next(0,256), Rand.Next(0,256))    
+    let random() =  
+        Color.FromArgb (Rand.Next(0,256), Rand.Next(0,256), Rand.Next(0,256))    
     
     /// Generates a Random color with high saturation probability, exluding yellow colors
     /// These are ideal for layer color in Rhino3d CAD app
     let rec randomForRhino () =
         let hue = Rand.NextDouble()       
-        let sat = UtilMath.randomStandardDeviation 1.0 0.3  |> (fun x -> if x > 1. then 2.-x else x ) |>  UtilMath.clamp 0.1 1.0 
-        let lum = UtilMath.randomStandardDeviation 0.5 0.1                                            |>  UtilMath.clamp 0.2 0.8 // to avoid total white (1.0) or black (0.0)
+        let sat = UtilMath.randomStandardDeviation (1.0, 0.3)  |> (fun x -> if x > 1. then 2.-x else x ) |>  UtilMath.clamp 0.1 1.0 
+        let lum = UtilMath.randomStandardDeviation (0.5, 0.1)                                            |>  UtilMath.clamp 0.2 0.8 // to avoid total white (1.0) or black (0.0)
         if     hue < 0.19 && hue > 0.12 // to avoid a color close to yellow
             && sat > 0.8  && lum > 0.3 
             && lum < 0.7  then 

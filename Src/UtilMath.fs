@@ -3,16 +3,65 @@
 open System
 open System.Globalization
 
+/// A struct of two floats representing start and end of a range
+//[<Struct>]
+//type Range = {
+//         start:float
+//         ende :float
+//         }
 
 /// Math Utils.
 /// When opened ths module shadows the built in trigonometric asin and acos function to include clamping if values are slightly above -1.0 or 1.0
 module UtilMath =
     
+    /// Test is a floating point number (with Measure)  is NaN (Not a Number) or Infinity
+    let inline isNanOrInf (f:float<'T>) = Double.IsInfinity (float f) || Double.IsNaN (float f)
+    
+    /// Test is a floating point number (with Measure)  is NaN (Not a Number)
+    let inline isNan (f:float<'T>) = Double.IsNaN (float f)
+    
+
+    /// To make sure a value is within a given range
+    /// minVal -> maxVal -> x -> clamped value.  
+    let inline clamp (minVal:'T) (maxVal:'T) (x:'T) = 
+        if maxVal < minVal then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.clamp: max value %g must be bigger than min %g" maxVal minVal
+        if x > maxVal then maxVal elif x < minVal then minVal else x
+
+    /// Shadows the built in 'acos' (Invers Cosine) function to include clamping if values are slightly above -1.0 or 1.0
+    /// Tolerance: 0.00001 
+    /// This is useful on dot products from unit vectors
+    /// Returns angel in Radians
+    let inline acos (x:float) =
+        if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.acos: given input is NaN or Infinity."
+        if x < -1.00001 then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.acos failed on %f , input must be between -1.00001 and +1.00001" x
+        if x >  1.00001  then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.acos failed on %f , input must be between -1.00001 and +1.00001" x
+        else x |> clamp -1.0 1.0 |> System.Math.Acos
+
+    /// Shadows the built in 'asin' (Invers Sine) function to include clamping if values are slightly above -1.0 or 1.0
+    /// Tolerance: 0.00001 
+    /// Returns angel in Radians
+    let inline asin (x:float) =
+        if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.asin: given input is NaN or Infinity."       
+        if x < -1.00001 then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.asin failed on %f , input must be between -1.00001 and +1.00001" x
+        if x >  1.00001 then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.asin failed on %f , input must be between -1.00001 and +1.00001" x
+        else x |> clamp -1.0 1.0 |> System.Math.Asin
+
+    /// Converts Angels from Degrees to Radians
+    let inline toRadians (degrees:float<'T>) = 
+        if isNanOrInf degrees then raise <| ArgumentException "FsEx.UtilMath.toRadians: given input is NaN or Infinity."
+        0.0174532925199433 * degrees // 0.0174532925199433 = Math.PI / 180. 
+
+    /// Converts Angels from Radians to Degrees
+    let inline toDegrees (radians:float<'T>) = 
+        if isNanOrInf radians then raise <| ArgumentException "FsEx.UtilMath.toDegrees: given input is NaN or Infinity."
+        57.2957795130823 * radians // 57.2957795130823 = 180. / Math.PI
+
+
     /// American Englisch culture (used for float parsing)
-    let enUs = CultureInfo.GetCultureInfo("en-us")
+    let private enUs = CultureInfo.GetCultureInfo("en-US")
     
     /// German culture (used for float parsing)
-    let deAt = CultureInfo.GetCultureInfo("de-at")
+    let private deAt = CultureInfo.GetCultureInfo("de-DE")  
     
     /// First tries to parses float with En-Us CultureInfo (period as decimal separator),
     /// if this fails tries to parse parses float with De-At CultureInfo (comma as decimal separator)
@@ -22,14 +71,13 @@ module UtilMath =
         | _ ->  match Double.TryParse(x, NumberStyles.Any, deAt) with
                 | true, f -> Some f
                 | _ -> None
-    
+
     /// First tries to parses float with En-Us CultureInfo (period as decimal separator),
     /// if this fails tries to parse parses float with De-At CultureInfo (comma as decimal separator)
     let parseFloatEnDe (x:string) : float =
         match tryParseFloatEnDe x  with
         | Some f -> f
         | None ->   ArgumentException.RaiseBase "FsEx.UtilMath.parseFloatEnDe Could not parse '%s' into a floating point number using Englisch or German culture settings" x    
-
 
     /// A very tolerant custom float parser
     /// ignores all non numeric characters ( expect leading '-' )
@@ -45,155 +93,156 @@ module UtilMath =
         match Double.TryParse(sb.ToString(), NumberStyles.Float, enUs) with
         | true, f -> Some f
         | _ ->   None 
-
     
-   
-    /// Test is a floating point value is Infinity or Not a Number
-    let inline isNanOrInf f = Double.IsInfinity f || Double.IsNaN f
-    
-    /// To make sure a value is within a given range
-    /// min -> max -> value -> clamped value.  
-    let inline clamp min max value = 
-        if max < min then failwithf "clamp: max value %g must be bigger than min %g" max min
-        if value > max then max elif value < min then min else value
 
-    /// To make sure a value is between 0.0 and 1.0 range    
-    let inline clamp01 (value:float<'T>)  =         
-        if   value > 1.0<_> then 1.0<_> 
-        elif value < 0.0<_> then 0.0<_> 
+   /// To make sure a value is between 0.0 and 1.0 range    
+    let inline clamp01 (value:'T)  = 
+        // if isNan value then ArgumentException.RaiseBase "FsEx.UtilMath.clamp01: given input is NaN."
+        if   value > LanguagePrimitives.GenericOne< ^T>  then LanguagePrimitives.GenericOne< ^T>
+        elif value < LanguagePrimitives.GenericZero< ^T> then LanguagePrimitives.GenericZero< ^T> 
         else value
 
+        
     /// Checks if a number is between or on a lower and upper bound value . 
     /// x >= minVal && x <= maxVal
-    let inline isInRange (minVal:'T) (maxVal:'T) (x:'T) = 
+    let inline isInRange (minVal:'T) (maxVal:'T) (x:'T) =         
         x >= minVal && x <= maxVal
 
     /// Checks if a number is bigger or smaller than a lower and upper bound value . 
     /// x < minVal || x > maxVal
     let inline isNotInRange (minVal:'T) (maxVal:'T) (x:'T)  = 
         x < minVal || x > maxVal
-
-      
+    
     /// Compares two numbers within a relative tolerance for equality. 
     /// The comparing tolerance is calculated as:  
     /// let mi = min (abs a) (abs b)
     /// abs(a-b) < relativeTolerance * mi
-    let inline equalsWithRelativeTolerance (relativeTolerance:float) (valueA:float<'T>) (valueB:float<'T>)  = 
+    let inline equalsWithRelativeTolerance (relativeTolerance:'T) (valueA:'T) (valueB:'T)  =
+        //if isNanOrInf valueA then raise <| ArgumentException("FsEx.UtilMath.equalsWithRelativeTolerance: given valueA is NaN or Infinity") // dont do this, keep it generic
+        //if isNanOrInf valueB then raise <| ArgumentException("FsEx.UtilMath.equalsWithRelativeTolerance: given valueB is NaN or Infinity")
         let mi = min (abs valueA) (abs valueB)
         abs(valueA - valueB) < relativeTolerance * mi
     
     /// Compares two numbers to be within a tolerance for equality
     /// abs(a-b) < absoluteTolerance
-    let inline equalsWithTolerance (absoluteTolerance:float<'T>) (valueA:float<'T>) (valueB:float<'T>)  = 
-        abs(valueA - valueB) < absoluteTolerance
+    let inline equalsWithTolerance (absoluteTolerance:'T) (valueA:'T) (valueB:'T)  = 
+        //if isNanOrInf valueA then raise <| ArgumentException("FsEx.UtilMath.equalsWithTolerance: given valueA is NaN or Infinity") // dont do this, keep it generic
+        //if isNanOrInf valueB then raise <| ArgumentException("FsEx.UtilMath.equalsWithTolerance: given valueB is NaN or Infinity")
+        abs(valueA - valueB) < absoluteTolerance    
+
     
-    /// Shadows the built in 'acos' (Invers Cosine) function to include clamping if values are slightly above -1.0 or 1.0
-    /// Tolerance: 0.00001 
-    /// This is useful on dot products from unit vectors
-    /// Returns angel in Radians
-    let acos x =
-        if x < -1.00001 then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.acos failed on %f , input must be between -1.00001 and +1.00001" x
-        if x >  1.00001 then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.acos failed on %f , input must be between -1.00001 and +1.00001" x
-        else x |> clamp -1.0 1.0 |> System.Math.Acos
-
-    /// Shadows the built in 'asin' (Invers Sine) function to include clamping if values are slightly above -1.0 or 1.0
-    /// Tolerance: 0.00001 
-    /// Returns angel in Radians
-    let asin x =
-        if x < -1.00001 then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.asin failed on %f , input must be between -1.00001 and +1.00001" x
-        if x >  1.00001 then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.asin failed on %f , input must be between -1.00001 and +1.00001" x
-        else x |> clamp -1.0 1.0 |> System.Math.Asin
-
-    /// Converts Angels from Degrees to Radians
-    let inline toRadians degrees = 0.0174532925199433 * degrees // 0.0174532925199433 = Math.PI / 180. 
-
-    /// Converts Angels from Radians to Degrees
-    let inline toDegrees radians = 57.2957795130823 * radians // 57.2957795130823 = 180. / Math.PI
-
-    /// start + ( (ende-start) * rel )
-    let inline interpolate (start:float<'T>)  (ende:float<'T>)  (rel:float) = 
-        start + ( (ende-start) * rel )
+    /// Interpolates between start and end value Generic numbers
+    /// works on any type that imlements  + , - and *
+    let inline interpolate (start)  (ende)  (rel) =          
+        //if isNanOrInf start then raise <| ArgumentException "FsEx.UtilMath.interpolate: given input for 'start' is NaN or Infinity." 
+        //if isNanOrInf ende  then raise <| ArgumentException "FsEx.UtilMath.interpolate: given input for 'ende' is NaN or Infinity." 
+        //if isNanOrInf rel   then raise <| ArgumentException "FsEx.UtilMath.interpolate: given input for 'rel' is NaN or Infinity." 
+        //start + ( (ende - start) * (float rel) )
+        start + ( (ende - start) * rel )
     
     /// multiplicative inverse or reciprocal:
     /// 1/x
-    let inline reciprocal (x:float<'T>) : float</'T> = 1. / x
+    let inline reciprocal (x:'T) : 'U = 
+        //if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is NaN or Infinity."  // dont do this, keep it generic
+        //let a = abs(x) // dont do this, keep it generic
+        //if a < 1e-16<_> then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is almost Zero, less than + or - 1e-16."  
+        //if a > 1e24<_>  then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is extremly large, more than + or - 1e24."  // dont do this, keep it generic
+        if x = LanguagePrimitives.GenericZero< ^T> then  raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is Zero" 
+        LanguagePrimitives.GenericOne< ^T> / x
 
     /// multiplicative inverse or reciprocal:
     /// 1/x
-    let inline inverse (x:float<'T>) : float</'T> = 1. / x
+    let inline inverse(x:'T) : 'U = 
+        //if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.inverse: given input is NaN or Infinity."  
+        //let a = abs(x) 
+        //if a < 1e-16<_> then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is almost Zero, less than + or - 1e-16."  
+        //if a > 1e24<_>  then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is extremly large, more than + or - 1e24." 
+        if x = LanguagePrimitives.GenericZero< ^T> then  raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is Zero" 
+        LanguagePrimitives.GenericOne< ^T> / x
 
     /// Given the min and max value and a test value,  (val-min) / (max-min)
-    /// Returns the relative  position  of the test value between min (= 0.0) and (max = 1.0),
+    /// Returns the relative  position of the test value between min (= 0.0) and (max = 1.0),
     /// can also be bigger than 1.0
-    let inline normalize rangeStart rangeStop valueAt =  (rangeStart-valueAt)/(rangeStart-rangeStop) // div 0 ?
+    let inline normalize (rangeStart:'T) (rangeStop:'T) (valueAt:'T) =  
+        //if isNanOrInf rangeStart then raise <| ArgumentException "FsEx.UtilMath.normalize: given input for 'rangeStart' is NaN or Infinity."
+        //if isNanOrInf rangeStop then raise <| ArgumentException "FsEx.UtilMath.normalize: given input for 'rangeStop' is NaN or Infinity." 
+        //if isNanOrInf valueAt then raise <| ArgumentException "FsEx.UtilMath.normalize: given input for 'valueAt' is NaN or Infinity."
+        let range = rangeStart-rangeStop        
+        //let a = abs(range) 
+        //if a < 1e-16<_> then raise <| ArgumentException "FsEx.UtilMath.normalize: rangeStart-rangeStop is almost Zero, less than + or - 1e-16."  
+        //if a > 1e24<_>  then raise <| ArgumentException "FsEx.UtilMath.normalize: rangeStart-rangeStop is extremly large, more than + or - 1e24." 
+        if range = LanguagePrimitives.GenericZero< ^T> then raise <| ArgumentException "FsEx.UtilMath.normalize: rangeStart-rangeStop is Zero" 
+        (rangeStart-valueAt)/range 
     
-    /// Rounds to the next biggest (away from zero) number on logaritmic scale.
+    /// Rounds to the next bigger (away from zero) number on logaritmic scale.
     /// Define scale by giving amount of steps(int) to double or half a value.
-    let roundUpToNextLogSteps (stepsToDouble:int) x =
-        if isNanOrInf x then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.roundUpToNextLogSteps failed on: %f" x
-        elif stepsToDouble < 0 then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.roundUpToNextLogSteps failed on: int stepsToDouble must be bigger than 0" 
-        elif x = 0.0 then 0.0
-        else
-            let logBase =  2. ** (1./float stepsToDouble) 
-            if x > 0.0 then   logBase ** (Math.Ceiling (Math.Log (    x, logBase)))
-            else            -(logBase ** (Math.Ceiling (Math.Log (abs x, logBase)))) // with negative sign, (log fails on negative numbers)
+    /// Fails if input is zero
+    let roundUpToNextLogSteps (stepsToDouble:int) (x:float<'T>) :float<'T> =
+        if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.roundUpToNextLogSteps: given input for 'rangeStart' is NaN or Infinity."
+        if stepsToDouble < 0 then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.roundUpToNextLogSteps failed on: int stepsToDouble must be bigger than 0"
+        let a = abs(float x) 
+        if a < 1e-24 then raise <| ArgumentException "FsEx.UtilMath.roundUpToNextLogSteps: input value is almost Zero, less than + or - 1e-24."        
+        
+        let logBase =  2. ** (1./float stepsToDouble) 
+        if x > 0.0<_> then    logBase ** (Math.Ceiling (Math.Log (    float  x , logBase))) |> LanguagePrimitives.FloatWithMeasure
+        else                -(logBase ** (Math.Ceiling (Math.Log (abs(float  x), logBase))))|> LanguagePrimitives.FloatWithMeasure // with negative sign, (log fails on negative numbers)
 
     /// Rounds to the next smaller (closer to zero) number on logaritmic scale
     /// Define scale by giving amount of steps(int) to double or half a value.
-    let roundDownToNextLogSteps (stepsToDouble:int) x =
-        if isNanOrInf x then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.roundDownToNextLogSteps failed on: %f" x
-        elif stepsToDouble < 0 then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.roundDownToNextLogSteps failed on: int stepsToDouble must be bigger than 0 but is %d" stepsToDouble 
-        elif x = 0.0 then 0.0
-        else
-            let logBase =  2. ** (1./float stepsToDouble) 
-            if x > 0.0 then   logBase ** (Math.Floor (Math.Log (    x, logBase)))
-            else            -(logBase ** (Math.Floor (Math.Log (abs x, logBase)))) // with negative sign, (log fails on negative numbers)
-    
-    /// Converts an Int32 to a string of 32 characters of '█' and '0'.
-    let asBinaryString (n:int) : string =  
-        // or System.Convert.ToString (n,2)
-        let b = Array.zeroCreate 32
-        let mutable pos = 31
-        let mutable i = 0
-        while i < 32 do  
-            if ((n &&& (1 <<< i)) <> 0) then  b.[pos] <- '█' //'1'                
-            else                              b.[pos] <- '0'                
-            pos <- pos - 1
-            i   <- i + 1        
-        (* // testing :
-        for i = 0 to 100 do
-            //printfn "%08d: %s" i <| asBinaryString i
-            //printfn "%08d: %s" i <| asBinaryString -i
-            printfn "%08d: %s" i <| asBinaryString (i <<< 16)
-            printfn "%08d: %s" i <| asBinaryString (-i <<< 16)
-            
-            *)
-        new System.String(b)
+    /// Fails if input is zero
+    let roundDownToNextLogSteps  (stepsToDouble:int) (x:float<'T>) :float<'T> =
+        if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.roundDownToNextLogSteps: given input for 'rangeStart' is NaN or Infinity."
+        if stepsToDouble < 0 then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.roundDownToNextLogSteps failed on: int stepsToDouble must be bigger than 0 but is %d" stepsToDouble 
+        let a = abs(float x) 
+        if a < 1e-24 then raise <| ArgumentException "FsEx.UtilMath.roundDownToNextLogSteps: input value is almost Zero, less than + or - 1e-24." 
+        
+        let logBase =  2. ** (1./float stepsToDouble) 
+        if x > 0.0<_> then   logBase ** (Math.Floor (Math.Log (    float  x , logBase)))  |> LanguagePrimitives.FloatWithMeasure
+        else               -(logBase ** (Math.Floor (Math.Log (abs(float  x), logBase)))) |> LanguagePrimitives.FloatWithMeasure// with negative sign, (log fails on negative numbers)
 
 
     /// Numeric Steping: Converts floats to ints, devides by precicion.
+    /// Like rounding floats to integers but with another step size than 1.0
     /// = int (v / prec)
-    let inline precInt (prec:float) (v:float) : int = int (v / prec)
+    let inline precInt (prec:float) (v:float) : int = 
+        if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.precInt: given input for 'v' is NaN or Infinity."
+        if isNanOrInf prec then raise <| ArgumentException "FsEx.UtilMath.precInt: given input for 'prec' is NaN or Infinity."        
+        if prec < 1e-16    then raise <| ArgumentException "FsEx.UtilMath.precInt: prec value is negative or almost Zero, less than +1e-16." 
+        int (v / prec)
     
     /// Numeric Steping:Converts floats to ints within defined integer step sizes. 
     /// Always rounding down like the int function
     /// = int (v / float prec) * prec
-    let inline stepedInt (prec:int) (v:float) : int = int (v / float prec) * prec
+    let inline stepedInt (prec:int) (v:float) : int = 
+        if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.stepedInt: given input for 'v' is NaN or Infinity."              
+        if prec < 1        then raise <| ArgumentException "FsEx.UtilMath.stepedInt: prec value is negative or Zero." 
+        int (v / float prec) * prec
     
     /// Numeric Steping:Converts floats to floats within defined float step sizes. 
     /// Always rounding down like the int function)
     /// = float (int (v / prec)) * prec
-    let inline stepedFloat (prec:float) (v:float) : float = float (int (v / prec)) * prec
+    let inline stepedFloat (prec:float) (v:float) : float = 
+        if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.stepedFloat: given input for 'v' is NaN or Infinity."
+        if isNanOrInf prec then raise <| ArgumentException "FsEx.UtilMath.stepedFloat: given input for 'prec' is NaN or Infinity."        
+        if prec < 1e-16    then raise <| ArgumentException "FsEx.UtilMath.stepedFloat: prec value is negative or almost Zero, less than +1e-16." 
+        float (int (v / prec)) * prec
 
     /// Numeric Steping:Converts floats to floats within defined float step sizes. 
     /// Always rounding mid point  like the round function)
     /// =  (round (v / prec)) * prec
-    let inline stepedFloatMid (prec:float) (v:float) : float = (round (v / prec)) * prec
+    let inline stepedFloatMid (prec:float) (v:float) : float = 
+        if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.stepedFloatMid: given input for 'v' is NaN or Infinity."
+        if isNanOrInf prec then raise <| ArgumentException "FsEx.UtilMath.stepedFloatMid: given input for 'prec' is NaN or Infinity."        
+        if prec < 1e-16    then raise <| ArgumentException "FsEx.UtilMath.stepedFloatMid: prec value is negative or almost Zero, less than +1e-16."         
+        (round (v / prec)) * prec
   
     /// This float range function ensures that the end is always included.
     /// The F# build in range fails for example on [0.0 .. 0.1 .. 0.2 ] , it equals [0.0 .. 0.1 .. 0.3 ]
     /// It increases the stop value by the smallest step possible 15 times, to ensure end value is included in returned seq.
     let floatRange (start:float<'T>, step:float<'T> , stop:float<'T>) : seq<float<'T>> =        
+        if isNanOrInf start then raise <| ArgumentException "FsEx.UtilMath.floatRange: given input for 'start' is NaN or Infinity."
+        if isNanOrInf stop then raise <| ArgumentException "FsEx.UtilMath.floatRange: given input for 'stop' is NaN or Infinity." 
+        if isNanOrInf step then raise <| ArgumentException "FsEx.UtilMath.floatRange: given input for 'step' is NaN or Infinity."
         if step = LanguagePrimitives.FloatWithMeasure<'T> 0.0 then  ArgumentOutOfRangeException.Raise "FsEx.UtilMath.floatRange:stepsize cannot be zero: start: %f step: %f stop: %f " start step stop
         let range = stop - start 
                     |> float
@@ -209,13 +258,15 @@ module UtilMath =
                     yield! frange (start, (i + 1.0 ), steps) }
         frange (start, 0.0 , steps)   
 
-    let internal rand = System.Random () 
+    let internal rand = System.Random() 
     /// Given mean and standardDeviation returns a random value from this Gaussian distribution
-    /// if mean is 0 and stDev is 1 then 99% of values are  are within -2.3 to +2.3 ; 70% within -1 to +1
-    let randomStandardDeviation mean standardDeviation =
-        let u1 = rand.NextDouble()
-        let u2 = rand.NextDouble()
+    /// if mean is 0 and stDev is 1 then 99% of values are are within -2.3 to +2.3 ; 70% within -1 to +1
+    let randomStandardDeviation (mean:float<'T> , standardDeviation:float<'U>) : float<'T> =
+        if isNanOrInf mean then raise <| ArgumentException "FsEx.UtilMath.randomStandardDeviation: given input for 'mean' is NaN or Infinity."
+        if isNanOrInf standardDeviation then raise <| ArgumentException "FsEx.UtilMath.randomStandardDeviation: given input for 'standardDeviation' is NaN or Infinity." 
+        let u1 = 1.0 - rand.NextDouble() // so that 0.0  < x <= 1.0 (never 0.0) see https://docs.microsoft.com/en-us/dotnet/api/system.random.nextdouble?view=netframework-4.7.2#remarks
+        let u2 = rand.NextDouble() 
         let randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2) //random normal(0, 1)
         //random normal(mean, stdDev^2)
-        mean + standardDeviation * randStdNormal    
+        mean + (float standardDeviation|> LanguagePrimitives.FloatWithMeasure)* randStdNormal    
 

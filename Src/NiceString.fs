@@ -6,12 +6,15 @@ open System.Globalization
 open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
 
+//TODO refactor to a large settings record , instead of gloabal values
+
 /// Exposes the settings used in toNiceString pretty printing function
 module NiceStringSettings = 
     
     /// |Head of string * seq<Lines>
     /// |Element of string
     /// |EarlyEnd // "this is just the string "..." or similar;  for not fully enumerated sequences 
+    [<NoComparison>]
     type Lines = 
         |Head of string * ResizeArray<Lines>
         |Element of string
@@ -27,6 +30,10 @@ module NiceStringSettings =
     /// Set this to change how how many items per seq are printed (printFull ignores this).
     /// default = 6
     let mutable maxItemsPerSeq = 6
+
+    /// Set this to change how how many items can be in one line before switching to vertical sequence.
+    /// default = 80
+    let mutable maxCharsPerLine = 80
 
     /// Set this to change how many characters of a string might be printed at onece.
     /// default = 2000
@@ -44,9 +51,17 @@ module NiceStringSettings =
         fun _ -> None   
 
     [<Struct>]
-    type NiceStringLength = {maxDepth:int ; maxItems:int}
+    type NicePrintSettings = {
+        /// maximum nesting depth
+        maxDepth:int
+        /// maximum items when printing vertically
+        maxVertItems:int
+        /// maximum total characters when printing horizontally
+        maxHorChars:int
+        }
 
-
+/// For formating simple types like int, float, very long strings for nice printing 
+/// Used by NiceString Module
 module NiceFormat  =  // used by Rhino.Scripting
     
     module private Literals = 
@@ -140,9 +155,14 @@ module NiceFormat  =  // used by Rhino.Scripting
 
     
     let int (x:int) = 
-        // because abs(Int32.MinValue) would fail !!
+        // because abs(Int32.MinValue)  fails !!
         if x = Int32.MinValue || abs (x) >= 1000 then x.ToString() |> addThousandSeparators 
         else                                          x.ToString()  
+
+    let int64 (x:int64) = 
+        // because abs(Int64.MinValue) fails ??
+        if x = Int64.MinValue || abs (x) >= 1000L then x.ToString() |> addThousandSeparators 
+        else                                           x.ToString()  
 
     /// Formating with automatic precision 
     /// e.g.: 0 digits behind comma if above 1000 
@@ -221,7 +241,8 @@ module NiceFormat  =  // used by Rhino.Scripting
     /// Else, if the input string is less than maxChars + 20, it is still returned in full (enclosed in double quotes ").
     /// also see String.truncatedFormated
     let truncateString (stringToTrim:string) =
-        if stringToTrim.Length <= NiceStringSettings.maxCharsInString + 20 then sprintf "\"%s\""stringToTrim
+        if isNull stringToTrim then "-null string-" // add too, just in case this gets called externally        
+        elif stringToTrim.Length <= NiceStringSettings.maxCharsInString + 20 then sprintf "\"%s\""stringToTrim
         else 
             let len   = stringToTrim.Length
             let st    = stringToTrim.Substring(0, maxCharsInString) 
@@ -259,35 +280,47 @@ module NiceFormat  =  // used by Rhino.Scripting
 module internal NiceStringImplementation  =
     open System.Collections.Generic 
     open Microsoft.FSharp.Reflection
-    open NiceStringSettings     
+    open NiceStringSettings    
+    
+    // TODO test alternative implementations:
+    // https://github.com/eiriktsarpalis/TypeShape/blob/main/samples/TypeShape.Samples/printer.fs
+    // https://eiriktsarpalis.wordpress.com/2016/08/05/typeshape-practical-generic-programming-in-f/
+    // and use :
+    // http://www.fssnip.net/cV/title/A-Generic-PrettyPrinter-for-Record-types 
 
     type SeqCount = Counted of int | More of int
  
     /// retruns if the returned list is trimmed to maxCount,  input has more elements then maxCount
-    let rec getItemsInSeq (nsl:NiceStringLength) depth (xs:Collections.IEnumerable) : ResizeArray<Lines>=  // non generic IEnumerable
+    let rec getItemsInSeq (nsl:NicePrintSettings) depth (xs:Collections.IEnumerable) : ResizeArray<Lines>=  // non generic IEnumerable
         let mutable reachedEnd = false
         let mutable k = 0
         let rs = ResizeArray<Lines>() 
         let enum = xs.GetEnumerator()
-        while enum.MoveNext() &&   k < nsl.maxDepth do 
-            rs.Add(getLines nsl depth (box enum.Current))
+        let mutable  chars = 15 // stat higher to be sure it will be rendered in one line 
+        while enum.MoveNext() &&  (k < nsl.maxVertItems || chars < nsl.maxHorChars) do 
+            let lns = getLines nsl depth (box enum.Current)
+            match lns with 
+            |Element s -> chars <- chars + s.Length
+            |EarlyEnd  -> chars <- chars + 4
+            |Head _    -> chars <- 9999 // to stop this line if k is alreadey more than nsl.maxVertItems via ( || chars < nsl.maxHorChars). dont do nested seq in one line !            
+            rs.Add(lns)
             k <- k+1
-        if k = nsl.maxItems && enum.MoveNext() then // don@iteret full seqence if only the first few items are printed
+        if enum.MoveNext() then // don@iteret full seqence if only the first few items are printed
             rs.Add( EarlyEnd)
         rs                                                 
   
 
-    and getCollection (nsl:NiceStringLength) depth (x:obj) (xs:Collections.ICollection) :Lines = // non generic ICollection
+    and getCollection (nsl:NicePrintSettings) depth (x:obj) (xs:Collections.ICollection) :Lines = // non generic ICollection
         // count is always available 
         let typ = xs.GetType()
-        let name =  NiceFormat.typeName   typ
+        let name =  NiceFormat.typeName typ
         let desc = 
             if xs.Count = 0 then sprintf "empty %s "  name 
             else                 sprintf "%s with %d items"  name xs.Count
         if depth = nsl.maxDepth then Element desc else Head (desc, getItemsInSeq nsl (depth+1) xs )
 
 
-    and getSeq (nsl:NiceStringLength) depth (x:obj) (xs:Collections.IEnumerable) :Lines = // non generic IEnumerable
+    and getSeq (nsl:NicePrintSettings) depth (x:obj) (xs:Collections.IEnumerable) :Lines = // non generic IEnumerable
         // count may not be available , sequences are not only iterated till NiceStringSettings.maxItemsPerSeq
         let typ = xs.GetType()
         let name =   NiceFormat.typeName   typ   
@@ -297,12 +330,11 @@ module internal NiceStringImplementation  =
             if ls.Count = 0 then                 sprintf "empty %s " name 
             elif ls.[ls.Count-1] = EarlyEnd then sprintf "%s with more than %d items" name  (ls.Count-1) 
             else                                 sprintf "%s with %d items" name  ls.Count
-        if depth = nsl.maxDepth then Element desc else Head (desc, ls )
-        
+        if depth = nsl.maxDepth then Element desc else Head (desc, ls )        
         
 
     ///  x is boxed already
-    and getLines  (nsl:NiceStringLength) (depth:int) (x:obj) : Lines =        
+    and getLines  (nsl:NicePrintSettings) (depth:int) (x:obj) : Lines =        
         match externalFormater x with // first check if externalFormater provides a string , this is used e.g. for types from RhinoCommon.dll
         | Some ln -> ln
         | None ->
@@ -313,7 +345,7 @@ module internal NiceStringImplementation  =
             | :? single     as v   -> v |> NiceFormat.single  |> Element 
             | :? decimal    as d   -> d |> NiceFormat.decimal |> Element 
             | :? Char       as c   -> c.ToString()            |> Element // "'" + c.ToString() + "'" // or add qotes?
-            | :? string     as s   -> if depth=0 && nsl.maxItems = Int32.MaxValue then s |> Element // dont truncate string if toplevel and printFull
+            | :? string     as s   -> if depth=0 && nsl.maxVertItems = Int32.MaxValue then s |> Element // dont truncate string if toplevel and printFull
                                       else  NiceFormat.truncateString s  |> Element   
             | :? Guid       as g   -> sprintf "Guid[%O]" g    |> Element 
             | :? Collections.ICollection as xs -> getCollection nsl depth x xs
@@ -345,8 +377,7 @@ module internal NiceStringImplementation  =
                     else
                         sprintf "%A" x |> Element
                 
-                // TODO use 
-                // http://www.fssnip.net/cV/title/A-Generic-PrettyPrinter-for-Record-types 
+               
         (*
         open Microsoft.FSharp.Quotations
         open Microsoft.FSharp.Quotations.DerivedPatterns
@@ -375,50 +406,93 @@ module internal NiceStringImplementation  =
             | _ -> failwith "toNiceStringRec: the UC pattern can only be used against simple union cases"
     
         *)
+    
+    let appendIfFitInOneLine (sb:Text.StringBuilder, nsl:NicePrintSettings, xs:ResizeArray<Lines>) =
+        let onlyElements = xs |> Seq.forall (function |Element _ | EarlyEnd -> true |Head _ -> false) // no sub lists
+        if onlyElements then 
+            // we only count the raw length  without head or separators
+            let len = Seq.fold (fun k e -> match e with | Element s -> k + s.Length | EarlyEnd -> k + 4 |Head _ -> eprintfn "**no Heads here ever3**";k ) 0 xs             
+            if len < nsl.maxHorChars  then // less than 120 chars joint 
+                sb.Append(": [ ")  |> ignoreObj 
+                for i=0 to xs.Count - 2 do 
+                    match xs.[i] with 
+                    |Element s -> sb.Append(s).Append("; ")  |> ignoreObj 
+                    |EarlyEnd -> eprintfn "**EarlyEnd second last?**" 
+                    |Head _   -> eprintfn "**no Heads here1**" 
+                match xs.[xs.Count - 1] with 
+                |Element s -> sb.Append(s).AppendLine(" ]")  |> ignoreObj 
+                |EarlyEnd -> sb.AppendLine("... ]")  |> ignoreObj
+                |Head _   -> eprintfn "**no Heads here2**" 
+                true
+            else                 
+                false
+        else 
+            false
 
-    let formatLines  (nsl:NiceStringLength) (lines:Lines) : string = 
-        match lines with
-        |Element s    -> s //without adding a new line at end
-        |EarlyEnd     -> eprintf "EarlyEnd schould not be at root of Lines tree" ; "..."
-        |Head (h0,xs0)  -> 
-            let sb = Text.StringBuilder(h0).AppendLine()             
-            let rec loop depth (lns:Lines) = 
-                if depth <= nsl.maxDepth then 
-                    match lns with
-                    |Element s    -> sb.Append(String(' ', 4 * depth)).AppendLine(s)        |> ignoreObj 
-                    |EarlyEnd     -> sb.Append(String(' ', 4 * depth)).AppendLine("(...)")  |> ignoreObj  
-                    |Head (h,xs)  ->                                  
-                                     // header:
-                                     sb.Append(String(' ', 4 * depth)).Append(h)     |> ignoreObj  
-                                     (if xs.Count=0 then sb.AppendLine() else sb.AppendLine(":"))  |> ignoreObj  // only add colon if items follow
-                                     // items
-                                     for x in xs do 
-                                        loop (depth+1) x
-            
-            for x0 in xs0 do 
-                loop (1) x0
-            
-            //finally trimm of line return at end
-            let len = sb.Length
-            if sb.Chars(len-2) = '\r' then 
-                sb.Remove(len-2 , 2) |> ignoreObj  
-            sb.ToString()
+    let formatLines  (nsl:NicePrintSettings) (lines:Lines) : string = 
+        let inde = 4 // indent size
+        let colonAfterNumber = ": "
+        let sb = Text.StringBuilder()           
+        let rec loop (pos:int) depth (lns:Lines) = 
+            if depth <= nsl.maxDepth then 
+                if depth > 0 then // add indent with number                        
+                    sb.Append(pos.ToString().PadLeft(inde*depth,' ')).Append(colonAfterNumber) |> ignoreObj 
+                
+                match lns with
+                |Element s    -> sb.AppendLine(s)       |> ignoreObj 
+                |EarlyEnd     -> sb.AppendLine("...")   |> ignoreObj  
+                |Head (h,xs)  ->                                  
+                    // header:                                      
+                    sb.Append(h) |> ignoreObj  
+                    // items:
+                    if xs.Count=0 then 
+                        sb.AppendLine()  |> ignoreObj // dont add colon, no items follow     
+                    elif appendIfFitInOneLine(sb,nsl, xs) then
+                        ()
+                    else // list items vertically
+                        sb.AppendLine(":")  |> ignoreObj  // only add colon if items follow                                        
+                        for i,x in Seq.indexed xs do  
+                            loop i (depth+1) x        
+        loop 0 0 lines
+        
+        //finally trimm of line return at end
+        let len = sb.Length
+        if sb.Chars(len-2) = '\r' then sb.Remove(len-2 , 2) |> ignoreObj 
+        let len = sb.Length
+        if sb.Chars(len-1) = '\n' then sb.Remove(len-1 , 1) |> ignoreObj //in case ther is no '\r'
+        sb.ToString()
+   
 
 module NiceString  =
     open NiceStringImplementation
     open NiceStringSettings
 
-    //TODO sync the docstring here with print and printfull in module Print and the shadowing one in Rhino.Scripting 
+    //TODO sync the docstring here with print and printfull in module Print and the shadowing one in Rhino.Scripting
 
-
-    /// Nice formating for numbers including thousand Separator and (nested) sequences, first five items are printed out.
+    /// Nice formating for numbers including thousand Separator and (nested) sequences, first six items are printed out.
     /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
     /// • thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
     /// • maxNestingDepth         = 3     ; set this to change how deep the content of nested seq is printed (printFull ignores this)
-    /// • maxNestingDepth         = 6     ; set this to change how how many items per seq are printed (printFull ignores this)
+    /// • maxItemsPerSeq          = 6     ; set this to change how how many items per seq are printed in vertical list(printFull ignores this)
     /// • maxCharsInString        = 2000  ; set this to change how many characters of a string might be printed at once.    
     let toNiceString (x:'T) :string = 
-        let nsl = {maxDepth = NiceStringSettings.maxNestingDepth ; maxItems = NiceStringSettings.maxItemsPerSeq} 
+        let nsl = {
+            maxDepth     = NiceStringSettings.maxNestingDepth
+            maxVertItems = NiceStringSettings.maxItemsPerSeq
+            maxHorChars  = NiceStringSettings.maxCharsPerLine } 
+        x |> box |> getLines nsl 0 |> formatLines nsl
+
+
+    /// Nice formating for numbers including thousand Separator and (nested) sequences, first 50 items are printed out.
+    /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
+    /// • thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
+    /// • maxNestingDepth         = 3     ; set this to change how deep the content of nested seq is printed (printFull ignores this)
+    /// • maxCharsInString        = 2000  ; set this to change how many characters of a string might be printed at once.    
+    let toNiceStringLong (x:'T) :string = 
+        let nsl = {
+            maxDepth     = NiceStringSettings.maxNestingDepth
+            maxVertItems = 50
+            maxHorChars  = NiceStringSettings.maxCharsPerLine } 
         x |> box |> getLines nsl 0 |> formatLines nsl
 
 
@@ -427,7 +501,10 @@ module NiceString  =
     /// • thousandSeparator       = '      ; set this to change the printing of floats and integers larger than 10'000   
     /// • maxCharsInString        = 2000   ; set this to change how many characters of a string might be printed at once. 
     let toNiceStringFull (x:'T) :string =         
-        let nsl = {maxDepth = Int32.MaxValue ; maxItems = Int32.MaxValue} 
+        let nsl = {
+            maxDepth     = 300
+            maxVertItems = Int32.MaxValue
+            maxHorChars  = NiceStringSettings.maxCharsPerLine } 
         x |> box |> getLines nsl 0 |> formatLines nsl
         
 

@@ -6,19 +6,25 @@
 [![FsEx on nuget.org](https://img.shields.io/nuget/v/FsEx)](https://www.nuget.org/packages/FsEx/)
 [![FsEx on fuget.org](https://www.fuget.org/packages/FsEx/badge.svg)](https://www.fuget.org/packages/FsEx)
 
-FsEx is an FSharp extension and utility library. 
+[![release](https://img.shields.io/github/release/goswinr/FsEx.svg)](https://github.com/goswinr/FsEx/releases) 
+![code size](https://img.shields.io/github/languages/code-size/goswinr/FsEx.svg) 
+[![license](https://img.shields.io/github/license/goswinr/FsEx)](LICENSE)
 
 ![Logo](https://raw.githubusercontent.com/goswinr/FsEx/main/Doc/logo.png)
 
+FsEx is an FSharp extension and utility library. 
 
 
-#### It Includes 
+### It Includes: 
 
-- A thin wrapper over the `ResizeArray` type called `Rarr`. It provides additional members and more detailed error messages when the List is used with out of bound indices.
-- A `Rarr` module that provides similar functions like the `Array` module from `FSharp.Core`
+- [A thin wrapper over the `ResizeArray` type called `Rarr`](https://www.fuget.org/packages/FsEx/0.5.1/lib/netstandard2.0/FsEx.dll/FsEx/Rarr%601). It provides structural equality ,additional members and more detailed error messages when the List is used with out of bound indices.
+- [A `Rarr` module](https://www.fuget.org/packages/FsEx/0.5.1/lib/netstandard2.0/FsEx.dll/FsEx/RarrModule) that provides all the functions for `Rarr` that the  `Array` module from `FSharp.Core` has. Including those for parallel computing.
 - A thin wrapper over the generic `Dictionary` type called `Dict`. It provides additional members and more detailed error messages when a given Key is not found.
-- An implementation of [defaultdict](https://docs.python.org/3/library/collections.html#collections.defaultdict) called `DefDict`, a dictionary that creates a key when its accessed but missing.
-- Useful extension members to existing collections like seq, array, dictionary.
-- Computaional Expressions vor building `Rarr`, `strings`, and CSV fles. Like they exist for `seq`, `list` and `array` in `FSharp.Core` 
+- An implementation of [defaultdict](https://docs.python.org/3/library/collections.html#collections.defaultdict) called `DefDict` , a dictionary that creates a key when its accessed but missing.
+- [A comprehensive module](https://www.fuget.org/packages/FsEx/0.5.1/lib/netstandard2.0/FsEx.dll/FsEx/StringModule) for working with `string`, including nice error messages.
+- Useful extension members to existing collections like seq, array, Dictionary, Stringbuilder.
+- Computational Expressions for building `Rarr`, `strings`, and CSV-files. Like they exist for `seq`, `list` and `array` in `FSharp.Core` 
 - pretty printing for collections
 - and more ..
+
+[See full API documentation on Fuget.org](https://www.fuget.org/packages/FsEx)

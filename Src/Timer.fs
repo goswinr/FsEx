@@ -31,8 +31,9 @@ type Timer() =
         sw.Start()
 
     let tocWithGC (sw:Diagnostics.Stopwatch) countGC = 
-        sw.Stop()        
-        let txt = sprintf "%s, %s" (formatMilliSeconds sw.Elapsed.TotalMilliseconds) (formatGCs countGC)
+        sw.Stop()   
+        let el = sw.Elapsed
+        let txt = sprintf "%s, %s" (formatMilliSeconds el.TotalMilliseconds) (formatGCs countGC)
         for i=0 to numGC do countGC.[i] <- GC.CollectionCount(i) // reset GC counter base
         sw.Reset() 
         sw.Start()
@@ -40,7 +41,8 @@ type Timer() =
 
     let tocNoGC (sw:Diagnostics.Stopwatch) = 
         sw.Stop()
-        let txt = formatMilliSeconds sw.Elapsed.TotalMilliseconds
+        let el = sw.Elapsed
+        let txt = formatMilliSeconds el.TotalMilliseconds
         sw.Reset() 
         GC.Collect()   
         GC.WaitForPendingFinalizers() 

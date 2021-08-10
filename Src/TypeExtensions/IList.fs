@@ -70,7 +70,7 @@ module ExtensionsIList =
         /// equal to this.Count - 1   
         [<Extension>]
         member inline this.LastIndex = 
-            if this.Count = 0 then failwithf "this.LastIndex: Failed to get LastIndex of empty IList"
+            if this.Count = 0 then IndexOutOfRangeException.Raise "this.LastIndex: Failed to get LastIndex of empty IList"
             this.Count - 1
 
         /// Get (or set) the last item in the IList.

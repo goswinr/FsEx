@@ -45,12 +45,12 @@ module AutoOpenExtensionsExceptions =
         /// Raise DirectoryNotFoundException with F# printf string formating
         [<Extension>] static member inline Raise msg =  Printf.kprintf (fun s -> raise (DirectoryNotFoundException(s))) msg
 
-    
+   
 
 /// This module is set to auto open. 
 /// General Utility functions
 [<AutoOpen>] // so that extension become availale on opening FsEx
-module  AutoOpenUtil =     
+module AutoOpenUtil =     
     
     /// a quick way to throw an exception.
     /// for use in temporary scripts when you are too lazy to do a proper exception.
@@ -60,7 +60,7 @@ module  AutoOpenUtil =
     /// throws an exception with 'msg' as Error message if 'value' is false.
     /// this function is usefull to follow up on any methods that return booleans indication sucess or failure
     let inline failIfFalse (failMsg:string) (value :bool) : unit = 
-        if not value then failwithf "failIfFalse: %s " failMsg 
+        if not value then raise <| Exception( "FsEx.failIfFalse: " + failMsg )
     
     /// throws an exception with 'msg' as Error message if 'value' is null.
     /// this function is usefull to doing many null checks without adding lots if clauses and lots of indenting

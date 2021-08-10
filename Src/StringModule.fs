@@ -5,6 +5,7 @@ open System.Text
 open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 open FsEx.ExtensionsString // for FsExStringException
 
+/// Functions for transforming strings
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide String class in C# assemblies
 module String =              
     
@@ -33,7 +34,7 @@ module String =
 
     // TODO removed inline to get compile times down in FSI ?  
    
-    /// removes substring from a string if it exists. same as:
+    /// Removes substring from a string if it exists. same as:
     /// fromString.Replace(textToRemove, "")
     let (*inline*) delete (textToRemove:string) (fromString:string) :string =
         if isNull fromString   then FsExStringException.Raise "String.delete: fromString is null (textToRemove:%s)" (exnf textToRemove)
