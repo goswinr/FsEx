@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FsEx.Tests", "FsEx.Tests.fsproj", "{5059ABF2-AC8C-4930-86E4-76F523600826}"
+EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "FsEx", "..\FsEx.fsproj", "{084500D8-5DD9-4E92-BE7D-56CA428B8C01}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5059ABF2-AC8C-4930-86E4-76F523600826}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5059ABF2-AC8C-4930-86E4-76F523600826}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5059ABF2-AC8C-4930-86E4-76F523600826}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5059ABF2-AC8C-4930-86E4-76F523600826}.Release|Any CPU.Build.0 = Release|Any CPU
+		{084500D8-5DD9-4E92-BE7D-56CA428B8C01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{084500D8-5DD9-4E92-BE7D-56CA428B8C01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{084500D8-5DD9-4E92-BE7D-56CA428B8C01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{084500D8-5DD9-4E92-BE7D-56CA428B8C01}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {65D03487-3D0E-4D6A-A106-03DC214629B1}
+	EndGlobalSection
+EndGlobal
