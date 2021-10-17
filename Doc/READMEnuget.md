@@ -2,7 +2,6 @@
 
 # FsEx
 
-[![FsEx on fuget.org](https://www.fuget.org/packages/FsEx/badge.svg)](https://www.fuget.org/packages/FsEx)
 [![release](https://img.shields.io/github/release/goswinr/FsEx.svg)](https://github.com/goswinr/FsEx/releases) 
 ![code size](https://img.shields.io/github/languages/code-size/goswinr/FsEx.svg) 
 [![license](https://img.shields.io/github/license/goswinr/FsEx)](LICENSE)
