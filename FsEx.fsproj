@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>netstandard2.0</TargetFramework>  
-    <UseWPF>true</UseWPF>    
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <UseWPF>true</UseWPF>
     <LangVersion>preview</LangVersion>
     <OtherFlags>$(OtherFlags)--warnon:3390</OtherFlags>  <!-- warnon:3390 is to verify xml docstrings https://devblogs.microsoft.com/dotnet/announcing-f-5/#improved-compiler-analysis-for-library-authors -->
-    
+
     <NeutralLanguage>en</NeutralLanguage>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>    <!--to only have the english resources-->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -14,29 +14,36 @@
     <RootNamespace>FsEx</RootNamespace>
     <AssemblyName>FsEx</AssemblyName>
     <AssemblyTitle>FsEx</AssemblyTitle>
-    <Title>FsEx</Title>  
+    <Title>FsEx</Title>
     <Product>FsEx</Product>
-    <PackageId>FsEx</PackageId>  
+    <PackageId>FsEx</PackageId>
 
-    <Version>0.5.1.0</Version>
-    <AssemblyVersion>0.5.1.0</AssemblyVersion>
-    <FileVersion>0.5.1.0</FileVersion>
-    <PackageReleaseNotes>First release</PackageReleaseNotes>
+    <Version>0.7.0</Version>
+    <AssemblyVersion>0.7.0</AssemblyVersion>
+    <FileVersion>0.7.0</FileVersion>
+    <PackageReleaseNotes>
+      - Add Process Module for running external Processes
+      - Fix Rarr.rotate
+      - Add Rarr.isNotEmpty
+      - Add IO.getAllFilesInParentsByPattern
+      - Typo in Timer μs is actually  ms
+      - Add String.truncate, skip and take methods
+    </PackageReleaseNotes>
 
     <Authors>GoswinR</Authors>
     <Copyright>Goswin Rothenthal 2021</Copyright>
 
     <Description>An F# extension and utility library, mostly focused on scripting.</Description>
-    
-    
+    <PackageDescription>An F# extension and utility library, mostly focused on scripting.</PackageDescription><!--used on nuget.org-->
+
     <WarningLevel>5</WarningLevel>
     <!-- WarningLevel 3 is default , see https://github.com/dsyme/fsharp-presentations/blob/master/design-notes/off-by-default-warnings.md -->
   </PropertyGroup>
 
-  <PropertyGroup> 
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>      
+  <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat> <!-- using  snupkg the readme does not pack https://github.com/NuGet/Home/issues/10791 --> 
+    <!-- <SymbolPackageFormat>snupkg</SymbolPackageFormat> --><!-- using  snupkg the readme does not pack https://github.com/NuGet/Home/issues/10791 -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -44,13 +51,13 @@
     <RepositoryUrl>https://github.com/goswinr/FsEx</RepositoryUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageIcon>logo128.png</PackageIcon>
-    <!--<PackageReadmeFile>READMEnuget.md</PackageReadmeFile> using  snupkg the readme does not pack https://github.com/NuGet/Home/issues/10791 --> 
-    <PackageDescription>An F# extension and utility library, mostly focused on scripting.</PackageDescription>    
-    <PackageTags>F#</PackageTags>    
+    <PackageReadmeFile>READMEnuget.md</PackageReadmeFile> <!--using  snupkg the readme does not pack https://github.com/NuGet/Home/issues/10791 -->
+    
+    <PackageTags>F#</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="README.md" />   
+    <None Include="README.md" />
     <None Include="Doc/READMEnuget.md" Pack="true" PackagePath="" />
     <None Include="Doc/logo128.png" Pack="true" PackagePath="" /> <!--PackagePath = "" makes the file availabe to nuget pack tool-->
 
@@ -61,7 +68,7 @@
     <Compile Include="Src/NiceString.fs" />
     <Compile Include="Src/Kernel32.fs" />
     <Compile Include="Src/IO.fs" />
-    
+
     <Compile Include="Src/Types/Rarr.fs" />
     <Compile Include="Src/Types/Dict.fs" />
     <Compile Include="Src/Types/DefaultDict.fs" />
@@ -75,15 +82,16 @@
     <Compile Include="Src/TypeExtensions/IDictionary.fs" />
     <Compile Include="Src/TypeExtensions/IList.fs" />
     <Compile Include="Src/TypeExtensions/Seq.fs" />
-    <Compile Include="Src\TypeExtensions\Hashset.fs" />
+    <Compile Include="Src/TypeExtensions/Hashset.fs" />
     <Compile Include="Src/RarrModule.fs" />
     <Compile Include="Src/StringModule.fs" />
     <Compile Include="Src/ArrayModule.fs" />
     <Compile Include="Src/SeqModule.fs" />
-    <Compile Include="Src\DictModule.fs" /> 
+    <Compile Include="Src/DictModule.fs" />
 
     <Compile Include="Src/ComputationalExpressions.fs" />
     <Compile Include="Src/Print.fs" />
+    <Compile Include="Src/Process.fs" />
   </ItemGroup>
 
 </Project>
