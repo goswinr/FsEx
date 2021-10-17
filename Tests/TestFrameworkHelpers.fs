@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation.  All Rights Reserved.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft Corporation.  All Rights Reserved.  See License.txt in the project root for license information.
 
 namespace Xunit
 
@@ -9,7 +9,7 @@ open System.Runtime.InteropServices
 
 open Xunit
 
-module Info =
+module Info = 
     /// Use this to distinguish cases where output is deterministically different between x86 runtime or x64 runtime,
     /// for instance w.r.t. floating point arithmetic. For more info, see https://github.com/dotnet/roslyn/issues/7333
     let isX86Runtime = sizeof<IntPtr> = 4
@@ -30,12 +30,12 @@ module Info =
     let isNetNative = framework.StartsWith(".NET Native")
 
 
-module private Impl =
+module private Impl = 
 
-    let rec equals (expected:obj) (actual:obj) =
+    let rec equals (expected:obj) (actual:obj) = 
 
         // get length expected
-        let toArray (o:obj) =
+        let toArray (o:obj) = 
             match o with
             | :? seq<bigint> as seq -> seq |> Seq.toArray :>obj
             | :? seq<decimal> as seq -> seq |> Seq.toArray :>obj
@@ -61,20 +61,20 @@ module private Impl =
         let expected = toArray expected
         let actual = toArray actual
 
-        match expected, actual with 
+        match expected, actual with
         |   (:? Array as a1), (:? Array as a2) ->
-                if a1.Rank > 1 then failwith "Rank > 1 not supported"                
+                if a1.Rank > 1 then failwith "Rank > 1 not supported"
                 if a2.Rank > 1 then false
                 else
                     let lb = a1.GetLowerBound(0)
                     let ub = a1.GetUpperBound(0)
                     if lb <> a2.GetLowerBound(0) || ub <> a2.GetUpperBound(0) then false
                     else
-                        {lb..ub} |> Seq.forall(fun i -> equals (a1.GetValue(i)) (a2.GetValue(i)))    
+                        {lb..ub} |> Seq.forall(fun i -> equals (a1.GetValue(i)) (a2.GetValue(i)))
         |   _ ->
                 Object.Equals(expected, actual)
 
-    /// Special treatment of float and float32 to get a somewhat meaningful error message 
+    /// Special treatment of float and float32 to get a somewhat meaningful error message
     /// (otherwise, the missing precision leads to different values that are close together looking the same)
     let floatStr (flt1: obj) (flt2: obj)  = 
         match flt1, flt2 with
@@ -87,9 +87,9 @@ module private Impl =
         | _ -> flt1.ToString(), flt2.ToString()
 
 
-type Assert =
+type Assert = 
 
-    static member AreEqual(expected : obj, actual : obj, message : string) =
+    static member AreEqual(expected : obj, actual : obj, message : string) = 
         if not (Impl.equals expected actual) then
             let message = 
                 let (exp, act) = Impl.floatStr expected actual
@@ -97,7 +97,7 @@ type Assert =
 
             Exception message |> raise
 
-    static member AreNotEqual(expected : obj, actual : obj, message : string) =
+    static member AreNotEqual(expected : obj, actual : obj, message : string) = 
         if Impl.equals expected actual then
             let message = sprintf "%s: Expected not %A but got %A" message expected actual
             Exception message |> raise
@@ -106,7 +106,7 @@ type Assert =
 
     /// Use this to compare floats within a delta of 1e-15, useful for discrepancies
     /// between 80-bit (dotnet, RyuJIT) and 64-bit (x86, Legacy JIT) floating point calculations
-    static member AreNearEqual(expected: float, actual: float) =
+    static member AreNearEqual(expected: float, actual: float) = 
         let delta = 1.0e-15
         let message = 
             let ((e, a)) = Impl.floatStr expected actual
@@ -118,11 +118,11 @@ type Assert =
 
     static member Fail(message : string) = Exception(message) |> raise
 
-    static member Fail() = Assert.Fail("") 
+    static member Fail() = Assert.Fail("")
 
     static member Fail(message : string, args : obj[]) = Assert.Fail(String.Format(message,args))
 
-type CollectionAssert =
+type CollectionAssert = 
     static member AreEqual(expected, actual) = 
         Assert.AreEqual(expected, actual)
 

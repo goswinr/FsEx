@@ -5,201 +5,231 @@ open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
 // TODO check with https://github.com/eiriktsarpalis/TypeShape/blob/main/samples/TypeShape.Samples/printer.fs
 
+/// This will provide the functions:
+/// print, printFull, printWithHighlight, clearSeffLog
 [<AutoOpen>] // to have print functions at end of module auto opened
-module AutoOpenPrint =
-    
+module AutoOpenPrint = 
+
     open NiceString
 
     /// Exposes functionality like print and clear of the Seff Editor, when FsEx is loaded there
-    type internal Seff private () = // no public constructor  
-                  
+    type internal Seff private () = // no public constructor
+
         static let mutable printColor : int-> int -> int -> string -> unit = //changed via reflection below from Seff
-            fun r g b s -> Console.WriteLine s    
-           
-        static let mutable printnColor : int-> int -> int -> string -> unit = //changed via reflection below from Seff
+            fun r g b s -> Console.Write s
+
+        static let mutable printNewLineColor : int-> int -> int -> string -> unit = //changed via reflection below from Seff
             fun r g b s -> Console.WriteLine s
 
-        static let mutable clear : unit -> unit = //changed via reflection below from Seff         
+        static let mutable clear : unit -> unit = // changed via reflection below from Seff
             fun () -> ()
-        
-        static let mutable doInit = true
-        
-        static let init()=
-            doInit <- false
+
+        static let mutable initIsPending = true
+
+        static let init()= 
+            initIsPending <- false
             let allAss = AppDomain.CurrentDomain.GetAssemblies()
-            
-            let assemblySeff =  allAss |> Seq.tryFind (fun a -> a.GetName().Name = "Seff")            
-            
-            match assemblySeff with 
-            | Some seffAssembly -> 
-                try   
-                    let printModule = seffAssembly.GetType("Seff.Model.ISeffLogModule")                    
-                    printColor   <- printModule.GetProperty("printColor" ).GetValue(seffAssembly)  :?>  int-> int -> int -> string -> unit
-                    printnColor  <- printModule.GetProperty("printnColor").GetValue(seffAssembly)  :?>  int-> int -> int -> string -> unit
-                    clear        <- printModule.GetProperty("clear").GetValue(seffAssembly)        :?>  unit -> unit
+
+            let assemblySeff =  allAss |> Seq.tryFind (fun a -> a.GetName().Name = "Seff")
+
+            match assemblySeff with
+            | Some seffAssembly ->
+                try
+                    let printModule = seffAssembly.GetType("Seff.Model.ISeffLogModule")
+                    if notNull printModule then 
+                        let pc = printModule.GetProperty("printColor" ).GetValue(seffAssembly)  
+                        if notNull pc then 
+                            let pct = pc :?>  int-> int -> int -> string -> unit
+                            printColor   <- pct
+                        let pnc = printModule.GetProperty("printnColor").GetValue(seffAssembly) 
+                        if notNull pnc then 
+                            let pct = pnc :?> int-> int -> int -> string -> unit
+                            printNewLineColor   <- pct
+                        let cl = printModule.GetProperty("clear").GetValue(seffAssembly) 
+                        if notNull cl then 
+                            let clt = cl :?>unit -> unit
+                            clear   <- clt                        
                 with ex ->
-                    eprintfn "Failed to get Seff.Model.ISeffLog.printnColor via Reflection, If you are not using the Seff Editor Plugin this is normal. The function 'fnColor' will behave just as 'printfn'\r\nMessage: %A" ex     
-                
+                    eprintfn "Failed to get Seff.Model.ISeffLog.printnColor via Reflection, If you are not using the Seff Editor Plugin this is normal."
+                    eprintfn "The function using color will just print to Console.Out."
+                    eprintfn "The ignored Error was: %A" ex
+
             |None -> ()
                 //eprintfn "Only found:"
                 //AppDomain.CurrentDomain.GetAssemblies()
-                //|> Seq.map (fun a -> a.GetName().Name ) 
+                //|> Seq.map (fun a -> a.GetName().Name )
                 //|> Seq.sortBy string
                 //|> Seq.iter (eprintfn "%s" )
-            
-    
+
+
         static member PrintColor r g b s = 
-            if doInit then init() // to delay reflection calls to latest possible moment
+            if initIsPending then init() // to delay reflection calls to latest possible moment
             printColor r g b s
-        
-        static member PrintnColor r g b s = 
-            if doInit then init() // to delay reflection calls to latest possible moment
-            printnColor r g b s   
+
+        static member PrintLineColor r g b s = 
+            if initIsPending then init() // to delay reflection calls to latest possible moment
+            printNewLineColor r g b s
 
         static member Clear () = 
-            if doInit then init() // to delay reflection calls to latest possible moment
+            if initIsPending then init() // to delay reflection calls to latest possible moment
             clear()
-    
+
 
     /// Print to standard out including nice formating for numbers including thousand Separator and (nested) sequences, first five items are printed out.
     /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
     /// • thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
     /// • maxNestingDepth         = 3     ; set this to change how deep the content of nested seq is printed (printFull ignores this)
     /// • maxNestingDepth         = 6     ; set this to change how how many items per seq are printed (printFull ignores this)
-    /// • maxCharsInString        = 2000  ; set this to change how many characters of a string might be printed at once.  
+    /// • maxCharsInString        = 2000  ; set this to change how many characters of a string might be printed at once.
     let print x = 
-        Console.WriteLine (toNiceString x)// Console.WriteLine is about 2-3 times faster than printf "%s"
-    
+        Console.WriteLine (toNiceString x) // Console.WriteLine is about 2-3 times faster than printf "%s"
+
     /// Print to standard out including nice formating for numbers including thousand Separator, all items of sequences, including nested items, are printed out.
     /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
-    /// • thousandSeparator       = '      ; set this to change the printing of floats and integers larger than 10'000   
-    /// • maxCharsInString        = 2000   ; set this to change how many characters of a string might be printed at once. 
-    let printFull x = Console.WriteLine (toNiceStringFull x)
-    
+    /// • thousandSeparator       = '      ; set this to change the printing of floats and integers larger than 10'000
+    /// • maxCharsInString        = 2000   ; set this to change how many characters of a string might be printed at once.
+    let printFull x = 
+        Console.WriteLine (toNiceStringFull x) // Console.WriteLine is about 2-3 times faster than printf "%s"
 
-    /// Highligths the given word in red in the line to print in gray.
+
+    /// Highligths every occurance of the given word in the color of first three integers (red, green, blue)
+    /// and the rest of the line in next three integers.
     /// Adds line return at end.
-    let printWithHighlight (word:string) (fullLine:string)=        
-        if String.IsNullOrWhiteSpace word then 
-            Seff.PrintnColor 180 180 180 (fullLine)// adds line return 
+    let internal printWithHighlightColor wR wG wB fR fG fB (word:string) (fullLine:string)= 
+        if String.IsNullOrWhiteSpace word then
+            Seff.PrintLineColor fR fG fB (fullLine)// adds line return
         else
-            let rec loop (fromIdx:int) =
-                match fullLine.IndexOf(word, fromIdx, StringComparison.Ordinal) with 
-                | -1 -> Seff.PrintnColor 180 180 180 (fullLine.Substring(fromIdx))// adds line return 
-                | i  -> 
+            let rec loop (fromIdx:int) = 
+                match fullLine.IndexOf(word, fromIdx, StringComparison.Ordinal) with
+                | -1 -> Seff.PrintLineColor fR fG fB (fullLine.Substring(fromIdx))// adds line return
+                | i  ->
                     let beforeLen = i - fromIdx
-                    if beforeLen > 0 then Seff.PrintColor 180 180 180 (fullLine.Substring(fromIdx,beforeLen))
-                
-                    if i + word.Length = fullLine.Length then                    
-                        Seff.PrintnColor 240   0   0 (fullLine.Substring(i,word.Length)) // adds line return 
-                    else                                            
-                        Seff.PrintColor  240   0   0 (fullLine.Substring(i,word.Length)) // no line return
+                    if beforeLen > 0 then Seff.PrintColor fR fG fB (fullLine.Substring(fromIdx,beforeLen))
+
+                    if i + word.Length = fullLine.Length then
+                        Seff.PrintLineColor wR wG wB (fullLine.Substring(i,word.Length)) // adds line return
+                    else
+                        Seff.PrintColor wR wG wB (fullLine.Substring(i,word.Length)) // no line return
                         loop (i + word.Length)
             loop 0
-        
+
+    /// Tries to printf with colors if running inside Seff Editor.
+    /// Highligths the given word in red in the line to print in gray.
+    /// Adds line return at end.
+    let printWithHighlight (word:string) (fullLine:string)= 
+        printWithHighlightColor 240 0 0 180 180 180 word fullLine
 
 
-    /// Clears the Seff Log View, 
-    /// if it can be found via reflection in loaded assemblies,
-    /// else does nothing.
+    /// Tries to clears the Seff Log View, if it can be found via reflection in loaded assemblies.
+    /// Else does nothing.
     /// Can be called from any thread.
     let clearSeffLog() = Seff.Clear()
 
 
 
-
-
-/// Tries to printf with colors if running in Seff Editor. 
-/// Else just normal printf  
-/// Does NOT add a new line at end.  
+/// Tries to printf with colors if running inside Seff Editor.
+/// Else just normal printf
+/// Does NOT add a new line at end.
 module Printf = 
 
-    /// Print with rgb colors if running in Seff Editor. Else just normal printf     
+    /// Print with rgb colors if running in Seff Editor. Else just normal printf
     /// red -> green -> blue -> string -> unit
     let color red green blue msg = Printf.kprintf (fun s -> Seff.PrintColor red green blue s)  msg
-        
-    /// Like printf but in Red if used in Seff Editor. Does not add a new line at end.              
-    let red msg =  Printf.kprintf (fun s -> Seff.PrintColor 220 0 0 s)  msg 
+
+    /// Like printf but in Red if used in Seff Editor. Does not add a new line at end.
+    let red msg =  Printf.kprintf (fun s -> Seff.PrintColor 220 0 0 s)  msg
 
     /// Like printf but in Green if used in Seff Editor. Does not add a new line at end.
-    let green msg = Printf.kprintf (fun s -> Seff.PrintColor 0 170 0 s)  msg 
+    let green msg = Printf.kprintf (fun s -> Seff.PrintColor 0 180 0 s)  msg
 
+    /// Like printf but in Dark Green if used in Seff Editor. Does not add a new line at end.
+    let darkGreen msg = Printf.kprintf (fun s -> Seff.PrintColor 0 100 0 s)  msg
+    
+    /// Like printf but in Dark Red if used in Seff Editor. Does not add a new line at end.
+    let darkRed msg = Printf.kprintf (fun s -> Seff.PrintColor 80 0 0 s)  msg
+    
     /// Like printf but in Light Blue if in from Seff Editor. Does not add a new line at end.
-    let lightBlue msg = Printf.kprintf (fun s -> Seff.PrintColor 170 210 230 s)  msg        
+    let lightBlue msg = Printf.kprintf (fun s -> Seff.PrintColor 170 210 230 s)  msg
 
     /// Like printf but in Blue if used in Seff Editor. Does not add a new line at end.
-    let blue msg = Printf.kprintf (fun s -> Seff.PrintColor 0 0 220 s)  msg         
+    let blue msg = Printf.kprintf (fun s -> Seff.PrintColor 0 0 220 s)  msg
 
     /// Like printf but in Yellow if used in Seff Editor.  Does not add a new line at end.
-    let yellow msg = Printf.kprintf (fun s -> Seff.PrintColor 235 220 0 s)  msg   
+    let yellow msg = Printf.kprintf (fun s -> Seff.PrintColor 235 220 0 s)  msg
 
     /// Like printf but in Gray if used in Seff Editor. Does not add a new line at end.
-    let gray msg = Printf.kprintf (fun s -> Seff.PrintColor 150 150 150 s)  msg  
-        
+    let gray msg = Printf.kprintf (fun s -> Seff.PrintColor 150 150 150 s)  msg
+
     /// Like printf but in Gray if used in Seff Editor. Does not add a new line at end.
-    let lightGray msg = Printf.kprintf (fun s -> Seff.PrintColor 200 200 200 s)  msg  
+    let lightGray msg = Printf.kprintf (fun s -> Seff.PrintColor 200 200 200 s)  msg
 
     /// Like printf but in Orchid purple if used in Seff Editor. Does not add a new line at end.
-    let orchid msg = Printf.kprintf (fun s -> Seff.PrintColor 218 112 214 s)  msg  
+    let orchid msg = Printf.kprintf (fun s -> Seff.PrintColor 218 112 214 s)  msg
 
     /// Like printf but in Purple if used in Seff Editor. Does not add a new line at end.
-    let purple msg = Printf.kprintf (fun s -> Seff.PrintColor 128 0 128 s)  msg 
+    let purple msg = Printf.kprintf (fun s -> Seff.PrintColor 128 0 128 s)  msg
 
     /// Like printf but in Orange if used in Seff Editor. Does not add a new line at end.
-    let orange msg = Printf.kprintf (fun s -> Seff.PrintColor 255 140 0 s)  msg     
-    
+    let orange msg = Printf.kprintf (fun s -> Seff.PrintColor 255 140 0 s)  msg
+
     /// Like printf but in Cyan if used in Seff Editor. Does not add a new line at end.
-    let cyan msg = Printf.kprintf (fun s -> Seff.PrintColor 0 150 150 s)  msg 
-    
+    let cyan msg = Printf.kprintf (fun s -> Seff.PrintColor 0 150 150 s)  msg
+
     /// Like printf but in Random Color if used in Seff Editor. Does not add a new line at end.
     let colorRnd msg = 
         let c = Color.randomForRhino()
-        Printf.kprintf (fun s -> Seff.PrintColor c.R.ToInt c.G.ToInt c.B.ToInt s)  msg  
+        Printf.kprintf (fun s -> Seff.PrintColor c.R.ToInt c.G.ToInt c.B.ToInt s)  msg
 
 
-/// Tries to printfn with colors if running in Seff Editor. 
-/// Else just normal printf  
+/// Tries to printfn with colors if running in Seff Editor.
+/// Else just normal printf
 /// Adds a new line at end.
-module Printfn =        
+module Printfn = 
 
-    /// Print with rgb colors if running in Seff Editor. Else just normal printf     
+    /// Print with rgb colors if running in Seff Editor. Else just normal printf
     /// red -> green -> blue -> string -> unit
-    let color red green blue msg = Printf.kprintf (fun s -> Seff.PrintnColor red green blue s)  msg
-        
-    /// Like printfn but in Red if used in Seff Editor. Adds a new line at end.             
-    let red msg =  Printf.kprintf (fun s -> Seff.PrintnColor 220 0 0 s)  msg 
+    let color red green blue msg = Printf.kprintf (fun s -> Seff.PrintLineColor red green blue s)  msg
+
+    /// Like printfn but in Red if used in Seff Editor. Adds a new line at end.
+    let red msg =  Printf.kprintf (fun s -> Seff.PrintLineColor 220 0 0 s)  msg
 
     /// Like printfn but in Green if used in Seff Editor. Adds a new line at end.
-    let green msg = Printf.kprintf (fun s -> Seff.PrintnColor 0 170 0 s)  msg 
+    let green msg = Printf.kprintf (fun s -> Seff.PrintLineColor 0 180 0 s)  msg
+    
+    /// Like printfn but in Dark Red if used in Seff Editor. Adds a new line at end.
+    let darkRed msg = Printf.kprintf (fun s -> Seff.PrintLineColor 80 0 0 s)  msg
+    
+    /// Like printfn but in Dark Green if used in Seff Editor. Adds a new line at end.
+    let darkGreen msg = Printf.kprintf (fun s -> Seff.PrintLineColor 0 100 0 s)  msg
 
     /// Like printfn but in Light Blue if in from Seff Editor. Adds a new line at end.
-    let lightBlue msg = Printf.kprintf (fun s -> Seff.PrintnColor 170 210 230 s)  msg        
+    let lightBlue msg = Printf.kprintf (fun s -> Seff.PrintLineColor 170 210 230 s)  msg
 
     /// Like printfn but in Blue if used in Seff Editor. Adds a new line at end.
-    let blue msg = Printf.kprintf (fun s -> Seff.PrintnColor 0 0 220 s)  msg      
-    
+    let blue msg = Printf.kprintf (fun s -> Seff.PrintLineColor 0 0 220 s)  msg
+
     /// Like printfn but in Yellow if used in Seff Editor. Adds a new line at end.
-    let yellow msg = Printf.kprintf (fun s -> Seff.PrintnColor 235 220 0 s)  msg     
+    let yellow msg = Printf.kprintf (fun s -> Seff.PrintLineColor 235 220 0 s)  msg
 
     /// Like printfn but in Gray if used in Seff Editor. Adds a new line at end.
-    let gray msg = Printf.kprintf (fun s -> Seff.PrintnColor 150 150 150 s)  msg  
-    
+    let gray msg = Printf.kprintf (fun s -> Seff.PrintLineColor 150 150 150 s)  msg
+
     /// Like printfn but in Gray if used in Seff Editor. Adds a new line at end.
-    let lightGray msg = Printf.kprintf (fun s -> Seff.PrintnColor 200 200 200 s)  msg  
-    
+    let lightGray msg = Printf.kprintf (fun s -> Seff.PrintLineColor 200 200 200 s)  msg
+
     /// Like printfn but in Orchid (light Purple) if used in Seff Editor. Adds a new line at end.
-    let orchid msg = Printf.kprintf (fun s -> Seff.PrintnColor 218 112 214  s)  msg  
-    
+    let orchid msg = Printf.kprintf (fun s -> Seff.PrintLineColor 218 112 214  s)  msg
+
     /// Like printfn but in Purple if used in Seff Editor. Adds a new line at end.
-    let purple msg = Printf.kprintf (fun s -> Seff.PrintnColor 128 0 128 s)  msg  
-    
+    let purple msg = Printf.kprintf (fun s -> Seff.PrintLineColor 128 0 128 s)  msg
+
     /// Like printfn but in Orange if used in Seff Editor. Adds a new line at end.
-    let orange msg = Printf.kprintf (fun s -> Seff.PrintnColor 255 140 0 s)  msg  
-    
+    let orange msg = Printf.kprintf (fun s -> Seff.PrintLineColor 255 140 0 s)  msg
+
     /// Like printfn but in Cyan if used in Seff Editor. Adds a new line at end.
-    let cyan msg = Printf.kprintf (fun s -> Seff.PrintnColor 0 150 150 s)  msg
+    let cyan msg = Printf.kprintf (fun s -> Seff.PrintLineColor 0 150 150 s)  msg
 
     /// Like printfn but in random Color if used in Seff Editor. Adds a new line at end.
     let colorRnd msg = 
         let c = Color.randomForRhino()
-        Printf.kprintf (fun s -> Seff.PrintnColor c.R.ToInt c.G.ToInt c.B.ToInt s)  msg  
+        Printf.kprintf (fun s -> Seff.PrintLineColor c.R.ToInt c.G.ToInt c.B.ToInt s)  msg

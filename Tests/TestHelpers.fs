@@ -1,16 +1,16 @@
-module Tests.TestHelpers
+﻿module Tests.TestHelpers
 
 (*
 open System.IO
 
-let assembleDiffMessage actual expected =
-  
-    let getLines text =
+let assembleDiffMessage actual expected = 
+
+    let getLines text = 
         use reader = new StringReader(text)
-        Seq.initInfinite (fun _ -> reader.ReadLine()) 
+        Seq.initInfinite (fun _ -> reader.ReadLine())
         |> Seq.takeWhile (not << isNull)
         |> set
-    let actual   = getLines actual  
+    let actual   = getLines actual
     let expected = getLines expected
     //
     // Find types/members which exist in exactly one of the expected or actual surface areas.
@@ -28,7 +28,7 @@ let assembleDiffMessage actual expected =
         None
     else
         // The surface areas don't match; prepare an easily-readable output message.
-        let msg =
+        let msg = 
             let inline newLine (sb : System.Text.StringBuilder) = sb.AppendLine () |> ignore
             let sb = System.Text.StringBuilder ()
             sb.Append "Unexpectedly missing (expected, not actual):" |> ignore

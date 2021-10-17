@@ -33,7 +33,7 @@ let isStable sorted = sorted |> Seq.pairwise |> Seq.forall (fun ((ia, a),(ib, b)
 
 let isSorted sorted = sorted |> Seq.pairwise |> Seq.forall (fun (a,b) -> a <= b)
 
-let haveSameElements (xs:seq<_>) (ys:seq<_>) =
+let haveSameElements (xs:seq<_>) (ys:seq<_>) = 
     let xsHashSet = new System.Collections.Generic.HashSet<_>(xs)
     let ysHashSet = new System.Collections.Generic.HashSet<_>(ys)
     xsHashSet.SetEquals(ysHashSet)

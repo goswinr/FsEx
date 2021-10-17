@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation.  All Rights Reserved.  See License.txt in the project root for license information.
+﻿// Copyright (c) Microsoft Corporation.  All Rights Reserved.  See License.txt in the project root for license information.
 
 module FSharp.Core.UnitTests.LibraryTestFx
 
@@ -14,16 +14,16 @@ open FsEx
 
 /// Check that the lambda throws an exception of the given type. Otherwise
 /// calls Assert.Fail()
-let CheckThrowsExn<'a when 'a :> exn> (f : unit -> unit) =
+let CheckThrowsExn<'a when 'a :> exn> (f : unit -> unit) = 
     try
         let _ = f ()
-        sprintf "Expected %O exception, got no exception" typeof<'a> |> Assert.Fail 
+        sprintf "Expected %O exception, got no exception" typeof<'a> |> Assert.Fail
     with
     | :? 'a -> ()
     | e -> sprintf "Expected %O exception, got: %O" typeof<'a> e |> Assert.Fail
 
-let private CheckThrowsExn2<'a when 'a :> exn> s (f : unit -> unit) =
-    let funcThrowsAsExpected =
+let private CheckThrowsExn2<'a when 'a :> exn> s (f : unit -> unit) = 
+    let funcThrowsAsExpected = 
         try
             let _ = f ()
             false // Did not throw!
@@ -57,18 +57,18 @@ let CheckThrowsArithmeticException   f = CheckThrowsExn<ArithmeticException>  f
 (*
 
 // Verifies two sequences are equal (same length, equiv elements)
-let VerifySeqsEqual (seq1 : seq<'T>) (seq2 : seq<'T>) =
+let VerifySeqsEqual (seq1 : seq<'T>) (seq2 : seq<'T>) = 
     CollectionAssert.AreEqual(seq1, seq2)
 
-let sleep(n : int32) =
+let sleep(n : int32) = 
     System.Threading.Thread.Sleep(n)
-module SurfaceArea =
+module SurfaceArea = 
     open System.Reflection
     open System
     open System.Text.RegularExpressions
 
     // gets string form of public surface area for the currently-loaded FSharp.Core
-    let private getActual () =
+    let private getActual () = 
 
         // get current FSharp.Core
         let asm = typeof<int list>.Assembly
@@ -78,9 +78,9 @@ module SurfaceArea =
         let types = asm.ExportedTypes |> Seq.filter (fun ty -> let ti = ty.GetTypeInfo() in ti.IsPublic || ti.IsNestedPublic) |> Array.ofSeq
 
         // extract canonical string form for every public member of every type
-        let getTypeMemberStrings (t : Type) =
+        let getTypeMemberStrings (t : Type) = 
             // for System.Runtime-based profiles, need to do lots of manual work
-            let getMembers (t : Type) =
+            let getMembers (t : Type) = 
                 let ti = t.GetTypeInfo()
                 let cast (info: #MemberInfo) = (t, info :> MemberInfo)
                 let isDeclaredInFSharpCore (m:MemberInfo) = m.DeclaringType.Assembly.FullName = fsCoreFullName
@@ -97,30 +97,30 @@ module SurfaceArea =
             getMembers t
             |> Array.map (fun (ty, m) -> sprintf "%s: %s" (ty.ToString()) (m.ToString()))
 
-        let actual =
+        let actual = 
             types |> Array.collect getTypeMemberStrings
 
         asm, actual
 
     // verify public surface area matches expected
-    let verify expected platform (fileName : string) =
+    let verify expected platform (fileName : string) = 
         printfn "Verify"
-        let normalize (s:string) =
+        let normalize (s:string) = 
             Regex.Replace(s, "(\\r\\n|\\n|\\r)+", "\r\n").Trim()
 
         let asm, actualNotNormalized = getActual ()
         let actual = 
-            actualNotNormalized 
-            |> Seq.map normalize 
-            |> Seq.filter (String.IsNullOrWhiteSpace >> not) 
+            actualNotNormalized
+            |> Seq.map normalize
+            |> Seq.filter (String.IsNullOrWhiteSpace >> not)
             |> String.concat Environment.NewLine
-        
+
         let expected = normalize expected
 
         match Tests.TestHelpers.assembleDiffMessage actual expected with
         | None -> ()
         | Some diff ->
-            let logFile =
+            let logFile = 
                 let workDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
                 sprintf "%s\\FSharp.Core.SurfaceArea.%s.txt" workDir platform
             System.IO.File.WriteAllText(logFile, String.Join("\r\n", actual))

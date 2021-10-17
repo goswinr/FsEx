@@ -6,7 +6,7 @@
     <TargetFrameworks>net472</TargetFrameworks>
     <OutputType>Library</OutputType>
 
-    <AssemblyName>FSharp.Core.UnitTests</AssemblyName>    
+    <AssemblyName>FSharp.Core.UnitTests</AssemblyName>
     <PreRelease>true</PreRelease>
     <LangVersion>preview</LangVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -25,11 +25,11 @@
     <DefineConstants Condition="'$(UnitTestType)' == 'xunit'">$(DefineConstants);XUNIT</DefineConstants>
     <DefineConstants Condition="'$(UnitTestType)' != 'xunit'">$(DefineConstants);NUNIT</DefineConstants>
   </PropertyGroup>
-  
-  
-  
+
+
+
    <ItemGroup> <!--https://xunit.net/docs/getting-started/netfx/visual-studio-->
-     
+
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
@@ -41,14 +41,14 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-    
-    
+
+
   <ItemGroup>
-    <ProjectReference Include="../FsEx.fsproj" />    
+    <ProjectReference Include="../FsEx.fsproj" />
     <PackageReference Include="FsCheck" Version="2.16.0" />
     <PackageReference Update="FSharp.Core" Version="5.0.2" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Compile Include="Utils.fs" />
     <Compile Include="TestHelpers.fs" />
@@ -64,5 +64,5 @@
   </ItemGroup>
 
 
-  
+
 </Project>

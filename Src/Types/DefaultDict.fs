@@ -1,86 +1,93 @@
-namespace FsEx
+﻿namespace FsEx
 
 open System
 open System.Collections.Generic
 
 
 /// A System.Collections.Generic.Dictionary with default Values that get created upon accessing a missing key.
-/// If accessing a non exiting key , the default function is called to create and set it. 
+/// If accessing a non exiting key , the default function is called to create and set it.
 /// Like defaultdict in Python
-type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, baseDict : Dictionary<'K,'V>) =
-    
+[<NoComparison>]
+[<NoEquality>] // TODO add structural equality
+type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, baseDict : Dictionary<'K,'V>) = 
+
     //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
 
     let dGet key  = 
         match box key with // or https://stackoverflow.com/a/864860/969070
         | null -> ArgumentNullException.Raise "DefaultDict.get key is null "
         | _ ->
-            match baseDict.TryGetValue(key) with 
+            match baseDict.TryGetValue(key) with
             |true, v-> v
-            |false, _ -> 
-                let v = defaultOfKeyFun(key) 
+            |false, _ ->
+                let v = defaultOfKeyFun(key)
                 baseDict.[key] <- v
-                v         
+                v
 
-    let set key value =
+    let set key value = 
         match box key with // or https://stackoverflow.com/a/864860/969070
         | null -> ArgumentNullException.Raise  "DefaultDict.set key is null for value %A" value
         | _ -> baseDict.[key] <- value
 
- 
-  
+
     /// <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
-    /// If accessing a non exiting key , the default function is called on ther key to create the value and set it. 
-    /// Similar to  defaultdict in Python</summary>    
+    /// If accessing a non exiting key , the default function is called on ther key to create the value and set it.
+    /// Similar to  defaultdict in Python</summary>
     /// <param name="defaultOfKeyFun">(&apos;K-&gt;&apos;V): The function to create a default value from the key</param>
     new (defaultOfKeyFun: 'K -> 'V) = 
         let d = new  Dictionary<'K,'V>()
-        DefaultDict( defaultOfKeyFun, d )   
+        DefaultDict( defaultOfKeyFun, d )
 
-    
 
     /// Constructs a new DefaultDict by using the supplied Dictionary<'K,'V> directly, without any copying of items
-    static member CreateDirectly (defaultOfKeyFun: 'K->'V) (di:Dictionary<'K,'V> ) =
-        if isNull di then ArgumentNullException.Raise "Dictionary in DefaultDict.CreateDirectly is null"        
+    static member createDirectly (defaultOfKeyFun: 'K->'V) (di:Dictionary<'K,'V> ) = 
+        if isNull di then ArgumentNullException.Raise "Dictionary in DefaultDict.CreateDirectly is null"
         let d = new  Dictionary<'K,'V>()
-        DefaultDict( defaultOfKeyFun, d) 
+        DefaultDict( defaultOfKeyFun, d)
 
+    /// Constructs a new DefaultDict from seq of key and value pairs
+    static member create (defaultOfKeyFun: 'K->'V) (keysValues: seq<'K * 'V>) = 
+        if isNull keysValues then ArgumentNullException.Raise "seq in DefaultDict.Create is null"
+        let d = new  Dictionary<'K,'V>()        
+        for k,v in keysValues do
+            d.[k] <- v
+        DefaultDict( defaultOfKeyFun, d)  
 
     /// Access the underlying Collections.Generic.Dictionary<'K,'V>
-    /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of DefaultDict!    
+    /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of DefaultDict!
     /// use #nowarn "44" to disable the obsolete warning
     [<Obsolete("It is not actually obsolete but unsafe to use, so hidden from editor tools. In F# use #nowarn \"44\" to disable the obsolete warning")>]
     member _.Dictionary = baseDict
 
     /// For Index operator: get or set the value for given key
-    member _.Item 
-        with get k   = dGet k        
+    member _.Item
+        with get k   = dGet k
         and  set k v = set k v
-    
-    /// Get value for given key. 
+
+    /// Get value for given key.
     /// Calls defaultFun to get value if key not found.
     /// Also sets key to retuned value.
     /// use .TryGetValue(k) if you dont want a missing key to be created
-    member _.Get k = dGet k 
-    
-    /// Get a value and remove key and value it from dictionary, like *.pop() in Python 
+    member _.Get k = dGet k
+
+    /// Get a value and remove key and value it from dictionary, like *.pop() in Python
     /// Will fail if key does not exist
     /// Does not set any new key if key is missing
-    member _.Pop(k:'K) =
+    member _.Pop(k:'K) = 
         match box k with // or https://stackoverflow.com/a/864860/969070
         | null -> ArgumentNullException.Raise "DefaultDict.Pop(key) key is null"
-        | _ -> 
+        | _ ->
             let ok, v = baseDict.TryGetValue(k)
             if ok then
                 baseDict.Remove k |>ignore
                 v
-            else 
+            else
                 raise <|  KeyNotFoundException( sprintf "DefaultDict.Pop(key): Failed to pop key %A in %A of %d items" k baseDict baseDict.Count)
 
     /// Returns a (lazy) sequence of key and value tuples
-    member _.Items =
+    member _.Items = 
         seq { for KeyValue(k, v) in baseDict -> k, v}
-        
+
     // override baseDict.ToString() = // covered by NiceString Pretty printer ?
         //stringBuffer {
         //    yield "DefaultDict with "
@@ -91,7 +98,7 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
         //        yield " : "
         //        yield! v.ToString()
         //    yield "..."
-        //    }            
+        //    }
 
 
     // -------------------- properties: --------------------------------------
@@ -120,7 +127,7 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
     member _.ContainsKey(k) = baseDict.ContainsKey(k)
 
     /// Determines whether the dictionary contains a specific value.
-    member _.ContainsValue(v) = baseDict.ContainsValue(v)    
+    member _.ContainsValue(v) = baseDict.ContainsValue(v)
 
     /// Removes the value with the specified key from the dictionary.
     /// See also .Pop(key) method to get the contained value too.
@@ -139,19 +146,19 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
     interface IEnumerable<KeyValuePair<'K ,'V>> with
         member _.GetEnumerator() = (baseDict:>IDictionary<'K,'V>).GetEnumerator()
 
-    interface Collections.IEnumerable with // Non generic needed too ? 
+    interface Collections.IEnumerable with // Non generic needed too ?
         member __.GetEnumerator() = baseDict.GetEnumerator():> System.Collections.IEnumerator
-    
-    interface Collections.ICollection with // Non generic needed too ? 
+
+    interface Collections.ICollection with // Non generic needed too ?
         member _.Count = baseDict.Count
-        
+
         member _.CopyTo(arr, i) = (baseDict:>Collections.ICollection).CopyTo(arr, i)
 
         member _.IsSynchronized= (baseDict:>Collections.ICollection).IsSynchronized
 
         member _.SyncRoot= (baseDict:>Collections.ICollection).SyncRoot
-    
-    interface ICollection<KeyValuePair<'K,'V>> with 
+
+    interface ICollection<KeyValuePair<'K,'V>> with
         member _.Add(x) = (baseDict:>ICollection<KeyValuePair<'K,'V>>).Add(x)
 
         member _.Clear() = baseDict.Clear()
@@ -166,12 +173,12 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
 
         member _.Count = baseDict.Count
 
-    interface IDictionary<'K,'V> with 
-        member _.Item 
+    interface IDictionary<'K,'V> with
+        member _.Item
             with get k = dGet k
-            and  set k v = set k v 
-       
-        member _.Keys = (baseDict:>IDictionary<'K,'V>).Keys 
+            and  set k v = set k v
+
+        member _.Keys = (baseDict:>IDictionary<'K,'V>).Keys
 
         member _.Values = (baseDict:>IDictionary<'K,'V>).Values
 
@@ -179,25 +186,26 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
 
         member _.ContainsKey k = baseDict.ContainsKey k
 
-        member _.TryGetValue(k, r ) = baseDict.TryGetValue(k, ref r) 
+        member _.TryGetValue(k, r ) = baseDict.TryGetValue(k, ref r)
 
         member _.Remove(k) = baseDict.Remove(k)
 
-    interface IReadOnlyCollection<KeyValuePair<'K,'V>> with 
+    interface IReadOnlyCollection<KeyValuePair<'K,'V>> with
         member _.Count = baseDict.Count
 
-    interface IReadOnlyDictionary<'K,'V> with 
-        member _.Item 
+    interface IReadOnlyDictionary<'K,'V> with
+        member _.Item
             with get k = dGet k
-       
-        member _.Keys = (baseDict:>IReadOnlyDictionary<'K,'V>).Keys 
+
+        member _.Keys = (baseDict:>IReadOnlyDictionary<'K,'V>).Keys
 
         member _.Values = (baseDict:>IReadOnlyDictionary<'K,'V>).Values
 
         member _.ContainsKey k = baseDict.ContainsKey k
 
-        member _.TryGetValue(k, r ) = baseDict.TryGetValue(k, ref r) 
+        member _.TryGetValue(k, r ) = baseDict.TryGetValue(k, ref r)
 
+    // TODO add these too?
 
     //member _.GetObjectData() = baseDict.GetObjectData()
 
@@ -213,4 +221,4 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
     //interface _.ISerializable() = baseDict.ISerializable()
 
     //interface _.IDeserializationCallback() = baseDict.IDeserializationCallback()
-    
+

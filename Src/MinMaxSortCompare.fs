@@ -3,7 +3,7 @@
 /// Small functions for sorting and finding minimum or maximum values
 /// of tuple ,triples and quadruples
 module MinMaxSort = 
-    
+
     // make all inline because of https://stackoverflow.com/questions/6104221/why-is-this-f-code-so-slow
 
 
@@ -19,13 +19,13 @@ module MinMaxSort =
 
     /// Returns the smallest of three elements.
     let inline min3 (a, b, c) = min a b |> min c
-    
+
     /// Returns the biggest of three elements.
     let inline max3 (a, b, c) = max a b |> max c
-    
+
     /// Returns the smallest of four elements.
-    let inline min4 (a, b, c, d) = min a b |> min c |> min d  
-    
+    let inline min4 (a, b, c, d) = min a b |> min c |> min d
+
     /// Returns the biggest of four elements.
     let inline max4 (a, b, c, d) = max a b |> max c |> max d
 
@@ -37,29 +37,29 @@ module MinMaxSort =
     /// Elements are compared by applying the predicate function first.
     /// If they are equal after function is applied then the the order is kept
     let inline sort2By f (a, b) = if f a <= f b  then a, b else b, a
-        
+
     /// Sort three elements.
     /// If any are equal then the the order is kept
     let inline sort3 (a, b, c) = 
-        if a <= b then           
+        if a <= b then
             if b <= c then      a, b, c
-            else // c<b        
+            else // c<b
                 if a <= c then  a, c, b
                 else            c, a, b
-        else // b<a            
+        else // b<a
             if a <= c then      b, a, c
-            else //c<a         
-                if b <= c then  b, c, a 
+            else //c<a
+                if b <= c then  b, c, a
                 else            c, b, a
-    
+
     /// Sort three elements.
-    /// Elements are compared by applying the predicate function first.   
+    /// Elements are compared by applying the predicate function first.
     /// If any are equal after function is applied then the the order is kept
     let inline sort3By f (aa, bb, cc) = 
         let a = f aa
         let b = f bb
-        let c = f cc        
-        if a <= b then 
+        let c = f cc
+        if a <= b then
             if b <= c then      aa, bb, cc
             else // c<b
                 if a <= c then  aa, cc, bb
@@ -67,23 +67,23 @@ module MinMaxSort =
         else // b<a
             if a <= c then      bb, aa, cc
             else //c<a
-                if b <= c then  bb, cc, aa 
+                if b <= c then  bb, cc, aa
                 else            cc, bb, aa
-    
+
     /// Compare two elements. Returns -1, 0 or 1
     /// if   a= b then  0
     /// elif a<b  then -1
-    /// else            1 
-    let inline cmp a b =
+    /// else            1
+    let inline cmp a b = 
         if   a= b then  0
         elif a<b  then -1
-        else            1 
-        
-    /// Gets the positiv differnce between 2 numbers. 
+        else            1
+
+    /// Gets the positiv differnce between 2 numbers.
     /// Avoids the integer( or byte) overflow and underflow risk of "abs(a-b)"
-    let inline diff a b =
+    let inline diff a b = 
         if   a<b then b-a
-        else          a-b 
+        else          a-b
 
 
 /// Operators for chaining compare operations like: <c> 1 <. x .< 9 </c>
@@ -110,7 +110,7 @@ module CompareOperators =
     let inline (.<=.) (leftResult, middle) right = leftResult && (middle <= right), right
 
 
-    (* 
+    (*
     this reversed order does not realy make sense since the combinig logic is always AND (&&)
 
     let x = 2
@@ -134,4 +134,4 @@ module CompareOperators =
     /// For inner expressions: like this: min <. x .<. y .< max
     let inline (.>.) (leftResult, middle) right = leftResult && (middle > right), right
     *)
-    
+
