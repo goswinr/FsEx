@@ -26,35 +26,41 @@ module Process =
         p.Start() |> ignore
         p.BeginOutputReadLine()
         p.BeginErrorReadLine()
-        p.WaitForExit() 
+        p.WaitForExit()    
+
+
 
     
     /// Run a command synchronously.
     /// ProcessName, the arguments, output text and errors will be printed to Console.Out.
-    /// "^^^^^^^^^^^^" is printed before and "vvvvvvvvvvvvvvvv" after each process.
+    /// Each process's output is sourrounded by a border drawn with ASCII art characters.
     /// If this is called inside Seff Editor the words in redHighlights and greenHighlights will be highlighted if found in the output text.    
     let runWithHighlighting (redHighlights:string list) (greenHighlights:string list) processName arguments : unit = 
         let gray = 170        
-        Printfn.color 180 180 255 "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"  
+        Console.WriteLine "┌────────────────────────────────────────────────────────────────────────────────────────────────────────"  
+        Console.Write "│"
         Printf.color 50 50 100 "%s " processName
         Printfn.color 50 50 180 "%s" arguments   
         run            
             (fun txt ->
                 let mutable printPending = true
                 for r in redHighlights do
-                    if printPending && not (String.IsNullOrWhiteSpace r) && txt.Contains(r) then
+                    if printPending && not (String.IsNullOrWhiteSpace r) && txt.Contains(r) then //TODO: add Regex based highlighting
+                        Console.Write "│"
                         printWithHighlightColor 240 0 0 gray gray gray r txt
                         printPending <- false
                 for g in greenHighlights do
                     if  printPending && not (String.IsNullOrWhiteSpace g) && txt.Contains(g) then
+                        Console.Write "│"
                         printWithHighlightColor 0 200 0 gray gray gray g txt
                         printPending <- false
                 if printPending then
+                    Console.Write "│"
                     Printfn.color gray gray gray "%s" txt  )
-            (fun e -> Printfn.color 240 0 240 "%s" e )
+            (fun e -> Console.Write "│" ;  Printfn.color 240 0 240 "%s" e )
             processName
             arguments
-        Printfn.color 180 180 255 "vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv"
+        Console.WriteLine "└────────────────────────────────────────────────────────────────────────────────────────────────────────"
 
 
     (*

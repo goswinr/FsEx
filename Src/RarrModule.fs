@@ -827,7 +827,7 @@ module Rarr =
 
 
 
-    /// <summary>Returns an empty Rarr of the given type.</summary>
+    /// <summary>Returns an empty Rarr of the given type. With initial capacity zero.</summary>
     /// <returns>The empty Rarr.</returns>
     [<GeneralizableValue>]
     let inline empty<'T> : Rarr<'T> = 
