@@ -141,7 +141,7 @@ module IO =
         let getNonBlockingStream (path:string) = 
             // using a stream allows for non blocking file access
             use stream  = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-            use mstream = new MemoryStream(int stream.Length)
+            let mstream = new MemoryStream(int stream.Length)
             stream.CopyTo(mstream)
             stream.Dispose()
             mstream
