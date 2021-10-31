@@ -9,6 +9,7 @@ open System.Collections.Generic
 /// In F# use #nowarn "44" to disable the obsolete warning for this hidden member.
 [<NoComparison>]
 [<NoEquality>] // TODO add structural equality
+[<Sealed>]
 type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) = 
 
     //using inheritance from Dictionary would not work because .Item method is seald and cant have an override

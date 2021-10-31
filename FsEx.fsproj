@@ -18,16 +18,11 @@
     <Product>FsEx</Product>
     <PackageId>FsEx</PackageId>
 
-    <Version>0.7.0</Version>
-    <AssemblyVersion>0.7.0</AssemblyVersion>
-    <FileVersion>0.7.0</FileVersion>
+    <Version>0.8.0</Version>
+    <AssemblyVersion>0.8.0</AssemblyVersion>
+    <FileVersion>0.8.0</FileVersion>
     <PackageReleaseNotes>
-      - Add Process Module for running external Processes
-      - Fix Rarr.rotate
-      - Add Rarr.isNotEmpty
-      - Add IO.getAllFilesInParentsByPattern
-      - Typo in Timer μs is actually  ms
-      - Add String.truncate, skip and take methods
+      - update Process Module for running external Processes
     </PackageReleaseNotes>
 
     <Authors>GoswinR</Authors>

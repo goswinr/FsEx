@@ -15,7 +15,7 @@ open NiceString
 /// The name Rarr is derived from of the F# type ResizeArray
 /// There is a hidden member called "List" to access the underlaying List<'T> directly
 /// In F# use #nowarn "44" to disable the obsolete warning for this hidden member.
-[<NoComparison>]
+[<Sealed;NoComparison>]
 type Rarr<'T> private (xs:List<'T>) = 
 
 

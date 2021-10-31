@@ -9,6 +9,7 @@ open System.Collections.Generic
 /// Like defaultdict in Python
 [<NoComparison>]
 [<NoEquality>] // TODO add structural equality
+[<Sealed>]
 type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, baseDict : Dictionary<'K,'V>) = 
 
     //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
