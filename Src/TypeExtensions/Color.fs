@@ -31,22 +31,26 @@ module Color =
         let now = DateTime.Now
         let seed = now.TimeOfDay
         new Random(int <| seed.TotalMilliseconds * 0.001295473) // random seed different than other modules
+    
+    
+    //let inline private (!!) (x:float<_>) :float  = float x
+    //let inline private (!^) (x:float) = LanguagePrimitives.FloatWithMeasure x
 
     /// Compares two colors only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor
     let isEqualARGB (this:Color) (other:Color) = 
         this.EqualsARGB(other)
 
     /// Given Hue,Saturation,Luminance in range of 0.0 to 1.0, returns a Drawing.Color
-    let fromHSL (H,S,L) = 
+    let fromHSL (hue:float, saturation:float, luminance:float) = 
         // from http://stackoverflow.com/questions/2942/hsl-in-net
         // or http://bobpowell.net/RGBHSB.aspx
         // allow some numerical error:
-        if not (-0.001 <. H .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.fromHSL: H is bigger than 1.0 or smaller than 0.0: %f" H
-        if not (-0.001 <. S .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.fromHSL: S is bigger than 1.0 or smaller than 0.0: %f" S
-        if not (-0.001 <. L .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.fromHSL: L is bigger than 1.0 or smaller than 0.0: %f" L
-        let H = UtilMath.clamp 0. 1. H
-        let S = UtilMath.clamp 0. 1. S
-        let L = UtilMath.clamp 0. 1. L
+        if not (-0.001 <. hue        .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.fromHSL: H is bigger than 1.0 or smaller than 0.0: %f" hue
+        if not (-0.001 <. saturation .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.fromHSL: S is bigger than 1.0 or smaller than 0.0: %f" saturation
+        if not (-0.001 <. luminance  .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.fromHSL: L is bigger than 1.0 or smaller than 0.0: %f" luminance
+        let H = UtilMath.clamp 0. 1. hue
+        let S = UtilMath.clamp 0. 1. saturation
+        let L = UtilMath.clamp 0. 1. luminance
         let v = if L <= 0.5 then L * (1.0 + S) else L + S - L * S
         let r,g,b = 
             if v > 0.001 then
@@ -73,10 +77,18 @@ module Color =
 
     /// Returns a color value from gradient blue to green  to yellow to red, excludes purple
     /// Input value to range from 0.0 to 1.0
-    /// Will fail on to small or too big values,
+    /// Will fail on too small or too big values,
     /// but up to a tolerance of 0.001 values wil be clamped to 0 or 1.
-    let fromInterval v = 
+    let gradientFromInterval (v) = 
         if not (-0.001 <. v .< 1.001) then ArgumentOutOfRangeException.Raise " FsEx.Color.FromInterval: v is bigger than 1.0 or smaller than 0.0: %f" v
+        let v = UtilMath.clamp 0. 1. v
+        let v = (1.0 - v) * 0.7 // 0.66666666 // to NOT make full color cirle, that means to exclude the purple values.
+        fromHSL (v,1.0,0.5)
+
+    /// Returns a color value from gradient blue to green to yellow to red, excludes purple
+    /// Input value to range from 0.0 to 1.0
+    /// Will clamp on too small or too big values.
+    let gradientFromIntervalClamped (v) = 
         let v = UtilMath.clamp 0. 1. v
         let v = (1.0 - v) * 0.7 // 0.66666666 // to NOT make full color cirle, that means to exclude the purple values.
         fromHSL (v,1.0,0.5)
