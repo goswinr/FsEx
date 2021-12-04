@@ -25,25 +25,26 @@ module NiceStringSettings =
     /// default = 3
     let mutable maxNestingDepth = 3
 
-    /// Set this to change how how many items per seq are printed (printFull ignores this).
+    /// Set this to change how many items per seq are printed (printFull ignores this).
     /// default = 6
     let mutable maxItemsPerSeq = 6
 
-    /// Set this to change how how many items can be in one line before switching to vertical sequence.
+    /// Set this to change how  many items can be in one line before switching to vertical sequence.
     /// default = 80
     let mutable maxCharsPerLine = 80
 
-    /// Set this to change how many characters of a string might be printed at onece.
+    /// Set this to change how many characters of a string might be printed at once.
     /// default = 2000
     let mutable maxCharsInString = 2000
 
-    /// If the absolut value of a float is below this, display ±0.0
-    /// default = Double.Epsilon = no rounding down
-    /// This value can be set for exmaple by hosting apps that have a build in absolute tolerance like Rhion3d
-    let mutable roundToZeroBelow = Double.Epsilon
+    /// If the absolute value of a float is below this, display ±0.0
+    /// Default = 1e-24. 
+    /// Double.Epsilon = no rounding down
+    /// This value can be set for example by hosting apps that have a build in absolute tolerance like Rhino3d
+    let mutable roundToZeroBelow = 1e-24 // Double.Epsilon
 
-    /// Allows to inject an optional formater that gets called befor main formater
-    /// This formater shall return None if the main formater should be used
+    /// Allows to inject an optional formatter that gets called before main formatter
+    /// This formatter shall return None if the main formatter should be used
     /// use externalFormater for types defined in other assemblies
     let mutable externalFormater : obj -> option<Lines> = 
         fun _ -> None
@@ -93,10 +94,10 @@ module NiceFormat  =  // used by Rhino.Scripting
     open NiceStringSettings
 
     //let internal deDE = Globalization.CultureInfo("de-DE")
-    let private invC = Globalization.CultureInfo.InvariantCulture
+    let internal invC = Globalization.CultureInfo.InvariantCulture
 
-    /// Assumes a string that represent a float or int with '.' as decimal serapator and no other input formating
-    let private addThousandSeparators (s:string) = 
+    /// Assumes a string that represent a float or int with '.' as decimal separator and no other input formating
+    let internal addThousandSeparators (s:string) = 
         let b = Text.StringBuilder(s.Length + s.Length / 3 + 1)
         let inline add (c:char) = b.Append(c) |> ignoreObj
 
@@ -119,11 +120,22 @@ module NiceFormat  =  // used by Rhino.Scripting
             else                          0
 
         match s.IndexOf('.') with
-        | -1 -> doBeforeComma start (s.Length-1)
+        | -1 -> 
+            match s.IndexOf('e') with // TODO check for 'E' too ?
+            | -1 -> doBeforeComma start (s.Length-1)
+            | e -> // if float is in scientific notation dont insert comas into it too:
+                doBeforeComma start (s.Length-1)
+                for ei = e to s.Length-1 do add s.[ei]
         | i ->
-            if i>start then doBeforeComma start (i-1)
+            if i>start then 
+                doBeforeComma start (i-1)
             add '.'
-            if i < s.Length then doAfterComma (i+1) (s.Length-1)
+            if i < s.Length then 
+                match s.IndexOf('e') with
+                | -1 -> doAfterComma (i+1) (s.Length-1)
+                | e -> // if float is in scientific notation dont insert comas into it too:
+                    doAfterComma (i+1) (e-1)
+                    for ei = e to s.Length-1 do add s.[ei]
 
         b.ToString()
 
@@ -179,9 +191,9 @@ module NiceFormat  =  // used by Rhino.Scripting
             elif a <  roundToZeroBelow then Literals.RoundedToZero
             elif a >= 1000.      then x.ToString("#")
             elif a >= 100.       then x.ToString("#.#" , invC)
-            elif a >= 10.        then x.ToString("#.##" , invC)
-            elif a >= 1.         then x.ToString("#.###" , invC)
-            elif a >= 0.1        then x.ToString("0.####" , invC)|> addThousandSeparators
+            elif a >= 10.        then x.ToString("0.0#" , invC)
+            elif a >= 1.         then x.ToString("0.0##" , invC)
+            elif a >= 0.1        then x.ToString("0.####" , invC)
             elif a >= 0.01       then x.ToString("0.#####" , invC)|> addThousandSeparators
             elif a >= 0.001      then x.ToString("0.######" , invC)|> addThousandSeparators
             elif a >= 0.0001     then x.ToString("0.#######" , invC)|> addThousandSeparators
@@ -189,8 +201,18 @@ module NiceFormat  =  // used by Rhino.Scripting
             elif a >= 0.000001   then x.ToString("0.#########" , invC)|> addThousandSeparators
             elif a >= 0.0000001  then x.ToString("0.##########" , invC)|> addThousandSeparators
             elif a >= 0.000000000000001 then x.ToString("0.###############" , invC)|> addThousandSeparators // 15 decimal paces for doubles
-            elif x >= 0.0 then "~0.0"
-            else "~-0.0"
+            elif x >= 0.0 then Literals.AlmostZero
+            else Literals.AlmostZeroNeg
+    
+    /// prints float via x.ToString("R"), then still adds Thousand Separators
+    let floatR  (x:float) = 
+        if   Double.IsNaN x then Literals.NaN
+        elif x = Double.NegativeInfinity then Literals.NegativeInfinity
+        elif x = Double.PositiveInfinity then Literals.PositiveInfinity
+        elif x = -1.23432101234321e+308 then Literals.RhinoMathUnsetDouble 
+        elif x = 0.0 then "0.0" // not "0" as in sprintf "%g"
+        else x.ToString("R") |> addThousandSeparators // R for round tripping: https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings?redirectedfrom=MSDN#round-trip-format-specifier-r
+           
 
 
     /// Formating with automatic precision
@@ -203,13 +225,17 @@ module NiceFormat  =  // used by Rhino.Scripting
             elif a <  decimal(roundToZeroBelow) then Literals.RoundedToZero
             elif a >= 1000M   then x.ToString("#")
             elif a >= 100M    then x.ToString("#.#" , invC)
-            elif a >= 10M     then x.ToString("#.##" , invC)
-            elif a >= 1M      then x.ToString("#.###" , invC)
+            elif a >= 10M     then x.ToString("0.0#" , invC)
+            elif a >= 1M      then x.ToString("0.0##" , invC)
             elif a >= 0.1M    then x.ToString("0.####" , invC)
-            elif a >= 0.01M   then x.ToString("0.#####" , invC)
-            elif a >= 0.001M  then x.ToString("0.######" , invC)
-            elif a >= 0.0001M then x.ToString("0.#######" , invC)
-            else                   x.ToString("0.########" , invC)
+            elif a >= 0.01M   then x.ToString("0.#####" , invC) |> addThousandSeparators
+            elif a >= 0.001M  then x.ToString("0.######" , invC) |> addThousandSeparators
+            elif a >= 0.0001M then x.ToString("0.#######" , invC) |> addThousandSeparators
+            else                   x.ToString("0.########" , invC)|> addThousandSeparators
+    
+    /// prints decimal via x.ToString("R"), then still adds Thousand Separators
+    let decimalR  (d:Decimal) = 
+        d.ToString("R") |> addThousandSeparators
 
     /// Formating with automatic precision
     /// e.g.: 0 digits behind comma if above 1000
@@ -225,12 +251,22 @@ module NiceFormat  =  // used by Rhino.Scripting
             elif a <  float32(roundToZeroBelow) then Literals.RoundedToZero
             elif a >= 1000.f  then x.ToString("#")
             elif a >= 100.f   then x.ToString("#.#" , invC)
-            elif a >= 10.f    then x.ToString("#.##" , invC)
-            elif a >= 1.f     then x.ToString("0.###" , invC)
+            elif a >= 10.f    then x.ToString("0.0#" , invC)
+            elif a >= 1.f     then x.ToString("0.0##" , invC)
             elif a >= 0.1f    then x.ToString("0.####" , invC)
-            elif a >= 0.01f   then x.ToString("0.#####" , invC)
-            elif a >= 0.001f  then x.ToString("0.######" , invC)
-            else                   x.ToString("0.#######" , invC) // 7 decimal paces for singles
+            elif a >= 0.01f   then x.ToString("0.#####" , invC) |> addThousandSeparators
+            elif a >= 0.001f  then x.ToString("0.######" , invC) |> addThousandSeparators
+            else                   x.ToString("0.#######" , invC) |> addThousandSeparators// 7 decimal paces for singles
+    
+    /// prints single via x.ToString("R"), then still adds Thousand Separators
+    let singleR (x:float32) = 
+        if   Single.IsNaN x then Literals.NaN
+        elif x = Single.NegativeInfinity then Literals.PositiveInfinity
+        elif x = Single.PositiveInfinity then Literals.NegativeInfinity
+        elif x = -1.234321e+38f then Literals.RhinoMathUnsetSingle 
+        elif x = 0.0f then "0.0" // not "0" as in sprintf "%g"
+        else x.ToString("R")|> addThousandSeparators // R for round triping: https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings?redirectedfrom=MSDN#round-trip-format-specifier-r
+            
 
 
     /// If the input string is longer than maxChars + 20 then
@@ -279,6 +315,7 @@ module internal NiceStringImplementation  =
     open System.Collections.Generic
     open Microsoft.FSharp.Reflection
     open NiceStringSettings
+    open NiceFormat
 
     // TODO test alternative implementations:
     // https://github.com/eiriktsarpalis/TypeShape/blob/main/samples/TypeShape.Samples/printer.fs
@@ -287,6 +324,19 @@ module internal NiceStringImplementation  =
     // http://www.fssnip.net/cV/title/A-Generic-PrettyPrinter-for-Record-types
 
     type SeqCount = Counted of int | More of int
+
+
+    let getNiceOrDefault(typ:Type, x:obj) :Lines=
+        let nstr = typ.GetProperty("ToNiceString")
+        if notNull nstr then 
+            match nstr.GetValue(x) with 
+            |null -> sprintf "%A" x 
+            | :? string as s -> s   
+            | _ -> sprintf "%A" x   
+        else                 
+            sprintf "%A" x         
+        |> Element
+        
 
     /// retruns if the returned list is trimmed to maxCount,  input has more elements then maxCount
     let rec getItemsInSeq (nsl:NicePrintSettings) depth (xs:Collections.IEnumerable) : ResizeArray<Lines>=  // non generic IEnumerable
@@ -335,25 +385,26 @@ module internal NiceStringImplementation  =
     and getLines  (nsl:NicePrintSettings) (depth:int) (x:obj) : Lines = 
         match externalFormater x with // first check if externalFormater provides a string , this is used e.g. for types from RhinoCommon.dll
         | Some ln -> ln
-        | None ->
+        | None ->            
+            let topAndFull = depth=0 && nsl.maxVertItems = Int32.MaxValue  // to not  truncate string if toplevel and printFull
+
             match x with // boxed already
-            | null -> "'null' (or Option.None)"               |> Element
-            | :? int        as i   -> i |> NiceFormat.int     |> Element
-            | :? float      as v   -> v |> NiceFormat.float   |> Element
-            | :? single     as v   -> v |> NiceFormat.single  |> Element
-            | :? decimal    as d   -> d |> NiceFormat.decimal |> Element
-            | :? Char       as c   -> c.ToString()            |> Element // "'" + c.ToString() + "'" // or add qotes?
-            | :? string     as s   -> if depth=0 && nsl.maxVertItems = Int32.MaxValue then s |> Element // dont truncate string if toplevel and printFull
-                                      else  NiceFormat.truncateString s  |> Element
-            | :? Guid       as g   -> sprintf "Guid[%O]" g    |> Element
+            | null -> "'null' (or Option.None)"                                                                   |> Element
+            | :? int        as i   -> i |> NiceFormat.int                                                         |> Element
+            | :? float      as v   -> (if topAndFull then v |> NiceFormat.floatR   else  v |> NiceFormat.float  ) |> Element
+            | :? single     as v   -> (if topAndFull then v |> NiceFormat.singleR  else  v |> NiceFormat.single ) |> Element
+            | :? decimal    as d   -> (if topAndFull then d |> NiceFormat.decimalR else  d |> NiceFormat.decimal) |> Element
+            | :? Char       as c   -> c.ToString()                                                                |> Element  // "'" + c.ToString() + "'" // or add qotes?
+            | :? string     as s   -> (if topAndFull then s else  NiceFormat.truncateString s)                    |> Element // dont truncate string if toplevel and printFull                                      
+            | :? Guid       as g   -> sprintf "Guid[%O]" g                                                        |> Element
             | :? Collections.ICollection as xs -> getCollection nsl depth x xs
             | :? Collections.IEnumerable as xs -> getSeq nsl depth x xs
             | _ ->
                 let typ = x.GetType()
                 if depth = 0 then
-                    if FSharpType.IsTuple(typ) then     // just to trim brackerts off
+                    if FSharpType.IsTuple(typ) then     // just to trim brackets off
                         let tyStr = NiceFormat.typeName typ
-                        let formatA = (sprintf "%A" x) .[1.. ^1] // trim enclosing in brackets ?
+                        let formatA = (sprintf "%A" x) .[1 .. ^1] // trim enclosing in brackets ?
                         Element (sprintf "%s: %s" tyStr formatA)
                         //let fields = FSharpValue.GetTupleFields(x)
                         //let desc =  sprintf "%s of %d items" tyStr fields.Length
@@ -368,12 +419,12 @@ module internal NiceStringImplementation  =
                         //if depth = maxDepth then Element desc else Head (desc, getItemsInSeq (depth+1) fields) // TODO test what are the fields
 
                     else
-                        sprintf "%A" x |> Element
+                        getNiceOrDefault(typ,x)
                 else
                     if FSharpType.IsTuple(typ) then
                         Element (sprintf "%A" x) .[1.. ^1] // trim enclosing in brackets ?
                     else
-                        sprintf "%A" x |> Element
+                        getNiceOrDefault(typ,x)
 
 
         (*
