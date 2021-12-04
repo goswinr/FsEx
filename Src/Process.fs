@@ -6,7 +6,7 @@ open System
 module Process = 
 
     /// Run a command synchronously.
-    /// The error and standart text output is redirected to the delegates 'output' and 'error'.
+    /// The error and standard text output is redirected to the delegates 'output' and 'error'.
     let run (output:string->unit) (error:string->unit) processName arguments : unit =         
         //https://stackoverflow.com/questions/1145969/processinfo-and-redirectstandardoutput
         let p = new Diagnostics.Process()
@@ -33,7 +33,7 @@ module Process =
     
     /// Run a command synchronously.
     /// ProcessName, the arguments, output text and errors will be printed to Console.Out.
-    /// Each process's output is sourrounded by a border drawn with ASCII art characters.
+    /// Each process's output is surrounded by a border drawn with ASCII art characters.
     /// If this is called inside Seff Editor the words in redHighlights and greenHighlights will be highlighted if found in the output text.    
     let runWithHighlighting (redHighlights:string list) (greenHighlights:string list) processName arguments : unit = 
         let gray = 170        

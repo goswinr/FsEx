@@ -102,7 +102,7 @@ module NiceFormat  =  // used by Rhino.Scripting
         let inline add (c:char) = b.Append(c) |> ignoreObj
 
         let inline doBeforeComma st en = 
-            for i=st to en-1 do // dont go to last one becaus it shal never get a separator
+            for i=st to en-1 do // don't go to last one because it shall never get a separator
                 let rest = en-i
                 add s.[i]
                 if rest % 3 = 0 then add thousandSeparator
@@ -110,7 +110,7 @@ module NiceFormat  =  // used by Rhino.Scripting
 
         let inline doAfterComma st en = 
             add s.[st] //add fist (never with sep)
-            for i=st+1 to en do // dont go to last one becaus it shal never get a separator
+            for i=st+1 to en do // don't go to last one because it shall never get a separator
                 let pos = i-st
                 if pos % 3 = 0 then add thousandSeparator
                 add s.[i]
@@ -123,7 +123,7 @@ module NiceFormat  =  // used by Rhino.Scripting
         | -1 -> 
             match s.IndexOf('e') with // TODO check for 'E' too ?
             | -1 -> doBeforeComma start (s.Length-1)
-            | e -> // if float is in scientific notation dont insert comas into it too:
+            | e -> // if float is in scientific notation don't insert comas into it too:
                 doBeforeComma start (s.Length-1)
                 for ei = e to s.Length-1 do add s.[ei]
         | i ->
@@ -133,7 +133,7 @@ module NiceFormat  =  // used by Rhino.Scripting
             if i < s.Length then 
                 match s.IndexOf('e') with
                 | -1 -> doAfterComma (i+1) (s.Length-1)
-                | e -> // if float is in scientific notation dont insert comas into it too:
+                | e -> // if float is in scientific notation don't insert comas into it too:
                     doAfterComma (i+1) (e-1)
                     for ei = e to s.Length-1 do add s.[ei]
 
@@ -270,7 +270,7 @@ module NiceFormat  =  // used by Rhino.Scripting
 
 
     /// If the input string is longer than maxChars + 20 then
-    /// it returns the input string trimmed to maxChars, a count of skiped characters and the last 6 characters (all enclosed in double quotes ")
+    /// it returns the input string trimmed to maxChars, a count of skipped characters and the last 6 characters (all enclosed in double quotes ")
     /// e.g. "abcde[..20 more Chars..]xyz"
     /// Else, if the input string is less than maxChars + 20, it is still returned in full (enclosed in double quotes ").
     /// also see String.truncatedFormated
@@ -338,7 +338,7 @@ module internal NiceStringImplementation  =
         |> Element
         
 
-    /// retruns if the returned list is trimmed to maxCount,  input has more elements then maxCount
+    /// returns if the returned list is trimmed to maxCount,  input has more elements then maxCount
     let rec getItemsInSeq (nsl:NicePrintSettings) depth (xs:Collections.IEnumerable) : ResizeArray<Lines>=  // non generic IEnumerable
         let mutable reachedEnd = false
         let mutable k = 0
@@ -350,7 +350,7 @@ module internal NiceStringImplementation  =
             match lns with
             |Element s -> chars <- chars + s.Length
             |EarlyEnd  -> chars <- chars + 4
-            |Head _    -> chars <- 9999 // to stop this line if k is alreadey more than nsl.maxVertItems via ( || chars < nsl.maxHorChars). dont do nested seq in one line !
+            |Head _    -> chars <- 9999 // to stop this line if k is alreadey more than nsl.maxVertItems via ( || chars < nsl.maxHorChars). don't do nested seq in one line !
             rs.Add(lns)
             k <- k+1
         if enum.MoveNext() then // don@iteret full seqence if only the first few items are printed
@@ -395,7 +395,7 @@ module internal NiceStringImplementation  =
             | :? single     as v   -> (if topAndFull then v |> NiceFormat.singleR  else  v |> NiceFormat.single ) |> Element
             | :? decimal    as d   -> (if topAndFull then d |> NiceFormat.decimalR else  d |> NiceFormat.decimal) |> Element
             | :? Char       as c   -> c.ToString()                                                                |> Element  // "'" + c.ToString() + "'" // or add qotes?
-            | :? string     as s   -> (if topAndFull then s else  NiceFormat.truncateString s)                    |> Element // dont truncate string if toplevel and printFull                                      
+            | :? string     as s   -> (if topAndFull then s else  NiceFormat.truncateString s)                    |> Element // don't truncate string if toplevel and printFull                                      
             | :? Guid       as g   -> sprintf "Guid[%O]" g                                                        |> Element
             | :? Collections.ICollection as xs -> getCollection nsl depth x xs
             | :? Collections.IEnumerable as xs -> getSeq nsl depth x xs
@@ -495,7 +495,7 @@ module internal NiceStringImplementation  =
                     sb.Append(h) |> ignoreObj
                     // items:
                     if xs.Count=0 then
-                        sb.AppendLine()  |> ignoreObj // dont add colon, no items follow
+                        sb.AppendLine()  |> ignoreObj // don't add colon, no items follow
                     elif appendIfFitInOneLine(sb,nsl, xs) then
                         ()
                     else // list items vertically

@@ -79,11 +79,11 @@ module Seq =
         xs.Slice(startIdx,endIdx)
 
     /// Gets an item by index position in the Seq
-    /// Allows for negtive index too (like Python)
+    /// Allows for negative index too (like Python)
     let getNeg index  (xs:seq<'T>) = 
         xs.GetNeg(index)
 
-    /// Considers sequence cirular and move elements up or down
+    /// Considers sequence circular and move elements up or down
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
     /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a]
     let rotate r (xs:seq<'T>) = 
@@ -116,7 +116,7 @@ module Seq =
     //---------------------prev-this-next ------------------------------
     //------------------------------------------------------------------
 
-    /// Yields a looped Seq from (first, second)  upto (last, first)
+    /// Yields a looped Seq from (first, second)  up to (last, first)
     /// The length of the resulting seq is the same as the input seq.
     /// Use Seq.windowed2 if you don't want a looped sequence.
     let thisNext (xs:seq<'T>) : seq<'T*'T> = 
@@ -136,7 +136,7 @@ module Seq =
             else
                 IndexOutOfRangeException.Raise "Seq.thisNext: Empty Input Sequence"}
 
-    /// Yields a Seq from (first, second)  upto (second last, last)
+    /// Yields a Seq from (first, second)  up to (second last, last)
     /// The length of the resulting seq is one shorter than input seq.
     /// Use Seq.thisNext if you want a looped sequence till (last, first)
     let windowed2 (xs:seq<'T>): seq<'T*'T> = 
@@ -155,7 +155,7 @@ module Seq =
                 IndexOutOfRangeException.Raise "Seq.windowed2: Empty Input Sequence"}
 
 
-    /// Yields looped Seq from (0, first, second)  upto (lastIndex, last, first)
+    /// Yields looped Seq from (0, first, second)  up to (lastIndex, last, first)
     /// The length of the resulting seq is the same as the input seq.
     /// Use Seq.windowed2i if you don't want a looped sequence.
     let iThisNext (xs:seq<'T>): seq<int *'T*'T>  = 
@@ -178,7 +178,7 @@ module Seq =
             else
                 IndexOutOfRangeException.Raise "thisNextLooped: Empty Input Sequence"}
 
-    /// Yields a Seq from (0,first, second) upto (secondLastIndex, second last, last)
+    /// Yields a Seq from (0,first, second) up to (secondLastIndex, second last, last)
     /// The length of the resulting seq is one shorter than input seq.
     /// Use Seq.iTthisNext if you want a looped sequence till (lastIndex,last, first)
     let windowed2i (xs:seq<'T>): seq<int *'T*'T> = 
@@ -199,7 +199,7 @@ module Seq =
                 IndexOutOfRangeException.Raise "Seq.windowed2i: Empty Input Sequence"}
 
 
-    /// Yields a looped Seq from (last, first, second)  upto (second-last, last, first)
+    /// Yields a looped Seq from (last, first, second)  up to (second-last, last, first)
     /// The length of the resulting seq is the same as the input seq.
     /// Use Seq.windowed3 if you don't want a looped sequence.
     let prevThisNext (xs:seq<'T>) : seq<'T *'T*'T> =  seq {
@@ -227,9 +227,9 @@ module Seq =
             IndexOutOfRangeException.Raise "Seq.prevThisNextLooped: Empty Input Sequence %A" xs}
 
 
-    /// Yields a Seq from (first, second, third)  upto (third-last, second-last, last)
+    /// Yields a Seq from (first, second, third)  up to (third-last, second-last, last)
     /// The length of the resulting seq is two shorter than the input seq.
-    /// Use Seq.prevThisNext if you want a looped sequence upto (second-last, last, first)
+    /// Use Seq.prevThisNext if you want a looped sequence up to (second-last, last, first)
     let windowed3 (xs:seq<'T>) : seq<'T *'T*'T> =  seq {
         use e = xs.GetEnumerator()
         if e.MoveNext() then
@@ -252,7 +252,7 @@ module Seq =
             IndexOutOfRangeException.Raise "Seq.windowed3: Empty Input Sequence %A" xs}
 
 
-    /// Yields looped Seq from (0, last, first, second)  upto (lastIndex, second-last, last, first)
+    /// Yields looped Seq from (0, last, first, second)  up to (lastIndex, second-last, last, first)
     /// The length of the resulting seq is the same as the input seq.
     /// Use Seq.windowed3i if you don't want a looped sequence.
     let iPrevThisNext (xs:seq<'T>) : seq<int*'T *'T*'T> = seq {
@@ -281,9 +281,9 @@ module Seq =
         else
             IndexOutOfRangeException.Raise "prevThisNextLooped: Empty Input Sequence %A" xs}
 
-    /// Yields a Seq from (1, first, second, third)  upto (secondLastIndex, third-last, second-last, last)
+    /// Yields a Seq from (1, first, second, third)  up to (secondLastIndex, third-last, second-last, last)
     /// The length of the resulting seq is two shorter than the input seq.
-    /// Use Seq.iPrevThisNext if you want a looped sequence upto (lastIndex,second-last, last, first)
+    /// Use Seq.iPrevThisNext if you want a looped sequence up to (lastIndex,second-last, last, first)
     let windowed3i (xs:seq<'T>) : seq<int*'T *'T*'T> =  seq {
         use e = xs.GetEnumerator()
         if e.MoveNext() then

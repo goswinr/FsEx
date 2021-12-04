@@ -57,7 +57,7 @@ type Timer() =
     let stopWatch = new Diagnostics.Stopwatch()
 
     do
-        ticWithGC stopWatch kGC // start stopwatch immediatly in constructor
+        ticWithGC stopWatch kGC // start stopwatch immediately in constructor
 
     /// Returns time and Garbage Collector information
     /// since last tic (or toc) as string, then reset and restart timer

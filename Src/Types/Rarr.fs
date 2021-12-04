@@ -11,7 +11,7 @@ open NiceString
 /// and some more useful methods like this.First or this.Last.
 /// It's a very thin wrapper over a System.Collections.Generic.List<'T>
 /// It has all members and interfaces of List<'T> implemented.
-/// Just like F# Arrays and list, Rarr comparsion is also structural.
+/// Just like F# Arrays and list, Rarr comparison is also structural.
 /// The name Rarr is derived from of the F# type ResizeArray
 /// There is a hidden member called "List" to access the underlaying List<'T> directly
 /// In F# use #nowarn "44" to disable the obsolete warning for this hidden member.
@@ -94,7 +94,7 @@ type Rarr<'T> private (xs:List<'T>) =
     /// Equal to this.[this.Count - 1]
     member this.Last
         with get() = 
-            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.Last: Failed to get last item of of empty Rarr<%s>" (typeof<'T>).FullName
+            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.Last: Failed to get last item of empty Rarr<%s>" (typeof<'T>).FullName
             xs.[xs.Count - 1]
         and set (v:'T) = 
             if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.Last: Failed to set last item of %s to %s" this.ToNiceStringLong (toNiceString v)
@@ -125,10 +125,10 @@ type Rarr<'T> private (xs:List<'T>) =
     /// Equal to this.[0]
     member this.First
         with get() = 
-            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.First: Failed to get first item of of empty Rarr<%s>" (typeof<'T>).FullName
+            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.First: Failed to get first item of empty Rarr<%s>" (typeof<'T>).FullName
             xs.[0]
         and set (v:'T) = 
-            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.First: Failed to set first item of of empty Rarr<%s> to  %s"  (typeof<'T>).FullName (toNiceString v)
+            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.First: Failed to set first item of empty Rarr<%s> to  %s"  (typeof<'T>).FullName (toNiceString v)
             xs.[0] <- v
 
     /// Get (or set) the second item in the FsEx.Rarr.
@@ -186,7 +186,7 @@ type Rarr<'T> private (xs:List<'T>) =
         xs.[index] <- value
 
     /// Gets an item in the FsEx.Rarr by index.
-    /// Allows for negtive index too ( -1 is last item,  like Python)
+    /// Allows for negative index too ( -1 is last item,  like Python)
     /// (From the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
     member this.GetNeg index = 
         let len = xs.Count
@@ -195,7 +195,7 @@ type Rarr<'T> private (xs:List<'T>) =
         xs.[ii]
 
     /// Sets an item in the FsEx.Rarr by index.
-    /// Allows for negtive index too ( -1 is last item,  like Python)
+    /// Allows for negative index too ( -1 is last item,  like Python)
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
     member this.SetNeg index value = 
         let len = xs.Count
@@ -349,7 +349,7 @@ type Rarr<'T> private (xs:List<'T>) =
 
     /// Sets or Gets the element at the given index. With nice error messages on bad indices.
     member this.Item // overriding this and other index based members is the main purpose off all of this class
-        // Of course it would be simpler to just override the .Item method on System.Collections.Generic.List<'T> but unfortunatly it is sealed
+        // Of course it would be simpler to just override the .Item method on System.Collections.Generic.List<'T> but unfortunately it is sealed
         with get index  = 
             if index < 0 then IndexOutOfRangeException.Raise "Index must be positive. Failed to get rarr.[%d] from:\r\n%s" index  this.ToNiceStringLong
             if index >= xs.Count then IndexOutOfRangeException.Raise "Failed to get rarr.[%d] from:\r\n%s" index this.ToNiceStringLong
@@ -479,7 +479,7 @@ type Rarr<'T> private (xs:List<'T>) =
         if arrayIndex < 0 then
             ArgumentException.RaiseBase "rarr.CopyTo: The start index %d cannot be less than zero ( for copying %d elements to array of %d)" arrayIndex  xs.Count array.Length
         if xs.Count + arrayIndex > array.Length then
-            ArgumentException.RaiseBase "rarr.CopyTo: The start index %d  is to big top copy %d  elemenys into Array of %d" arrayIndex  xs.Count array.Length
+            ArgumentException.RaiseBase "rarr.CopyTo: The start index %d  is to big top copy %d  elements into Array of %d" arrayIndex  xs.Count array.Length
         xs.CopyTo(array , arrayIndex)
 
     /// <summary>Copies a range of elements from the List to a compatible one-dimensional array, starting at the specified index of the target array.</summary>
@@ -489,13 +489,13 @@ type Rarr<'T> private (xs:List<'T>) =
     /// <param name="count">The number of elements to copy.</param>
     member _.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int) = 
         if arrayIndex< 0 then
-            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): The start index of target Array %d cannot be less than zero. (for copying %d elements starting at %d from Rarr of %d into array of size %d sttaring at array position %d)" arrayIndex  count index xs.Count array.Length arrayIndex
+            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): The start index of target Array %d cannot be less than zero. (for copying %d elements starting at %d from Rarr of %d into array of size %d starting at array position %d)" arrayIndex  count index xs.Count array.Length arrayIndex
         if index < 0 then
-            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): The start index of Rarr %d cannot be less than zero. (for copying %d elements starting at %d from Rarr of %d into array of size %d sttaring at array position %d)" index  count index xs.Count array.Length arrayIndex
+            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): The start index of Rarr %d cannot be less than zero. (for copying %d elements starting at %d from Rarr of %d into array of size %d starting at array position %d)" index  count index xs.Count array.Length arrayIndex
         if index + count > xs.Count then
-            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): index + count is more than xs.Count (for copying %d elements starting at %d from Rarr of %d into array of size %d sttaring at array position %d)" index  count index xs.Count array.Length arrayIndex
+            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): index + count is more than xs.Count (for copying %d elements starting at %d from Rarr of %d into array of size %d starting at array position %d)" index  count index xs.Count array.Length arrayIndex
         if count + arrayIndex > array.Length then
-            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): count is more than array.Length - arrayIndex (for copying %d elements starting at %d from Rarr of %d into array of size %d sttaring at array position %d)" index  count index xs.Count array.Length arrayIndex
+            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): count is more than array.Length - arrayIndex (for copying %d elements starting at %d from Rarr of %d into array of size %d starting at array position %d)" index  count index xs.Count array.Length arrayIndex
         xs.CopyTo(index , array , arrayIndex , count)
 
     /// <summary>Determines whether the List contains elements that match the conditions defined by the specified predicate.</summary>
@@ -627,7 +627,7 @@ type Rarr<'T> private (xs:List<'T>) =
 
     // Returns the index of the first occurrence of a given value in a range of
     // this list. The list is searched forwards, starting at index
-    // index and upto count number of elements. The
+    // index and up to count number of elements. The
     // elements of the list are compared to the given value using the
     // Object.Equals method.
     // This method uses the Array.IndexOf method to perform the  search.
@@ -678,7 +678,7 @@ type Rarr<'T> private (xs:List<'T>) =
 
     /// Returns the index of the last occurrence of a given value in a range of
     /// this list. The list is searched backwards, starting at index
-    /// and upto count elements. The elements of the list are compared to
+    /// and up to count elements. The elements of the list are compared to
     /// the given value using the Object.Equals method.
     /// This method uses the Array.LastIndexOf method to perform the search.
     member _.LastIndexOf(item : 'T, index:int, count:int) = 
@@ -794,7 +794,7 @@ type Rarr<'T> private (xs:List<'T>) =
         if Object.ReferenceEquals(this,other) then true
         elif this.Count <> other.Count then false
         else
-            let comparer = EqualityComparer<'T>.Default // for  structural equality to be implemented on this class without putting the <'T when 'T : equality> contraint on 'T?
+            let comparer = EqualityComparer<'T>.Default // for  structural equality to be implemented on this class without putting the <'T when 'T : equality> constraint on 'T?
             let rec eq i = 
                 if i < this.Count then
                     if comparer.Equals(this.List.[i] , other.List.[i]) then

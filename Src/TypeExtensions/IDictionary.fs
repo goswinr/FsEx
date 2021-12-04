@@ -4,10 +4,10 @@
 open System.Collections.Generic
 
 /// Provides Extensions for IDictionary
-/// Such as Items as ke value tuples , Pop(key)  or GetValue with nicer error message)
+/// Such as Items as key value tuples , Pop(key)  or GetValue with nicer error message)
 module ExtensionsIDictionary = 
 
-    // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
+    // overrides of existing methods are unfortunately silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
 
     type IDictionary<'K,'V> with
 
@@ -39,7 +39,7 @@ module ExtensionsIDictionary =
             seq { for KeyValue(k, v) in d -> k, v}
 
         /// A property like the ToString() method,
-        /// But with richer formationg for collections
+        /// But with richer formating for collections
         member obj.ToNiceString = 
             NiceString.toNiceString obj
 

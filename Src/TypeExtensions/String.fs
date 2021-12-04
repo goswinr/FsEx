@@ -10,7 +10,7 @@ open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 [<AutoOpen>]
 module AutoOpenExtensionsString = 
 
-    // This type extension should be alway availabe that is why it is in this Autoopen module
+    // This type extension should be alway available that is why it is in this Auto-open module
     type System.String with
 
         /// s.IndexOf(subString,StringComparison.Ordinal) = -1
@@ -34,7 +34,7 @@ module AutoOpenExtensionsString =
             s.Split([|chr|])
 
 /// Adds extension members on System.String
-/// for geting first, second, last and similar indices.
+/// for getting first, second, last and similar indices.
 /// Also adds functionality for negative indices and s.Slice(startIdx:int , endIdx: int) that works  with negative numbers
 module ExtensionsString = 
 
@@ -106,7 +106,7 @@ module ExtensionsString =
 
 
         /// Gets an item in the string by index.
-        /// Allows for negtive index too ( -1 is last item,  like Python)
+        /// Allows for negative index too ( -1 is last item,  like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         member s.GetNeg index = 
             if isNull s then FsExStringException.Raise "FsEx.ExtensionsString: string.GetNeg: Failed to get character at index %d from string from null string." index
@@ -125,20 +125,20 @@ module ExtensionsString =
             let ii = if t >= 0 then t  else t + len
             s.[ii]
 
-        //member s.GetSlice(startIdx, endIdx) = // overides of existing methods are unfortrunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
+        //member s.GetSlice(startIdx, endIdx) = // overrides of existing methods are unfortunately silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
 
         /// Allows for negative indices too. -1 is last character
         /// Includes end index in string
         /// for example str.Slice(0,-3) will trim off the last two character from the string
         member s.Slice(startIdx:int , endIdx:int):string = 
-             // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
+             // overrides of existing methods are unfortunately silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
             if isNull s then FsExStringException.Raise "FsEx.ExtensionsString: string.GetSlice: Failed to string.Slice(%d,%d) null string" startIdx  endIdx
             let count = s.Length
             let st  = if startIdx<0 then count+startIdx else startIdx
             let len = if endIdx<0 then count+endIdx-st+1 else endIdx-st+1
 
             if st < 0 || st > count-1 then
-                FsExStringException.Raise "FsEx.ExtensionsString: string.GetSlice: Start index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
+                FsExStringException.Raise "FsEx.ExtensionsString: string.GetSlice: Start index %d is out of range. Allowed values are -%d up to %d for String '%s' of %d chars" startIdx count (count-1) s count
 
 
             if st+len > count then

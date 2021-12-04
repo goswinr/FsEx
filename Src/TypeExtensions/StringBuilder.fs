@@ -6,21 +6,21 @@ open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
 
 /// Extensions for StringBuilder
-// like indexOf(str), append which retuns unit, ..
+// like indexOf(str), append which returns unit, ..
 [<AutoOpen>]
 module AutoOpenExtensionsStringBuilder = 
     type Text.StringBuilder with
 
-        /// Like .Append(string) but returnig unit
+        /// Like .Append(string) but returning unit
         member inline sb.append (s:string) = sb.Append(s) |> ignoreObj
 
-        /// Like .Append(char) but returnig unit
+        /// Like .Append(char) but returning unit
         member inline sb.append (c:char) = sb.Append(c) |> ignoreObj
 
-        /// Like .AppendLine(string) but returnig unit
+        /// Like .AppendLine(string) but returning unit
         member inline sb.appendLine (s:string) = sb.AppendLine(s) |> ignoreObj
 
-        /// Like .AppendLine() but returnig unit
+        /// Like .AppendLine() but returning unit
         member inline sb.appendLine() = sb.AppendLine() |> ignoreObj
 
         // TODO: add overload with length: sb.IndexOf (c:char, from:int, length:int )

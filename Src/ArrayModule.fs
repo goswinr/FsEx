@@ -20,7 +20,7 @@ module Array =
         find atIdx 0
 
 
-    /// Find first index where searchFor occures in searchIn array.
+    /// Find first index where searchFor occurs in searchIn array.
     /// Give lower and upper bound index for search space.
     /// Returns -1 if not found
     let find (searchFor:'T) fromIdx  tillIdx (searchIn:'T[])  :int = 
@@ -34,7 +34,7 @@ module Array =
         find fromIdx
 
 
-    /// Find last index where searchFor occures in searchIn array. Searching from end.
+    /// Find last index where searchFor occurs in searchIn array. Searching from end.
     /// Give lower and upper bound index for search space.
     /// Returns -1 if not found
     let findLast (searchFor:'T) fromIdx  tillIdx (searchIn:'T[])   :int = 
@@ -48,9 +48,9 @@ module Array =
         find tillIdx
 
 
-    /// Find first index where searchFor array occures in searchIn array.
+    /// Find first index where searchFor array occurs in searchIn array.
     /// Give lower and upper bound index for search space.
-    /// Returns index of first elment or -1 if not found
+    /// Returns index of first element or -1 if not found
     let findArray (searchFor:'T[]) fromIdx  tillIdx (searchIn:'T[])   :int = 
         if fromIdx < 0                then IndexOutOfRangeException.Raise    "Array.findArray (of %d items): fromIdx Index is too small: %d for array of %d items" searchFor.Length fromIdx searchIn.Length
         if tillIdx >= searchIn.Length then IndexOutOfRangeException.Raise    "Array.findArray (of %d items): tillIdx Index is too big:   %d for array of %d items" searchFor.Length tillIdx searchIn.Length
@@ -66,9 +66,9 @@ module Array =
 
 
 
-    /// Find last index where searchFor array occures in searchIn array. Searching from end.
+    /// Find last index where searchFor array occurs in searchIn array. Searching from end.
     /// Give lower and upper bound index for search space.
-    /// Returns index of first elment  or -1 if not found
+    /// Returns index of first element  or -1 if not found
     let findLastArray  (searchFor:'T[]) fromIdx  tillIdx (searchIn:'T[])   :int = 
         if fromIdx < 0                then IndexOutOfRangeException.Raise    "Array.findLastArray (of %d items): fromIdx Index is too small: %d for array of %d items" searchFor.Length fromIdx searchIn.Length
         if tillIdx >= searchIn.Length then IndexOutOfRangeException.Raise    "Array.findLastArray (of %d items): tillIdx Index is too big:   %d for array of %d items" searchFor.Length tillIdx searchIn.Length

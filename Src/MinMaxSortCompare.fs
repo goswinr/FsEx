@@ -30,16 +30,16 @@ module MinMaxSort =
     let inline max4 (a, b, c, d) = max a b |> max c |> max d
 
     /// Sort two elements.
-    /// If they are equal then the the order is kept
+    /// If they are equal then the order is kept
     let inline sort2 (a, b)  = if a <= b  then a, b else b, a
 
     /// Sort two elements.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the the order is kept
+    /// If they are equal after function is applied then the order is kept
     let inline sort2By f (a, b) = if f a <= f b  then a, b else b, a
 
     /// Sort three elements.
-    /// If any are equal then the the order is kept
+    /// If any are equal then the order is kept
     let inline sort3 (a, b, c) = 
         if a <= b then
             if b <= c then      a, b, c
@@ -54,7 +54,7 @@ module MinMaxSort =
 
     /// Sort three elements.
     /// Elements are compared by applying the predicate function first.
-    /// If any are equal after function is applied then the the order is kept
+    /// If any are equal after function is applied then the order is kept
     let inline sort3By f (aa, bb, cc) = 
         let a = f aa
         let b = f bb
@@ -79,7 +79,7 @@ module MinMaxSort =
         elif a<b  then -1
         else            1
 
-    /// Gets the positiv differnce between 2 numbers.
+    /// Gets the positive difference between 2 numbers.
     /// Avoids the integer( or byte) overflow and underflow risk of "abs(a-b)"
     let inline diff a b = 
         if   a<b then b-a
@@ -111,7 +111,7 @@ module CompareOperators =
 
 
     (*
-    this reversed order does not realy make sense since the combinig logic is always AND (&&)
+    this reversed order does not really make sense since the combing logic is always AND (&&)
 
     let x = 2
     10 >. x .> 20  // to test if x is outside of range would return false, but true could be expected (OR logic)

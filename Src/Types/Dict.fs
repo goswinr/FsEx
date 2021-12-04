@@ -4,7 +4,7 @@ open System
 open System.Collections.Generic
 
 
-/// A thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys.
+/// A thin wrapper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys.
 /// There is a hidden member called "Dictionary" to access the underlaying Collections.Generic.Dictionary<'K,'V> directly.
 /// In F# use #nowarn "44" to disable the obsolete warning for this hidden member.
 [<NoComparison>]
@@ -12,7 +12,7 @@ open System.Collections.Generic
 [<Sealed>]
 type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) = 
 
-    //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
+    //using inheritance from Dictionary would not work because .Item method is sealed and cant have an override
 
     let get key  = 
          match box key with // or https://stackoverflow.com/a/864860/969070
@@ -30,11 +30,11 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
          | _ -> dic.[key] <- value
 
     /// Create a new empty Dict<'K,'V>.
-    /// A Dict is a thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys.
+    /// A Dict is a thin wrapper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys.
     new () = Dict(new Dictionary<'K,'V>())
 
     /// Create a new empty Dict<'K,'V> with an IEqualityComparer like HashIdentity.Structural.
-    /// A Dict is a thin wraper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys.
+    /// A Dict is a thin wrapper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys.
     new (iEqualityComparer:IEqualityComparer<'K>) = Dict(new Dictionary<'K,'V>(iEqualityComparer))
 
     /// Constructs a new Dict by using the supplied Dictionary<'K,'V> directly, without any copying of items
@@ -110,7 +110,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
         //    yield "DefaultDict with "
         //    yield dic.Count.ToString()
         //    yield! "entries"
-        //    for k, v in dic.Items  |> Seq.truncate 3 do // adic sorting ? print 3 lines??
+        //    for k, v in dic.Items  |> Seq.truncate 3 do // dic sorting ? print 3 lines??
         //        yield  k.ToString()
         //        yield " : "
         //        yield! v.ToString()
@@ -166,7 +166,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
     member _.GetEnumerator() = dic.GetEnumerator()
 
     //---------------------------------------interfaces:-------------------------------------
-    // TODO adic XML doc str
+    // TODO dic XML doc str
 
     interface IEnumerable<KeyValuePair<'K ,'V>> with
         member _.GetEnumerator() = (dic:>IDictionary<'K,'V>).GetEnumerator()

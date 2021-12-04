@@ -18,7 +18,7 @@ module Rarr =
     //----------------------------------------------------
 
     /// Gets an item in the Rarr by index.
-    /// Allows for negtive index too ( -1 is last item,  like Python)
+    /// Allows for negative index too ( -1 is last item,  like Python)
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
     let inline getNeg index  (rarr: Rarr<'T>)= 
         let len = rarr.Count
@@ -27,12 +27,12 @@ module Rarr =
         rarr.List.[ii] // access List directly to not check index twice
 
     /// Sets an item in the Rarr by index.
-    /// Allows for negtive index too ( -1 is last item,  like Python)
+    /// Allows for negative index too ( -1 is last item,  like Python)
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
     let inline setNeg index value (rarr: Rarr<'T>)= 
         let len = rarr.Count
         let ii =  if index < 0 then len + index else index
-        if ii<0 || ii >= len then ArgumentException.RaiseBase "Rarr.SetNeg: Failed to set index %d to %s rom Rarr of %d items: %s" index (toNiceString value) rarr.Count rarr.ToNiceStringLong
+        if ii<0 || ii >= len then ArgumentException.RaiseBase "Rarr.SetNeg: Failed to set index %d to %s from Rarr of %d items: %s" index (toNiceString value) rarr.Count rarr.ToNiceStringLong
         rarr.List.[ii] <- value     // access List directly to not check index twice
 
     /// Any index will return a value.
@@ -100,37 +100,37 @@ module Rarr =
 
     (*
 
-            implemet those with cashing to avoid repeated index lookup, see Seq module
+            implement those with cashing to avoid repeated index lookup, see Seq module
 
-            /// Yields Seq from (first, second)  upto (second-last, last)
+            /// Yields Seq from (first, second)  up to (second-last, last)
             /// not looped
             /// the resulting seq is one element shorter than the input Rarr
             let windowed2 (a:Rarr<'T>) = 
                 checkCount 2 "windowed2" a
                 seq {   for i = 0 to a.Count-2 do  yield a.[i], a.[i+1] }
 
-            /// Yields looped Seq from (first, second)  upto (last, first)
+            /// Yields looped Seq from (first, second)  up to (last, first)
             /// the resulting seq has the same element count as the input Rarr
             let thisNext (a:Rarr<'T>) = 
                 checkCount 2 "thisNext" a
                 seq {   for i = 0 to a.Count-2 do yield a.[i], a.[i+1]
                         yield a.[a.Count-1], a.[0] }
 
-            /// Yields looped Seq from (last,first)  upto (second-last, last)
+            /// Yields looped Seq from (last,first)  up to (second-last, last)
             /// the resulting seq has the same element count as the input Rarr
             let prevThis (a:Rarr<'T>) = 
                 checkCount 2 "prevThis" a
                 seq {   yield a.[a.Count-1], a.[0]
                         for i = 0 to a.Count-2 do yield a.[i], a.[i+1] }
 
-            /// Yields Seq from (first, second, third)  upto (third-last, second-last, last)
+            /// Yields Seq from (first, second, third)  up to (third-last, second-last, last)
             /// not looped
             /// the resulting seq is two elements shorter than the input Rarr
             let windowed3 (a:Rarr<'T>) = 
                 checkCount 3 "windowed3" a
                 seq {   for i = 0 to a.Count-3 do yield a.[i], a.[i+1], a.[i+2] }
 
-            /// Yields looped Seq of  from (last, first, second)  upto (second-last, last, first)
+            /// Yields looped Seq of  from (last, first, second)  up to (second-last, last, first)
             /// the resulting seq has the same element count as the input Rarr
             let prevThisNext (a:Rarr<'T>) = 
                 checkCount 3 "prevThisNext" a
@@ -138,28 +138,28 @@ module Rarr =
                         for i = 0 to a.Count-3 do yield a.[i], a.[i+1], a.[i+2]
                         yield  a.[a.Count-2],a.[a.Count-1], a.[0] }
 
-            /// Yields Seq from (0,first, second)  upto (lastIndex-1 , second-last, last)
+            /// Yields Seq from (0,first, second)  up to (lastIndex-1 , second-last, last)
             /// not looped
             /// the resulting seq is one element shorter than the input Rarr
             let windowed2i (a:Rarr<'T>) = 
                 checkCount 2 "windowed2i" a
                 seq {   for i = 0 to a.Count-2 do yield i, a.[i], a.[i+1] }
 
-            /// Yields looped Seq  from (0,first, second)  upto (lastIndex, last, first)
+            /// Yields looped Seq  from (0,first, second)  up to (lastIndex, last, first)
             /// the resulting seq has the same element count as the input Rarr
             let iThisNext (a:Rarr<'T>) = 
                 checkCount 2 "iThisNext" a
                 seq {   for i = 0 to a.Count-2 do yield i, a.[i], a.[i+1]
                         yield  a.Count-1, a.[a.Count-1], a.[0] }
 
-            /// Yields Seq from (1, first, second, third)  upto (lastIndex-1 , third-last, second-last, last)
+            /// Yields Seq from (1, first, second, third)  up to (lastIndex-1 , third-last, second-last, last)
             /// not looped
             /// the resulting seq is two elements shorter than the input Rarr
             let windowed3i (a:Rarr<'T>) = 
                 checkCount 3 "windowed3i" a
                 seq {   for i = 0 to a.Count-3 do yield i+1, a.[i], a.[i+1], a.[i+2] }
 
-            /// Yields looped Seq from (1, last, first, second)  upto (lastIndex, second-last, last, first)
+            /// Yields looped Seq from (1, last, first, second)  up to (lastIndex, second-last, last, first)
             /// the resulting seq has the same element count as the input Rarr
             let iPrevThisNext (a:Rarr<'T>) = 
                 checkCount 3 "iPrevThisNext" a
@@ -170,13 +170,13 @@ module Rarr =
             *)
 
 
-    /// Retuns a Rarr containing just one element
+    /// Returns a Rarr containing just one element
     let singelton  (element: 'T) : Rarr<'T> = 
         let r = Rarr(1)
         r.List.Add element
         r
 
-    /// <summary>Considers List cirular and move elements up or down
+    /// <summary>Considers List circular and move elements up or down
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
     /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a] </summary>
     /// <param name="amount">How many elements to shift forward. Or backward if number is negative</param>
@@ -190,7 +190,7 @@ module Rarr =
         r
 
     /// Structural equality.
-    /// Compares each element in both lists for eqality . Rarrs must also be of same Count
+    /// Compares each element in both lists for equality . Rarrs must also be of same Count
     let equals (rarr1: Rarr<'T>) (rarr2: Rarr<'T>) :bool = 
         rarr1.IsEqualTo(rarr2)
 
@@ -227,7 +227,7 @@ module Rarr =
         if i<>j then
             if j < 0 then IndexOutOfRangeException.Raise "Rarr.swap: index j can't be less than 0: %d (i: %d)" j i
             if j >= xs.Count then IndexOutOfRangeException.Raise "Rarr.swap: index j can't be bigger than %d but is %d (i: %d)" (xs.Count-1) j i
-            // operate on underlaying list since indixes are checked
+            // operate on underlaying list since indices are checked
             let ti = xs.List.[i]
             xs.List.[i] <- xs.List.[j]
             xs.List.[j] <- ti
@@ -258,7 +258,7 @@ module Rarr =
             m1,m2
 
 
-        /// If any are equal then the the order is kept by using ( a=b || ) since the comare operate does not include the equal test
+        /// If any are equal then the  order is kept by using ( a=b || ) since the compare operate does not include the equal test
         let inline sort3 cmp a b c  = 
             if a=b || cmp a b then
                 if  cmp b c then a,b,c
@@ -272,7 +272,7 @@ module Rarr =
                     else                   c,b,a
 
 
-        /// If any are equal then the the order is kept by using ( a=b || ) since the comare operate does not include the equal test
+        /// If any are equal then the  order is kept by using ( a=b || ) since the compare operate does not include the equal test
         let inline indexOfSort3By f cmp aa bb cc  = 
             let a = f aa
             let b = f bb
@@ -371,7 +371,7 @@ module Rarr =
             i1,i2,i3
 
 
-    (* covered by part copied fron Array module
+    (* covered by part copied from Array module
 
         // Returns the smallest element of the Rarr.
         let min rarr =     rarr |> MinMax.simple (<)
@@ -388,7 +388,7 @@ module Rarr =
         let maxBy f rarr = let i = rarr |> MinMax.indexByFun (>) f in rarr.List.[i]
         *)
 
-    /// <summary>Returns the inedx of the smallest of all elements of the Rarr, compared via Operators.max on the function result.</summary>
+    /// <summary>Returns the index of the smallest of all elements of the Rarr, compared via Operators.max on the function result.</summary>
     /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
     /// <param name="rarr">The input Rarr.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarr is empty.</exception>
@@ -396,7 +396,7 @@ module Rarr =
     let inline minIndBy  (projection : 'T -> 'Key) (rarr: Rarr<'T>) : int = 
         rarr |> MinMax.indexByFun (<) projection
    
-    /// <summary>Returns the inedx of the greatest of all elements of the Rarr, compared via Operators.max on the function result.</summary>
+    /// <summary>Returns the index of the greatest of all elements of the Rarr, compared via Operators.max on the function result.</summary>
     /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
     /// <param name="rarr">The input Rarr.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarr is empty.</exception>
@@ -405,14 +405,14 @@ module Rarr =
         rarr |> MinMax.indexByFun (>) projection
 
     /// Returns the smallest two elements of the Rarr.
-    /// If they are equal then the the order is kept
+    /// If they are equal then the  order is kept
     let inline min2 rarr =     rarr |> MinMax.simple2 (<)
 
     /// Returns the biggest two elements of the Rarr.
-    /// If they are equal then the the order is kept
+    /// If they are equal then the  order is kept
     let inline max2 rarr =     rarr |> MinMax.simple2 (>)
 
-    // TODO make consitent xml docstring on below functions:
+    // TODO make consistent xml docstring on below functions:
 
     /// Returns the smallest two elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
@@ -440,11 +440,11 @@ module Rarr =
     let inline max2IndBy f rarr = rarr |> MinMax.index2ByFun (>) f
 
     /// Returns the smallest three elements of the Rarr.
-    /// If they are equal then the the order is kept
+    /// If they are equal then the  order is kept
     let inline min3 rarr =  rarr |> MinMax.simple3 (<)
 
     /// Returns the biggest three elements of the Rarr.
-    /// If they are equal then the the order is kept
+    /// If they are equal then the  order is kept
     let inline max3 rarr =  rarr |> MinMax.simple3 (>)
 
     /// Returns the smallest three elements of the Rarr.
@@ -520,14 +520,14 @@ module Rarr =
         results1, results2
 
     /// Applies a function to List
-    /// If resulting List meets the resultPredicate it is returned , otherwise  orinal input is returned.
+    /// If resulting List meets the resultPredicate it is returned , otherwise  original input is returned.
     let inline applyIfResult (resultPredicate:Rarr<'T> -> bool) (transform:Rarr<'T> -> Rarr<'T>)  (rarr: Rarr<'T>) : Rarr<'T> = 
         let r = transform rarr
         if resultPredicate r then r
         else rarr
 
     /// Applies a function to List if it meets the inputPredicate, otherwise just returns input.
-    /// If resulting List meets the resultPredicate it is returned , otherwise orinal input is returned.
+    /// If resulting List meets the resultPredicate it is returned , otherwise original input is returned.
     let inline applyIfInputAndResult (inputPredicate:Rarr<'T> -> bool) (resultPredicate:Rarr<'T> -> bool) (transform:Rarr<'T> -> Rarr<'T>)  (rarr: Rarr<'T>) : Rarr<'T> = 
         if inputPredicate rarr then
             let r = transform rarr
@@ -538,7 +538,7 @@ module Rarr =
 
 
     //--------------------------------------------------------------------------------------------------------------------
-    // ------------- implementation adaped form FSharp.Core Array module: ------------------------------------------------
+    // ------------- implementation adapted form FSharp.Core Array module: ------------------------------------------------
     //
     //               alternatives:
     //               https://github.com/fsprojects/FSharpx.Collections/blob/master/src/FSharpx.Collections/ResizeArray.fs
@@ -652,7 +652,7 @@ module Rarr =
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The concatenation of the sub-Rarrs.</returns>
     let collect (mapping: 'T -> Rarr<'U>)  (rarr: Rarr<'T>) : Rarr<'U> = 
-        //let collect (mapping: 'T -> seq<'U>)  (rarr: Rarr<'T>) : Rarr<'U> = // tests dont pass like that
+        //let collect (mapping: 'T -> seq<'U>)  (rarr: Rarr<'T>) : Rarr<'U> = // tests don't pass like that
         let res = Rarr(rarr.Count)
         for e in rarr do
             res.AddRange(mapping e)
@@ -691,7 +691,7 @@ module Rarr =
     /// <param name="rarrs">The input sequence of Rarrs.</param>
     /// <returns>The concatenation of the sequence of input Rarrs.</returns>
     let concat (rarrs: seq<Rarr<'T>>) : Rarr<'T>= 
-        //let concat (rarrs: Rarr<Rarr<'T>>) : Rarr<'T> =  // test dont pass with this
+        //let concat (rarrs: Rarr<Rarr<'T>>) : Rarr<'T> =  // test don't pass with this
         //if rarrs.Count = 0 then
         if Seq.isEmpty rarrs then
             Rarr(0)
@@ -716,7 +716,7 @@ module Rarr =
         rarr.GetRange(0,rarr.Count) // fastest way to create a shallow copy
 
 
-    /// <summary>Reads a range of elements from the first Rarr and write them into the second. The target Rarr must alreay have the required minimum size to fit targetStartIndex + count.</summary>
+    /// <summary>Reads a range of elements from the first Rarr and write them into the second. The target Rarr must already have the required minimum size to fit targetStartIndex + count.</summary>
     /// <param name="source">The source Rarr.</param>
     /// <param name="sourceIndex">The starting index of the source Rarr.</param>
     /// <param name="target">The target Rarr.</param>
@@ -735,7 +735,7 @@ module Rarr =
             j <-j+1
 
     /// <summary>Reads a range of elements from the first Rarr and write them into the second. The target Rarr increases in size if needed.
-    /// But it needs to have  minimum <c>targetStartIndex</c> elements alsready.</summary>
+    /// But it needs to have  minimum <c>targetStartIndex</c> elements already.</summary>
     /// <param name="source">The source Rarr.</param>
     /// <param name="sourceIndex">The starting index of the source Rarr.</param>
     /// <param name="target">The target Rarr.</param>
@@ -784,7 +784,7 @@ module Rarr =
     /// <returns>The result Rarr.</returns>
     let countBy (projection: 'T->'Key) (rarr: Rarr<'T>) : Rarr<'Key * int> = 
         if typeof<'Key>.IsValueType
-            // We avoid wrapping a StructBox, because under 64 JIT we get some "hard" tailcalls which affect performance
+            // We avoid wrapping a StructBox, because under 64 JIT we get some "hard" tail-calls which affect performance
             then countByImpl HashIdentity.Structural<'Key> projection id rarr
 
             // Wrap a StructBox around all keys in case the key type is itself a type using null as a representation
@@ -1146,7 +1146,7 @@ module Rarr =
     /// <returns>The result Rarr.</returns>
     let groupBy (projection:'T -> 'Key) (rarr:Rarr<'T>) :  Rarr<'Key * Rarr<'T>> = 
         if typeof<'Key>.IsValueType then
-            // We avoid wrapping a StructBox, because under 64 JIT we get some "hard" tailcalls which affect performance
+            // We avoid wrapping a StructBox, because under 64 JIT we get some "hard" tail-calls which affect performance
              groupByImpl HashIdentity.Structural<'Key> projection id rarr
         else
             // Wrap a StructBox around all keys in case the key type is itself a type using null as a representation
@@ -1839,7 +1839,7 @@ module Rarr =
 
 
     /// <summary>Splits the input Rarr into at most <c>chunkCount</c> chunks.
-    /// If the list can not be split evenly the inital elementys will be one bigge than the later elements. Just like with Array.splitInto.</summary>
+    /// If the list can not be split evenly the initial elements will be one bigger than the later elements. Just like with Array.splitInto.</summary>
     /// <param name="chunkCount">The maximum number of chunks.</param>
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The Rarr split into chunks.</returns>

@@ -248,7 +248,7 @@ module AutoOpenComputationalExpressions  =
     /// accepts ints and floats too. (including nice Formating via NiceString.floatToString )
     let stringBuffer = StringBufferBuilder ()
 
-    /// Computational Expression for making csv files in Englisch culture:
+    /// Computational Expression for making csv files in English culture:
     /// use 'yield' to append text and a  subsequent comma
     /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
     /// accepts ints and floats too. (floats are printed in full length using f.AsString)
@@ -262,7 +262,7 @@ module AutoOpenComputationalExpressions  =
     let csvDE = CsvBuilderDE ()
 
 
-    /// Computational Expression:  use 'yield' to add alements to a Rarr (= Collections.Generic.List).
+    /// Computational Expression:  use 'yield' to add elements to a Rarr (= Collections.Generic.List).
     let rarr<'T> = new RarrBuilder<'T> ()
 
 

@@ -28,14 +28,14 @@ module  NonBoxingEqualityOperatorOverloads =
     /// Use (!=) for types that don't have System.IEquatable<'T> implemented.
     let inline (<>) x y = not (eq x y)
 
-    /// The orignal Equals operator (=) is overloaded to always use the generic System.IEquatable<'T>
+    /// The original Equals operator (=) is overloaded to always use the generic System.IEquatable<'T>
     /// This avoids boxing of custom structs when comparing. A significant performance improvement.
-    /// Use this operator (==) for types that don't have System.IEquatable<'T> implemented or any type if you dont mind performance.
+    /// Use this operator (==) for types that don't have System.IEquatable<'T> implemented or any type if you don't mind performance.
     let inline (==) x y = Microsoft.FSharp.Core.Operators.(=) x y
 
     /// The original NotEquals operator (<>) is overloaded to always use the generic System.IEquatable<'T>
     /// This avoids boxing of custom structs when comparing. A significant performance improvement.
-    /// Use (!=) for types that don't have System.IEquatable<'T> implemented or any type if you dont mind performance.
+    /// Use (!=) for types that don't have System.IEquatable<'T> implemented or any type if you don't mind performance.
     let inline (!=) x y = Microsoft.FSharp.Core.Operators.(<>) x y
 
 [<AutoOpen>]
@@ -56,10 +56,10 @@ open System.Runtime.CompilerServices // for ; IsByRefLike; IsReadOnly
 
 /// A struct of two integers
 /// use operator (===) for fast equality test
-/// Avoid using this struct in Fsharp.Core functions like: List.contains value. boxing will ocure
+/// Avoid using this struct in Fsharp.Core functions like: List.contains value. boxing will occur
 /// Better: List.exists (fun v -> v === value)
 [<Struct; CustomEquality; NoComparison>]
-//[<IsByRefLike; IsReadOnly>] not avaialable in netstandart https://bartoszsypytkowski.com/writing-high-performance-f-code/
+//[<IsByRefLike; IsReadOnly>] not available in netstandart https://bartoszsypytkowski.com/writing-high-performance-f-code/
 type  IntTup = 
     val a :int
     val b :int
@@ -104,9 +104,9 @@ type  IntTup =
 
 /// A struct of three integers
 /// use operator (===) for fast equality test
-/// Avoid using this struct in Fsharp.Core functions like: List.contains value. boxing will ocure
+/// Avoid using this struct in Fsharp.Core functions like: List.contains value. boxing will occur
 /// Better: List.exists ( (===) value)
-//[<IsByRefLike; IsReadOnly>] not avaialable in netstandart https://bartoszsypytkowski.com/writing-high-performance-f-code/
+//[<IsByRefLike; IsReadOnly>] not available in netstandart https://bartoszsypytkowski.com/writing-high-performance-f-code/
 [<Struct; CustomEquality; NoComparison>] 
 type IntTrip = 
     val a :int

@@ -11,7 +11,7 @@ module Dict =
     let get (key:'K) (d:IDictionary<'K,'V>) : 'V = 
         let ok, v = d.TryGetValue(key)
         if ok then  v
-        else KeyNotFoundException.Raise "Dict.get faild to find key %A in %A of %d items" key d d.Count
+        else KeyNotFoundException.Raise "Dict.get failed to find key %A in %A of %d items" key d d.Count
 
     /// Set value at key from IDictionary
     /// just d.[k]<-v

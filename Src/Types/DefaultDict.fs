@@ -12,7 +12,7 @@ open System.Collections.Generic
 [<Sealed>]
 type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, baseDict : Dictionary<'K,'V>) = 
 
-    //using inheritance from Dictionary would not work because .Item method is seald and cant have an override
+    //using inheritance from Dictionary would not work because .Item method is sealed and cant have an override
 
     let dGet key  = 
         match box key with // or https://stackoverflow.com/a/864860/969070
@@ -32,7 +32,7 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
 
 
     /// <summary>A System.Collections.Generic.Dictionary with default Values that get created upon accessing a key.
-    /// If accessing a non exiting key , the default function is called on ther key to create the value and set it.
+    /// If accessing a non exiting key , the default function is called on the key to create the value and set it.
     /// Similar to  defaultdict in Python</summary>
     /// <param name="defaultOfKeyFun">(&apos;K-&gt;&apos;V): The function to create a default value from the key</param>
     new (defaultOfKeyFun: 'K -> 'V) = 
@@ -67,8 +67,8 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
 
     /// Get value for given key.
     /// Calls defaultFun to get value if key not found.
-    /// Also sets key to retuned value.
-    /// use .TryGetValue(k) if you dont want a missing key to be created
+    /// Also sets key to returned value.
+    /// use .TryGetValue(k) if you don't want a missing key to be created
     member _.Get k = dGet k
 
     /// Get a value and remove key and value it from dictionary, like *.pop() in Python

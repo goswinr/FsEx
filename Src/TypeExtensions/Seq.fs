@@ -39,7 +39,7 @@ module ExtensionsSeq =
     type IEnumerable<'T>  with
 
         /// Gets an item by index position in the Seq
-        /// Allows for negtive index too (like Python)
+        /// Allows for negative index too (like Python)
         member this.GetNeg (index) = 
             try
                 if index >= 0 then Seq.item index this
@@ -90,7 +90,7 @@ module ExtensionsSeq =
         /// Seq.Slice
         /// Allows for negative indices too, like Python, -1 is the last element.
         /// The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
-        member this.Slice(startIdx:int , endIdx: int) : 'T seq = // don't overload .GetSlice .[ x ... y] directly, this would be a casting horror for Lists and arrays wher neg indices dont work
+        member this.Slice(startIdx:int , endIdx: int) : 'T seq = // don't overload .GetSlice .[ x ... y] directly, this would be a casting horror for Lists and arrays where neg indices don't work
             let count = lazy(Seq.length this)
             let st  = if startIdx< 0 then count.Value + startIdx        else startIdx
             let len = if endIdx  < 0 then count.Value + endIdx - st + 1 else endIdx - st + 1
@@ -104,7 +104,7 @@ module ExtensionsSeq =
 
 
         /// A property like the ToString() method,
-        /// But with richer formationg for collections
+        /// But with richer formating for collections
         member obj.ToNiceString = 
             NiceString.toNiceString obj
 

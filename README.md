@@ -14,11 +14,11 @@ FsEx is an FSharp extension and utility library.
 
 ### It Includes: 
 
-- [A thin wrapper over the `ResizeArray` type called `Rarr`](https://www.fuget.org/packages/FsEx/0.7.0/lib/netstandard2.0/FsEx.dll/FsEx/Rarr%601). It provides structural equality ,additional members and more detailed error messages when the List is used with out of bound indices.
-- [A `Rarr` module](https://www.fuget.org/packages/FsEx/0.7.0/lib/netstandard2.0/FsEx.dll/FsEx/RarrModule) that provides all the functions for `Rarr` that the  `Array` module from `FSharp.Core` has. Including those for parallel computing.
+- [A thin wrapper over the `ResizeArray` type called `Rarr`](https://www.fuget.org/packages/FsEx/0.8.0/lib/netstandard2.0/FsEx.dll/FsEx/Rarr%601). It provides structural equality ,additional members and more detailed error messages when the List is used with out of bound indices.
+- [A `Rarr` module](https://www.fuget.org/packages/FsEx/0.8.0/lib/netstandard2.0/FsEx.dll/FsEx/RarrModule) that provides all the functions for `Rarr` that the  `Array` module from `FSharp.Core` has. Including those for parallel computing.
 - A thin wrapper over the generic `Dictionary` type called `Dict`. It provides additional members and more detailed error messages when a given Key is not found.
 - An implementation of [defaultdict](https://docs.python.org/3/library/collections.html#collections.defaultdict) called `DefDict` , a dictionary that creates a key when its accessed but missing.
-- [A comprehensive module](https://www.fuget.org/packages/FsEx/0.7.0/lib/netstandard2.0/FsEx.dll/FsEx/StringModule) for working with `string`, including nice error messages.
+- [A comprehensive module](https://www.fuget.org/packages/FsEx/0.8.0/lib/netstandard2.0/FsEx.dll/FsEx/StringModule) for working with `string`, including nice error messages.
 - Useful extension members to existing collections like seq, array, Dictionary, Stringbuilder.
 - Computational Expressions for building `Rarr`, `strings`, and CSV-files. Like they exist for `seq`, `list` and `array` in `FSharp.Core` 
 - Pretty printing for collections
@@ -30,6 +30,12 @@ FsEx is an FSharp extension and utility library.
 [MIT](https://raw.githubusercontent.com/goswinr/FsEx/main/LICENSE.txt)
 
 ### Changelog
+`0.8.0` 
+- update Process Module for running external Processes
+- improve float formating in toNiceString module
+- add more colors for printing via Seff editor
+- fix typos in docstrings
+
 `0.7.0` 
 - Add Process Module for running external Processes
 - Fix Rarr.rotate

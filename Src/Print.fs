@@ -50,7 +50,7 @@ module AutoOpenPrint =
                             let clt = cl :?>unit -> unit
                             clear   <- clt                        
                 with ex ->
-                    eprintfn "Failed to get Seff.Model.ISeffLog.printnColor via Reflection, If you are not using the Seff Editor Plugin this is normal."
+                    eprintfn "Failed to get Seff.Model.ISeffLog.printnColor via Reflection, If you are not using the Seff Editor Plug-in this is normal."
                     eprintfn "The function using color will just print to Console.Out."
                     eprintfn "The ignored Error was: %A" ex
 
@@ -79,7 +79,7 @@ module AutoOpenPrint =
     /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
     /// • thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
     /// • maxNestingDepth         = 3     ; set this to change how deep the content of nested seq is printed (printFull ignores this)
-    /// • maxNestingDepth         = 6     ; set this to change how how many items per seq are printed (printFull ignores this)
+    /// • maxNestingDepth         = 6     ; set this to change how many items per seq are printed (printFull ignores this)
     /// • maxCharsInString        = 2000  ; set this to change how many characters of a string might be printed at once.
     let print x = 
         Console.WriteLine (toNiceString x) // Console.WriteLine is about 2-3 times faster than printf "%s"
@@ -92,7 +92,7 @@ module AutoOpenPrint =
         Console.WriteLine (toNiceStringFull x) // Console.WriteLine is about 2-3 times faster than printf "%s"
 
 
-    /// Highligths every occurance of the given word in the color of first three integers (red, green, blue)
+    /// Highlights every occurrence of the given word in the color of first three integers (red, green, blue)
     /// and the rest of the line in next three integers.
     /// Adds line return at end.
     let internal printWithHighlightColor wR wG wB fR fG fB (word:string) (fullLine:string)= 
@@ -114,7 +114,7 @@ module AutoOpenPrint =
             loop 0
 
     /// Tries to printf with colors if running inside Seff Editor.
-    /// Highligths the given word in red in the line to print in gray.
+    /// Highlights the given word in red in the line to print in gray.
     /// Adds line return at end.
     let printWithHighlight (word:string) (fullLine:string)= 
         printWithHighlightColor 240 0 0 180 180 180 word fullLine

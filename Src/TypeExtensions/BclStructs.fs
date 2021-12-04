@@ -4,7 +4,7 @@ open System
 
 
 /// This module is set to auto open.
-[<AutoOpen>] // so that extension become availale on opening FsEx
+[<AutoOpen>] // so that extension become available on opening FsEx
 module ExtensionsBclStructs = 
 
     let private deDE = Globalization.CultureInfo("de-DE")
@@ -18,7 +18,7 @@ module ExtensionsBclStructs =
         /// Calls byte(x)
         member inline x.ToByte = byte(x)
 
-        /// Same as i.ToString() but as propertry, not method.
+        /// Same as i.ToString() but as property, not method.
         /// So without the need for the brackets. (for nicer inlining)
         member inline x.AsString = x.ToString()
 
@@ -55,7 +55,7 @@ module ExtensionsBclStructs =
         /// Calls byte(x)
         member inline x.ToByte = byte(x)
 
-        /// Same as i.ToString() but as propertry, not method.
+        /// Same as i.ToString() but as property, not method.
         /// So without the need for the brackets. (for nicer inlining)
         member inline x.AsString = x.ToString()
 

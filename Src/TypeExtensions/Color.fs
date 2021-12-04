@@ -78,11 +78,11 @@ module Color =
     /// Returns a color value from gradient blue to green  to yellow to red, excludes purple
     /// Input value to range from 0.0 to 1.0
     /// Will fail on too small or too big values,
-    /// but up to a tolerance of 0.001 values wil be clamped to 0 or 1.
+    /// but up to a tolerance of 0.001 values will be clamped to 0 or 1.
     let gradientFromInterval (v) = 
         if not (-0.001 <. v .< 1.001) then ArgumentOutOfRangeException.Raise " FsEx.Color.FromInterval: v is bigger than 1.0 or smaller than 0.0: %f" v
         let v = UtilMath.clamp 0. 1. v
-        let v = (1.0 - v) * 0.7 // 0.66666666 // to NOT make full color cirle, that means to exclude the purple values.
+        let v = (1.0 - v) * 0.7 // 0.66666666 // to NOT make full color circle, that means to exclude the purple values.
         fromHSL (v,1.0,0.5)
 
     /// Returns a color value from gradient blue to green to yellow to red, excludes purple
@@ -90,7 +90,7 @@ module Color =
     /// Will clamp on too small or too big values.
     let gradientFromIntervalClamped (v) = 
         let v = UtilMath.clamp 0. 1. v
-        let v = (1.0 - v) * 0.7 // 0.66666666 // to NOT make full color cirle, that means to exclude the purple values.
+        let v = (1.0 - v) * 0.7 // 0.66666666 // to NOT make full color circle, that means to exclude the purple values.
         fromHSL (v,1.0,0.5)
 
     /// Given a Drawing.Color , returns Hue,Saturation,Luminance in range of 0.0 to 1.0
@@ -103,7 +103,7 @@ module Color =
     let random() = 
         Color.FromArgb (Rand.Next(0,256), Rand.Next(0,256), Rand.Next(0,256))
 
-    /// Generates a Random color with high saturation probability, exluding yellow colors
+    /// Generates a Random color with high saturation probability, excluding yellow colors
     /// These are ideal for layer color in Rhino3d CAD app
     let rec randomForRhino () = 
         let hue = Rand.NextDouble()
@@ -116,7 +116,7 @@ module Color =
         else
             fromHSL (hue,sat,lum)
 
-    /// Make a color lighter by perecentage (value between 0.0 to 1.0) (1.0 = white, 0.0 = current color)
+    /// Make a color lighter by percentage (value between 0.0 to 1.0) (1.0 = white, 0.0 = current color)
     let makeLighter v c = 
         if not (-0.001 <. v .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.makeLighter: v is bigger than 1.0 or smaller than 0.0: %f" v
         let v = UtilMath.clamp 0. 1. v
@@ -124,7 +124,7 @@ module Color =
         let delta = 1.0 - l
         fromHSL (h,s,l + delta * v )
 
-    /// Make a color darker by perecentage (value between 0.0 to 1.0) (1.0 = black, 0.0 = current color)
+    /// Make a color darker by percentage (value between 0.0 to 1.0) (1.0 = black, 0.0 = current color)
     let makeDarker v c = 
         if not (-0.001 <. v .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.makeDarker: v is bigger than 1.0 or smaller than 0.0: %f" v
         let v = UtilMath.clamp 0. 1. v

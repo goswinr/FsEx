@@ -9,7 +9,7 @@ open System
 /// Also adds functionality for negative indices and a.Slice(startIdx:int , endIdx: int) that works  with negative numbers
 module ExtensionsArray = 
 
-    // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
+    // overrides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
 
     type ``[]``<'T>  with //Generic Array
 
@@ -40,7 +40,7 @@ module ExtensionsArray =
             this.[index] <- value
 
         /// Gets an item in the Array by index.
-        /// Allows for negtive index too ( -1 is last item,  like in Python).
+        /// Allows for negative index too ( -1 is last item,  like in Python).
         /// Alternative: from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item.
         /// (this is an Extension Member from FsEx.ExtensionsArray)
         member inline this.GetNeg index = 
@@ -50,13 +50,13 @@ module ExtensionsArray =
             this.[ii]
 
         /// Sets an item in the Array by index.
-        /// Allows for negtive index too ( -1 is last item,  like in Python).
+        /// Allows for negative index too ( -1 is last item,  like in Python).
         /// Alternative: from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item.
         /// (this is an Extension Member from FsEx.ExtensionsArray)
         member inline this.SetNeg index value = 
             let len = this.Length
             let ii =  if index < 0 then len + index else index
-            if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "FsEx.ExtensionsArray: arr.SetNeg: Failed to set index %d to %A rom Array of %d items: %A" index value this.Length this
+            if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "FsEx.ExtensionsArray: arr.SetNeg: Failed to set index %d to %A from Array of %d items: %A" index value this.Length this
             this.[ii] <- value
 
         /// Any index will return a value.
@@ -158,12 +158,12 @@ module ExtensionsArray =
 
         /// Allows for negative indices too. ( -1 is last item, like Python)
         /// The resulting array includes the end index.
-        /// The built in slicing notaion (e.g. a.[1..3]) for arrays does not allow for negative indices. (and can't be overwritten)
+        /// The built in slicing notation (e.g. a.[1..3]) for arrays does not allow for negative indices. (and can't be overwritten)
         /// Alternative: from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item.
         /// (this is an Extension Member from FsEx.ExtensionsArray)
         member inline this.Slice(startIdx:int , endIdx: int ) : 'T array= 
 
-            // overides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
+            // overrides of existing methods are unfortunately silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
             // member inline this.GetSlice(startIdx, endIdx) = 
 
             let count = this.Length
@@ -171,11 +171,11 @@ module ExtensionsArray =
             let len = if endIdx  < 0 then count + endIdx - st + 1 else endIdx - st + 1
 
             if st < 0 || st > count - 1 then
-                let err = sprintf "array.Slice: Start index %d is out of range. Allowed values are -%d upto %d for Array of %d items" startIdx count (count-1)  count
+                let err = sprintf "array.Slice: Start index %d is out of range. Allowed values are -%d up to %d for Array of %d items" startIdx count (count-1)  count
                 raise (IndexOutOfRangeException(err))
 
             if st+len > count then
-                let err = sprintf "array.Slice: End index %d is out of range. Allowed values are -%d upto %d for Array of %d items" startIdx count (count-1)  count
+                let err = sprintf "array.Slice: End index %d is out of range. Allowed values are -%d up to %d for Array of %d items" startIdx count (count-1)  count
                 raise (IndexOutOfRangeException(err))
 
             if len < 0 then

@@ -24,7 +24,7 @@ module ExtensionsIList =
             this.[index] <- value
 
         /// Gets an item in the IList by index.
-        /// Allows for negtive index too ( -1 is last item,  like Python)
+        /// Allows for negative index too ( -1 is last item,  like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         member inline this.GetNeg index = 
             let len = this.Count
@@ -33,12 +33,12 @@ module ExtensionsIList =
             this.[ii]
 
         /// Sets an item in the IList by index.
-        /// Allows for negtive index too ( -1 is last item,  like Python)
+        /// Allows for negative index too ( -1 is last item,  like Python)
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         member inline this.SetNeg index value = 
             let len = this.Count
             let ii =  if index < 0 then len + index else index
-            if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "IList.SetNeg: Failed to set index %d to %A rom IList of %d items: %A" index value this.Count this
+            if ii<0 || ii >= len then ArgumentOutOfRangeException.Raise "IList.SetNeg: Failed to set index %d to %A from IList of %d items: %A" index value this.Count this
             this.[ii] <- value
 
         /// Any index will return a value.
@@ -139,11 +139,11 @@ module ExtensionsIList =
             let len = if endIdx  < 0 then count + endIdx - st + 1 else endIdx - st + 1
 
             if st < 0 || st > count - 1 then
-                let err = sprintf "Slice: Start index %d is out of range. Allowed values are -%d upto %d for IList of %d items" startIdx count (count-1)  count
+                let err = sprintf "Slice: Start index %d is out of range. Allowed values are -%d up to %d for IList of %d items" startIdx count (count-1)  count
                 raise (IndexOutOfRangeException(err))
 
             if st+len > count then
-                let err = sprintf "Slice: End index %d is out of range. Allowed values are -%d upto %d for IList of %d items" startIdx count (count-1)  count
+                let err = sprintf "Slice: End index %d is out of range. Allowed values are -%d up to %d for IList of %d items" startIdx count (count-1)  count
                 raise (IndexOutOfRangeException(err))
 
             if len < 0 then

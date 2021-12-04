@@ -60,18 +60,18 @@ module AutoOpenUtil =
         raise <| Exception "Quick fail (inner exception should show more helpful message)"
     
     /// Throws an exception with 'msg' as Error message if the projection called with 'value' as argument returns true.
-    /// This function is usefull to check values in piping
+    /// This function is useful to check values in piping
     let inline failIf (projection:'T -> bool) (failMsg:string) (value:'T) : 'T = 
         if projection value then raise <| Exception( "FsEx.failIf: " + failMsg ) else value  
      
     
     /// Throws an exception with 'msg' as Error message if 'value' is false.
-    /// This function is usefull to follow up on any methods that return booleans indication sucess or failure
+    /// This function is useful to follow up on any methods that return booleans indication sucess or failure
     let inline failIfFalse (failMsg:string) (value :bool) : unit = 
         if not value then raise <| Exception( "FsEx.failIfFalse: " + failMsg )
 
     /// Throws an exception with 'msg' as Error message if 'value' is null.
-    /// This function is usefull to doing many null checks without adding lots if clauses and lots of indenting
+    /// This function is useful to doing many null checks without adding lots if clauses and lots of indenting
     let inline failIfNull (failMsg:string) (value :'T when 'T: null) : unit = 
         match value with
         | null -> ArgumentNullException.Raise "<null> in FsEx.Util.failIfNull: %s" failMsg
@@ -90,8 +90,8 @@ module AutoOpenUtil =
             ArgumentException.RaiseBase "Empty Guid in  FsEx.Util.failIfEmptyGuid: %s" failMsg
 
     /// Returns false if the value is null.
-    /// The opposit of isNull
-    let inline notNull (value :'T when 'T: null) = // Fsharp core does it like this too. don't use Obejct.RefrenceEquals (because of Generics)
+    /// The opposite of isNull
+    let inline notNull (value :'T when 'T: null) = // FSharp core does it like this too. don't use Obejct.RefrenceEquals (because of Generics)
         match value with
         | null -> false
         | _ -> true
@@ -169,10 +169,10 @@ module AutoOpenUtil =
         if condition then f x else x
 
     /// Caches the results of a function in a Map.
-    /// The arument to the function will be used as key in the Map.
+    /// The argument to the function will be used as key in the Map.
     /// The argument can be unit or null(=None) too.
     let memoize f = 
-        let cache = ref Map.empty // using a Dictionary would faill on a null or unit key
+        let cache = ref Map.empty // using a Dictionary would fail on a null or unit key
         fun x ->
             match (!cache).TryFind(x) with
             | Some res -> res
@@ -198,12 +198,12 @@ module AutoOpenUtil =
 
 
 /// Shadows the ignore function to only accept structs
-/// This is to prevent accidetially ignoring partially aplied functions that would return struct
+/// This is to prevent accidentally ignoring partially applied functions that would return struct
 module SaveIgnore = 
 
     /// This ignore only work on Value types,
     /// Objects and functions need to be ignored with 'ignoreObj'
-    /// This is to prevent accidetially ignoring partially aplied functions that would return struct
+    /// This is to prevent accidentally ignoring partially applied functions that would return struct
     let inline ignore (x:'T when 'T: struct) = ()
 
     /// Ignores any object (and struct)
@@ -211,11 +211,11 @@ module SaveIgnore =
     let inline ignoreObj (x:obj) = ()
 
 /// Functions to deal with integer ref objects
-/// Also works with ints agmented with Units of Measure (UoM)
+/// Also works with ints augmented with Units of Measure (UoM)
 module IntRef = 
 
     /// Increment a ref cell by one
-    /// Schadows built in 'incr' to allow Units of Measure (UoM)
+    /// Shadows built in 'incr' to allow Units of Measure (UoM)
     let inline incr i (x:int<'UoM>) = i := !i + 1<_>
 
     /// Decrement a ref cell by one
@@ -236,7 +236,7 @@ module IntRef =
 
 
 /// Functions to deal with float ref objects
-/// Also works with floats agmented with Units of Measure (UoM)
+/// Also works with floats augmented with Units of Measure (UoM)
 module FloatRef = 
 
     /// Increment a ref cell by a given float

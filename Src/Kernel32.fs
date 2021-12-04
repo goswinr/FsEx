@@ -63,7 +63,7 @@ module Kernel32 =
         let loadedLibs = Collections.Generic.Dictionary()
         let loadDirs   = Collections.Generic.Dictionary()
 
-    /// To load a native (C++) dll in FSI. Because #r statment does not work for native dlls in fsi
+    /// To load a native (C++) dll in FSI. Because #r statement does not work for native dlls in fsi
     /// Loads the specified module into the address space of the calling process. The specified module may cause other modules to be loaded.
     /// If you were writing this in a long running process where the DLL is used in a well defined section only,
     /// then you'd better unload the library once no longer needed with the symmetric FreeLibrary routine on kernel32.dll.
@@ -76,7 +76,7 @@ module Kernel32 =
         else
             FileNotFoundException.Raise "FsEx.Kernel32.loadLibrary cant find file %s" path
 
-    /// To unload a native (C++) dll in FSI. Because #r statment does not work for native dlls in fsi
+    /// To unload a native (C++) dll in FSI. Because #r statement does not work for native dlls in fsi
     let freeLibrary (path:string) : unit = 
         let cleanPath = path.Replace("/","\\")
         if K32.loadedLibs.ContainsKey(cleanPath) then
@@ -85,7 +85,7 @@ module Kernel32 =
         else
             Kernel32Exception.Raise "FsEx.Kernel32.freeLibrary cant find pointer for file to unload, is it not loaded? %s" cleanPath
 
-    /// To help load a native (C++) dll in FSI. Because #r statment does not work for native dlls in fsi
+    /// To help load a native (C++) dll in FSI. Because #r statement does not work for native dlls in fsi
     /// Adds a directory to the process DLL search path.
     /// An absolute path to the directory to add to the search path.
     /// For example, to add the directory Dir2 to the process DLL search path, specify \Dir2

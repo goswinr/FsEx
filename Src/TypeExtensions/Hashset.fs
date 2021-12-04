@@ -13,7 +13,7 @@ type Hashset<'T> = HashSet<'T>
 [<AutoOpen>]
 module AutoOpenExtensionsHashset = 
 
-    // This type extension should be alway availabe that s why it is in this Auitoopen module
+    // This type extension should be alway available that s why it is in this Auto-open module
     type HashSet<'T> with
 
         /// Returns: not (set.Contains(key))

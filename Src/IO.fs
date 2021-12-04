@@ -32,9 +32,9 @@ module IO =
     let checkIfDirectoryExists s = 
         if not (IO.Directory.Exists s) then  raise (DirectoryNotFoundException("Directory missing or path worng: '" + s + "'"))
 
-    /// Returns all files in folder and subfolders.
+    /// Returns all files in folder and sub-folders.
     /// Returns first the files from this folder then from first child folder with all its grandchildren
-    /// then next child folder with all its granddchildren...
+    /// then next child folder with all its grandchildren...
     /// May fail with IOExceptions.
     let getAllFiles (directory:string) = 
         if not (Directory.Exists(directory)) then
@@ -44,10 +44,10 @@ module IO =
                     for d in Directory.EnumerateDirectories(dir) do yield! get d }
         get directory
 
-    /// Returns all files in folder and subfolders that fit pattern (e.g. '*.pdf').
+    /// Returns all files in folder and sub-folders that fit pattern (e.g. '*.pdf').
     /// Returns first the files from this folder then from first child folder with all its grandchildren
-    /// then next child folder with all its granddchildren...
-    /// Wildcard specifiers:
+    /// then next child folder with all its grandchildren...
+    /// Wild-card specifiers:
     /// * (asterisk)    Zero or more characters in that position.
     /// ? (question mark)    Zero or one character in that position.
     /// May fail with IOExceptions.
@@ -59,7 +59,7 @@ module IO =
                     for d in Directory.EnumerateDirectories(dir) do yield! get d }
         get directory  
     
-    /// Returns all files in folder and subfolders
+    /// Returns all files in folder and sub-folders
     /// Ignores all errors except if the initial directory does not exist and moves on to next folder.
     /// Returns first the files from this folder (sorted) then from first child folder with all its grandchildren
     let getAllFilesSave (directory:string) = 
@@ -79,7 +79,7 @@ module IO =
         getAll(directory)
     
     /// Returns all files in this folder and parent folders that fit pattern (e.g. '*.pdf').
-    /// Wildcard specifiers:
+    /// Wild-card specifiers:
     /// * (asterisk)        Zero or more characters in that position.
     /// ? (question mark)   Zero or one character in that position.
     /// May fail with IOExceptions
@@ -162,7 +162,7 @@ module IO =
         let maxCharsInString = 500
 
         /// If the input string is longer than maxChars + 20 then
-        /// it returns the input string trimmed to maxChars, a count of skiped characters and the last 6 characters (all enclosed in double quotes ")
+        /// it returns the input string trimmed to maxChars, a count of skipped characters and the last 6 characters (all enclosed in double quotes ")
         /// e.g. "abcde[..20 more Chars..]xyz"
         /// Else, if the input string is less than maxChars + 20, it is still returned in full (enclosed in double quotes ").
         /// also see String.truncatedFormated
@@ -230,7 +230,7 @@ module IO =
             async{
                 lock lockObj (fun () -> // lock is using Monitor class : https://github.com/dotnet/fsharp/blob/6d91b3759affe3320e48f12becbbbca493574b22/src/fsharp/FSharp.Core/prim-types.fs#L4793
                     try  IO.File.WriteAllText(path,text, Text.Encoding.UTF8)
-                    // try & with is needed because exceptions on threadpool cannot be caught otherwise !!
+                    // try & with is needed because exceptions on thread-pool cannot be caught otherwise !!
                     with ex ->  errorLogger(sprintf "FsEx.Wpf.SaveWriter.WriteAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path (truncateString text)) // use %A to trimm long text
                     )
                 } |> Async.Start
@@ -242,7 +242,7 @@ module IO =
             async{
                 lock lockObj (fun () -> // lock is using Monitor class : https://github.com/dotnet/fsharp/blob/6d91b3759affe3320e48f12becbbbca493574b22/src/fsharp/FSharp.Core/prim-types.fs#L4793
                     try  IO.File.WriteAllLines(path,texts, Text.Encoding.UTF8)
-                    // try & with is needed because exceptions on threadpool cannot be caught otherwise !!
+                    // try & with is needed because exceptions on thread-pool cannot be caught otherwise !!
                     with ex ->  errorLogger(sprintf "FsEx.Wpf.SaveWriter.WriteAllLinesAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path (Array.truncate 20 texts)) // use %A to trimm long text
                     )
                 } |> Async.Start
@@ -260,9 +260,9 @@ module IO =
                 if !counter = k then //k > 2L &&   //do not save on startup && only save last event after a delay if there are many save events in a row ( eg from window size change)(ignore first two event from creating window)
                     try
                         let text = getText()
-                        this.WriteAsync (text) // this should never fail since exeptions are caught inside
+                        this.WriteAsync (text) // this should never fail since exceptions are caught inside
                     with ex ->
-                        // try & with is needed because exceptions on threadpool cannot be caught otherwise !!
+                        // try & with is needed because exceptions on thread-pool cannot be caught otherwise !!
                         errorLogger(sprintf "FsEx.Wpf.SaveWriter.WriteIfLast: getText() for path '%s' failed with: %A" path ex )
                 } |> Async.StartImmediate
 
