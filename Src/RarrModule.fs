@@ -184,8 +184,9 @@ module Rarr =
     /// <returns>The new result Rarr.</returns>
     let inline rotate amount (rarr: Rarr<'T>) :  Rarr<'T>  = 
         let r = Rarr(rarr.Count)
+        let li = rarr.List
         for i = 0 to rarr.Count-1 do
-            r.Add <| rarr.List.[negIdxLooped (i-amount) rarr.Count]
+            r.Add <| li.[negIdxLooped (i-amount) rarr.Count]
         r
 
     /// Structural equality.
@@ -312,8 +313,9 @@ module Rarr =
             let mutable f = func xs.List.[0]
             let mutable mf = f
             let mutable ii = 0
+            let li = xs.List
             for i=1 to xs.Count-1 do
-                f <- func xs.List.[i]
+                f <- func li.[i]
                 if cmpF f mf then
                     ii <- i
                     mf <- f
@@ -326,8 +328,9 @@ module Rarr =
             let mutable mf1 = func xs.List.[i1]
             let mutable mf2 = func xs.List.[i2]
             let mutable f = mf1 // placeholder
+            let li = xs.List
             for i=1 to xs.Count-1 do
-                f <- func xs.[i]
+                f <- func li.[i]
                 if cmpF f mf1 then
                     i2 <- i1
                     i1 <- i
@@ -347,8 +350,9 @@ module Rarr =
             let mutable e2 =  byFun xs.List.[i2]
             let mutable e3 =  byFun xs.List.[i3]
             let mutable f = e1 // placeholder
+            let li = xs.List
             for i=3 to xs.Count-1 do
-                f <- byFun xs.List.[i]
+                f <- byFun li.[i]
                 if cmpOp f e1 then
                     i3 <- i2
                     i2 <- i1
@@ -412,14 +416,14 @@ module Rarr =
 
     /// Returns the smallest two elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the the order is kept
+    /// If they are equal after function is applied then the order is kept
     let inline min2By f rarr = 
         let i,ii = rarr |> MinMax.index2ByFun (<) f
         rarr.List.[i],rarr.List.[ii]
 
     /// Returns the biggest two elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the the order is kept
+    /// If they are equal after function is applied then the order is kept
     let inline max2By f rarr = 
         let i,ii = rarr |> MinMax.index2ByFun (>) f
         rarr.List.[i],
@@ -427,12 +431,12 @@ module Rarr =
 
     /// Returns the indices of the two smallest elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the the order is kept
+    /// If they are equal after function is applied then the order is kept
     let inline min2IndBy f rarr = rarr |> MinMax.index2ByFun (<) f
 
     /// Returns the indices of the two biggest elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the the order is kept
+    /// If they are equal after function is applied then the order is kept
     let inline max2IndBy f rarr = rarr |> MinMax.index2ByFun (>) f
 
     /// Returns the smallest three elements of the Rarr.
@@ -445,7 +449,7 @@ module Rarr =
 
     /// Returns the smallest three elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the the order is kept
+    /// If they are equal after function is applied then the order is kept
     let inline min3By f rarr = 
         let i,ii,iii = rarr |> MinMax.index3ByFun (<) f
         rarr.List.[i],
@@ -454,7 +458,7 @@ module Rarr =
 
     /// Returns the biggest three elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the the order is kept
+    /// If they are equal after function is applied then the order is kept
     let inline max3By f rarr = 
         let i,ii,iii = rarr |> MinMax.index3ByFun (>) f
         rarr.List.[i],
@@ -463,12 +467,12 @@ module Rarr =
 
     /// Returns the indices of the three smallest elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the the order is kept
+    /// If they are equal after function is applied then the order is kept
     let inline min3IndBy f rarr = rarr |> MinMax.index3ByFun(<) f
 
     /// Returns the indices of the three biggest elements of the Rarr.
     /// Elements are compared by applying the predicate function first.
-    /// If they are equal after function is applied then the the order is kept
+    /// If they are equal after function is applied then the order is kept
     let inline max3IndBy f rarr = rarr |> MinMax.index3ByFun (>) f
 
     /// Return the length or count of the collection.
@@ -480,8 +484,9 @@ module Rarr =
     /// Same as Rarr.filter and then Rarr.length
     let inline countIf (predicate : 'T -> bool) (rarr : Rarr<'T>) : int = //countBy is something else !!
         let mutable k = 0
+        let li = rarr.List
         for i=0 to rarr.Count - 1 do
-            if predicate rarr.List.[i] then
+            if predicate li.[i] then
                 k <- k + 1
         k
 
@@ -505,8 +510,9 @@ module Rarr =
         let results1 = Rarr ()
         let results2 = Rarr ()
         let len = rarr.Count
+        let li = rarr.List
         for i = 0 to len - 1 do
-            match partitioner rarr.List.[i] with
+            match partitioner li.[i] with
             | Choice1Of2 value ->
                 results1.Add value
             | Choice2Of2 value ->
@@ -556,9 +562,11 @@ module Rarr =
     /// <returns>The resulting Rarr of pairs of length: rarr1.Count * rarr2.Count.</returns>
     let allPairs (rarr1: Rarr<'T>) (rarr2: Rarr<'U>) :Rarr<'T*'U> = 
         let res = Rarr(rarr1.Count * rarr2.Count)
+        let l1 = rarr1.List
+        let l2 = rarr2.List
         for i = 0 to rarr1.Count-1 do
             for j = 0 to rarr2.Count-1 do
-                res.Add (rarr1.List.[i], rarr2.List.[j])
+                res.Add (l1.[i], l2.[j])
         res
 
 
@@ -579,8 +587,9 @@ module Rarr =
     let inline average (rarr: Rarr<'T>) = 
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.average: Count must be at least one: %s" rarr.ToNiceStringLong
         let mutable acc = LanguagePrimitives.GenericZero< ^T>
+        let li = rarr.List
         for i = 0 to rarr.Count - 1 do
-            acc <- Checked.(+) acc rarr.List.[i]
+            acc <- Checked.(+) acc li.[i]
         LanguagePrimitives.DivideByInt< ^T> acc rarr.Count
 
 
@@ -592,8 +601,9 @@ module Rarr =
     let inline averageBy (projection: 'T -> ^Key) (rarr: Rarr<'T>) : ^Key = 
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.averageBy: Count must be at least one: %s" rarr.ToNiceStringLong
         let mutable acc = LanguagePrimitives.GenericZero< ^Key>
+        let li = rarr.List
         for i = 0 to rarr.Count - 1 do
-            acc <- Checked.(+) acc (projection rarr.List.[i])
+            acc <- Checked.(+) acc (projection li.[i])
         LanguagePrimitives.DivideByInt< ^Key> acc rarr.Count
 
     /// <summary>Applies the given function to each element of the Rarr. Returns
@@ -605,8 +615,9 @@ module Rarr =
     let inline choose (chooser : 'T -> 'U option) (rarr : Rarr<'T>) : Rarr<'U> = 
         let result = Rarr ()
         let count = rarr.Count
+        let li = rarr.List
         for i = 0 to count - 1 do
-            match chooser rarr.List.[i] with
+            match chooser li.[i] with
             | None -> ()
             | Some value ->
                 result.Add value
@@ -628,11 +639,12 @@ module Rarr =
             let chunkCount = (len - 1) / chunkSize + 1
             let res = Rarr(chunkCount)
             let mutable sub = Rarr(0)
+            let li = rarr.List
             for i=0 to rarr.Count-1 do
                 if i % chunkSize = 0 then
                     sub <- Rarr(chunkSize)
                     res.Add(sub)
-                sub.Add rarr.List.[i]
+                sub.Add li.[i]
             res
 
     /// <summary>For each element of the Rarr, applies the given function. Concatenates all the results and return the combined Rarr.</summary>
@@ -800,8 +812,9 @@ module Rarr =
     let distinct (rarr: Rarr<'T>) = 
         let temp = Rarr()
         let hashSet = HashSet<'T>(HashIdentity.Structural<'T>)
+        let li = rarr.List
         for i=0 to rarr.Count-1 do
-            let v = rarr.List.[i]
+            let v = li.[i]
             if hashSet.Add(v) then
                 temp.Add v
         temp
@@ -819,8 +832,9 @@ module Rarr =
         else
             let temp = Rarr()
             let hashSet = HashSet<'Key>(HashIdentity.Structural<_>)
+            let li = rarr.List
             for i=0 to rarr.Count-1 do
-                let v = rarr.List.[i]
+                let v = li.[i]
                 if hashSet.Add(projection v) then
                     temp.Add v
             temp
@@ -855,8 +869,9 @@ module Rarr =
         else
             let cached = HashSet(itemsToExclude, HashIdentity.Structural)
             let res = Rarr()
+            let li = rarr.List
             for i=0 to rarr.Count-1 do
-                let e = rarr.List.[i]
+                let e = li.[i]
                 if cached.Add e then
                     res.Add e
             res
@@ -937,11 +952,12 @@ module Rarr =
     /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if <c>predicate</c> never returns true.</exception>
     /// <returns>The last element for which <c>predicate</c> returns true.</returns>
     let findBack (predicate:'T->bool) (rarr: Rarr<'T>) = 
+        let li = rarr.List
         let rec loop i = 
             if i < 0 then
                 KeyNotFoundException.Raise "Rarr.findBack: not found in %d items %s" rarr.Count rarr.ToNiceStringLong
             else
-                if predicate rarr.List.[i] then rarr.List.[i]  else loop (i-1)
+                if predicate li.[i] then li.[i]  else loop (i-1)
         loop (rarr.Count-1)
 
 
@@ -968,10 +984,11 @@ module Rarr =
     /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if <c>predicate</c> never returns true.</exception>
     /// <returns>The index of the last element in the Rarr that satisfies the given predicate.</returns>
     let findIndexBack (predicate:'T->bool) (rarr: Rarr<'T>) = 
+        let li = rarr.List
         let rec go n = 
             if n < 0 then
                 KeyNotFoundException.Raise "Rarr.findIndexBack: not found in %s" rarr.ToNiceStringLong
-            elif predicate rarr.List.[n] then
+            elif predicate li.[n] then
                 n
             else go (n-1)
         go (rarr.Count-1)
@@ -987,8 +1004,9 @@ module Rarr =
     let fold<'T, 'State> (folder: 'State -> 'T -> 'State) (state: 'State) (rarr: Rarr<'T>) = 
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(folder)
         let mutable state = state
+        let li = rarr.List
         for i = 0 to rarr.Count-1 do
-            state <- f.Invoke(state, rarr.List.[i])
+            state <- f.Invoke(state, li.[i])
         state
 
 
@@ -1022,8 +1040,9 @@ module Rarr =
     let foldBack<'T, 'State> (folder: 'T -> 'State -> 'State) (rarr: Rarr<'T>) (state: 'State) = 
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(folder)
         let mutable res = state
+        let li = rarr.List
         for i = rarr.Count-1 downto 0 do
-            res <- f.Invoke(rarr.List.[i], res)
+            res <- f.Invoke(li.[i], res)
         res
 
 
@@ -1102,8 +1121,9 @@ module Rarr =
         else
             let dict = Dictionary<_, Rarr<_>> comparer
             // Build the groupings
+            let li = rarr.List
             for i = 0 to length - 1 do
-                let v = rarr.List.[i]
+                let v = li.[i]
                 let safeKey = keyf v
                 let mutable prev = Unchecked.defaultof<_>
                 if dict.TryGetValue(safeKey, &prev) then
@@ -1145,10 +1165,11 @@ module Rarr =
     /// paired with the integer index (from 0) of each element.</summary>
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The Rarr of indexed elements.</returns>
-    let indexed (rarr: Rarr<'T>) = 
+    let indexed (rarr: Rarr<'T>) :  Rarr<int * 'T> = 
         let res = Rarr(rarr.Count)
+        let li = rarr.List
         for i = 0 to rarr.Count-1 do
-            res.Add (i, rarr.List.[i])
+            res.Add (i, li.[i])
         res
 
     /// <summary>Creates an Rarr given the dimension and a generator function to compute the elements.</summary>
@@ -1206,8 +1227,9 @@ module Rarr =
     /// <param name="action">The function to apply.</param>
     /// <param name="rarr">The input Rarr.</param>
     let inline iter ((*[<InlineIfLambda>]*) action) (rarr: Rarr<'T>) = // TODO activate InlineIfLambda
+        let li = rarr.List
         for i = 0 to rarr.Count-1 do
-            action rarr.List.[i]
+            action li.[i]
 
 
     /// <summary>Applies the given function to pair of elements drawn from matching indices in two Rarrs. The
@@ -1230,8 +1252,9 @@ module Rarr =
     /// <param name="rarr">The input Rarr.</param>
     let inline iteri (action : int -> 'T -> unit)  (rarr: Rarr<'T>) = 
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(action)
+        let li = rarr.List
         for i = 0 to rarr.Count-1 do
-            f.Invoke(i, rarr.List.[i])
+            f.Invoke(i, li.[i])
 
 
     /// <summary>Applies the given function to pair of elements drawn from matching indices in two Rarrs,
@@ -1321,8 +1344,9 @@ module Rarr =
             let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(mapping)
             let mutable acc = state
             let res = Rarr(len)
+            let li = rarr.List
             for i = 0 to len-1 do
-                let h, s = f.Invoke(acc, rarr.List.[i])
+                let h, s = f.Invoke(acc, li.[i])
                 res.Add h
                 acc <- s
             res, acc
@@ -1342,9 +1366,9 @@ module Rarr =
             let res = Rarr(len)
             for i = 0 to len-1 do
                 res.Add Unchecked.defaultof<'Result> // needs to be filled already because of 'downto' loop
-
+            let li = rarr.List
             for i = len - 1 downto 0 do
-                let h, s = f.Invoke(rarr.List.[i], acc)
+                let h, s = f.Invoke(li.[i], acc)
                 res.[i] <- h
                 acc <- s
             res, acc
@@ -1358,8 +1382,9 @@ module Rarr =
     let mapi (mapping: int -> 'T -> 'U) (rarr: Rarr<'T>) : Rarr<'U> = 
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(mapping)
         let res = Rarr(rarr.Count)
+        let li = rarr.List
         for i = 0 to rarr.Count-1 do
-            res.Add <|  f.Invoke(i, rarr.List.[i])
+            res.Add <|  f.Invoke(i, li.[i])
         res
 
     /// <summary>Builds a new collection whose elements are the results of applying the given function
@@ -1387,8 +1412,9 @@ module Rarr =
     let inline max (rarr: Rarr<'T>) = 
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.max: Count must be at least one: %s"  rarr.ToNiceStringLong
         let mutable acc = rarr.List.[0]        
+        let li = rarr.List
         for i = 1 to rarr.Count - 1 do
-            let curr = rarr.List.[i]
+            let curr = li.[i]
             if curr > acc then
                 acc <- curr
         acc
@@ -1401,11 +1427,13 @@ module Rarr =
     let inline maxBy (projection : 'T -> 'Key) (rarr: Rarr<'T>) : 'T = 
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.maxBy: Count must be at least one: %s"  rarr.ToNiceStringLong
         let mutable accv = rarr.List.[0]
-        if rarr.Count =  1 then accv // if len = 1 then don't call the projection not even once !
+        if rarr.Count =  1 then 
+            accv // if len = 1 then don't call the projection not even once !
         else 
             let mutable acc = projection accv
+            let li = rarr.List
             for i = 1 to rarr.Count - 1 do
-                let currv = rarr.List.[i]
+                let currv = li.[i]
                 let curr = projection currv
                 if curr > acc then
                     acc <- curr
@@ -1419,8 +1447,9 @@ module Rarr =
     let inline min (rarr: Rarr<'T>) : 'T= 
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.min: Count must be at least one: %s"  rarr.ToNiceStringLong
         let mutable acc = rarr.List.[0]
+        let li = rarr.List
         for i = 1 to rarr.Count - 1 do
-            let curr = rarr.List.[i]
+            let curr = li.[i]
             if curr < acc then
                 acc <- curr
         acc
@@ -1433,11 +1462,13 @@ module Rarr =
     let inline minBy ((*[<InlineIfLambda>]*) projection : 'T -> 'Key) (rarr: Rarr<'T>) : 'T = 
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.minBy: Count must be at least one: %s"  rarr.ToNiceStringLong
         let mutable accv = rarr.List.[0]
-        if rarr.Count =  1 then accv // if len = 1 then don't call the projection not even once !
+        if rarr.Count =  1 then 
+            accv // if len = 1 then don't call the projection not even once !
         else
             let mutable acc = projection accv
+            let li = rarr.List
             for i = 1 to rarr.Count - 1 do
-                let currv = rarr.List.[i]
+                let currv = li.[i]
                 let curr = projection currv
                 if curr < acc then
                     acc <- curr
@@ -1487,8 +1518,9 @@ module Rarr =
         let trueResults  = Rarr()
         let falseResults = Rarr()
         let len = rarr.Count
+        let li = rarr.List
         for i = 0 to len - 1 do
-            let el = rarr.List.[i]
+            let el = li.[i]
             if predicate el then
                 trueResults.Add el
             else
@@ -1504,10 +1536,11 @@ module Rarr =
     let permute (indexMap:int -> int) (rarr: Rarr<'T>) : Rarr<'T>= 
         let res  = rarr.Clone()
         let inv = Array.zeroCreate rarr.Count
+        let li = rarr.List
         for i = 0 to rarr.Count - 1 do
             let j = indexMap i
             if j < 0 || j >= rarr.Count then ArgumentException.RaiseBase "Rarr.permute: the indexMap generated %d from %d but only 0 to %d is allowed" j i (rarr.Count-1)
-            res.[j] <- rarr.List.[i]
+            res.[j] <- li.[i]
             inv.[j] <- 1uy
         for i = 0 to rarr.Count - 1 do
             if inv.[i] <> 1uy then ArgumentException.RaiseBase "Rarr.permute: the indexMap function did not generated %d a new value for " i
@@ -1523,11 +1556,12 @@ module Rarr =
     /// <c>chooser</c> is <c>None</c>.</exception>
     /// <returns>The first result.</returns>
     let pick (chooser:'T -> 'U option) (rarr: Rarr<'T>) = 
+        let li = rarr.List
         let rec loop i = 
             if i >= rarr.Count then
                 KeyNotFoundException.Raise "Rarr.pick: Key not found in %d elements" rarr.Count
             else
-                match chooser rarr.List.[i] with
+                match chooser li.[i] with
                 | None -> loop(i+1)
                 | Some res -> res
         loop 0
@@ -1544,9 +1578,10 @@ module Rarr =
     let reduce (reduction:'T -> 'T -> 'T) (rarr: Rarr<'T>) = 
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.reduce: Count must be at least one: %s"  rarr.ToNiceStringLong
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(reduction)
-        let mutable res = rarr.List.[0]
+        let li = rarr.List
+        let mutable res = li.[0]
         for i = 1 to rarr.Count - 1 do
-            res <- f.Invoke(res, rarr.List.[i])
+            res <- f.Invoke(res, li.[i])
         res
 
 
@@ -1562,8 +1597,9 @@ module Rarr =
         if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.reduceBack: Count must be at least one: %s"  rarr.ToNiceStringLong
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(reduction)
         let mutable res = rarr.Last
+        let li = rarr.List
         for i = rarr.Count - 2 downto 0 do
-            res <- f.Invoke(rarr.List.[i], res)
+            res <- f.Invoke(li.[i], res)
         res
 
 
@@ -1609,8 +1645,9 @@ module Rarr =
     let rev (rarr: Rarr<'T>) = 
         let len = rarr.Count
         let result = Rarr (len)
+        let li = rarr.List
         for i = len - 1 downto 0 do
-            result.Add rarr.List.[i]
+            result.Add li.[i]
         result
 
 
@@ -1626,8 +1663,9 @@ module Rarr =
         results.Add stateInit
         // Fold over the specified range of items.
         let mutable state = stateInit
+        let li = rarr.List
         for i = 0 to rarr.Count-1 do
-            state <- folder.Invoke (state, rarr.List.[i])
+            state <- folder.Invoke (state, li.[i])
             results.Add state
         results
 
@@ -1643,8 +1681,9 @@ module Rarr =
             results.Add stateInit
         // Fold over the specified range of items.
         let mutable state = stateInit
+        let li = rarr.List
         for i = rarr.Count-1 downto 0 do
-            state <- folder.Invoke (rarr.List.[i],state)
+            state <- folder.Invoke (li.[i],state)
             results.[i] <- state
         results
 
@@ -1688,7 +1727,8 @@ module Rarr =
     /// <returns>The created sub Rarr.</returns>
     let skipWhile (predicate:'T->bool) (rarr: Rarr<'T>) = 
         let mutable i = 0
-        while i < rarr.Count && predicate rarr.List.[i] do
+        let li = rarr.List
+        while i < rarr.Count && predicate li.[i] do
             i <- i + 1
         if i = rarr.Count then
             Rarr()
@@ -1837,8 +1877,9 @@ module Rarr =
     /// <returns>The resulting sum.</returns>
     let inline sum (rarr: ^T Rarr ) : ^T = 
         let mutable acc = LanguagePrimitives.GenericZero< ^T>
+        let li = rarr.List
         for i = 0 to rarr.Count - 1 do
-            acc <- Checked.(+) acc rarr.List.[i]
+            acc <- Checked.(+) acc li.[i]
         acc
 
 
@@ -1848,8 +1889,9 @@ module Rarr =
     /// <returns>The resulting sum.</returns>
     let inline sumBy (projection: 'T -> ^Key) (rarr: Rarr<'T>) : ^Key = 
         let mutable acc = LanguagePrimitives.GenericZero< ^Key>
+        let li = rarr.List
         for i = 0 to rarr.Count - 1 do
-            acc <- Checked.(+) acc (projection rarr.List.[i])
+            acc <- Checked.(+) acc (projection li.[i])
         acc
 
 
@@ -1886,11 +1928,12 @@ module Rarr =
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The result Rarr.</returns>
     let takeWhile (predicate:'T->bool) (rarr: Rarr<'T>) = 
+        let li = rarr.List
         if rarr.Count = 0 then
             Rarr(0)
         else
             let mutable count = 0
-            while count < rarr.Count && predicate rarr.List.[count] do
+            while count < rarr.Count && predicate li.[count] do
                 count <- count + 1
             rarr.GetRange(0,count)
 
@@ -1900,9 +1943,10 @@ module Rarr =
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The list of Rarr elements.</returns>
     let toList (rarr:Rarr<'T>) : list<'T> = 
+        let li = rarr.List
         let mutable res = []
         for i = rarr.Count - 1 downto 0 do
-            res <- rarr.List.[i] :: res
+            res <- li.[i] :: res
         res
 
 
@@ -1977,9 +2021,10 @@ module Rarr =
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The last element that satisfies the predicate, or <c>None</c>.</returns>
     let tryFindBack (predicate:'T->bool) (rarr: Rarr<'T>) :option<'T> = 
+        let li = rarr.List
         let rec loop i = 
             if i < 0 then None else
-            if predicate rarr.List.[i] then Some rarr.List.[i]  else loop (i-1)
+            if predicate li.[i] then Some li.[i]  else loop (i-1)
         loop ((rarr.Count-1))
 
 
@@ -2003,9 +2048,10 @@ module Rarr =
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The index of the last element that satisfies the predicate, or <c>None</c>.</returns>
     let tryFindIndexBack (predicate:'T->bool) (rarr: Rarr<'T>) : option<int>= 
+        let li = rarr.List
         let rec loop i = 
             if i < 0 then None else
-            if predicate rarr.List.[i] then Some i  else loop (i-1)
+            if predicate li.[i] then Some i  else loop (i-1)
         loop ((rarr.Count-1))
 
 
@@ -2044,11 +2090,12 @@ module Rarr =
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The first transformed element that is <c>Some(x)</c>.</returns>
     let tryPick chooser (rarr: Rarr<'T>) = 
+        let li = rarr.List
         let rec loop i = 
             if i >= rarr.Count then
                 None
             else
-                match chooser rarr.List.[i] with
+                match chooser li.[i] with
                 | None -> loop(i+1)
                 | res -> res
         loop 0
@@ -2079,8 +2126,9 @@ module Rarr =
         let len = rarr.Count
         let res1 = Rarr(len)
         let res2 = Rarr(len)
+        let li = rarr.List
         for i = 0 to rarr.Count-1 do
-            let x, y = rarr.List.[i]
+            let x, y = li.[i]
             res1.Add <|  x
             res2.Add <|  y
         res1, res2
@@ -2094,8 +2142,9 @@ module Rarr =
         let res1 = Rarr(len)
         let res2 = Rarr(len)
         let res3 = Rarr(len)
+        let li = rarr.List
         for i = 0 to rarr.Count-1 do
-            let x, y, z = rarr.List.[i]
+            let x, y, z = li.[i]
             res1.Add <|  x
             res2.Add <|  y
             res3.Add <|  z
@@ -2186,11 +2235,12 @@ module Rarr =
             let isChosen: bool[] = Array.zeroCreate inputLength
             let results: 'U []   = Array.zeroCreate inputLength
             let mutable outputLength = 0
+            let li = rarr.List
             Parallel.For(0,
                             inputLength,
                             (fun () -> 0),
                             (fun i _ count ->
-                                match chooser rarr.List.[i] with
+                                match chooser li.[i] with
                                 | None -> count
                                 | Some v ->
                                     isChosen.[i] <-  true
@@ -2216,8 +2266,9 @@ module Rarr =
         let collect (mapping: 'T -> Rarr<'U>)  (rarr: Rarr<'T>) : Rarr<'U>= 
             let inputLength = rarr.Count
             let result = create inputLength Unchecked.defaultof<_>
+            let li = rarr.List
             Parallel.For(0, inputLength,
-                (fun i -> result.[i] <- mapping rarr.List.[i])) |> ignore
+                (fun i -> result.[i] <- mapping li.[i])) |> ignore
             concat result
 
 
@@ -2239,7 +2290,8 @@ module Rarr =
         /// <param name="action"></param>
         /// <param name="rarr">The input Rarr.</param>
         let iter (action:'T->unit) (rarr: Rarr<'T>) = 
-            Parallel.For (0, rarr.Count, fun i -> action rarr.List.[i]) |> ignore
+            let li = rarr.List
+            Parallel.For (0, rarr.Count, fun i -> action li.[i]) |> ignore
 
 
         /// <summary>Apply the given function to each element of the Rarr. The integer passed to the
@@ -2250,7 +2302,8 @@ module Rarr =
         /// <param name="rarr">The input Rarr.</param>
         let iteri (action:int->'T->unit) (rarr: Rarr<'T>) = 
             let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(action)
-            Parallel.For (0, rarr.Count, fun i -> f.Invoke(i, rarr.List.[i])) |> ignore
+            let li = rarr.List
+            Parallel.For (0, rarr.Count, fun i -> f.Invoke(i, li.[i])) |> ignore
 
 
         /// <summary>Build a new Rarr whose elements are the results of applying the given function
@@ -2263,8 +2316,9 @@ module Rarr =
         let map (mapping: 'T -> 'U) (rarr: Rarr<'T>) : Rarr<'U>= 
             let inputLength = rarr.Count
             let result = create inputLength Unchecked.defaultof<_>
+            let li = rarr.List
             Parallel.For(0, inputLength, fun i ->
-                result.[i] <- mapping rarr.List.[i]) |> ignore
+                result.[i] <- mapping li.[i]) |> ignore
             result
 
 
@@ -2280,8 +2334,9 @@ module Rarr =
             let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(mapping)
             let inputLength = rarr.Count
             let result = create inputLength  Unchecked.defaultof<_>
+            let li = rarr.List
             Parallel.For(0, inputLength, fun i ->
-                result.[i] <- f.Invoke (i, rarr.List.[i])) |> ignore
+                result.[i] <- f.Invoke (i, li.[i])) |> ignore
             result
 
 
@@ -2297,11 +2352,12 @@ module Rarr =
             let inputLength = rarr.Count
             let isTrue = Array.zeroCreate inputLength
             let mutable trueLength = 0
+            let li = rarr.List
             Parallel.For(   0,
                             inputLength,
                             (fun () -> 0),
                             (fun i _ trueCount ->
-                            if predicate rarr.List.[i] then
+                            if predicate li.[i] then
                                 isTrue.[i] <- true
                                 trueCount + 1
                             else
@@ -2313,9 +2369,9 @@ module Rarr =
 
             for i = 0 to isTrue.Length-1 do
                 if isTrue.[i] then
-                    res1.Add rarr.List.[i]
+                    res1.Add li.[i]
                 else
-                    res2.Add rarr.List.[i]
+                    res2.Add li.[i]
 
             res1, res2
 

@@ -87,14 +87,14 @@ type Rarr<'T> private (xs:List<'T>) =
     /// Gets the index of the last item in the FsEx.Rarr.
     /// Equal to this.Count - 1
     member this.LastIndex = 
-        if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.LastIndex: Failed to get LastIndex of %s" this.ToNiceStringLong
+        if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.LastIndex: Failed to get LastIndex of empty Rarr<%s>" (typeof<'T>).FullName
         xs.Count - 1
 
     /// Get (or set) the last item in the FsEx.Rarr.
     /// Equal to this.[this.Count - 1]
     member this.Last
         with get() = 
-            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.Last: Failed to get last item of %s" this.ToNiceStringLong
+            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.Last: Failed to get last item of of empty Rarr<%s>" (typeof<'T>).FullName
             xs.[xs.Count - 1]
         and set (v:'T) = 
             if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.Last: Failed to set last item of %s to %s" this.ToNiceStringLong (toNiceString v)
@@ -125,10 +125,10 @@ type Rarr<'T> private (xs:List<'T>) =
     /// Equal to this.[0]
     member this.First
         with get() = 
-            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.First: Failed to get first item of %s " this.ToNiceStringLong
+            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.First: Failed to get first item of of empty Rarr<%s>" (typeof<'T>).FullName
             xs.[0]
         and set (v:'T) = 
-            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.First: Failed to set first item of %s to %s" this.ToNiceStringLong (toNiceString v)
+            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.First: Failed to set first item of of empty Rarr<%s> to  %s"  (typeof<'T>).FullName (toNiceString v)
             xs.[0] <- v
 
     /// Get (or set) the second item in the FsEx.Rarr.
