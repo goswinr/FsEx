@@ -7,13 +7,13 @@ open System.Collections.Generic
 
 // mark this assembly as extension assembly http://www.latkin.org/blog/2014/04/30/f-extension-methods-in-roslyn/
 // https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/type-extensions#extension-methods
-//[<assembly:Extension>] do() // currently this library does not support C# style estensions, type info for them is ugly
-// and C# extension properties seem not possibe from F# eg array.Last|>
+//[<assembly:Extension>] do() // currently this library does not support C# style extensions, type info for them is ugly
+// and C# extension properties seem not possible from F# eg array.Last|>
 
 
 /// This module is set to auto open.
 /// Static Extension methods on Exceptions to cal Excn.Raise "%A" x with F# printf string formating
-[<AutoOpen>] // so that extension become availale on opening FsEx
+[<AutoOpen>] // so that extension become available on opening FsEx
 module AutoOpenExtensionsExceptions = 
 
     // type FsExStringException is now defined in String Module
@@ -51,7 +51,7 @@ module AutoOpenExtensionsExceptions =
 
 /// This module is set to auto open.
 /// General Utility functions
-[<AutoOpen>] // so that extension become availale on opening FsEx
+[<AutoOpen>] // so that extension become available on opening FsEx
 module AutoOpenUtil = 
 
     /// A quick way to throw an exception.
@@ -66,7 +66,7 @@ module AutoOpenUtil =
      
     
     /// Throws an exception with 'msg' as Error message if 'value' is false.
-    /// This function is useful to follow up on any methods that return booleans indication sucess or failure
+    /// This function is useful to follow up on any methods that return booleans indication success or failure
     let inline failIfFalse (failMsg:string) (value :bool) : unit = 
         if not value then raise <| Exception( "FsEx.failIfFalse: " + failMsg )
 
@@ -112,7 +112,7 @@ module AutoOpenUtil =
         |null -> alternativeValue
         | _   -> maybeNullValue
 
-    /// Null coalesceing:
+    /// Null coalescing:
     /// Returns the value on the left unless it is null, then it returns the value on the right.
     let inline (|?) (a:'T) (b:'T)  = 
         // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs

@@ -2,7 +2,6 @@
 
 # FsEx
 
-[![release](https://img.shields.io/github/release/goswinr/FsEx.svg)](https://github.com/goswinr/FsEx/releases) 
 ![code size](https://img.shields.io/github/languages/code-size/goswinr/FsEx.svg) 
 [![license](https://img.shields.io/github/license/goswinr/FsEx)](LICENSE)
 
@@ -32,7 +31,7 @@ FsEx is an FSharp extension and utility library.
 ### Changelog
 `0.8.0` 
 - update Process Module for running external Processes
-- improve float formating in toNiceString module
+- improve float formatting in toNiceString module
 - add more colors for printing via Seff editor
 - fix typos in docstrings
 
@@ -50,5 +49,5 @@ FsEx is an FSharp extension and utility library.
 - Improved Exception messages.
 - nicer pretty printing via `print` function
     
-> 0.4.0
-- first release
+`0.4.0` 
+- first public release

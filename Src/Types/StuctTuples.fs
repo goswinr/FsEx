@@ -2,7 +2,7 @@
 
 open System
 
-#nowarn "86" // to allow redefinging (=) and (<>) operators in module FastEqualOperators = 
+#nowarn "86" // to allow redefining (=) and (<>) operators in module FastEqualOperators = 
 
 
 //What if the type must be used as a key in e.g. a dictionary?
@@ -52,7 +52,7 @@ module NonBoxingEqualityOperators =
     /// This avoids boxing of custom structs when comparing with (<>). A significant performance improvement.
     let inline (=!=) x y = not (eq x y)
 
-open System.Runtime.CompilerServices // for ; IsByRefLike; IsReadOnly
+//open System.Runtime.CompilerServices // for ; IsByRefLike; IsReadOnly
 
 /// A struct of two integers
 /// use operator (===) for fast equality test

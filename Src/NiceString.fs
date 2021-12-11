@@ -265,7 +265,7 @@ module NiceFormat  =  // used by Rhino.Scripting
         elif x = Single.PositiveInfinity then Literals.NegativeInfinity
         elif x = -1.234321e+38f then Literals.RhinoMathUnsetSingle 
         elif x = 0.0f then "0.0" // not "0" as in sprintf "%g"
-        else x.ToString("R")|> addThousandSeparators // R for round triping: https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings?redirectedfrom=MSDN#round-trip-format-specifier-r
+        else x.ToString("R")|> addThousandSeparators // R for round tripping: https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings?redirectedfrom=MSDN#round-trip-format-specifier-r
             
 
 
@@ -284,7 +284,7 @@ module NiceFormat  =  // used by Rhino.Scripting
             sprintf "\"%s[<< ...... %d more chars ...... >>]%s\"" st (len - maxCharsInString - 20) last20
 
 
-    /// return the string befor a splitter
+    /// return the string before a splitter
     /// if splitter is missing return full string
     let inline private before (splitter:Char) (s:string) = 
         let start = s.IndexOf(splitter)
@@ -350,10 +350,10 @@ module internal NiceStringImplementation  =
             match lns with
             |Element s -> chars <- chars + s.Length
             |EarlyEnd  -> chars <- chars + 4
-            |Head _    -> chars <- 9999 // to stop this line if k is alreadey more than nsl.maxVertItems via ( || chars < nsl.maxHorChars). don't do nested seq in one line !
+            |Head _    -> chars <- 9999 // to stop this line if k is already more than nsl.maxVertItems via ( || chars < nsl.maxHorChars). don't do nested seq in one line !
             rs.Add(lns)
             k <- k+1
-        if enum.MoveNext() then // don@iteret full seqence if only the first few items are printed
+        if enum.MoveNext() then // don@iteret full sequence if only the first few items are printed
             rs.Add( EarlyEnd)
         rs
 
@@ -386,7 +386,7 @@ module internal NiceStringImplementation  =
         match externalFormater x with // first check if externalFormater provides a string , this is used e.g. for types from RhinoCommon.dll
         | Some ln -> ln
         | None ->            
-            let topAndFull = depth=0 && nsl.maxVertItems = Int32.MaxValue  // to not  truncate string if toplevel and printFull
+            let topAndFull = depth=0 && nsl.maxVertItems = Int32.MaxValue  // to not  truncate string if top-level and printFull
 
             match x with // boxed already
             | null -> "'null' (or Option.None)"                                                                   |> Element
@@ -504,11 +504,11 @@ module internal NiceStringImplementation  =
                             loop i (depth+1) x
         loop 0 0 lines
 
-        //finally trimm of line return at end
+        //finally trim of line return at end
         let len = sb.Length
         if sb.Chars(len-2) = '\r' then sb.Remove(len-2 , 2) |> ignoreObj
         let len = sb.Length
-        if sb.Chars(len-1) = '\n' then sb.Remove(len-1 , 1) |> ignoreObj //in case ther is no '\r'
+        if sb.Chars(len-1) = '\n' then sb.Remove(len-1 , 1) |> ignoreObj //in case there is no '\r'
         sb.ToString()
 
 
@@ -522,7 +522,7 @@ module NiceString  =
     /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
     /// • thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
     /// • maxNestingDepth         = 3     ; set this to change how deep the content of nested seq is printed (printFull ignores this)
-    /// • maxItemsPerSeq          = 6     ; set this to change how how many items per seq are printed in vertical list(printFull ignores this)
+    /// • maxItemsPerSeq          = 6     ; set this to change how many items per seq are printed in vertical list(printFull ignores this)
     /// • maxCharsInString        = 2000  ; set this to change how many characters of a string might be printed at once.
     let toNiceString (x:'T) :string = 
         let nsl = {

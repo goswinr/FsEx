@@ -106,7 +106,7 @@ module Kernel32 =
         else
             Kernel32Exception.Raise "FsEx.Kernel32.removeDllDirectory cant find pointer for folder to unload, is it not loaded? %s" cleanPath
 
-    /// Removes the blocking of dll files from untrusted sources, e.g. the internet
+    /// Removes the blocking of dll files from untrusted sources, e.g. the Internet
     /// calls pInvoke  kernel32.dll DeleteFile() to remove Zone.Identifier
     /// Raises an exception if file does not exist
     /// Returns true if Zone.Identifier where removed from the file stream. Else false
