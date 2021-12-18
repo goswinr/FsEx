@@ -404,7 +404,8 @@ module internal NiceStringImplementation  =
                 if depth = 0 then
                     if FSharpType.IsTuple(typ) then     // just to trim brackets off
                         let tyStr = NiceFormat.typeName typ
-                        let formatA = (sprintf "%A" x) .[1 .. ^1] // trim enclosing in brackets ?
+                        let t = sprintf "%A" x
+                        let formatA =  t.[1 .. t.Length-2] // trim enclosing in brackets. good idea ?                        
                         Element (sprintf "%s: %s" tyStr formatA)
                         //let fields = FSharpValue.GetTupleFields(x)
                         //let desc =  sprintf "%s of %d items" tyStr fields.Length
@@ -422,7 +423,8 @@ module internal NiceStringImplementation  =
                         getNiceOrDefault(typ,x)
                 else
                     if FSharpType.IsTuple(typ) then
-                        Element (sprintf "%A" x) .[1.. ^1] // trim enclosing in brackets ?
+                        let t = sprintf "%A" x
+                        Element t.[1 .. t.Length-2] // trim enclosing in brackets. good idea ?     
                     else
                         getNiceOrDefault(typ,x)
 
