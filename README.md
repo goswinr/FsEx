@@ -32,6 +32,7 @@ FsEx is an FSharp extension and utility library.
 `0.9.0` 
 - Fix xml doc that was broken in 0.8.0
 - Lower minimum FSharp.Core version to  4.5.2
+- add tryWith,tryFinally and Using to ComputationalExpressionsBuilders
 
 `0.8.0` 
 - update Process Module for running external Processes

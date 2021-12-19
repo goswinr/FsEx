@@ -25,7 +25,7 @@ module ComputationalExpressionsBuilders =
 
         member this.Return(x) = Some x
 
-        member this.ReturnFrom(m: 'T option) = m
+        member this.ReturnFrom(m: option<'T>) = m
 
         member this.Bind(m, f) = Option.bind f m
 
@@ -74,9 +74,56 @@ module ComputationalExpressionsBuilders =
         member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addLn b (g.ToString())
 
         member inline _.Yield (strings: seq<string>) = 
+            fun (b: StringBuilder) -> for s in strings do   addLn b s
+
+        member inline _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
+
+        member inline _.Delay f = fun (b: StringBuilder) -> (f()) b
+
+        member inline _.Zero () = ignore
+
+        member inline _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) = 
             fun (b: StringBuilder) ->
-                for s in strings do
-                    addLn b s
+                use e = xs.GetEnumerator ()
+                while e.MoveNext() do  (f e.Current) b
+
+        member inline _.While (p: unit -> bool, f: StringBuilder -> unit) = 
+            fun (b: StringBuilder) -> 
+                while p () do f b
+
+        member inline _.Run (f: StringBuilder -> unit) = 
+            let b = StringBuilder()
+            do f b
+            b.ToString()
+
+        member inline  _.TryWith(body: StringBuilder -> unit, handler: exn ->  StringBuilder -> unit) =
+            fun (b: StringBuilder) -> 
+                try body b with e -> handler e b
+
+        member inline  _.TryFinally(body: StringBuilder -> unit, compensation:  StringBuilder -> unit) =
+            fun (b: StringBuilder) ->  
+                try body b finally compensation  b
+
+        member inline this.Using(disposable: #IDisposable, body: #IDisposable -> StringBuilder -> unit) =            
+            this.TryFinally(  body disposable ,  fun (b: StringBuilder)  ->  if not <| Object.ReferenceEquals(disposable,null) then disposable.Dispose() ) // might be disposed already                        
+               
+
+
+    type CsvBuilderEN () = 
+
+        member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  addCsvEn b txt
+        member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  addCsvEn b (c.ToString())
+        member inline _.Yield (f: float) =     fun (b: StringBuilder) ->  addCsvEn b (f.AsString)
+        member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> addCsvEn b (i.ToString())
+        member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> addCsvEn b (g.ToString())
+        //member inline _.Yield (x: 'T) =        fun (b: StringBuilder)  -> b.Append (x.ToString())  |> ignore
+
+        member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> addCsvEnLn b txt
+        member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> addCsvEnLn b (c.ToString())
+        member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addCsvEnLn b (f.AsString)
+        member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addCsvEnLn b (i.ToString())
+        member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addCsvEnLn b (g.ToString())
+        member inline _.YieldFrom () =             fun (b: StringBuilder) -> b.AppendLine()
 
         member inline _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
 
@@ -100,141 +147,120 @@ module ComputationalExpressionsBuilders =
             do f b
             b.ToString()
 
+        member inline  _.TryWith(body: StringBuilder -> unit, handler: exn ->  StringBuilder -> unit) =
+            fun (b: StringBuilder) -> 
+                try body b with e -> handler e b
 
-    type CsvBuilderEN () = 
+        member inline  _.TryFinally(body: StringBuilder -> unit, compensation:  StringBuilder -> unit) =
+            fun (b: StringBuilder) ->  
+                try body b finally compensation  b
 
-           member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  addCsvEn b txt
-           member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  addCsvEn b (c.ToString())
-           member inline _.Yield (f: float) =     fun (b: StringBuilder) ->  addCsvEn b (f.AsString)
-           member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> addCsvEn b (i.ToString())
-           member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> addCsvEn b (g.ToString())
-           //member inline _.Yield (x: 'T) =        fun (b: StringBuilder)  -> b.Append (x.ToString())  |> ignore
+        member inline this.Using(disposable: #IDisposable, body: #IDisposable -> StringBuilder -> unit) =            
+            this.TryFinally(  body disposable ,  fun (b: StringBuilder)  ->  if not <| Object.ReferenceEquals(disposable,null) then disposable.Dispose() ) // might be disposed already                        
+       
 
-           member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> addCsvEnLn b txt
-           member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> addCsvEnLn b (c.ToString())
-           member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addCsvEnLn b (f.AsString)
-           member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addCsvEnLn b (i.ToString())
-           member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addCsvEnLn b (g.ToString())
-           member inline _.YieldFrom () =             fun (b: StringBuilder) -> b.AppendLine()
-
-           member inline _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
-
-           member inline _.Delay f = fun (b: StringBuilder) -> (f()) b
-
-           member inline _.Zero () = ignore
-
-           member inline _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) = 
-               fun (b: StringBuilder) ->
-                   use e = xs.GetEnumerator ()
-                   while e.MoveNext() do
-                       (f e.Current) b
-
-           member inline _.While (p: unit -> bool, f: StringBuilder -> unit) = 
-               fun (b: StringBuilder) ->
-                   while p () do
-                       f b
-
-           member inline _.Run (f: StringBuilder -> unit) = 
-               let b = StringBuilder()
-               do f b
-               b.ToString()
 
     type CsvBuilderDE () = 
 
-           member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  addCsvDe b txt
-           member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  addCsvDe b (c.ToString())
-           member inline _.Yield (f: float) =     fun (b: StringBuilder) ->  addCsvDe b (f.AsStringDE)
-           member inline _.Yield (f: single) =    fun (b: StringBuilder) ->  addCsvDe b (f.AsStringDE)
-           member inline _.Yield (f: decimal) =   fun (b: StringBuilder) ->  addCsvDe b (f.AsStringDE)
-           member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> addCsvDe b (i.ToString())
-           member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> addCsvDe b (g.ToString())
-           //member inline _.Yield (x: 'T) =        fun (b: StringBuilder)  -> b.Append (x.ToString())  |> ignore
+        member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  addCsvDe b txt
+        member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  addCsvDe b (c.ToString())
+        member inline _.Yield (f: float) =     fun (b: StringBuilder) ->  addCsvDe b (f.AsStringDE)
+        member inline _.Yield (f: single) =    fun (b: StringBuilder) ->  addCsvDe b (f.AsStringDE)
+        member inline _.Yield (f: decimal) =   fun (b: StringBuilder) ->  addCsvDe b (f.AsStringDE)
+        member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> addCsvDe b (i.ToString())
+        member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> addCsvDe b (g.ToString())
+        //member inline _.Yield (x: 'T) =        fun (b: StringBuilder)  -> b.Append (x.ToString())  |> ignore
 
-           member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> addCsvDeLn b txt
-           member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> addCsvDeLn b (c.ToString())
-           member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addCsvDeLn b (f.AsStringDE)
-           member inline _.YieldFrom (f: single) =    fun (b: StringBuilder) -> addCsvDeLn b (f.AsStringDE)
-           member inline _.YieldFrom (f: decimal) =   fun (b: StringBuilder) -> addCsvDeLn b (f.AsStringDE)
-           member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addCsvDeLn b (i.ToString())
-           member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addCsvDeLn b (g.ToString())
-           member inline _.YieldFrom () =             fun (b: StringBuilder) -> b.AppendLine()
+        member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> addCsvDeLn b txt
+        member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> addCsvDeLn b (c.ToString())
+        member inline _.YieldFrom (f: float) =     fun (b: StringBuilder) -> addCsvDeLn b (f.AsStringDE)
+        member inline _.YieldFrom (f: single) =    fun (b: StringBuilder) -> addCsvDeLn b (f.AsStringDE)
+        member inline _.YieldFrom (f: decimal) =   fun (b: StringBuilder) -> addCsvDeLn b (f.AsStringDE)
+        member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addCsvDeLn b (i.ToString())
+        member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addCsvDeLn b (g.ToString())
+        member inline _.YieldFrom () =             fun (b: StringBuilder) -> b.AppendLine()
 
-           member inline _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
+        member inline _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
 
-           member inline _.Delay f = fun (b: StringBuilder) -> (f()) b
+        member inline _.Delay f = fun (b: StringBuilder) -> (f()) b
 
-           member inline _.Zero () = ignore
+        member inline _.Zero () = ignore
 
-           member inline _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) = 
-               fun (b: StringBuilder) ->
-                   use e = xs.GetEnumerator ()
-                   while e.MoveNext() do
-                       (f e.Current) b
+        member inline _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) = 
+            fun (b: StringBuilder) ->
+                use e = xs.GetEnumerator ()
+                while e.MoveNext() do
+                    (f e.Current) b
 
-           member inline _.While (p: unit -> bool, f: StringBuilder -> unit) = 
-               fun (b: StringBuilder) ->
-                   while p () do
-                       f b
+        member inline _.While (p: unit -> bool, f: StringBuilder -> unit) = 
+            fun (b: StringBuilder) ->
+                while p () do
+                    f b
 
-           member inline _.Run (f: StringBuilder -> unit) = 
-               let b = StringBuilder()
-               do f b
-               b.ToString()
+        member inline _.Run (f: StringBuilder -> unit) = 
+            let b = StringBuilder()
+            do f b
+            b.ToString()        
+        
+         member inline  _.TryWith(body: StringBuilder -> unit, handler: exn ->  StringBuilder -> unit) =
+             fun (b: StringBuilder) -> 
+                 try body b with e -> handler e b
+        
+         member inline  _.TryFinally(body: StringBuilder -> unit, compensation:  StringBuilder -> unit) =
+             fun (b: StringBuilder) ->  
+                 try body b finally compensation  b
+        
+         member inline this.Using(disposable: #IDisposable, body: #IDisposable -> StringBuilder -> unit) =            
+             this.TryFinally(  body disposable ,  fun (b: StringBuilder)  ->  if not <| Object.ReferenceEquals(disposable,null) then disposable.Dispose() ) // might be disposed already                        
+        
+
 
     type RarrBuilder<'T> () = 
         member inline _.Yield (x: 'T) = 
-            fun (r: Rarr<'T>) -> r.Add(x)
+            fun (r: Rarr<'T>) -> 
+                r.Add(x)
 
         member inline _.YieldFrom (xs: #seq<'T>) = 
-            fun (r: Rarr<'T>) -> r.AddRange(xs)
+            fun (r: Rarr<'T>) -> 
+                r.AddRange(xs)
 
         member inline _.Combine (f, g) = 
-            fun (r: Rarr<'T>) -> f r; g r
+            fun (r: Rarr<'T>) -> 
+                f r; 
+                g r
 
         member inline _.Delay f = 
             fun (r: Rarr<'T>) -> (f()) r
 
-        member inline _.Zero () =  ignore
+        member inline _.Zero () =  
+            ignore
 
-        member inline _.For (xs: 'U seq, f: 'U -> Rarr<'T> -> unit) = 
+        member inline _.For (xs: 'U seq, body: 'U -> Rarr<'T> -> unit) = 
             fun (r: Rarr<'T>) ->
                 use e = xs.GetEnumerator()
-                while e.MoveNext() do
-                    (f e.Current) r
+                while e.MoveNext() do    (body e.Current) r
 
-        member inline _.While (p: unit -> bool, f: Rarr<'T> -> unit) = 
-            fun (r: Rarr<'T>) -> while p () do  f r
+        member inline _.While (predicate: unit -> bool, body: Rarr<'T> -> unit) = 
+            fun (r: Rarr<'T>) -> 
+                while predicate () do  body r
 
-        member inline _.Run (f: Rarr<'T> -> unit) = 
+        member inline _.Run (body: Rarr<'T> -> unit) = 
             let r = Rarr<'T>()
-            do f r
+            do body r
             r
-        (*
-        TODO
-        https://fsharpforfunandprofit.com/posts/computation-expressions-builder-part6/
-        member this.While(guard, body) =
-            if not (guard())
-            then this.Zero()
-            else this.Bind( body(), fun () ->
-                this.While(guard, body))
+        
+        member inline  _.TryWith(body: Rarr<'T> -> unit, handler: exn ->  Rarr<'T> -> unit) =
+            fun (r: Rarr<'T>) -> 
+                try body r  with e -> handler e r
 
-        member this.TryWith(body, handler) =
-            try this.ReturnFrom(body())
-            with e -> handler e
+        member inline  _.TryFinally(body: Rarr<'T> -> unit, compensation:  Rarr<'T> -> unit) =
+            fun (r: Rarr<'T>) -> 
+                try     body r finally compensation  r
 
-        member this.TryFinally(body, compensation) =
-            try this.ReturnFrom(body())
-            finally compensation()
-
-        member this.Using(disposable:#System.IDisposable, body) =
-            let body' = fun () -> body disposable
-            this.TryFinally(body', fun () ->
-                match disposable with
-                    | null -> ()
-                    | disp -> disp.Dispose())
-        *)
-
-
+        member inline this.Using(disposable: #IDisposable, body: #IDisposable -> Rarr<'T> -> unit) =            
+            this.TryFinally( body disposable ,  fun (r: Rarr<'T>)  ->  if not <| Object.ReferenceEquals(disposable,null) then disposable.Dispose() ) // might be disposed already                        
+               
+ 
 [<AutoOpen>]
 module AutoOpenComputationalExpressions  = 
     open ComputationalExpressionsBuilders
@@ -264,8 +290,5 @@ module AutoOpenComputationalExpressions  =
 
     /// Computational Expression:  use 'yield' to add elements to a Rarr (= Collections.Generic.List).
     let rarr<'T> = new RarrBuilder<'T> ()
-
-
-
 
 
