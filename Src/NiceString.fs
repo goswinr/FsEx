@@ -522,10 +522,10 @@ module NiceString  =
 
     /// Nice formating for numbers including thousand Separator and (nested) sequences, first six items are printed out.
     /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
-    /// • thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
-    /// • maxNestingDepth         = 3     ; set this to change how deep the content of nested seq is printed (printFull ignores this)
-    /// • maxItemsPerSeq          = 6     ; set this to change how many items per seq are printed in vertical list(printFull ignores this)
-    /// • maxCharsInString        = 2000  ; set this to change how many characters of a string might be printed at once.
+    /// .thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
+    /// .maxNestingDepth         = 3     ; set this to change how deep the content of nested seq is printed (printFull ignores this)
+    /// .maxItemsPerSeq          = 6     ; set this to change how many items per seq are printed in vertical list(printFull ignores this)
+    /// .maxCharsInString        = 2000  ; set this to change how many characters of a string might be printed at once.
     let toNiceString (x:'T) :string = 
         let nsl = {
             maxDepth     = NiceStringSettings.maxNestingDepth
@@ -536,9 +536,9 @@ module NiceString  =
 
     /// Nice formating for numbers including thousand Separator and (nested) sequences, first 50 items are printed out.
     /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
-    /// • thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
-    /// • maxNestingDepth         = 3     ; set this to change how deep the content of nested seq is printed (printFull ignores this)
-    /// • maxCharsInString        = 2000  ; set this to change how many characters of a string might be printed at once.
+    /// .thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
+    /// .maxNestingDepth         = 3     ; set this to change how deep the content of nested seq is printed (printFull ignores this)
+    /// .maxCharsInString        = 2000  ; set this to change how many characters of a string might be printed at once.
     let toNiceStringLong (x:'T) :string = 
         let nsl = {
             maxDepth     = NiceStringSettings.maxNestingDepth
@@ -549,8 +549,8 @@ module NiceString  =
 
     /// Nice formating for numbers including thousand Separator, all items of sequences, including nested items, are printed out.
     /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
-    /// • thousandSeparator       = '      ; set this to change the printing of floats and integers larger than 10'000
-    /// • maxCharsInString        = 2000   ; set this to change how many characters of a string might be printed at once.
+    /// .thousandSeparator       = '      ; set this to change the printing of floats and integers larger than 10'000
+    /// .maxCharsInString        = 2000   ; set this to change how many characters of a string might be printed at once.
     let toNiceStringFull (x:'T) :string = 
         let nsl = {
             maxDepth     = 300
