@@ -44,7 +44,7 @@ module String =
             let last6 = stringToTrim.Substring(len-6)
             sprintf "%s[..%d more Chars..]%s" st (len - maxChars - 5) last6
 
-    /// Trims strings ot maximum line count.
+    /// Trims strings to maximum line count.
     /// Adds note about trimmed line count if there are more [ ... and %d more lines.]
     /// Does not include surrounding quotes
     /// If string is null returns "-null string-"
@@ -378,7 +378,7 @@ module String =
         if isNull stringToSearchIn then FsExStringException.Raise "String.containsChar: stringToSearchIn is null, char: '%c'" charToFind
         stringToSearchIn.IndexOf(charToFind) <> -1
 
-    /// Returns true if specified charcter does NOT occurs within this string.
+    /// Returns true if specified character does NOT occurs within this string.
     let (*inline*) notContainsChar (charToFind:char) (stringToSearchIn:string) = 
         if isNull stringToSearchIn then FsExStringException.Raise "String.notContainsChar: stringToSearchIn is null, char: '%c'" charToFind
         stringToSearchIn.IndexOf(charToFind) = -1

@@ -721,10 +721,7 @@ type Rarr<'T> private (xs:List<'T>) =
     member _.Reverse() = 
         xs.Reverse()
 
-    /// Reverses the elements in a range of this list. Following a call to this
-    /// method, an element in the range given by index and count
-    /// which was previously located at index i will now be located at
-    /// index index + (index + count - i - 1).    //
+    /// Reverses the elements in a range of this list. 
     /// This method uses the Array.Reverse method to reverse the elements.
     member _.Reverse(index:int, count:int) = 
         if index < 0 || index > xs.Count then
@@ -742,8 +739,7 @@ type Rarr<'T> private (xs:List<'T>) =
     member _.Sort() = 
         xs.Sort()
 
-    /// Sorts the elements in this list.  Uses Array.Sort with the
-    /// provided comparer.
+    /// Sorts the elements in this list.  Uses Array.Sort with the provided comparer.
     member _.Sort(comparer : IComparer<'T>) = 
         xs.Sort(comparer)
 

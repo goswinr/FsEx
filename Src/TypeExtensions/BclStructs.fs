@@ -195,13 +195,13 @@ module ExtensionsBclStructs =
             n.ToString("yyyy-MM-dd_HH-mm_UTC")
 
         /// Current UTC date and time as yyyy-MM-dd_HH-mm-fff
-        /// (inludes 3 digits of miliseconds)
+        /// (includes 3 digits of milliseconds)
         static member nowStrLong = 
             let n= DateTime.UtcNow
             n.ToString("yyyy-MM-dd_HH-mm-ss-fff")
 
         /// Formats with .ToString("yyyy-MM-dd_HH-mm-ss-fff")
-        /// (inludes 3 digits of miliseconds)
+        /// (includes 3 digits of milliseconds)
         member t.formatYMDHMSF = 
             t.ToString("yyyy-MM-dd_HH-mm-ss-fff")
 

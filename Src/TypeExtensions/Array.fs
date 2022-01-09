@@ -188,6 +188,6 @@ module ExtensionsArray =
 
 
         /// A property like the ToString() method,
-        /// But with richer formationg for collections.
+        /// But with richer formatting for collections.
         /// (this is an Extension Member from FsEx.ExtensionsArray)
         member inline this.ToNiceString = NiceString.toNiceString this

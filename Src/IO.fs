@@ -10,15 +10,15 @@ open System.Threading
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide IO namespace in C# assemblies
 module IO = 
    
-   /// Returns the path to the current Desktop (exluding a trailing slash)
-    /// Containg forward slashes only
+    /// Returns the path to the current Desktop (excluding a trailing slash)
+    /// Contains forward slashes only
     /// Environment.GetFolderPath(Environment.SpecialFolder.Desktop).Replace('\\','/') 
     let desktop = 
         Environment.GetFolderPath(Environment.SpecialFolder.Desktop).Replace('\\','/') 
 
     
     /// Returns the path to the current Desktop(including a trailing slash '/').
-    /// Containg forward slashes only
+    /// Contains forward slashes only
     /// Environment.GetFolderPath(Environment.SpecialFolder.Desktop).Replace('\\','/')  + "/"
     let desktopS = 
         Environment.GetFolderPath(Environment.SpecialFolder.Desktop).Replace('\\','/')  + "/"
@@ -26,11 +26,11 @@ module IO =
 
     /// Raises an FileNotFoundException if the file path does not exist
     let checkIfFileExists s = 
-        if not (IO.File.Exists s) then  raise (FileNotFoundException("File missing or path worng: '" + s + "'"))
+        if not (IO.File.Exists s) then  raise (FileNotFoundException("File missing or path wrong: '" + s + "'"))
 
      /// Raises an DirectoryNotFoundException if the directory path does not exist
     let checkIfDirectoryExists s = 
-        if not (IO.Directory.Exists s) then  raise (DirectoryNotFoundException("Directory missing or path worng: '" + s + "'"))
+        if not (IO.Directory.Exists s) then  raise (DirectoryNotFoundException("Directory missing or path wrong: '" + s + "'"))
 
     /// Returns all files in folder and sub-folders.
     /// Returns first the files from this folder then from first child folder with all its grandchildren
@@ -231,7 +231,7 @@ module IO =
                 lock lockObj (fun () -> // lock is using Monitor class : https://github.com/dotnet/fsharp/blob/6d91b3759affe3320e48f12becbbbca493574b22/src/fsharp/FSharp.Core/prim-types.fs#L4793
                     try  IO.File.WriteAllText(path,text, Text.Encoding.UTF8)
                     // try & with is needed because exceptions on thread-pool cannot be caught otherwise !!
-                    with ex ->  errorLogger(sprintf "FsEx.Wpf.SaveWriter.WriteAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path (truncateString text)) // use %A to trimm long text
+                    with ex ->  errorLogger(sprintf "FsEx.Wpf.SaveWriter.WriteAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path (truncateString text)) // use %A to trim long text
                     )
                 } |> Async.Start
 
@@ -243,7 +243,7 @@ module IO =
                 lock lockObj (fun () -> // lock is using Monitor class : https://github.com/dotnet/fsharp/blob/6d91b3759affe3320e48f12becbbbca493574b22/src/fsharp/FSharp.Core/prim-types.fs#L4793
                     try  IO.File.WriteAllLines(path,texts, Text.Encoding.UTF8)
                     // try & with is needed because exceptions on thread-pool cannot be caught otherwise !!
-                    with ex ->  errorLogger(sprintf "FsEx.Wpf.SaveWriter.WriteAllLinesAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path (Array.truncate 20 texts)) // use %A to trimm long text
+                    with ex ->  errorLogger(sprintf "FsEx.Wpf.SaveWriter.WriteAllLinesAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path (Array.truncate 20 texts)) // use %A to trim long text
                     )
                 } |> Async.Start
 
@@ -256,7 +256,7 @@ module IO =
         member this.WriteIfLast ( getText: unit->string, delayMillisSeconds:int) = 
             async{
                 let k = Interlocked.Increment counter
-                do! Async.Sleep(delayMillisSeconds) // delay to see if this is the last of many events (otherwise there is a noticable lag in dragging window around, for example, when saving window position)
+                do! Async.Sleep(delayMillisSeconds) // delay to see if this is the last of many events (otherwise there is a noticeable lag in dragging window around, for example, when saving window position)
                 if !counter = k then //k > 2L &&   //do not save on startup && only save last event after a delay if there are many save events in a row ( eg from window size change)(ignore first two event from creating window)
                     try
                         let text = getText()

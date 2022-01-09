@@ -2,10 +2,8 @@
 
 open System
 
-
-
-/// Adds extension members on on Collections.Generic.IList
-/// for geting and setting first, second, last and similar indices.
+/// Adds extension members on Collections.Generic.IList
+/// for getting and setting first, second, last and similar indices.
 /// Also adds functionality for negative indices and l.Slice(startIdx:int , endIdx: int) that works  with negative numbers
 module ExtensionsIList = 
 
@@ -131,7 +129,7 @@ module ExtensionsIList =
         /// Gets a subrange of the IList
         /// Allows for negative indices too. ( -1 is last item, like Python)
         /// The resulting IList includes the end index.
-        /// The built in slicing notaion (e.g. a.[1..3]) for ILists does not allow for negative indices.
+        /// The built in slicing notation (e.g. a.[1..3]) for ILists does not allow for negative indices.
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
         member inline this.Slice(startIdx:int, endIdx:int) : 'T Rarr = // to use slicing notation e.g. : this.[ 1 .. -1] // don't overload .GetSlive .[ x ... y] directly, this would be a casting horror for Lists and ILists wher neg indices  Slices dont work
             let count = this.Count

@@ -20,10 +20,10 @@ type Timer() =
 
     let formatMilliSeconds ms = 
         if ms < 0.001 then "less than 0.001 ms"
-        elif ms < 1.0 then sprintf "%.3f ms" (ms)       //less than 1  millisec
-        elif ms < 10. then sprintf "%.2f ms" (ms)       //less than 10 millisec
-        elif ms < 1e3 then sprintf "%.1f ms" ms         //less than 1  sec
-        elif ms < 1e4 then sprintf "%.2f sec" (ms/1e3)  //less than 10 sec
+        elif ms < 1.0 then sprintf "%.3f ms" (ms)       //less than 1  millisecond
+        elif ms < 10. then sprintf "%.2f ms" (ms)       //less than 10 millisecond
+        elif ms < 1e3 then sprintf "%.1f ms" ms         //less than 1  second
+        elif ms < 1e4 then sprintf "%.2f sec" (ms/1e3)  //less than 10 second
         elif ms < 6e4 then sprintf "%.1f sec" (ms/1e3)  //less than 1 min
         else      sprintf "%.0f min %.0f sec" (Math.Floor (ms/6e4)) ((ms % 6e4)/1e3)
 

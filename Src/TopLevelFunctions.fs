@@ -141,7 +141,7 @@ module AutoOpenUtil =
 
 
     /// Converts negative indices to positive ones.
-    /// Correct results from -len up to len-1
+    /// Correct results from -length up to length-1
     /// e.g.: -1 is  last item .
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
     let inline negIdx i len = 
@@ -151,18 +151,18 @@ module AutoOpenUtil =
 
     /// Any int will give a valid index for given collection size.
     /// Converts negative indices to positive ones and loops to start after last index is reached.
-    /// Returns a valid index for a collection of 'len' items for any integer
-    let inline negIdxLooped i len = 
-        let t = i % len
+    /// Returns a valid index for a collection of 'length' items for any integer
+    let inline negIdxLooped i length = 
+        let t = i % length
         if t >= 0 then t
-        else           t + len
+        else           t + length
 
     /// Any int will give a valid index for given collection size.
-    /// Division remainder will be used i % len
+    /// Division remainder will be used i % length
     /// e.g.: -1 is last item
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
-    let inline saveIdx i len = 
-        negIdxLooped i len
+    let inline saveIdx i length = 
+        negIdxLooped i length
 
     /// If condition is true return f(x) else just x
     let inline ifDo condition (f:'T->'T)  (x:'T) = 

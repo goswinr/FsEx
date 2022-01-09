@@ -1197,7 +1197,7 @@ module Rarr =
         r
 
 
-    /// <summary>Return a new Rarr with new items inserted before the given index.(does NOT modify in place !) If required increases the cout of the Rarr.</summary>
+    /// <summary>Return a new Rarr with new items inserted before the given index.(does NOT modify in place !) If required increases the count of the Rarr.</summary>
     /// <param name="index">The index where the items should be inserted.</param>
     /// <param name="values">The values to insert.</param>
     /// <param name="source">The input Rarr.</param>
@@ -1772,7 +1772,7 @@ module Rarr =
     /// <returns>The sorted Rarr.</returns>
     let inline sortByDescending<'T, 'Key when 'Key : comparison> (projection : 'T -> 'Key) (rarr : Rarr<'T>) : Rarr<'T> = 
         let r = rarr.GetRange(0,rarr.Count) // fastest way to create a shallow copy
-        r.Sort (fun x y -> Operators.compare (projection y) (projection x)) // x and y are swaped for decending order
+        r.Sort (fun x y -> Operators.compare (projection y) (projection x)) // x and y are swapped for descending order
         r
 
 

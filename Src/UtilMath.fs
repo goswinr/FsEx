@@ -11,7 +11,7 @@ open System.Globalization
 //         }
 
 /// Math Utils.
-/// When opened ths module shadows the built in trigonometric asin and acos function to include clamping if values are slightly above -1.0 or 1.0
+/// When opened the module shadows the built in trigonometric asin and acos function to include clamping if values are slightly above -1.0 or 1.0
 module UtilMath = 
 
     /// Test is a floating point number (with Measure)  is NaN (Not a Number) or Infinity
@@ -36,7 +36,7 @@ module UtilMath =
         if x >  1.00001<_>  then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.acos failed on %f , input must be between -1.00001 and +1.00001" x
         else x  |> float|> clamp -1.0 1.0 |> System.Math.Acos
          
-    /// Shadows the built in 'asin' (Invers Sine) function to include clamping if values are slightly above -1.0 or 1.0
+    /// Shadows the built in 'asin' (Inverse Sine) function to include clamping if values are slightly above -1.0 or 1.0
     /// Tolerance: 0.00001
     /// Returns angel in Radians
     let inline asin (x:float<'T>) : float= // no measure on returned float !
@@ -179,7 +179,7 @@ module UtilMath =
         if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is NaN or Infinity."  // don't do this, keep it generic
         let a = abs(x) // don't do this, keep it generic?
         if a < 1e-16<_> then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is almost Zero, less than + or - 1e-16."
-        if a > 1e24<_>  then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is extremly large, more than + or - 1e24."  // don't do this, keep it generic
+        if a > 1e24<_>  then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is extremely large, more than + or - 1e24."  // don't do this, keep it generic
         1.0 / x
         //if x = LanguagePrimitives.GenericZero< ^T> then  raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is Zero"
         //LanguagePrimitives.GenericOne< ^T> / x
@@ -190,9 +190,9 @@ module UtilMath =
         if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is NaN or Infinity."  // don't do this, keep it generic
         let a = abs(x) // don't do this, keep it generic?
         if a < 1e-16<_> then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is almost Zero, less than + or - 1e-16."
-        if a > 1e24<_>  then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is extremly large, more than + or - 1e24."  // don't do this, keep it generic
+        if a > 1e24<_>  then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is extremely large, more than + or - 1e24."  // don't do this, keep it generic
         1.0 / x
-        //if x = LanguagePrimitives.GenericZero< ^T> then  raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is Zero" // generic alternative, not used to have savety checks
+        //if x = LanguagePrimitives.GenericZero< ^T> then  raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is Zero" // generic alternative, not used to have safety checks
         //LanguagePrimitives.GenericOne< ^T> / x
 
     /// Given the min and max value and a test value,  (val-min) / (max-min)
@@ -205,8 +205,8 @@ module UtilMath =
         let rangeLength = float (rangeStart - rangeStop)
         let a = abs(rangeLength)
         if a < 1e-16 then raise <| ArgumentException "FsEx.UtilMath.normalize: rangeStart-rangeStop is almost Zero, less than + or - 1e-16."
-        if a > 1e24  then raise <| ArgumentException "FsEx.UtilMath.normalize: rangeStart-rangeStop is extremly large, more than + or - 1e24."
-        //if range = LanguagePrimitives.GenericZero< ^T> then raise <| ArgumentException "FsEx.UtilMath.normalize: rangeStart-rangeStop is Zero" // generic alternative, not used to have savety checks
+        if a > 1e24  then raise <| ArgumentException "FsEx.UtilMath.normalize: rangeStart-rangeStop is extremely large, more than + or - 1e24."
+        //if range = LanguagePrimitives.GenericZero< ^T> then raise <| ArgumentException "FsEx.UtilMath.normalize: rangeStart-rangeStop is Zero" // generic alternative, not used to have safety checks
         (rangeStart-valueAt)/ rangeLength
 
     /// Rounds to the next bigger (away from zero) number on logarithmic scale.
@@ -236,7 +236,7 @@ module UtilMath =
         else               -(logBase ** (Math.Floor (Math.Log (abs(float  x), logBase)))) |> LanguagePrimitives.FloatWithMeasure// with negative sign, (log fails on negative numbers)
 
 
-    /// Numeric Stepping: Converts floats to ints, devides by precision.
+    /// Numeric Stepping: Converts floats to ints, divided by precision.
     /// Like rounding floats to integers but with another step size than 1.0
     /// = int (v / prec)
     let inline precInt (prec:float) (v:float) : int = 
@@ -278,7 +278,7 @@ module UtilMath =
         if isNanOrInf start then raise <| ArgumentException "FsEx.UtilMath.floatRange: given input for 'start' is NaN or Infinity."
         if isNanOrInf stop then raise <| ArgumentException "FsEx.UtilMath.floatRange: given input for 'stop' is NaN or Infinity."
         if isNanOrInf step then raise <| ArgumentException "FsEx.UtilMath.floatRange: given input for 'step' is NaN or Infinity."
-        if step = LanguagePrimitives.FloatWithMeasure<'T> 0.0 then  ArgumentOutOfRangeException.Raise "FsEx.UtilMath.floatRange:stepsize cannot be zero: start: %f step: %f stop: %f " start step stop
+        if step = LanguagePrimitives.FloatWithMeasure<'T> 0.0 then  ArgumentOutOfRangeException.Raise "FsEx.UtilMath.floatRange: stepsize cannot be zero: start: %f step: %f stop: %f " start step stop
         let range = stop - start
                     |> float
                     |> BitConverter.DoubleToInt64Bits //https://float.exposed/0x3ff0000000000000
@@ -295,7 +295,7 @@ module UtilMath =
 
     let internal rand = System.Random()
     /// Given mean and standardDeviation returns a random value from this Gaussian distribution
-    /// if mean is 0 and stDev is 1 then 99% of values are are within -2.3 to +2.3 ; 70% within -1 to +1
+    /// if mean is 0 and stDev is 1 then 99% of values are within -2.3 to +2.3 ; 70% within -1 to +1
     let randomStandardDeviation (mean:float<'T> , standardDeviation:float<'U>) : float<'T> = 
         if isNanOrInf mean then raise <| ArgumentException "FsEx.UtilMath.randomStandardDeviation: given input for 'mean' is NaN or Infinity."
         if isNanOrInf standardDeviation then raise <| ArgumentException "FsEx.UtilMath.randomStandardDeviation: given input for 'standardDeviation' is NaN or Infinity."

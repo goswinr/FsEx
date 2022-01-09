@@ -6,8 +6,8 @@ open System.Collections.Generic
 open ExtensionsIList // for a.GetNeg
 
 
-/// Adds extension members on on  Collections.Generic.IEnumerable
-/// for geting first, second, last and similar indices.
+/// Adds extension members on Collections.Generic.IEnumerable
+/// for getting first, second, last and similar indices.
 /// Also adds functionality for negative indices and l.Slice(startIdx:int , endIdx: int) that works  with negative numbers
 module ExtensionsSeq = 
 
@@ -17,7 +17,7 @@ module ExtensionsSeq =
         | :? ('T Rarr) as a  -> a.GetNeg(a.Count  - 1 - ix) //ResizeArray and other collections
         | :? ('T IList) as a -> a.GetNeg(a.Count  - 1 - ix) //ResizeArray and other collections
         | _ ->
-            // ther are two ways to get an item indexed from the back:
+            // there are two ways to get an item indexed from the back:
             // (1) iterate all items and keep a buffer
             // (2) iterate once to find length, and second time to find item ( no buffer)
             // using (1) here:
