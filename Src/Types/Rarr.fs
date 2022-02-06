@@ -889,3 +889,26 @@ type Rarr<'T> private (xs:List<'T>) =
         member _.Contains x = (xs:>Collections.IList).Contains x
         member _.IsReadOnly = false
         member _.IsFixedSize = false
+
+(*
+TODO add a version of Rarr that requires a UoM on the index.
+see https://twitter.com/mccrews/status/1489269693483405315 and 
+https://gist.github.com/matthewcrews/bea24372de6af4f040ec68a0640289ef
+        
+type TiRarr<'T, [<Measure>] 'M>(xs:seq<'T>)=
+            
+    let ls = ResizeArray(xs)
+            
+    member _.Item
+        with get (i: int<'M>) =
+            ls.[int i]
+        
+        
+[<Measure>] type ChickenIdx
+[<Measure>] type CowIdx
+        
+        
+let chicks = TiRarr<string, ChickenIdx>(["Pi"; "Pu"; "Pa"]) 
+        
+printfn "%A" chicks.[1<ChickenIdx>]
+*)
