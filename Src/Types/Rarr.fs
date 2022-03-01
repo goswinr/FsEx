@@ -18,7 +18,6 @@ open NiceString
 [<Sealed;NoComparison>]
 type Rarr<'T> private (xs:List<'T>) = 
 
-
     // Rarr could potentially be turned into a struct like FlatList:
     // https://github.com/fsprojects/FSharpx.Collections/blob/master/src/FSharpx.Collections.Experimental/FlatList.fs
     // but then default constructor 'Rarr()' would have to be private so that the underlying list can never be null. see:
@@ -46,7 +45,7 @@ type Rarr<'T> private (xs:List<'T>) =
     /// initially empty, but will have room for the given number of elements
     /// before any reallocations are required.
     new (capacity:int) = 
-        if capacity < 0  then ArgumentException.RaiseBase "new Rarr(capacity): The capacity %d cannot be less than zero " capacity
+        if capacity < 0  then ArgumentException.RaiseBase "new Rarr(capacity): The capacity %d cannot be less than zero." capacity
         new Rarr<'T>(new List<'T>(capacity))
 
     /// Constructs a new FsEx.Rarr, copying the contents of the given collection.
@@ -58,30 +57,39 @@ type Rarr<'T> private (xs:List<'T>) =
     /// The size and capacity of the new list will both be equal to the size of the
     /// given collection.
     new (collection : IEnumerable<'T>)  = 
-        if isNull collection then ArgumentNullException.Raise "IEnumerable in new FsEx.Rarr(iEnumerable) constructor is null"
+        if isNull collection then ArgumentNullException.Raise "The IEnumerable given in new FsEx.Rarr(IEnumerable) constructor is null."
         new Rarr<'T>(new List<'T>(collection))
     
     /// Copies the content of two Sequences into a new Rarr
     static member (++) (a : seq<'T>, b : seq<'T>) =
-        let r = Rarr()
+        let r = new Rarr<'T>()
         r.AddRange a
         r.AddRange b
         r   
 
+    /// Copies the content of two Rarrs into a new Rarr
+    static member (++) (a : Rarr<'T>, b : Rarr<'T>) =
+        let c: int = a.Count + b.Count
+        let l = new List<'T>(c)
+        for i=0 to a.Count-1 do l.Add(a.[i])
+        for i=0 to b.Count-1 do l.Add(b.[i])        
+        Rarr(l) 
+
+
     /// Constructs a new FsEx.Rarr by using the supplied List<'T>  directly, without any copying of items.
     static member createDirectly (xs:List<'T> ) = 
-        if isNull xs then ArgumentNullException.Raise "List in FsEx.Rarr.CreateDirectly is null"
+        if isNull xs then ArgumentNullException.Raise "List in FsEx.Rarr.CreateDirectly is null."
         new Rarr<'T>(xs)
 
     /// Constructs a new FsEx.Rarr by copying each item from the IEnumerable<'T>
     static member createFromSeq (xs:seq<'T> ) = 
-        if isNull xs then ArgumentNullException.Raise "Seq in FsEx.Rarr.CreateFromSeq is null"
+        if isNull xs then ArgumentNullException.Raise "Seq in FsEx.Rarr.CreateFromSeq is null."
         new Rarr<'T>(new List<'T>(xs))
 
     /// Access the underlying Collections.Generic.List<'T>
     /// This is NOT even a shallow copy, mutating it will also change this Instance of FsEx.Rarr!
     /// Use "#nowarn "44" to disable the obsolete warning
-    [<Obsolete("It is not actually obsolete, but normally not used, so hidden from editor tools. In F# use #nowarn \"44\" to disable the obsolete warning")>]
+    [<Obsolete("It is not actually obsolete, but normally not used, so hidden from editor tools. In F# use #nowarn \"44\" to disable the obsolete warning.")>]
     member _.List:List<'T> = xs
 
     /// Gets the index of the last item in the FsEx.Rarr.
@@ -115,7 +123,7 @@ type Rarr<'T> private (xs:List<'T>) =
     /// Equal to this.[this.Count - 3]
     member this.ThirdLast
         with get() = 
-            if xs.Count < 3 then  IndexOutOfRangeException.Raise  "FsEx.Rarr.ThirdLast: Failed to get third last item of %s" this.ToNiceStringLong
+            if xs.Count < 3 then  IndexOutOfRangeException.Raise  "FsEx.Rarr.ThirdLast: Failed to get third last item of %s." this.ToNiceStringLong
             xs.[xs.Count - 3]
         and set (v:'T) = 
             if xs.Count < 3 then  IndexOutOfRangeException.Raise  "FsEx.Rarr.ThirdLast: Failed to set third last item of %s to %s" this.ToNiceStringLong (toNiceString v)
@@ -128,7 +136,7 @@ type Rarr<'T> private (xs:List<'T>) =
             if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.First: Failed to get first item of empty Rarr<%s>" (typeof<'T>).FullName
             xs.[0]
         and set (v:'T) = 
-            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.First: Failed to set first item of empty Rarr<%s> to  %s"  (typeof<'T>).FullName (toNiceString v)
+            if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.First: Failed to set first item of empty Rarr<%s> to %s"  (typeof<'T>).FullName (toNiceString v)
             xs.[0] <- v
 
     /// Get (or set) the second item in the FsEx.Rarr.
