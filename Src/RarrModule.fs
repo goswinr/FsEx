@@ -927,6 +927,7 @@ module Rarr =
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>An Rarr containing the elements for which the given predicate returns true.</returns>
     let inline filter (predicate:'T->bool) (rarr: Rarr<'T>) = 
+        // TODO replace with F# implementation using [<InlineIfLambda>] for performance?? Test on non Lambdas too.
         rarr.FindAll (System.Predicate predicate)
 
 
@@ -1291,6 +1292,7 @@ module Rarr =
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The Rarr of transformed elements.</returns>
     let inline map ( mapping: 'T -> 'U) (rarr: Rarr<'T>) : Rarr<'U> = 
+         // TODO replace with F# implementation using [<InlineIfLambda>] for performance?? Test on non Lambdas too.
          rarr.ConvertAll (System.Converter mapping)
 
     /// <summary>Builds a new collection whose elements are the results of applying the given function
