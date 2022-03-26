@@ -2,6 +2,7 @@
 
 open System
 open System.Globalization
+open System.Collections.Generic
 
 /// A struct of two floats representing start and end of a range
 //[<Struct>]
@@ -173,7 +174,72 @@ module UtilMath =
         //start + ( (ende - start) * (float rel) )
         start + ( (ende - start) * rel )
 
-    /// multiplicative inverse or reciprocal:
+
+
+    /// Returns a functiopn to find linear interpolations in one table.
+    /// The input table is a sorted (increasing) array of tuples of input and respective output values.
+    let interpolateTable (table: IList< float<'Input> * float<'Output> > ) : float<'Input> -> float<'Output> = 
+
+        // make sure it is sorted and always increasing
+        for tn in Seq.windowed 2 table do            
+            let  t= tn.[0]
+            let  n= tn.[1]
+            if fst t >= fst n then
+                ArgumentException.RaiseBase "FsEx.UtilMath.interpolateTable: Table input is not sorted increasing %A >= %A  :\r\n%s" t  n (NiceString.toNiceString table)
+
+        // return the lookup function
+        fun (x:float<'Input>) ->
+            if x < fst table.[0] then  
+                //failwithf "Table query %A is smaller than first element in table %A" x table.[0]
+                let stepIn  = fst table.[1] - fst table.[0]
+                let stepOut = snd table.[1] - snd table.[0]
+                let distIn  = fst table.[0] - x 
+                if abs(float stepIn) < 1e-16 then  
+                    ArgumentException.RaiseBase "FsEx.UtilMath.interpolateTable: Table query %g is smaller than first element in table %A and the first two Input elemnts are almost the same, so a meaningful prediction is not possible." x table.[0]
+                    snd table.[0]
+                else
+                    let sc  = distIn / stepIn 
+                    snd table.[0] - stepOut * sc
+        
+            elif x > fst table.[table.Count-1]  then  
+                //failwithf "Table query %A is bigger than last element in table %A"   x table.[table.Length-1] 
+                let li = table.Count-1
+                let stepIn  = fst table.[li] - fst table.[li-1]
+                let stepOut = snd table.[li] - snd table.[li-1]
+                let distIn  = x - fst table.[li]
+                if abs(float stepIn) < 1e-16 then  // last are dulicates 
+                    ArgumentException.RaiseBase "FsEx.UtilMath.interpolateTable: Table query %g is bigger than last element in table %A and the last two Input elemnts are almost the same, so a meaningful prediction is not possible."   x table.[li] 
+                    //snd table.[li]
+                else
+                    let sc  = distIn / stepIn
+                    snd table.[li] + stepOut * sc        
+            else
+                let hiIdx = table |> Seq.findIndex ( fun v ->  fst v >= x) // finding could be optimised with binary search since its sorted    
+                if hiIdx = 0 then
+                    snd table.[0]
+                else
+                    let low,lowOut  = table.[hiIdx-1]
+                    let hig,higOut  = table.[hiIdx]
+                    let delta = hig - low
+                    if abs(float delta) < 1e-16 then // tolerance for div by zero (eg. from  duplicate positions in the list)
+                        (low+hig) *0.5
+                    else
+                        let local = x - low
+                        let rel = local / delta
+                        let deltaOut = higOut - lowOut
+                        let res = lowOut + deltaOut * rel
+                        res
+    
+    
+    /// Returns a function to find linear interpolations from two sorted(increasing) Lists of input and respective output values.
+    /// Includes a check that both list have the same length
+    let interpolateLists (input: float<'Input> IList) ( output: float<'Output> IList ) : (float<'T> ->  float<'U>) = 
+        if input.Count <> output.Count then
+            ArgumentException.RaiseBase "FsEx.UtilMath.interpolateLists: Tables length dont match:\r\n%s\r\nand %s" (NiceString.toNiceString input)  (NiceString.toNiceString output)        
+        interpolateTable(Seq.zip input output|> Array.ofSeq)
+
+
+    /// Multiplicative inverse or reciprocal:
     /// 1/x
     let inline reciprocal (x:float<'T>) : float< /'T > = 
         if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is NaN or Infinity."  // don't do this, keep it generic
@@ -184,7 +250,7 @@ module UtilMath =
         //if x = LanguagePrimitives.GenericZero< ^T> then  raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is Zero"
         //LanguagePrimitives.GenericOne< ^T> / x
 
-    /// multiplicative inverse or reciprocal:
+    /// Multiplicative inverse or reciprocal:
     /// 1/x
     let inline inverse(x:float<'T>) : float< /'T > = 
         if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is NaN or Infinity."  // don't do this, keep it generic

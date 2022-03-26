@@ -11,16 +11,16 @@ open NiceString
 /// and some more useful methods like this.First or this.Last.
 /// It's a very thin wrapper over a System.Collections.Generic.List<'T>
 /// It has all members and interfaces of List<'T> implemented.
-/// Just like F# Arrays and list, Rarr comparison is also structural.
-/// The name Rarr is derived from of the F# type ResizeArray
-/// There is a hidden member called "List" to access the underlaying List<'T> directly
+/// Just like F# Arrays and F# lists, Rarr equality is also structural.
+/// The name Rarr is derived from of the F# type ResizeArray.
+/// There is a hidden member called "List" to access the underlaying List<'T> directly.
 /// In F# use #nowarn "44" to disable the obsolete warning for this hidden member.
 [<Sealed;NoComparison>]
 type Rarr<'T> private (xs:List<'T>) = 
 
-    // Rarr could potentially be turned into a struct like FlatList:
-    // https://github.com/fsprojects/FSharpx.Collections/blob/master/src/FSharpx.Collections.Experimental/FlatList.fs
-    // but then default constructor 'Rarr()' would have to be private so that the underlying list can never be null. see:
+    // Rarr could potentially be turned into a struct.
+    // like for FlatList: https://github.com/fsprojects/FSharpx.Collections/blob/master/src/FSharpx.Collections.Experimental/FlatList.fs
+    // but then default constructor 'Rarr()' would not be possible anymore. see:
     // https://stackoverflow.com/a/29956903/969070
 
 

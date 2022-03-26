@@ -462,6 +462,7 @@ module String =
     let (*inline*) indexOfStringFromFor (stringToFind:string) (startIndex:int) (count:int) (stringToSearchIn:string)  = 
         if isNull stringToFind then FsExStringException.Raise "String.indexOfStringFromFor: stringToFind is null. (startIndex:%d)  (count:%d)  (stringToSearchIn:%s) " startIndex count (exnf stringToSearchIn)
         if isNull stringToSearchIn then FsExStringException.Raise "String.indexOfStringFromFor: stringToSearchIn is null. (stringToFind:%s)  (startIndex:%d)  (count:%d) " (exnf stringToFind) startIndex count
+        // TODO add check that Count and start Index is withIn string
         stringToSearchIn.IndexOf(stringToFind, startIndex, count, StringComparison.Ordinal)
 
     /// Reports the zero-based index of the first occurrence in this instance of any character in a specified array of Unicode characters.
@@ -522,6 +523,7 @@ module String =
     let (*inline*) lastIndexOfStringFromFor  (stringToFind:string) (startIndex:int) (count:int) (stringToSearchIn:string)  = 
         if isNull stringToFind then FsExStringException.Raise "String.lastIndexOfStringFromFor : stringToFind is null. (startIndex:%d)  (count:%d)  (stringToSearchIn:%s) " startIndex count (exnf stringToSearchIn)
         if isNull stringToSearchIn then FsExStringException.Raise "String.lastIndexOfStringFromFor : stringToSearchIn is null. (stringToFind:%s)  (startIndex:%d)  (count:%d) " (exnf stringToFind) startIndex count
+        // TODO add check that Count and start Index is withIn string
         stringToSearchIn.LastIndexOf(stringToFind, startIndex, count, StringComparison.Ordinal)
 
 

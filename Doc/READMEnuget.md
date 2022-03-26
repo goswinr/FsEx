@@ -30,6 +30,9 @@ FsEx is an FSharp extension and utility library.
 
 ### Changelog
 
+`0.10.0` 
+- add MathUtil.interpolateTable function
+
 `0.9.0` 
 - Fix xml doc that was broken in 0.8.0
 - Lower minimum FSharp.Core version to  4.5.2
