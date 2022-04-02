@@ -75,19 +75,28 @@ module AutoOpenPrint =
             clear()
 
 
-    /// Print to standard out including nice formating for numbers including thousand Separator and (nested) sequences, first five items are printed out.
+    /// Print to standard out. 
+    /// Nice formating for numbers including thousand Separator, records and (nested) sequences, 
+    /// NicePrintSettings:
+    /// maxDepth          = 3     , how deep the content of nested seq is printed (printFull ignores this)
+    /// maxVertItems      = 6     , how many items per seq are printed in vertical list(printFull ignores this)
+    /// maxHorChars       = 120   , how  many chars can be in one line before switching to vertical sequencing of items in collection.
+    /// maxCharsInString  = 2000  , how many characters of a string might be printed at once.
     /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
-    /// • thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
-    /// • maxNestingDepth         = 3     ; set this to change how deep the content of nested seq is printed (printFull ignores this)
-    /// • maxNestingDepth         = 6     ; set this to change how many items per seq are printed (printFull ignores this)
-    /// • maxCharsInString        = 2000  ; set this to change how many characters of a string might be printed at once.
+    /// .thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
     let print x = 
         Console.WriteLine (toNiceString x) // Console.WriteLine is about 2-3 times faster than printf "%s"
 
-    /// Print to standard out including nice formating for numbers including thousand Separator, all items of sequences, including nested items, are printed out.
-    /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
-    /// • thousandSeparator       = '      ; set this to change the printing of floats and integers larger than 10'000
-    /// • maxCharsInString        = 2000   ; set this to change how many characters of a string might be printed at once.
+    /// Print to standard out.
+    /// Nice formating for numbers including thousand Separator, records and (nested) sequences, 
+    /// NicePrintSettings:
+    /// maxDepth          = 24        , how deep the content of nested seq is printed (printFull ignores this)
+    /// maxVertItems      = 100'000   , how many items per seq are printed in vertical list(printFull ignores this)
+    /// maxHorChars       = 240       , how  many chars can be in one line before switching to vertical sequencing of items in collection.
+    /// maxCharsInString  = 1'000'000 , how many characters of a string might be printed at once.
+    /// Settings that are exposed in FsEx.NiceString.NiceStringSettings:
+    /// .thousandSeparator = '     , set this to change the printing of floats and integers larger than 10'000
+    /// .roundToZeroBelow  = 1e-24 , if the absolute value of a float is below this, display ±0.0
     let printFull x = 
         Console.WriteLine (toNiceStringFull x) // Console.WriteLine is about 2-3 times faster than printf "%s"
 
@@ -186,6 +195,7 @@ module Printf =
     let cyan msg = Printf.kprintf (fun s -> Seff.PrintColor 0 150 150 s)  msg
 
     /// Like printf but in Random Color if used in Seff Editor. Does not add a new line at end.
+    /// Very light, whithish and yellowish colors are excluded
     let colorRnd msg = 
         let c = Color.randomForRhino()
         Printf.kprintf (fun s -> Seff.PrintColor c.R.ToInt c.G.ToInt c.B.ToInt s)  msg

@@ -5,11 +5,6 @@ open System.IO
 open System.Collections.Generic
 
 
-// mark this assembly as extension assembly http://www.latkin.org/blog/2014/04/30/f-extension-methods-in-roslyn/
-// https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/type-extensions#extension-methods
-//[<assembly:Extension>] do() // currently this library does not support C# style extensions, type info for them is ugly
-// and C# extension properties seem not possible from F# eg array.Last|>
-
 
 /// This module is set to auto open.
 /// Static Extension methods on Exceptions to cal Excn.Raise "%A" x with F# printf string formating
@@ -47,12 +42,25 @@ module AutoOpenExtensionsExceptions =
         /// Raise DirectoryNotFoundException with F# printf string formating
         static member inline Raise msg =  Printf.kprintf (fun s -> raise (DirectoryNotFoundException(s))) msg
 
-
+module ResizeArray = 
+    let inline map ( mapping: 'T -> 'U) (rarr: ResizeArray<'T>) : ResizeArray<'U> = 
+         // TODO replace with F# implementation using [<InlineIfLambda>] for performance?? Test on non Lambdas too.
+         rarr.ConvertAll (System.Converter mapping)
 
 /// This module is set to auto open.
 /// General Utility functions
 [<AutoOpen>] // so that extension become available on opening FsEx
 module AutoOpenUtil = 
+
+    type Collections.IList with 
+        member this.LastObj =  this.[this.Count-1] 
+
+    type Collections.Generic.IList<'T> with 
+        member this.Last =  this.[this.Count-1] 
+    
+    type Collections.Generic.List<'T> with 
+        member this.Map(mapping: 'T -> 'U)  = this.ConvertAll (System.Converter mapping)
+
 
     /// A quick way to throw an exception.
     /// for use in temporary scripts when you are too lazy to do a proper exception.
@@ -195,6 +203,7 @@ module AutoOpenUtil =
         if (^a: (static member TryParse: string * byref<'a> -> bool) (x, &res))
         then res
         else ArgumentException.RaiseBase "Failed to parse %A to a %A" x (res.GetType())
+
 
 
 /// Shadows the ignore function to only accept structs

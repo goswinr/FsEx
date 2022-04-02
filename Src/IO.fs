@@ -153,27 +153,12 @@ module IO =
     /// Uses Text.Encoding.UTF8
     /// Writes Exceptions to errorLogger because it is tricky to catch exceptions form an async thread
     type SaveReadWriter (path:string, errorLogger:string->unit)= 
-        // same class also exist in FsEx , TODO keep in sync!
+        // same class also exist in FsEx.Wpf , TODO keep in sync!
 
         let counter = ref 0L // for atomic writing back to file
 
         let lockObj = new Object()
-
-        let maxCharsInString = 500
-
-        /// If the input string is longer than maxChars + 20 then
-        /// it returns the input string trimmed to maxChars, a count of skipped characters and the last 6 characters (all enclosed in double quotes ")
-        /// e.g. "abcde[..20 more Chars..]xyz"
-        /// Else, if the input string is less than maxChars + 20, it is still returned in full (enclosed in double quotes ").
-        /// also see String.truncatedFormated
-        let truncateString (stringToTrim:string) = 
-            if isNull stringToTrim then "-null string-" // add too, just in case this gets called externally
-            elif stringToTrim.Length <= maxCharsInString + 20 then sprintf "\"%s\""stringToTrim
-            else
-                let len   = stringToTrim.Length
-                let st    = stringToTrim.Substring(0, maxCharsInString)
-                let last20 = stringToTrim.Substring(len-21)
-                sprintf "\"%s[<< ... %d more chars ... >>]%s\"" st (len - maxCharsInString - 20) last20
+       
 
         /// Calls IO.File.Exists(path)
         member this.FileExists = IO.File.Exists(path)
@@ -195,7 +180,7 @@ module IO =
                     true
 
                 with e ->
-                    errorLogger(sprintf "FsEx.Wpf.SaveReadWriter.CreateFileIfMissing for path '%s' :\r\n%A" path e)
+                    errorLogger(sprintf "FsEx.IO.SaveReadWriter.CreateFileIfMissing for path '%s' :\r\n%A" path e)
                     false
 
 
@@ -207,7 +192,7 @@ module IO =
             lock lockObj (fun () ->
                 try Some <| IO.File.ReadAllText(path, Text.Encoding.UTF8)
                 with e ->
-                    errorLogger(sprintf "FsEx.Wpf.SaveReadWriter.ReadAllText from path '%s' :\r\n%A" path e)
+                    errorLogger(sprintf "FsEx.IO.SaveReadWriter.ReadAllText from path '%s' :\r\n%A" path e)
                     None  )
 
 
@@ -219,7 +204,7 @@ module IO =
             lock lockObj (fun () ->
                 try Some <| IO.File.ReadAllLines(path, Text.Encoding.UTF8)
                 with e ->
-                    errorLogger(sprintf "FsEx.Wpf.SaveReadWriter.ReadAllText from '%s' :\r\n%A" path e)
+                    errorLogger(sprintf "FsEx.IO.SaveReadWriter.ReadAllText from '%s' :\r\n%A" path e)
                     None  )
 
 
@@ -231,7 +216,7 @@ module IO =
                 lock lockObj (fun () -> // lock is using Monitor class : https://github.com/dotnet/fsharp/blob/6d91b3759affe3320e48f12becbbbca493574b22/src/fsharp/FSharp.Core/prim-types.fs#L4793
                     try  IO.File.WriteAllText(path,text, Text.Encoding.UTF8)
                     // try & with is needed because exceptions on thread-pool cannot be caught otherwise !!
-                    with ex ->  errorLogger(sprintf "FsEx.Wpf.SaveWriter.WriteAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path (truncateString text)) // use %A to trim long text
+                    with ex ->  errorLogger(sprintf "FsEx.IO.SaveWriter.WriteAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path (NiceFormat.truncateString 5000 text)) 
                     )
                 } |> Async.Start
 
@@ -243,7 +228,7 @@ module IO =
                 lock lockObj (fun () -> // lock is using Monitor class : https://github.com/dotnet/fsharp/blob/6d91b3759affe3320e48f12becbbbca493574b22/src/fsharp/FSharp.Core/prim-types.fs#L4793
                     try  IO.File.WriteAllLines(path,texts, Text.Encoding.UTF8)
                     // try & with is needed because exceptions on thread-pool cannot be caught otherwise !!
-                    with ex ->  errorLogger(sprintf "FsEx.Wpf.SaveWriter.WriteAllLinesAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path (Array.truncate 20 texts)) // use %A to trim long text
+                    with ex ->  errorLogger(sprintf "FsEx.IO.SaveWriter.WriteAllLinesAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path (Array.truncate 20 texts)) // use %A to trim long text
                     )
                 } |> Async.Start
 
@@ -263,6 +248,6 @@ module IO =
                         this.WriteAsync (text) // this should never fail since exceptions are caught inside
                     with ex ->
                         // try & with is needed because exceptions on thread-pool cannot be caught otherwise !!
-                        errorLogger(sprintf "FsEx.Wpf.SaveWriter.WriteIfLast: getText() for path '%s' failed with: %A" path ex )
+                        errorLogger(sprintf "FsEx.IO.SaveWriter.WriteIfLast: getText() for path '%s' failed with: %A" path ex )
                 } |> Async.StartImmediate
 

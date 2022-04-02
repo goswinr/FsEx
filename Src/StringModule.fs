@@ -24,7 +24,7 @@ module String =
                     let len   = stringToTrim.Length
                     let st    = stringToTrim.Substring(0,maxChars)
                     let last5 = stringToTrim.Substring(len-6)
-                    sprintf "%s[..%d more Chars..]%s" st (len - maxChars - 5) last5
+                    sprintf "%s[..%d more chars..]%s" st (len - maxChars - 5) last5
             s.Replace("\r","\\r").Replace("\n","\\n")
     
 
@@ -35,14 +35,14 @@ module String =
     /// Not enclosed in quotes.
     /// Fails on null.
     /// Alternatively use String.formatInOneShortLine that will not fail on null.
-    let (*inline*) truncateFormated (maxChars:int) (stringToTrim:string) = 
+    let truncateFormated (maxChars:int) (stringToTrim:string) = 
         if isNull stringToTrim then FsExStringException.Raise "String.truncateFormated: stringToTrim is null, maxChar: %d" maxChars
         if stringToTrim.Length <= maxChars + 20 then sprintf "%s"stringToTrim
         else
             let len   = stringToTrim.Length
             let st    = stringToTrim.Substring(0,maxChars)
             let last6 = stringToTrim.Substring(len-6)
-            sprintf "%s[..%d more Chars..]%s" st (len - maxChars - 5) last6
+            sprintf "%s[..%d more chars..]%s" st (len - maxChars - 5) last6
 
     /// Trims strings to maximum line count.
     /// Adds note about trimmed line count if there are more [ ... and %d more lines.]
@@ -66,22 +66,22 @@ module String =
     /// Takes at most a given amount of chars from string.
     /// If input is shorter than truncateLength returns input string unchanged.
     /// Code: if truncateLength >= fromString.Length then fromString else fromString.Substring(0,truncateLength)
-    let (*inline*) truncate (truncateLength:int) (fromString:string) :string = 
-        if isNull fromString   then FsExStringException.Raise "String.take: fromString is null (truncateLength:%d)" truncateLength
-        if truncateLength < 0 then FsExStringException.Raise "String.take: truncateLength:%d cant be negative(for  '%s')" truncateLength fromString
+    let truncate (truncateLength:int) (fromString:string) :string = 
+        if isNull fromString   then FsExStringException.Raise "String.truncate: fromString is null (truncateLength:%d)" truncateLength
+        if truncateLength < 0 then FsExStringException.Raise  "String.truncate: truncateLength:%d cant be negative(for '%s')" truncateLength fromString
         if truncateLength >= fromString.Length then fromString
         else fromString.Substring(0,truncateLength)
 
     /// For string formating in exceptions below.
     /// Including surrounding quotes
     let private exnf s :string = 
-        if isNull s then "-null string-"  else "\"" + truncateFormatedInOneLine s + "\"" //separate null check so null value is not in quotes
+        if isNull s then "-*null string*-"  else "\"" + truncateFormatedInOneLine s + "\"" //separate null check so null value is not in quotes
 
     // TODO removed inline to get compile times down in FSI ?
 
     /// Remove characters from the starts.
     /// fromString.Substring(skipLength)    
-    let (*inline*) skip (skipLength:int) (fromString:string) :string = 
+    let skip (skipLength:int) (fromString:string) :string = 
         if isNull fromString   then FsExStringException.Raise "String.skip: fromString is null (skipLength:%d)" skipLength
         if skipLength > fromString.Length then FsExStringException.Raise "String.skip: skipLength:%d is longer than string '%s'" skipLength fromString
         if skipLength < 0 then FsExStringException.Raise "String.skip: skipLength:%d cant be negative(for  '%s')" skipLength fromString

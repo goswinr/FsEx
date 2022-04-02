@@ -105,7 +105,24 @@ module Color =
 
     /// Generates a Random color with high saturation probability, excluding yellow colors
     /// These are ideal for layer color in Rhino3d CAD app
-    let rec randomForRhino () = 
+    let rec randomForRhino () =  //TODO test and improve color boundary an color distribution
+        (* TODO better use golden angle iterations:
+        https://stackoverflow.com/questions/10014271/generate-random-color-distinguishable-to-humans
+                    function selectColor(number) {
+              const hue = number * 137.508; // use golden angle approximation
+              return `hsl(${hue},50%,75%)`;
+            }
+        Does it always have to start with red? 🔴 No, not at all! You can simply add a random offset to your start value, as such:
+
+        # use golden ratio
+        golden_ratio_conjugate = 0.618033988749895
+        h = rand # use random start value
+        gen_html {
+          h += golden_ratio_conjugate
+          h %= 1
+          hsv_to_rgb(h, 0.5, 0.95)
+        } 
+            *)
         let hue = Rand.NextDouble()
         let sat = UtilMath.randomStandardDeviation (1.0, 0.3)  |> (fun x -> if x > 1. then 2.-x else x ) |>  UtilMath.clamp 0.1 1.0
         let lum = UtilMath.randomStandardDeviation (0.5, 0.1)                                            |>  UtilMath.clamp 0.2 0.8 // to avoid total white (1.0) or black (0.0)
