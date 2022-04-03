@@ -98,40 +98,30 @@ module Color =
             color.GetHue()/360.0f |> float,
             color.GetSaturation() |> float,
             color.GetBrightness() |> float
-
-    /// Generates a Random color
-    let random() = 
-        Color.FromArgb (Rand.Next(0,256), Rand.Next(0,256), Rand.Next(0,256))
-
+    
+    
+    let mutable private lastHue = 0.0
+    let mutable private lumUp = false
+    
     /// Generates a Random color with high saturation probability, excluding yellow colors
     /// These are ideal for layer color in Rhino3d CAD app
-    let rec randomForRhino () =  //TODO test and improve color boundary an color distribution
-        (* TODO better use golden angle iterations:
-        https://stackoverflow.com/questions/10014271/generate-random-color-distinguishable-to-humans
-                    function selectColor(number) {
-              const hue = number * 137.508; // use golden angle approximation
-              return `hsl(${hue},50%,75%)`;
-            }
-        Does it always have to start with red? 🔴 No, not at all! You can simply add a random offset to your start value, as such:
-
-        # use golden ratio
-        golden_ratio_conjugate = 0.618033988749895
-        h = rand # use random start value
-        gen_html {
-          h += golden_ratio_conjugate
-          h %= 1
-          hsv_to_rgb(h, 0.5, 0.95)
-        } 
-            *)
-        let hue = Rand.NextDouble()
-        let sat = UtilMath.randomStandardDeviation (1.0, 0.3)  |> (fun x -> if x > 1. then 2.-x else x ) |>  UtilMath.clamp 0.1 1.0
-        let lum = UtilMath.randomStandardDeviation (0.5, 0.1)                                            |>  UtilMath.clamp 0.2 0.8 // to avoid total white (1.0) or black (0.0)
-        if     hue < 0.19 && hue > 0.12 // to avoid a color close to yellow
-            && sat > 0.8  && lum > 0.3
-            && lum < 0.7  then
-                randomForRhino ()
-        else
-            fromHSL (hue,sat,lum)
+    /// Using golden-ratio-loop subsequent colors will have very distinct hues
+    let rec randomForRhino () =  //TODO test and improve color boundary an color distribution 
+        lastHue <- lastHue + 0.6180334 // golden angle conjugate
+        lastHue <- lastHue % 1.0 // loop it between 0.0 and 1.0    
+        let mutable s = Rand.NextDouble() 
+        s <- s*s*s*s  //  0.0 - 1.0 increases the probalility that the number is small( )
+        s <- s*0.7    //  0.0 - 0.7 make sure it is less than 0.6
+        s <- 1.1 - s  //  1.1 - 0.6  
+        s <- UtilMath.clamp01 s //  1.0 - 0.6 
+        let mutable l = Rand.NextDouble() 
+        l <- l * l     //  0.0 - 1.0 increases the probalility that the number is small( )
+        l <- l * 0.35 * s   //  0.0 - 0.25 , and scale down with saturation too
+        l <- if lumUp then lumUp<-false;  0.5+l*1.1 else lumUp<-true ;  0.5-l //alternate luminace up or down,  mor on the bright side
+        if l > 0.3 && lastHue > 0.10 && lastHue < 0.22 then  // exclude yellow unless dark
+            randomForRhino() 
+        else    
+            fromHSL(lastHue, s, l)
 
     /// Make a color lighter by percentage (value between 0.0 to 1.0) (1.0 = white, 0.0 = current color)
     let makeLighter v c = 
