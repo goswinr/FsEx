@@ -287,30 +287,100 @@ module NiceFormat  =  // used by Rhino.Scripting
             
 
 
-    /// If the input string is longer than 101% of maxChars + 20 then
-    /// it returns the input string trimmed to maxChars, a count of skipped characters and the last 1% of characters, but minimum 6.
-    /// All enclosed in double quotes.
-    /// e.g. "abcde[< ..99 more chars.. >]uvwxyz"
-    /// If the input string is less than maxChars + 1% + 24, it is returned in full, also enclosed in double quotes.
-    /// If input is null it returns -*null string*-
-    /// The inital part of the returned string never gets trimed shorter than 30 Characters, even if maxCharCount is less.
-    let truncateString maxCharCount (stringToTrim:string) = 
-        if isNull stringToTrim then 
-            "-*null string*-" 
-        else
-            let suffixLen = max 6 (maxCharCount / 100)
-            let maxCharChecked = max maxCharCount 30
-            if stringToTrim.Length <= maxCharChecked + suffixLen + 24 then 
-                sprintf "\"%s\"" stringToTrim
+    /// Reduces a string length for diplay to a maxiumum Length.
+    /// Shows (..) as placeholder for skiped characters if string is longer than maxCharCount.
+    /// If maxChars is bigger than 35 the placeholder will include the count of skipped characters: e.g. [< ..99 more chars.. >].
+    /// maxCharCount will be set to be minimum 6. 
+    /// Returned strings are enclosed in quotaion marks.
+    /// If input is null it returns <*null string*>
+    let stringTruncated maxCharCount (s:string):string = 
+        let maxChar = max 6 maxCharCount
+        if isNull s then 
+            if maxChar >= 15 then 
+                "<*null string*>" 
+            elif maxChar >= 8 then  
+                "<*null*>" 
             else
-                let len   = stringToTrim.Length
-                let st    = stringToTrim.Substring(0, maxCharChecked)
-                let suffix = stringToTrim.Substring(len-suffixLen)
-                sprintf "\"%s[< ..%d more chars.. >]-%s\"" st (len - maxCharChecked - suffixLen) suffix
+                "*null*" 
+        elif s.Length <= maxChar  then 
+            str{ "\"" ; s ; "\"" }
+        else 
+            let len = s.Length
+            if   maxChar <= 9 then str{ "\"" ;  s.Substring(0, maxChar-2-2)  ; "(..)"                           ; "\"" }
+            elif maxChar <= 20 then str{ "\"" ;  s.Substring(0, maxChar-3-2) ; "(..)"  ; s.Substring(len-1, 1)  ; "\"" }
+            elif maxChar <= 35 then str{ "\"" ;  s.Substring(0, maxChar-5-2) ; "(...)" ; s.Substring(len-2, 2)  ; "\"" }
+            else     
+                let suffixLen = 1 + maxChar / 20 // using 5% for end of string
+                let counterLen = "[< ..99 more chars.. >]".Length 
+                str{   
+                    "\""
+                    s.Substring(0, maxChar-counterLen-suffixLen) 
+                    "[< .."; len - maxChar+counterLen  ; " more chars.. >]" 
+                    s.Substring(len-suffixLen, suffixLen) 
+                    "\""
+                    } 
 
+    /// Joins string into one line. 
+    /// Replaces line break with space character.
+    /// Skips leading whitespaces on each line.
+    /// Does not include surrounding quotes.
+    /// If string is null returns "<*null string*>"
+    let stringInOneLine(s:string) =
+        if isNull s then  "<*null string*>"
+        else
+            let sb = Text.StringBuilder(s.Length)
+            let rec loop isBeginning i = 
+                if i<s.Length then 
+                    match s.[i] with 
+                    |'\n' ->  
+                        if sb.Length>0 && sb.Chars(sb.Length-1) <> ' ' then 
+                            sb.Append(' ') |> ignoreObj // to have at least on space separating new lines
+                        loop true  (i+1)
+                    |'\r' ->  
+                        loop true  (i+1)
+                    |' '  ->   
+                        if not isBeginning then  
+                            sb.Append(' ')  |> ignoreObj
+                        loop true  (i+1)
+                    | c  ->  
+                        sb.Append(c) |> ignoreObj
+                        loop false (i+1)
+            loop true 0
+            sb.ToString()
+    
+    /// Adds a note about trimmed line count if there are more [< ... and %d more lines.>].
+    /// Does not include surrounding quotes.
+    /// If string is null returns "<*null string*>" .
+    let stringTruncatedToMaxLines (maxLineCount:int) (s:string) :string = 
+        let maxLines = max 1 maxLineCount
+        if isNull s then  
+            "<*null string*>"
+        elif s.Length < 2 then  
+            s
+        else
+            let mutable found = if s.[0]= '\n' then 1 else 0
+            let mutable i = 0
+            let mutable stopPos = 0
+            while i >= 0 do
+                if i+1=s.Length then // end of string reached with a '\n'
+                    i<- -1
+                else
+                    i <- s.IndexOf('\n', i+1)
+                    found <- found + 1
+                    if found = maxLines then 
+                        stopPos <- i
+
+            if stopPos > 0  && found - maxLines > 1 then // if there is just one more lien print it instead of the note
+                str{ 
+                    s.Substring(0,stopPos+1)
+                    "[< ... and "
+                    found - maxLines
+                    " more lines.>]"
+                    }
+            else
+                s  
   
-module internal NiceStringImplementation  = 
-    open System.Collections.Generic
+module internal NiceStringImplementation  =     
     open Microsoft.FSharp.Reflection
     open NiceStringSettings
     open NiceFormat
@@ -332,11 +402,11 @@ module internal NiceStringImplementation  =
     /// reduces the maxCharsInString by a factor of 10 for each nesting level
     let internal formatStringByDepth (nps:NicePrintSettings) (depth:int) (s:String) =
         match depth with 
-        | 0 -> truncateString  nps.maxCharsInString        s
-        | 1 -> truncateString (nps.maxCharsInString/10)    s
-        | 2 -> truncateString (nps.maxCharsInString/100)   s
-        | 3 -> truncateString (nps.maxCharsInString/1000)  s
-        | _ -> truncateString (nps.maxCharsInString/10000) s
+        | 0 -> stringTruncated  nps.maxCharsInString        s
+        | 1 -> stringTruncated (nps.maxCharsInString/10)    s
+        | 2 -> stringTruncated (nps.maxCharsInString/100)   s
+        | 3 -> stringTruncated (nps.maxCharsInString/1000)  s
+        | _ -> stringTruncated (nps.maxCharsInString/10000) s
     
     
     /// return the string before a splitter
@@ -384,7 +454,7 @@ module internal NiceStringImplementation  =
         let enum = xs.GetEnumerator()
         let mutable chars = titleLength 
         let mutable i=0
-        // below enum.MoveNext() needs to be evalauted last 
+        // Important: enum.MoveNext() needs to be evalauted last 
         while  (i < nps.maxVertItems-1 || chars < nps.maxHorChars) && enum.MoveNext() do // don't iter full sequence if only the first few items are printed
             let ln = getLines nps depth (box enum.Current)
             match ln with

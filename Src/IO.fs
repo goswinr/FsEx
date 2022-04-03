@@ -216,7 +216,7 @@ module IO =
                 lock lockObj (fun () -> // lock is using Monitor class : https://github.com/dotnet/fsharp/blob/6d91b3759affe3320e48f12becbbbca493574b22/src/fsharp/FSharp.Core/prim-types.fs#L4793
                     try  IO.File.WriteAllText(path,text, Text.Encoding.UTF8)
                     // try & with is needed because exceptions on thread-pool cannot be caught otherwise !!
-                    with ex ->  errorLogger(sprintf "FsEx.IO.SaveWriter.WriteAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path (NiceFormat.truncateString 5000 text)) 
+                    with ex ->  errorLogger(sprintf "FsEx.IO.SaveWriter.WriteAsync failed with: %A \r\n while writing to %s:\r\n%A" ex path (NiceFormat.stringTruncated 5000 text)) 
                     )
                 } |> Async.Start
 
