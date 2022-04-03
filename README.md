@@ -32,6 +32,9 @@ FsEx is an FSharp extension and utility library.
 
 `0.10.0` 
 - add MathUtil.interpolateTable function
+- improve NiceString formating of F# records
+- rename stringbuffer to str
+- improve move and rename String.Truncate functions to NiceFormat module
 
 `0.9.0` 
 - Fix xml doc that was broken in 0.8.0

@@ -21,8 +21,11 @@
     <AssemblyVersion>0.10.0</AssemblyVersion>
     <FileVersion>0.10.0</FileVersion>  
 	  
-    <PackageReleaseNotes>
+    <PackageReleaseNotes>		
 		- add MathUtil.interpolateTable function
+		- improve NiceString formating of F# records
+		- rename stringbuffer to str
+		- improve move and rename String.Truncate functions to NiceFormat module
 	</PackageReleaseNotes>
 
     <Authors>GoswinR</Authors>
@@ -64,6 +67,7 @@
 
     <Compile Include="Src/TopLevelFunctions.fs" />
     <Compile Include="Src/Timer.fs" />
+	<Compile Include="Src/ComputationalExpressions.fs" />
     <Compile Include="Src/NiceString.fs" />
     <Compile Include="Src/UtilMath.fs" />
     <Compile Include="Src/MinMaxSortCompare.fs" />
@@ -71,6 +75,8 @@
     <Compile Include="Src/IO.fs" />
 
     <Compile Include="Src/Types/Rarr.fs" />
+
+    <Compile Include="Src/Types\RarrCE.fs" />
     <Compile Include="Src/Types/Dict.fs" />
     <Compile Include="Src/Types/DefaultDict.fs" />
     <Compile Include="Src/Types/StuctTuples.fs" />
@@ -89,8 +95,9 @@
     <Compile Include="Src/ArrayModule.fs" />
     <Compile Include="Src/SeqModule.fs" />
     <Compile Include="Src/DictModule.fs" />
+    <Compile Include="Src/csvCE.fs" />
 
-    <Compile Include="Src/ComputationalExpressions.fs" />
+    
     <Compile Include="Src/Print.fs" />
     <Compile Include="Src/Process.fs" />
   </ItemGroup>
