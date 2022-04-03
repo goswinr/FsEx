@@ -26,8 +26,6 @@ module NiceStringSettings =
         items:ResizeArray<int*Lines>
         closingBracket:string
         }
-
-        
     
     [<NoComparison;NoEquality>]
     type NicePrintSettings = {
@@ -44,26 +42,25 @@ module NiceStringSettings =
        
         /// how many characters of a string might be printed at once.
         maxCharsInString :int
-
-        /// Allows to inject an optional formatter that gets called before main formatter
-        /// This formatter shall return None if the main formatter should be used
-        /// use externalFormater for types defined in other assemblies
-        externalFormater : obj -> option<Lines> 
+        
         }
 
     /// Default NicePrintSettings:
     /// maxDepth          = 3
     /// maxVertItems      = 6
     /// maxHorChars       = 120  
-    /// maxCharsInString  = 2000
-    /// externalFormater  = fun _ -> None
+    /// maxCharsInString  = 2000    
     let defaultNicePrintSettings = {
         maxDepth          = 3
         maxVertItems      = 6
         maxHorChars       = 120
-        maxCharsInString  = 2000        
-        externalFormater  = fun _ -> None
+        maxCharsInString  = 2000 
         }
+    
+    /// Allows to inject an optional formatter that gets called before main formatter
+    /// This formatter shall return None if the main formatter should be used
+    /// use externalFormater for types defined in other assemblies
+    let mutable externalFormater : obj -> option<Lines>  = fun _ -> None
 
     /// Set this to change the printing of floats larger than 10'000
     let mutable thousandSeparator = '\'' // = just one quote '
@@ -527,7 +524,7 @@ module internal NiceStringImplementation  =
 
     ///  x is boxed already
     and getLines  (nps:NicePrintSettings) (depth:int) (x:obj) : Lines = 
-        match nps.externalFormater x with // first check if externalFormater provides a string , this is used e.g. for types from RhinoCommon.dll
+        match NiceStringSettings.externalFormater x with // first check if externalFormater provides a string , this is used e.g. for types from RhinoCommon.dll
         | Some ln -> ln
         | None -> 
             match x with // boxed already
@@ -722,8 +719,7 @@ module NiceString  =
             maxDepth          = 24
             maxVertItems      = 100_000
             maxHorChars       = 240
-            maxCharsInString  = 1_000_000        
-            externalFormater  = fun _ -> None
+            maxCharsInString  = 1_000_000  
             }
         x |> box |> getLines nps 0 |> formatLines nps
 
