@@ -292,7 +292,15 @@ module String =
         |> String.Concat
         |> fun s -> txt.Normalize(NormalizationForm.FormC)
 
+    /// Add a sufix to string   
+    let (*inline*) addSufix (sufix:string) (txt:string) = 
+        if isNull txt then FsExStringException.Raise "String.addSufix: txt is null"      
+        txt+sufix
 
+    /// Add a prefix to string   
+    let (*inline*) addPrefix (prefix:string) (txt:string) = 
+        if isNull txt then FsExStringException.Raise "String.addPrefix: txt is null"      
+        prefix+txt
 
     //-------------------------------------------------------------------------
     //-------------------------------------------------------------------------

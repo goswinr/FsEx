@@ -17,15 +17,15 @@
     <Product>FsEx</Product>
     <PackageId>FsEx</PackageId>
 
-    <Version>0.10.1</Version>
-    <AssemblyVersion>0.10.1</AssemblyVersion>
-    <FileVersion>0.10.1</FileVersion>  
+    <Version>0.11.0</Version>
+    <AssemblyVersion>0.11.0</AssemblyVersion>
+    <FileVersion>0.11.0</FileVersion>  
 	  
-    <PackageReleaseNotes>		
-		- add MathUtil.interpolateTable function
-		- improve NiceString formating of F# records
-		- rename stringbuffer to str
-		- improve move and rename String.Truncate functions to NiceFormat module
+    <PackageReleaseNotes>
+		- improve randomness of random color
+		- rename Dict and DefaultDict members Add and Set
+		- add getOrSetDefault to Dict
+		- add String.addPrefix String.addSufix
 	</PackageReleaseNotes>
 
     <Authors>GoswinR</Authors>

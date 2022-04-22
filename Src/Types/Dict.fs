@@ -12,9 +12,9 @@ open System.Collections.Generic
 [<Sealed>]
 type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) = 
 
-    //using inheritance from Dictionary would not work because .Item method is sealed and cant have an override
+    //using inheritance from Dictionary would not work because .Item method is sealed and can't have an override
 
-    let get key  = 
+    let get' key  = 
          match box key with // or https://stackoverflow.com/a/864860/969070
          | null -> ArgumentNullException.Raise "Dict.get key is null "
          | _ ->
@@ -24,7 +24,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
                  let keys = NiceString.toNiceString dic.Keys
                  KeyNotFoundException.Raise "Dict.get failed to find key %A in %A  of %d items. Keys: %s" key dic dic.Count keys
 
-    let set key value = 
+    let set' key value = 
          match box key with // or https://stackoverflow.com/a/864860/969070
          | null -> ArgumentNullException.Raise  "Dict.set key is null for value %A" value
          | _ -> dic.[key] <- value
@@ -50,26 +50,55 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
 
     /// For Index operator .[i]: get or set the value for given key
     member _.Item
-        with get k   = get k
-        and  set k v = set k v //dic.[k] <- v
+        with get k   = get' k
+        and  set k v = set' k v //dic.[k] <- v
 
     /// Get value for given key
-    member _.Get key = get key
+    member _.Get key = get' key
 
-    /// Set value for given key
-    member _.Set key value = set key value // dic.[key] <- value
+    /// Set value for given key, same as <c>dict.add key value</c>
+    member _.set key value = set' key value // dic.[key] <- value
+
+    /// Set value for given key, same as <c>dict.set key value</c>
+    member _.add key value = set' key value // dic.[key] <- value
 
     /// Set value only if key does not exist yet.
     /// Returns false if key already exist, does not set value in this case
-    member _.SetUnique (key:'K) (value:'V) = 
+    /// Same as <c>dict.addUnique key value</c>
+    member _.setUnique (key:'K) (value:'V) = 
         match box key with // or https://stackoverflow.com/a/864860/969070
-        | null -> ArgumentNullException.Raise "Dict.SetUnique key is null "
+        | null -> ArgumentNullException.Raise "Dict.setUnique key is null "
         | _ ->
             if dic.ContainsKey key then
                 false
             else
                 dic.[key] <- value
                 true
+    /// Set value only if key does not exist yet.
+    /// Returns false if key already exist, does not set value in this case
+    /// Same as <c>dict.setUnique key value</c>
+    member _.addUnique (key:'K) (value:'V) = 
+        match box key with // or https://stackoverflow.com/a/864860/969070
+        | null -> ArgumentNullException.Raise "Dict.addUnique key is null "
+        | _ ->
+            if dic.ContainsKey key then
+                false
+            else
+                dic.[key] <- value
+                true
+    
+    /// If the key ist not present calls the default function, set it as value at the key and return the value.
+    /// This function is an alternative to the DefaultDict type. Use it if you need to provide a custom implemantation of the default function depending on the key.
+    member _.getOrSetDefault (getDefault:'K -> 'V) (key:'K)   = 
+        match box key with // or https://stackoverflow.com/a/864860/969070
+        | null -> ArgumentNullException.Raise "DefaultDict.get key is null "
+        | _ ->
+            match dic.TryGetValue(key) with
+            |true, v-> v
+            |false, _ ->
+                let v = getDefault(key)
+                dic.[key] <- v
+                v
 
     /// Get a value and remove key and value it from dictionary, like *.pop() in Python.
     /// Will fail if key does not exist
@@ -137,7 +166,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
     // -------------------------------------methods:-------------------------------
 
     /// Add the specified key and value to the dictionary.
-    member _.Add(key, value) = set key value //dic.Add(key, value)
+    member _.Add(key, value) = set' key value //dic.Add(key, value)
 
     /// Removes all keys and values from the dictionary
     member _.Clear() = dic.Clear()
@@ -200,8 +229,8 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
 
     interface IDictionary<'K,'V> with
         member _.Item
-            with get k = get k
-            and  set k v = set k v // dic.[k] <- v
+            with get k   = get' k
+            and  set k v = set' k v // dic.[k] <- v
 
         member _.Keys = (dic:>IDictionary<'K,'V>).Keys
 
@@ -224,7 +253,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
 
     interface IReadOnlyDictionary<'K,'V> with
         member _.Item
-            with get k = get k
+            with get k = get' k
 
         member _.Keys = (dic:>IReadOnlyDictionary<'K,'V>).Keys
 

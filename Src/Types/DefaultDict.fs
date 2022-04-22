@@ -7,6 +7,8 @@ open System.Collections.Generic
 /// A System.Collections.Generic.Dictionary with default Values that get created upon accessing a missing key.
 /// If accessing a non exiting key , the default function is called to create and set it.
 /// Like defaultdict in Python
+/// If you need to provide a custom implemantation of the default function depending on the key
+/// then use the Dict type and its method <c>dict.getOrSetDefault func key</c>.
 [<NoComparison>]
 [<NoEquality>] // TODO add structural equality
 [<Sealed>]
@@ -25,7 +27,7 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
                 baseDict.[key] <- v
                 v
 
-    let set key value = 
+    let set' key value = 
         match box key with // or https://stackoverflow.com/a/864860/969070
         | null -> ArgumentNullException.Raise  "DefaultDict.set key is null for value %A" value
         | _ -> baseDict.[key] <- value
@@ -56,20 +58,26 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
 
     /// Access the underlying Collections.Generic.Dictionary<'K,'V>
     /// ATTENTION! This is not even a shallow copy, mutating it will also change this Instance of DefaultDict!
-    /// use #nowarn "44" to disable the obsolete warning
+    /// Use #nowarn "44" to disable the obsolete warning
     [<Obsolete("It is not actually obsolete but unsafe to use, so hidden from editor tools. In F# use #nowarn \"44\" to disable the obsolete warning")>]
     member _.Dictionary = baseDict
 
     /// For Index operator: get or set the value for given key
     member _.Item
         with get k   = dGet k
-        and  set k v = set k v
+        and  set k v = set' k v
 
     /// Get value for given key.
     /// Calls defaultFun to get value if key not found.
     /// Also sets key to returned value.
-    /// use .TryGetValue(k) if you don't want a missing key to be created
+    /// Use .TryGetValue(k) if you don't want a missing key to be created
     member _.Get k = dGet k
+
+    /// Set value for given key, same as <c>dict.add key value</c>
+    member _.set key value = set' key value // dic.[key] <- value
+
+    /// Set value for given key, same as <c>dict.set key value</c>
+    member _.add key value = set' key value // dic.[key] <- value
 
     /// Get a value and remove key and value it from dictionary, like *.pop() in Python
     /// Will fail if key does not exist
@@ -176,8 +184,8 @@ type DefaultDict<'K,'V when 'K:equality > private (defaultOfKeyFun: 'K -> 'V, ba
 
     interface IDictionary<'K,'V> with
         member _.Item
-            with get k = dGet k
-            and  set k v = set k v
+            with get k   = dGet k
+            and  set k v = set' k v
 
         member _.Keys = (baseDict:>IDictionary<'K,'V>).Keys
 

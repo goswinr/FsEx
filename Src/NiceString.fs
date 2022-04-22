@@ -133,7 +133,7 @@ module NiceFormat  =  // used by Rhino.Scripting
 
         match s.IndexOf('.') with
         | -1 -> 
-            match s.IndexOf('e') with // TODO check for 'E' too ?
+            match s.IndexOf("e",StringComparison.OrdinalIgnoreCase) with 
             | -1 -> doBeforeComma start (s.Length-1)
             | e -> // if float is in scientific notation don't insert comas into it too:
                 doBeforeComma start (s.Length-1)
@@ -143,7 +143,7 @@ module NiceFormat  =  // used by Rhino.Scripting
                 doBeforeComma start (i-1)
             add '.'
             if i < s.Length then 
-                match s.IndexOf('e') with
+                match s.IndexOf("e",StringComparison.OrdinalIgnoreCase) with
                 | -1 -> doAfterComma (i+1) (s.Length-1)
                 | e -> // if float is in scientific notation don't insert comas into it too:
                     doAfterComma (i+1) (e-1)
@@ -159,7 +159,7 @@ module NiceFormat  =  // used by Rhino.Scripting
     /// AlmostZero ->    Some 0.0
     /// AlmostZeroNeg->  Some 0.0
     /// RoundedToZero -> Some 0.0
-    let private tryParseNiceFloat (s:string)= 
+    let tryParseNiceFloat (s:string)= 
         match s with
         |Literals.NaN -> None
         |Literals.PositiveInfinity -> None
@@ -291,7 +291,7 @@ module NiceFormat  =  // used by Rhino.Scripting
     /// Returned strings are enclosed in quotaion marks.
     /// If input is null it returns <*null string*>
     let stringTruncated maxCharCount (s:string):string = 
-        let maxChar = max 6 maxCharCount
+        let maxChar = max 8 maxCharCount
         if isNull s then 
             if maxChar >= 15 then 
                 "<*null string*>" 
@@ -303,7 +303,7 @@ module NiceFormat  =  // used by Rhino.Scripting
             str{ "\"" ; s ; "\"" }
         else 
             let len = s.Length
-            if   maxChar <= 9 then str{ "\"" ;  s.Substring(0, maxChar-2-2)  ; "(..)"                           ; "\"" }
+            if   maxChar <= 10 then str{ "\"" ;  s.Substring(0, maxChar-2-2) ; "(..)"                           ; "\"" }
             elif maxChar <= 20 then str{ "\"" ;  s.Substring(0, maxChar-3-2) ; "(..)"  ; s.Substring(len-1, 1)  ; "\"" }
             elif maxChar <= 35 then str{ "\"" ;  s.Substring(0, maxChar-5-2) ; "(...)" ; s.Substring(len-2, 2)  ; "\"" }
             else     
@@ -399,11 +399,15 @@ module internal NiceStringImplementation  =
     /// reduces the maxCharsInString by a factor of 10 for each nesting level
     let internal formatStringByDepth (nps:NicePrintSettings) (depth:int) (s:String) =
         match depth with 
-        | 0 -> stringTruncated  nps.maxCharsInString        s
-        | 1 -> stringTruncated (nps.maxCharsInString/10)    s
-        | 2 -> stringTruncated (nps.maxCharsInString/100)   s
-        | 3 -> stringTruncated (nps.maxCharsInString/1000)  s
-        | _ -> stringTruncated (nps.maxCharsInString/10000) s
+        | 0 -> stringTruncated  nps.maxCharsInString     s
+        | 1 -> stringTruncated (nps.maxCharsInString/2)  s
+        | 2 -> stringTruncated (nps.maxCharsInString/4)  s
+        | 3 -> stringTruncated (nps.maxCharsInString/8)  s
+        | _ -> stringTruncated (nps.maxCharsInString/16) s
+        //| 1 -> stringTruncated (nps.maxCharsInString/10)    s
+        //| 2 -> stringTruncated (nps.maxCharsInString/100)   s
+        //| 3 -> stringTruncated (nps.maxCharsInString/1000)  s
+        //| _ -> stringTruncated (nps.maxCharsInString/10000) s
     
     
     /// return the string before a splitter
