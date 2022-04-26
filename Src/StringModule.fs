@@ -302,6 +302,13 @@ module String =
         if isNull txt then FsExStringException.Raise "String.addPrefix: txt is null"      
         prefix+txt
 
+    /// Add a double quote at start and end  
+    let (*inline*) inQuotes (txt:string) = 
+        if isNull txt then FsExStringException.Raise "String.inQuotes: txt is null"      
+        "\"" + txt + "\""
+
+
+
     //-------------------------------------------------------------------------
     //-------------------------------------------------------------------------
     // taken and adapted from  FSharpx
