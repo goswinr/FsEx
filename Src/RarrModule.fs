@@ -535,6 +535,25 @@ module Rarr =
             else rarr
         else
             rarr
+    
+    /// Returns all elements that exists more than once in Rarr.
+    /// Each element that exists more than once is only returned once.
+    /// Returned order is by first occurnce of first duplicate.
+    let duplicates (xs:Rarr<'T>) = 
+        let h = Hashset<'T>()
+        let t = Hashset<'T>() 
+        // first Add shoulds be false, second Add true, to recognice the first occurenace of a duplicate:
+        xs.FindAll (System.Predicate  (fun x -> if h.Add x then false else t.Add x)) 
+    
+    /// Returns all elements that exists more than once in Rarr.
+    /// Each element that exists more than once is only returned once.
+    /// Returned order is by first occurnce of first duplicate.
+    let duplicatesBy (f:'T->'U) (xs:Rarr<'T>) = 
+        let h = Hashset<'U>()
+        let t = Hashset<'U>()
+        // first Add shoulds be false, second Add true, to recognice the first occurenace of a duplicate: 
+        xs.FindAll (System.Predicate  (fun x -> let y = f x in  if h.Add y then false else t.Add y)) 
+
 
 
     //--------------------------------------------------------------------------------------------------------------------

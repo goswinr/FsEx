@@ -26,6 +26,7 @@
 		- rename Dict and DefaultDict members Add and Set
 		- add getOrSetDefault to Dict
 		- add String.addPrefix String.addSufix
+		- add Seq.tryFindDuplicate and Seq.duplicates
 	</PackageReleaseNotes>
 
     <Authors>GoswinR</Authors>

@@ -109,7 +109,34 @@ module Seq =
             if predicate x then t.Add(x)
             else                f.Add(x)
         t,f
+    
+    /// Returns the first element that exists more than once in Seq.
+    let tryFindDuplicate (xs:seq<'T>) = 
+        let h = Hashset<'T>()
+        xs |> Seq.tryFind (h.Add >> not) 
+    
+    /// Returns the first element that exists more than once in Seq.
+    let tryFindDuplicateBy (f:'T->'U) (xs:seq<'T>) = 
+        let h = Hashset<'U>()
+        xs |> Seq.tryFind (f >> h.Add >> not) 
 
+    /// Returns all elements that exists more than once in Seq.
+    /// Each element that exists more than once is only returned once.
+    /// Returned order is by first occurnce of first duplicate.
+    let duplicates (xs:seq<'T>) = 
+        let h = Hashset<'T>()
+        let t = Hashset<'T>() 
+        // first Add shoulds be false, second Add true, to recognice the first occurenace of a duplicate:
+        xs |> Seq.filter (fun x -> if h.Add x then false else t.Add x) 
+    
+    /// Returns all elements that exists more than once in Seq.
+    /// Each element that exists more than once is only returned once.
+    /// Returned order is by first occurnce of first duplicate.
+    let duplicatesBy (f:'T->'U) (xs:seq<'T>) = 
+        let h = Hashset<'U>()
+        let t = Hashset<'U>()
+        // first Add shoulds be false, second Add true, to recognice the first occurenace of a duplicate: 
+        xs |> Seq.filter (fun x -> let y = f x in  if h.Add y then false else t.Add y)    
 
 
     //------------------------------------------------------------------
