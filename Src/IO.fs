@@ -146,7 +146,13 @@ module IO =
             stream.Dispose()
             mstream
 
+        /// A curried version of IO.File.WriteAllText(path,content)
+        let writeAllText (path:string) (content:string) = 
+            IO.File.WriteAllText(path,content)
 
+        /// A curried version of IO.File.WriteAllLines(path,contentLines)
+        let writeAllLines (path:string) (contentLines:seq<string>) = 
+            IO.File.WriteAllLines(path,contentLines)
 
     /// Reads and Writes with Lock,
     /// Optionally only once after a delay in which it might be called several times
@@ -157,8 +163,7 @@ module IO =
 
         let counter = ref 0L // for atomic writing back to file
 
-        let lockObj = new Object()
-       
+        let lockObj = new Object()       
 
         /// Calls IO.File.Exists(path)
         member this.FileExists = IO.File.Exists(path)
@@ -242,7 +247,7 @@ module IO =
             async{
                 let k = Interlocked.Increment counter
                 do! Async.Sleep(delayMillisSeconds) // delay to see if this is the last of many events (otherwise there is a noticeable lag in dragging window around, for example, when saving window position)
-                if !counter = k then //k > 2L &&   //do not save on startup && only save last event after a delay if there are many save events in a row ( eg from window size change)(ignore first two event from creating window)
+                if counter.Value = k then //k > 2L &&   //do not save on startup && only save last event after a delay if there are many save events in a row ( eg from window size change)(ignore first two event from creating window)
                     try
                         let text = getText()
                         this.WriteAsync (text) // this should never fail since exceptions are caught inside
