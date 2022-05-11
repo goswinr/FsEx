@@ -64,10 +64,10 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
 
     /// Set value only if key does not exist yet.
     /// Returns false if key already exist, does not set value in this case
-    /// Same as <c>dict.addUnique key value</c>
-    member _.setUnique (key:'K) (value:'V) = 
+    /// Same as <c>dict.addOnce key value</c>
+    member _.setOnce (key:'K) (value:'V) = 
         match box key with // or https://stackoverflow.com/a/864860/969070
-        | null -> ArgumentNullException.Raise "Dict.setUnique key is null "
+        | null -> ArgumentNullException.Raise "Dict.setOnce key is null "
         | _ ->
             if dic.ContainsKey key then
                 false
@@ -76,10 +76,10 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
                 true
     /// Set value only if key does not exist yet.
     /// Returns false if key already exist, does not set value in this case
-    /// Same as <c>dict.setUnique key value</c>
-    member _.addUnique (key:'K) (value:'V) = 
+    /// Same as <c>dict.setOnce key value</c>
+    member _.addOnce (key:'K) (value:'V) = 
         match box key with // or https://stackoverflow.com/a/864860/969070
-        | null -> ArgumentNullException.Raise "Dict.addUnique key is null "
+        | null -> ArgumentNullException.Raise "Dict.addOnce key is null "
         | _ ->
             if dic.ContainsKey key then
                 false
@@ -91,7 +91,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
     /// This function is an alternative to the DefaultDict type. Use it if you need to provide a custom implemantation of the default function depending on the key.
     member _.getOrSetDefault (getDefault:'K -> 'V) (key:'K)   = 
         match box key with // or https://stackoverflow.com/a/864860/969070
-        | null -> ArgumentNullException.Raise "DefaultDict.get key is null "
+        | null -> ArgumentNullException.Raise "Dict.getOrSetDefault key is null "
         | _ ->
             match dic.TryGetValue(key) with
             |true, v-> v
@@ -99,6 +99,18 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
                 let v = getDefault(key)
                 dic.[key] <- v
                 v
+    /// If the key ist not present set it as value at the key and return the value.    
+    member _.getOrSetDefaultValue (defaultValue: 'V) (key:'K)   = 
+        match box key with // or https://stackoverflow.com/a/864860/969070
+        | null -> ArgumentNullException.Raise "Dict.getOrSetDefaultValue key is null "
+        | _ ->
+            match dic.TryGetValue(key) with
+            |true, v-> v
+            |false, _ ->
+                let v = defaultValue
+                dic.[key] <- v
+                v
+
 
     /// Get a value and remove key and value it from dictionary, like *.pop() in Python.
     /// Will fail if key does not exist
