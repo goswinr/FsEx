@@ -3,6 +3,7 @@
 open System
 
 /// A module to run command line processes via Diagnostics.Process()
+[<RequireQualifiedAccess>]
 module Process = 
 
     /// Run a command synchronously.

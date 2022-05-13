@@ -3,6 +3,7 @@
 open System
 
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+[<RequireQualifiedAccess>]
 module Array = 
 
     /// Checks if a given array matches the content in Array at a given index

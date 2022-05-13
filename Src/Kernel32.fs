@@ -3,8 +3,7 @@
 open System
 open System.IO
 
-
-
+[<RequireQualifiedAccess>]
 module Kernel32 = 
 
     /// For Exceptions that happen while calling native kernel32 functions

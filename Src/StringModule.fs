@@ -7,6 +7,7 @@ open FsEx.ExtensionsString // for FsExStringException
 
 /// Functions for transforming strings
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide String class in C# assemblies
+[<RequireQualifiedAccess>]
 module String = 
 
     /// Takes at most a given amount of chars from string.

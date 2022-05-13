@@ -11,6 +11,7 @@ open NiceString
 
 /// Generic operations on Rarr which is like a System.Collections.Generic.List<'T> but with nicer error messages.
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Rarr class in C# assemblies (should consider for other extension modules as well)
+[<RequireQualifiedAccess>]
 module Rarr = 
 
     //---------------------------------------------------

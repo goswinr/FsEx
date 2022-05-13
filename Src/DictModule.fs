@@ -5,6 +5,7 @@ open System.Collections.Generic
 
 /// Static Functions on IDictionary Interface
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Dict alias class in C# assemblies
+[<RequireQualifiedAccess>]
 module Dict = 
 
     /// Get value at key from IDictionary, with nicer Error messages
@@ -95,5 +96,13 @@ module Dict =
                 KeyNotFoundException.Raise "Dict.pop(key): Failed to pop key %A in %A of %d items" key dic dic.Count
 
     /// Returns a (lazy) sequence of key and value tuples
-    let items  (dic:IDictionary<'K,'V>) = 
+    let items(dic:IDictionary<'K,'V>) = 
         seq { for kvp in dic -> kvp.Key, kvp.Value}
+
+    /// Returns a (lazy) sequence of values
+    let valuesSeq (dic:IDictionary<'K,'V>) =  
+        seq { for kvp in dic -> kvp.Value}
+
+    /// Returns a (lazy) sequence of Keys
+    let keysSeq (dic:IDictionary<'K,'V>) =  
+        seq { for kvp in dic -> kvp.Key}

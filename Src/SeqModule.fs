@@ -8,6 +8,7 @@ open FsEx.ExtensionsSeq
 
 /// Additional functions to work with IEnumerable<'T>
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies
+[<RequireQualifiedAccess>]
 module Seq = 
 
     /// Counts for how many items of the Seq the predicate returns true.
