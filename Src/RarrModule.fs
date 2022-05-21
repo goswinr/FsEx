@@ -795,7 +795,7 @@ module Rarr =
             for group in dict do
                 res.Add( getKey group.Key, group.Value)
             res
-    /// <summary>Applies a key-generating function to each element of an Rarr and returns an Rarr yielding unique
+    /// <summary>Applies a key-generating function to each element of a Rarr and returns a Rarr yielding unique
     /// keys and their number of occurrences in the original Rarr.</summary>
     /// <param name="projection">A function transforming each item of the input Rarr into a key to be
     /// compared against the others.</param>
@@ -810,7 +810,7 @@ module Rarr =
             else countByImpl StructBox<'Key>.Comparer (fun t -> StructBox (projection t)) (fun sb -> sb.Value) rarr
 
 
-    /// <summary>Creates an Rarr whose elements are all initially the given value.</summary>
+    /// <summary>Creates a Rarr whose elements are all initially the given value.</summary>
     /// <param name="count">The length of the Rarr to create.</param>
     /// <param name="value">The value for the elements.</param>
     /// <returns>The created Rarr.</returns>
@@ -823,7 +823,7 @@ module Rarr =
         rarr
 
 
-    /// <summary>Returns an Rarr that contains no duplicate entries according to generic hash and
+    /// <summary>Returns a Rarr that contains no duplicate entries according to generic hash and
     /// equality comparisons on the entries.
     /// If an element occurs multiple times in the Rarr then the later occurrences are discarded.</summary>
     /// <param name="rarr">The input Rarr.</param>
@@ -839,7 +839,7 @@ module Rarr =
         temp
 
 
-    /// <summary>Returns an Rarr that contains no duplicate entries according to the
+    /// <summary>Returns a Rarr that contains no duplicate entries according to the
     /// generic hash and equality comparisons on the keys returned by the given key-generating function.
     /// If an element occurs multiple times in the Rarr then the later occurrences are discarded.</summary>
     /// <param name="projection">A function transforming the Rarr items into comparable keys.</param>
@@ -880,8 +880,8 @@ module Rarr =
     /// Uses generic hash and equality comparisons to compare values.</summary>
     /// <param name="itemsToExclude">A sequence whose elements that also occur in the input Rarr will cause those elements to be
     /// removed from the result.</param>
-    /// <param name="rarr">An Rarr whose elements that are not also in itemsToExclude will be returned.</param>
-    /// <returns>An Rarr that contains the distinct elements of <c>Rarr</c> that do not appear in <c>itemsToExclude</c>.</returns>
+    /// <param name="rarr">A Rarr whose elements that are not also in itemsToExclude will be returned.</param>
+    /// <returns>A Rarr that contains the distinct elements of <c>Rarr</c> that do not appear in <c>itemsToExclude</c>.</returns>
     let except (itemsToExclude: seq<'T>) (rarr: Rarr<'T>) : Rarr<'T> = 
         if rarr.Count = 0 then
             rarr
@@ -945,7 +945,7 @@ module Rarr =
     /// for which the given predicate returns <c>true</c>.</summary>
     /// <param name="predicate">The function to test the input elements.</param>
     /// <param name="rarr">The input Rarr.</param>
-    /// <returns>An Rarr containing the elements for which the given predicate returns true.</returns>
+    /// <returns>A Rarr containing the elements for which the given predicate returns true.</returns>
     let inline filter (predicate:'T->bool) (rarr: Rarr<'T>) = 
         // TODO replace with F# implementation using [<InlineIfLambda>] for performance?? Test on non Lambdas too.
         rarr.FindAll (System.Predicate predicate)
@@ -1158,10 +1158,10 @@ module Rarr =
                 result.Add( getKey group.Key, group.Value)
             result
 
-    /// <summary>Applies a key-generating function to each element of an Rarr and yields an Rarr of
-    /// unique keys. Each unique key contains an Rarr of all elements that match
+    /// <summary>Applies a key-generating function to each element of a Rarr and yields a Rarr of
+    /// unique keys. Each unique key contains a Rarr of all elements that match
     /// to this key.</summary>
-    /// <param name="projection">A function that transforms an element of the Rarr into a comparable key.</param>
+    /// <param name="projection">A function that transforms an element of the Rarr into a comparable key. Null or Option.None is allowed as key.</param>
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The result Rarr.</returns>
     let groupBy (projection:'T -> 'Key) (rarr:Rarr<'T>) :  Rarr<'Key * Rarr<'T>> = 
@@ -1171,6 +1171,29 @@ module Rarr =
         else
             // Wrap a StructBox around all keys in case the key type is itself a type using null as a representation
              groupByImpl StructBox<'Key>.Comparer (fun t -> StructBox (projection t)) (fun sb -> sb.Value) rarr
+
+
+
+    /// <summary>Applies a key-generating function to each element of a Rarr and yields a Dict of
+    /// unique keys and respective elements that match to this key. As opposeds to Rarr.groupBy the key may not be null or Option.None</summary>
+    /// <param name="projection">A function that transforms an element of the Rarr into a comparable key. As opposeds to Rarr.groupBy the key may not be null or Option.None </param>
+    /// <param name="rarr">The input Rarr.</param>
+    /// <returns>The result Rarr.</returns>
+    let groupByDict (projection:'T -> 'Key) (rarr:Rarr<'T>) :  Dict<'Key,Rarr<'T>> = 
+        let dict = Dictionary<'Key, Rarr<'T>>()
+        // Build the groupings
+        let li = rarr.List
+        for i = 0 to li.Count - 1 do
+            let v = li.[i]  
+            let k = projection v   
+            match dict.TryGetValue k with
+            |true, r -> r.Add v
+            |_ -> 
+                let r = Rarr ()
+                dict.[k] <- r
+                r.Add v
+        Dict.CreateDirectly dict
+
 
 
     /// <summary>Returns the first element of the Rarr.</summary>
@@ -1192,7 +1215,7 @@ module Rarr =
             res.Add (i, li.[i])
         res
 
-    /// <summary>Creates an Rarr given the dimension and a generator function to compute the elements.</summary>
+    /// <summary>Creates a Rarr given the dimension and a generator function to compute the elements.</summary>
     /// <param name="count">The number of elements to initialize.</param>
     /// <param name="initializer">The function to generate the initial values for each index.</param>
     /// <returns>The created Rarr.</returns>
@@ -1235,7 +1258,7 @@ module Rarr =
     let inline isEmpty (rarr: Rarr<'T>) = 
         rarr.Count = 0
 
-    /// <summary>Gets an element from an Rarr.</summary>
+    /// <summary>Gets an element from a Rarr.</summary>
     /// <param name="index">The input index.</param>
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The value of the Rarr at the given index.</returns>
@@ -1300,7 +1323,7 @@ module Rarr =
         rarr.List.[rarr.Count-1]
 
 
-    /// <summary>Returns the length of an Rarr. You can also use property rarr.Count.</summary>
+    /// <summary>Returns the length of a Rarr. You can also use property rarr.Count.</summary>
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The length or count of the Rarr.</returns>
     let inline length (rarr: Rarr<'T>) = 
@@ -1496,7 +1519,7 @@ module Rarr =
                     accv <- currv
             accv
 
-    /// <summary>Builds an Rarr from the given list.</summary>
+    /// <summary>Builds a Rarr from the given list.</summary>
     /// <param name="list">The input list.</param>
     /// <returns>The Rarr of elements from the list.</returns>
     let ofList (list: list<'T>) = 
@@ -1517,7 +1540,7 @@ module Rarr =
         | _  -> Rarr (source)
 
 
-    /// <summary>Returns an Rarr of each element in the input Rarr and its predecessor, with the
+    /// <summary>Returns a Rarr of each element in the input Rarr and its predecessor, with the
     /// exception of the first element which is only returned as the predecessor of the second element.</summary>
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The result Rarr.</returns>
@@ -1549,7 +1572,7 @@ module Rarr =
         trueResults, falseResults
 
 
-    /// <summary>Returns an Rarr with all elements permuted according to the specified permutation.</summary>
+    /// <summary>Returns a Rarr with all elements permuted according to the specified permutation.</summary>
     /// <param name="indexMap">The function that maps input indices to output indices.</param>
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The output Rarr.</returns>
@@ -1648,7 +1671,7 @@ module Rarr =
         r.RemoveRange(index,count)
         r
 
-    /// <summary>Creates an Rarr by replicating the given initial value.</summary>
+    /// <summary>Creates a Rarr by replicating the given initial value.</summary>
     /// <param name="count">The number of elements to replicate.</param>
     /// <param name="initial">The value to replicate</param>
     /// <returns>The generated Rarr.</returns>
@@ -1709,7 +1732,7 @@ module Rarr =
         results
 
 
-    /// <summary>Sets an element of an Rarr. (use Rarr.setNeg(i) function if you want to use negative indices too)</summary>
+    /// <summary>Sets an element of a Rarr. (use Rarr.setNeg(i) function if you want to use negative indices too)</summary>
     /// <param name="rarr">The input Rarr.</param>
     /// <param name="index">The input index.</param>
     /// <param name="value">The input value.</param>
@@ -1718,7 +1741,7 @@ module Rarr =
         rarr.[index] <- value
 
 
-    /// <summary>Returns an Rarr that contains one item only.</summary>
+    /// <summary>Returns a Rarr that contains one item only.</summary>
     /// <param name="value">The input item.</param>
     /// <returns>The result Rarr of one item.</returns>
     let inline singleton value = 
@@ -1741,7 +1764,7 @@ module Rarr =
             rarr.GetRange(count, rarr.Count-count)
 
 
-    /// <summary>Bypasses elements in an Rarr while the given predicate returns <c>true</c>, and then returns
+    /// <summary>Bypasses elements in a Rarr while the given predicate returns <c>true</c>, and then returns
     /// the remaining elements in a new Rarr.</summary>
     /// <param name="predicate">A function that evaluates an element of the Rarr to a boolean value.</param>
     /// <param name="rarr">The input Rarr.</param>
@@ -1757,7 +1780,7 @@ module Rarr =
             rarr.GetRange(i, rarr.Count-i)
 
 
-    /// <summary>Sorts the elements of an Rarr, returning a new Rarr. Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
+    /// <summary>Sorts the elements of a Rarr, returning a new Rarr. Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
     /// This means "Z" is before "a". This is different from Collections.Generic.List.Sort() where "a" is before "Z" using IComparable interface.
     /// This is NOT a stable sort, i.e. the original order of equal elements is not necessarily preserved.
     /// For a stable sort, consider using Seq.Sort</summary>
@@ -1769,7 +1792,7 @@ module Rarr =
         r
 
 
-    /// <summary>Sorts the elements of an Rarr, using the given projection for the keys and returning a new Rarr.
+    /// <summary>Sorts the elements of a Rarr, using the given projection for the keys and returning a new Rarr.
     /// Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
     /// This means "Z" is before "a". This is different from Collections.Generic.List.Sort() where "a" is before "Z" using IComparable interface.
     /// This is NOT a stable sort, i.e. the original order of equal elements is not necessarily preserved.
@@ -1783,7 +1806,7 @@ module Rarr =
         r
 
 
-    /// <summary>Sorts the elements of an Rarr, in descending order, using the given projection for the keys and returning a new Rarr.
+    /// <summary>Sorts the elements of a Rarr, in descending order, using the given projection for the keys and returning a new Rarr.
     /// Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
     /// This means in ascending sorting "Z" is before "a". This is different from Collections.Generic.List.Sort() where "a" is before "Z" using IComparable interface.
     /// This is NOT a stable sort, i.e. the original order of equal elements is not necessarily preserved.
@@ -1797,7 +1820,7 @@ module Rarr =
         r
 
 
-    /// <summary>Sorts the elements of an Rarr, in descending order, returning a new Rarr. Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
+    /// <summary>Sorts the elements of a Rarr, in descending order, returning a new Rarr. Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
     /// This means in ascending sorting "Z" is before "a". This is different from Collections.Generic.List.Sort() where "a" is before "Z" using IComparable interface.
     /// This is NOT a stable sort, i.e. the original order of equal elements is not necessarily preserved.
     /// For a stable sort, consider using Seq.sort.</summary>
@@ -1810,7 +1833,7 @@ module Rarr =
         r
 
 
-    /// <summary>Sorts the elements of an Rarr by mutating the Rarr in-place, using the given comparison function.
+    /// <summary>Sorts the elements of a Rarr by mutating the Rarr in-place, using the given comparison function.
     /// Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
     /// This means in ascending sorting "Z" is before "a". This is different from Collections.Generic.List.Sort() where "a" is before "Z" using IComparable interface.
     /// This is NOT a stable sort, i.e. the original order of equal elements is not necessarily preserved.
@@ -1820,7 +1843,7 @@ module Rarr =
         rarr.Sort(Operators.compare) // Operators.compare is need to match sorting of Array.sort
 
 
-    /// <summary>Sorts the elements of an Rarr by mutating the Rarr in-place, using the given projection for the keys.
+    /// <summary>Sorts the elements of a Rarr by mutating the Rarr in-place, using the given projection for the keys.
     /// Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
     /// This means in ascending sorting "Z" is before "a". This is different from Collections.Generic.List.Sort() where "a" is before "Z" using IComparable interface.
     /// This is NOT a stable sort, i.e. the original order of equal elements is not necessarily preserved.
@@ -1830,7 +1853,7 @@ module Rarr =
     let sortInPlaceBy<'T, 'Key when 'Key : comparison> (projection : 'T -> 'Key) (rarr : Rarr<'T>) : unit = 
         rarr.Sort (fun x y -> Operators.compare (projection x) (projection y))
 
-    /// <summary>Sorts the elements of an Rarr by mutating the Rarr in-place, using the given comparison function as the order.
+    /// <summary>Sorts the elements of a Rarr by mutating the Rarr in-place, using the given comparison function as the order.
     /// This is NOT a stable sort, i.e. the original order of equal elements is not necessarily preserved.
     /// For a stable sort, consider using Seq.sort.</summary>
     /// <param name="comparer">The function to compare pairs of Rarr elements.</param>
@@ -1838,7 +1861,7 @@ module Rarr =
     let sortInPlaceWith (comparer : 'T -> 'T -> int) (rarr : Rarr<'T>) : unit = 
         rarr.Sort (comparer)
 
-    /// <summary>Sorts the elements of an Rarr, using the given comparison function as the order, returning a new Rarr.
+    /// <summary>Sorts the elements of a Rarr, using the given comparison function as the order, returning a new Rarr.
     /// This is NOT a stable sort, i.e. the original order of equal elements is not necessarily preserved.
     /// For a stable sort, consider using Seq.sort.</summary>
     /// <param name="comparer">The function to compare pairs of Rarr elements.</param>
@@ -1849,7 +1872,7 @@ module Rarr =
         r.Sort (comparer)
         r
 
-    /// <summary>Splits an Rarr into two Rarrs, at the given index.</summary>
+    /// <summary>Splits a Rarr into two Rarrs, at the given index.</summary>
     /// <param name="index">The index at which the Rarr is split.</param>
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The two split Rarrs.</returns>
@@ -1943,7 +1966,7 @@ module Rarr =
 
 
 
-    /// <summary>Returns an Rarr that contains all elements of the original Rarr while the
+    /// <summary>Returns a Rarr that contains all elements of the original Rarr while the
     /// given predicate returns <c>true</c>, and then returns no further elements.</summary>
     /// <param name="predicate">A function that evaluates to false when no more items should be returned.</param>
     /// <param name="rarr">The input Rarr.</param>
@@ -2122,7 +2145,7 @@ module Rarr =
         loop 0
 
 
-    /// <summary>Returns an Rarr that contains the elements generated by the given computation.
+    /// <summary>Returns a Rarr that contains the elements generated by the given computation.
     /// The given initial <c>state</c> argument is passed to the element generator.</summary>
     /// <param name="generator">A function that takes in the current state and returns an option tuple of the next
     /// element of the Rarr and the next state value.</param>
@@ -2140,7 +2163,7 @@ module Rarr =
         res
 
 
-    /// <summary>Splits an Rarr of pairs into two Rarrs.</summary>
+    /// <summary>Splits a Rarr of pairs into two Rarrs.</summary>
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The two Rarrs.</returns>
     let unzip (rarr: Rarr<'T*'U>) : Rarr<'T> * Rarr<'U>= 
@@ -2155,7 +2178,7 @@ module Rarr =
         res1, res2
 
 
-    /// <summary>Splits an Rarr of triples into three Rarrs.</summary>
+    /// <summary>Splits a Rarr of triples into three Rarrs.</summary>
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The tuple of three Rarrs.</returns>
     let unzip3 (rarr: Rarr<'T*'U*'V>) = 
@@ -2188,12 +2211,12 @@ module Rarr =
     /// for which the given predicate returns <c>true</c>.</summary>
     /// <param name="predicate">The function to test the input elements.</param>
     /// <param name="rarr">The input Rarr.</param>
-    /// <returns>An Rarr containing the elements for which the given predicate returns true.</returns>
+    /// <returns>a Rarr containing the elements for which the given predicate returns true.</returns>
     let where (predicate:'T->bool) (rarr: Rarr<'T>) = 
         filter predicate rarr
 
 
-    /// <summary>Returns an Rarr of sliding windows containing elements drawn from the input Rarr. Each window is returned as a fresh Rarr.</summary>
+    /// <summary>Returns a Rarr of sliding windows containing elements drawn from the input Rarr. Each window is returned as a fresh Rarr.</summary>
     /// <param name="windowSize">The number of elements in each window.</param>
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The result Rarr.</returns>
@@ -2210,7 +2233,7 @@ module Rarr =
             res
 
 
-    /// <summary>Combines the two Rarrs into an Rarr of pairs. The two Rarrs must have equal lengths, otherwise an <c>ArgumentException</c> is raised.</summary>
+    /// <summary>Combines the two Rarrs into a Rarr of pairs. The two Rarrs must have equal lengths, otherwise an <c>ArgumentException</c> is raised.</summary>
     /// <param name="rarr1">The first input Rarr.</param>
     /// <param name="rarr2">The second input Rarr.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarrs differ in length.</exception>
@@ -2224,7 +2247,7 @@ module Rarr =
         res
 
 
-    /// <summary>Combines three Rarrs into an Rarr of pairs. The three Rarrs must have equal lengths, otherwise an <c>ArgumentException</c> is raised.</summary>
+    /// <summary>Combines three Rarrs into a Rarr of pairs. The three Rarrs must have equal lengths, otherwise an <c>ArgumentException</c> is raised.</summary>
     /// <param name="rarr1">The first input Rarr.</param>
     /// <param name="rarr2">The second input Rarr.</param>
     /// <param name="rarr3">The third input Rarr.</param>
@@ -2293,7 +2316,7 @@ module Rarr =
             concat result
 
 
-        /// <summary>Create an Rarr given the dimension and a generator function to compute the elements.
+        /// <summary>Create a Rarr given the dimension and a generator function to compute the elements.
         /// Performs the operation in parallel using <see cref="M:System.Threading.Tasks.Parallel.For" />.
         /// The order in which the given function is applied to indices is not specified.</summary>
         /// <param name="count"></param>
