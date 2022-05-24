@@ -10,10 +10,24 @@ open FsEx.ExtensionsSeq
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies
 [<RequireQualifiedAccess>]
 module Seq = 
+    
+    /// Gets the only element in Seq. 
+    /// Fails if there is not excactly one element in the Seq. 
+    let headAndOnly  (xs: seq<'T>) =
+        use e = xs.GetEnumerator()        
+        if e.MoveNext() then
+            let el = e.Current
+            if e.MoveNext() then
+                let len = try Seq.length xs |> string with _ -> "?(eval failed)"
+                IndexOutOfRangeException.Raise "Seq.headOnly: Input Sequence has %s elements not just one." len
+            else
+                el
+        else
+           IndexOutOfRangeException.Raise "Seq.headOnly: Empty Input Sequence"
 
     /// Counts for how many items of the Seq the predicate returns true.
     /// same as Seq.filter and then Seq.length
-    let inline countIf (predicate : 'T -> bool) (xs : seq<'T>) : int = //countBy is something else !!
+    let countIf (predicate : 'T -> bool) (xs : seq<'T>) : int = //countBy is something else !!
         let mutable k = 0
         for x in xs do
             if predicate x then

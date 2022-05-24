@@ -80,6 +80,13 @@ module Rarr =
         if rarr.Count = 0 then IndexOutOfRangeException.Raise "Rarr.first: Failed to get first item of %s" rarr.ToNiceStringLong
         rarr.List.[0]
 
+    /// Gets the the only item in the FsEx.Rarr.
+    /// Fails if the Rarr does not have exactly one element.
+    let inline firstAndOnly (rarr: Rarr<'T>) =
+        if rarr.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.firstOnly: Failed to get first item of empty Rarr<%s>" (typeof<'T>).FullName
+        if rarr.Count > 1 then IndexOutOfRangeException.Raise  "FsEx.Rarr.firstOnly: Rarr<%s> is expected to have only one item but has %d Rarr: %s" (typeof<'T>).FullName rarr.Count rarr.ToNiceStringLong
+        rarr.[0]
+
     /// Gets the second item in the Rarr.
     /// Same as   this.[1]
     let inline second  (rarr: Rarr<'T>)= 

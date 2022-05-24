@@ -129,15 +129,23 @@ type Rarr<'T> private (xs:List<'T>) =
             if xs.Count < 3 then  IndexOutOfRangeException.Raise  "FsEx.Rarr.ThirdLast: Failed to set third last item of %s to %s" this.ToNiceStringLong (toNiceString v)
             xs.[xs.Count - 3] <- v
 
-    /// Get (or set) Sets the first item in the FsEx.Rarr.
+    /// Get (or set) the first item in the FsEx.Rarr.
     /// Equal to this.[0]
-    member this.First
+    member _.First
         with get() = 
             if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.First: Failed to get first item of empty Rarr<%s>" (typeof<'T>).FullName
             xs.[0]
         and set (v:'T) = 
             if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.First: Failed to set first item of empty Rarr<%s> to %s"  (typeof<'T>).FullName (toNiceString v)
             xs.[0] <- v
+
+    /// Gets the the only item in the FsEx.Rarr.
+    /// Fails if the Rarr does not have exactly one element.
+    member this.FirstAndOnly =
+        if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.FirstOnly: Failed to get first item of empty Rarr<%s>" (typeof<'T>).FullName
+        if xs.Count > 1 then IndexOutOfRangeException.Raise  "FsEx.Rarr.FirstOnly: Rarr<%s> is expected to have only one item but has %d Rarr: %s" (typeof<'T>).FullName xs.Count this.ToNiceStringLong
+        xs.[0]
+       
 
     /// Get (or set) the second item in the FsEx.Rarr.
     /// Equal to this.[1]
