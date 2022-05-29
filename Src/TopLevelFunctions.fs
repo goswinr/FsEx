@@ -42,10 +42,6 @@ module AutoOpenExtensionsExceptions =
         /// Raise DirectoryNotFoundException with F# printf string formating
         static member inline Raise msg =  Printf.kprintf (fun s -> raise (DirectoryNotFoundException(s))) msg
 
-//module ResizeArray = 
-//    let inline map ( mapping: 'T -> 'U) (rarr: ResizeArray<'T>) : ResizeArray<'U> = 
-//         // TODO replace with F# implementation using [<InlineIfLambda>] for performance?? Test on non Lambdas too.
-//         rarr.ConvertAll (System.Converter mapping)
 
 /// This module is set to auto open.
 /// General Utility functions

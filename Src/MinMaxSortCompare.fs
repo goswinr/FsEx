@@ -4,9 +4,6 @@
 /// of tuple ,triples and quadruples
 module MinMaxSort = 
 
-    // make all inline because of https://stackoverflow.com/questions/6104221/why-is-this-f-code-so-slow
-
-
     /// Returns the smallest element.
     /// Elements are compared by applying the predicate function first.
     /// If both are equal then the first element is returned.
@@ -69,15 +66,6 @@ module MinMaxSort =
             else //c<a
                 if b <= c then  bb, cc, aa
                 else            cc, bb, aa
-
-    /// Compare two elements. Returns -1, 0 or 1
-    /// if   a= b then  0
-    /// elif a<b  then -1
-    /// else            1
-    let inline cmp a b = 
-        if   a= b then  0
-        elif a<b  then -1
-        else            1
 
     /// Gets the positive difference between 2 numbers.
     /// Avoids the integer( or byte) overflow and underflow risk of "abs(a-b)"
