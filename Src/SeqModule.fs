@@ -19,11 +19,11 @@ module Seq =
             let el = e.Current
             if e.MoveNext() then
                 let len = try Seq.length xs |> string with _ -> "?(eval failed)"
-                IndexOutOfRangeException.Raise "Seq.headOnly: Input Sequence has %s elements not just one." len
+                IndexOutOfRangeException.Raise "FsEx.Seq.headOnly: Input Sequence has %s elements not just one." len
             else
                 el
         else
-           IndexOutOfRangeException.Raise "Seq.headOnly: Empty Input Sequence"
+           IndexOutOfRangeException.Raise "FsEx.Seq.headOnly: Empty Input Sequence"
 
     /// Counts for how many items of the Seq the predicate returns true.
     /// same as Seq.filter and then Seq.length
@@ -113,7 +113,7 @@ module Seq =
                 yield  prev
                 prev <- e.Current
         else
-            IndexOutOfRangeException.Raise "skipLast: Empty Input Sequence"}
+            IndexOutOfRangeException.Raise "FsEx.Seq.skipLast: Empty Input Sequence"}
 
     /// Splits seq in two, like Seq.filter but returning both
     /// the first Rarr has all elements where the filter function returned 'true'
@@ -174,9 +174,9 @@ module Seq =
                             prev <- e.Current
                         yield prev, first
                 else
-                    IndexOutOfRangeException.Raise "Seq.thisNext: Input Sequence only had one element %s" xs.ToNiceString
+                    IndexOutOfRangeException.Raise "FsEx.Seq.thisNext: Input Sequence only had one element %s" xs.ToNiceString
             else
-                IndexOutOfRangeException.Raise "Seq.thisNext: Empty Input Sequence"}
+                IndexOutOfRangeException.Raise "FsEx.Seq.thisNext: Empty Input Sequence"}
 
     /// Yields a Seq from (first, second)  up to (second last, last)
     /// The length of the resulting seq is one shorter than input seq.
@@ -192,9 +192,9 @@ module Seq =
                         yield  prev, e.Current
                         prev <- e.Current
                 else
-                    IndexOutOfRangeException.Raise "Seq.windowed2: Input Sequence only had one element %s" xs.ToNiceString
+                    IndexOutOfRangeException.Raise "FsEx.Seq.windowed2: Input Sequence only had one element %s" xs.ToNiceString
             else
-                IndexOutOfRangeException.Raise "Seq.windowed2: Empty Input Sequence"}
+                IndexOutOfRangeException.Raise "FsEx.Seq.windowed2: Empty Input Sequence"}
 
 
     /// Yields looped Seq from (0, first, second)  up to (lastIndex, last, first)
@@ -236,9 +236,9 @@ module Seq =
                         yield  kk, prev, e.Current
                         prev <- e.Current
                 else
-                    IndexOutOfRangeException.Raise "Seq.windowed2i: Input Sequence only had one element %s" xs.ToNiceString
+                    IndexOutOfRangeException.Raise "FsEx.Seq.windowed2i: Input Sequence only had one element %s" xs.ToNiceString
             else
-                IndexOutOfRangeException.Raise "Seq.windowed2i: Empty Input Sequence"}
+                IndexOutOfRangeException.Raise "FsEx.Seq.windowed2i: Empty Input Sequence"}
 
 
     /// Yields a looped Seq from (last, first, second)  up to (second-last, last, first)
@@ -262,11 +262,11 @@ module Seq =
                         this <- e.Current
                     yield prev, this, first
                 else
-                    IndexOutOfRangeException.Raise "Seq.prevThisNextLooped: Input Sequence only had two elements: %s" xs.ToNiceString
+                    IndexOutOfRangeException.Raise "FsEx.Seq.prevThisNextLooped: Input Sequence only had two elements: %s" xs.ToNiceString
             else
-                IndexOutOfRangeException.Raise "Seq.prevThisNextLooped: Input Sequence only had one element: %s" xs.ToNiceString
+                IndexOutOfRangeException.Raise "FsEx.Seq.prevThisNextLooped: Input Sequence only had one element: %s" xs.ToNiceString
         else
-            IndexOutOfRangeException.Raise "Seq.prevThisNextLooped: Empty Input Sequence %A" xs}
+            IndexOutOfRangeException.Raise "FsEx.Seq.prevThisNextLooped: Empty Input Sequence %A" xs}
 
 
     /// Yields a Seq from (first, second, third)  up to (third-last, second-last, last)
@@ -287,11 +287,11 @@ module Seq =
                         prev <- this
                         this <- e.Current
                 else
-                    IndexOutOfRangeException.Raise "Seq.windowed3: Input Sequence only had two elements: %s" xs.ToNiceString
+                    IndexOutOfRangeException.Raise "FsEx.Seq.windowed3: Input Sequence only had two elements: %s" xs.ToNiceString
             else
-                IndexOutOfRangeException.Raise "Seq.windowed3: Input Sequence only had one element: %s" xs.ToNiceString
+                IndexOutOfRangeException.Raise "FsEx.Seq.windowed3: Input Sequence only had one element: %s" xs.ToNiceString
         else
-            IndexOutOfRangeException.Raise "Seq.windowed3: Empty Input Sequence %A" xs}
+            IndexOutOfRangeException.Raise "FsEx.Seq.windowed3: Empty Input Sequence %A" xs}
 
 
     /// Yields looped Seq from (0, last, first, second)  up to (lastIndex, second-last, last, first)
@@ -342,9 +342,9 @@ module Seq =
                         prev <- this
                         this <- e.Current
                 else
-                    IndexOutOfRangeException.Raise "Seq.windowed3i: Input Sequence only had two elements: %s" xs.ToNiceString
+                    IndexOutOfRangeException.Raise "FsEx.Seq.windowed3i: Input Sequence only had two elements: %s" xs.ToNiceString
             else
-                IndexOutOfRangeException.Raise "Seq.windowed3i: Input Sequence only had one element: %s" xs.ToNiceString
+                IndexOutOfRangeException.Raise "FsEx.Seq.windowed3i: Input Sequence only had one element: %s" xs.ToNiceString
         else
-            IndexOutOfRangeException.Raise "Seq.windowed3i: Empty Input Sequence %A" xs}
+            IndexOutOfRangeException.Raise "FsEx.Seq.windowed3i: Empty Input Sequence %A" xs}
 
