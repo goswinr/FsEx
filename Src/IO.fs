@@ -32,8 +32,8 @@ module IO =
         if not (IO.Directory.Exists s) then  raise (DirectoryNotFoundException("Directory missing or path wrong: '" + s + "'"))
 
     /// Given the full path to a file. This function creates all directories to this files if they dont exist yet.
-    /// However it does not creat the file.
-    let ensureDirectoriesOfFilePathExists s = 
+    /// However it does not creat the file itself.
+    let createDirectoriesOfFilePath s = 
        let fi = FileInfo(s)
        Directory.CreateDirectory(fi.DirectoryName)
        |> ignore      
