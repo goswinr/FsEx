@@ -5,6 +5,43 @@ open System
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 [<RequireQualifiedAccess>]
 module Array = 
+    
+    /// Gets the second last item in the Array.
+    /// Same as this.[this.Length - 2]
+    let inline secondLast  (arr: array<'T>)= 
+        if arr.Length < 2 then  IndexOutOfRangeException.Raise "Array.secondLast: Failed to get second last item of %s" (NiceString.toNiceStringLong arr)
+        arr.[arr.Length - 2]
+
+    /// Gets the third last item in the Array.
+    /// Same as this.[this.Length - 3]
+    let inline thirdLast  (arr: array<'T>)= 
+        if arr.Length < 3 then  IndexOutOfRangeException.Raise "Array.thirdLast: Failed to get third last item of %s" (NiceString.toNiceStringLong arr)
+        arr.[arr.Length - 3]
+
+    /// Gets the first item in the Array.
+    /// Same as this.[0]
+    let inline first  (arr: array<'T>)= 
+        if arr.Length = 0 then IndexOutOfRangeException.Raise "Array.first: Failed to get first item of %s" (NiceString.toNiceStringLong arr)
+        arr.[0]
+
+    /// Gets the the only item in the FsEx.Array.
+    /// Fails if the Array does not have exactly one element.
+    let inline firstAndOnly (arr: array<'T>) =
+        if arr.Length = 0 then IndexOutOfRangeException.Raise  "FsEx.Array.firstOnly: Failed to get first item of empty array<%s>" (typeof<'T>).FullName
+        if arr.Length > 1 then IndexOutOfRangeException.Raise  "FsEx.Array.firstOnly: array<%s> is expected to have only one item but has %d Array: %s" (typeof<'T>).FullName arr.Length (NiceString.toNiceStringLong arr)
+        arr.[0]
+
+    /// Gets the second item in the Array.
+    /// Same as this.[1]
+    let inline second  (arr: array<'T>)= 
+        if arr.Length < 2 then IndexOutOfRangeException.Raise  "Array.second: Failed to get second item of %s" (NiceString.toNiceStringLong arr)
+        arr.[1]
+
+    /// Gets the third item in the Array.
+    /// Same as this.[2]
+    let inline third  (arr: array<'T>)= 
+        if arr.Length < 3 then IndexOutOfRangeException.Raise "Array.third: Failed to get third item of %s" (NiceString.toNiceStringLong arr)
+        arr.[2]
 
     /// Checks if a given array matches the content in Array at a given index
     let matches (searchFor:'T[]) atIdx (searchIn:'T[]) :bool = 
