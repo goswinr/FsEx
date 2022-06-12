@@ -65,7 +65,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
     /// Set value only if key does not exist yet.
     /// Returns false if key already exist, does not set value in this case
     /// Same as <c>dict.addOnce key value</c>
-    member _.setOnce (key:'K) (value:'V) = 
+    member _.setIfKeyAbsent (key:'K) (value:'V) = 
         match box key with // or https://stackoverflow.com/a/864860/969070
         | null -> ArgumentNullException.Raise "Dict.setOnce key is null "
         | _ ->
@@ -77,7 +77,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
     /// Set value only if key does not exist yet.
     /// Returns false if key already exist, does not set value in this case
     /// Same as <c>dict.setOnce key value</c>
-    member _.addOnce (key:'K) (value:'V) = 
+    member _.addIfKeyAbsent  (key:'K) (value:'V) = 
         match box key with // or https://stackoverflow.com/a/864860/969070
         | null -> ArgumentNullException.Raise "Dict.addOnce key is null "
         | _ ->

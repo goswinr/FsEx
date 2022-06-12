@@ -35,7 +35,7 @@ module Dict =
     /// Set value only if key does not exist yet.
     /// Returns false if key already exist, does not set value in this case
     /// Same as <c>Dict.addOnce key value dic</c>
-    let setOnce (key:'Key) (value:'Value)  (dic:IDictionary<'Key,'Value>) = 
+    let setIfKeyAbsent  (key:'Key) (value:'Value)  (dic:IDictionary<'Key,'Value>) = 
         match box key with // or https://stackoverflow.com/a/864860/969070
         | null -> ArgumentNullException.Raise "Dict.setOnce key is null "
         | _ ->
@@ -48,7 +48,7 @@ module Dict =
     /// Set value only if key does not exist yet.
     /// Returns false if key already exist, does not set value in this case
     /// Same as <c>Dict.setOnce key value dic</c>
-    let addOnce (key:'Key) (value:'Value)  (dic:IDictionary<'Key,'Value>) = 
+    let addIfKeyAbsent  (key:'Key) (value:'Value)  (dic:IDictionary<'Key,'Value>) = 
         match box key with // or https://stackoverflow.com/a/864860/969070
         | null -> ArgumentNullException.Raise "Dict.addOnce key is null "
         | _ ->
