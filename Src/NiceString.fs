@@ -534,9 +534,13 @@ module internal NiceStringImplementation  =
             match x with // boxed already
             | null -> "'null' (or Option.None)"                                                           |> Element
             | :? int     as i -> i |> NiceFormat.int                                                      |> Element
+            | :? int64   as i -> i |> NiceFormat.int64                                                    |> Element
             | :? float   as v -> (if depth=0 then v |> NiceFormat.floatR   else  v |> NiceFormat.float  ) |> Element
             | :? single  as v -> (if depth=0 then v |> NiceFormat.singleR  else  v |> NiceFormat.single ) |> Element
             | :? decimal as d -> (if depth=0 then d |> NiceFormat.decimalR else  d |> NiceFormat.decimal) |> Element
+            | :? Ref<int>   as r ->  "ref " + NiceFormat.int r.Value                                      |> Element
+            | :? Ref<int64> as r ->  "ref " + NiceFormat.int64 r.Value + "L"                              |> Element
+            | :? Ref<float> as r ->  "ref " + NiceFormat.float r.Value                                    |> Element
             | :? Char    as c -> c.ToString()                                                             |> Element // "'" + c.ToString() + "'" // or add qotes?
             | :? string  as s -> formatStringByDepth nps depth s                                          |> Element                                  
             | :? Guid    as g -> sprintf "Guid[%O]" g                                                     |> Element
