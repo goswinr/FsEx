@@ -30,9 +30,22 @@ FsEx is an FSharp extension and utility library.
 
 ### Changelog
 
+`0.11.0`
+- improve randomness of random color
+- rename Dict and DefaultDict members Add and Set
+- add getOrSetDefault to Dict
+- add String.addPrefix String.addSuffix
+- add Seq.tryFindDuplicate and Seq.duplicates
+- rename Dict.setOnce to Dict.setIfKeyAbsent 
+- remove cmp
+- Array.second, Array.last and similar functions
+- better Error messages
+- add IO.createDirectoriesOfFilePath
+- better toNiceString
+
 `0.10.1` 
 - add MathUtil.interpolateTable function
-- improve NiceString formating of F# records
+- improve NiceString formatting of F# records
 - rename stringbuffer to str
 - improve move and rename String.Truncate functions to NiceFormat module
 

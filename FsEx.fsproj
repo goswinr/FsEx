@@ -27,6 +27,14 @@
 		- add getOrSetDefault to Dict
 		- add String.addPrefix String.addSufix
 		- add Seq.tryFindDuplicate and Seq.duplicates
+    - rename Dict.setOnce to Dict.setIfKeyAbsent 
+    - remove cmp
+    - Array.second, Array.last and simlar functions
+    - better Error messages
+    - add IO.createDirectoriesOfFilePath
+    - better toNiceString
+
+
 	</PackageReleaseNotes>
 
     <Authors>GoswinR</Authors>
