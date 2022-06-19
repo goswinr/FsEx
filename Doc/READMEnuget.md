@@ -30,7 +30,6 @@ FsEx is an FSharp extension and utility library.
 
 ### Changelog
 
-
 `0.11.0`
 - improve randomness of random color
 - rename Dict and DefaultDict members Add and Set
@@ -43,6 +42,7 @@ FsEx is an FSharp extension and utility library.
 - better Error messages
 - add IO.createDirectoriesOfFilePath
 - better toNiceString
+- more Rarr.partition functions
 
 `0.10.1` 
 - add MathUtil.interpolateTable function

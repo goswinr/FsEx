@@ -562,6 +562,102 @@ module Rarr =
         // first Add shoulds be false, second Add true, to recognice the first occurenace of a duplicate: 
         xs.FindAll (System.Predicate  (fun x -> let y = f x in  if h.Add y then false else t.Add y)) 
 
+    
+    /// <summary>Splits the collection into three collections, 
+    /// first  containing the elements for which the given predicate1 returns <c>true</c> ,
+    /// second containing the elements for which the given predicate2 returns <c>true</c> (and all previous predicates returned <c>false</c>),
+    /// third the rest.</summary>
+    /// <param name="predicate1">The first function to test the input elements.</param>
+    /// <param name="predicate2">The second function to test the input elements.</param>
+    /// <param name="rarr">The input Rarr.</param>
+    /// <returns>Three Rarrs. </returns>
+    let partition3 (predicate1:'T->bool) (predicate2:'T->bool) (rarr : Rarr<'T>) : Rarr<'T> * Rarr<'T>* Rarr<'T> = 
+        let p1True  = Rarr()
+        let p2True = Rarr()
+        let allFalse = Rarr()
+        let len = rarr.Count
+        let li = rarr.List
+        for i = 0 to len - 1 do
+            let el = li.[i]
+            if predicate1 el then
+                p1True.Add el
+            else
+                if predicate2 el then
+                    p2True.Add el
+                else
+                    allFalse.Add el
+        p1True, p2True, allFalse
+
+    /// <summary>Splits the collection into four collections, 
+    /// first  containing the elements for which the given predicate1 returns <c>true</c> ,
+    /// second containing the elements for which the given predicate2 returns <c>true</c> (and all previous predicates returned <c>false</c>),
+    /// third  containing the elements for which the given predicate3 returns <c>true</c> (and all previous predicates returned <c>false</c>),
+    /// fourth the rest.</summary>
+    /// <param name="predicate1">The first  function to test the input elements.</param>
+    /// <param name="predicate2">The second function to test the input elements.</param>
+    /// <param name="predicate3">The third  function to test the input elements.</param>
+    /// <param name="rarr">The input Rarr.</param>
+    /// <returns>Four Rarrs. </returns>
+    let partition4 (predicate1:'T->bool) (predicate2:'T->bool) (predicate3:'T->bool) (rarr : Rarr<'T>) : Rarr<'T> * Rarr<'T>* Rarr<'T>* Rarr<'T> = 
+        let p1True  = Rarr()
+        let p2True = Rarr()
+        let p3True = Rarr()
+        let allFalse = Rarr()
+        let len = rarr.Count
+        let li = rarr.List
+        for i = 0 to len - 1 do
+            let el = li.[i]
+            if predicate1 el then
+                p1True.Add el
+            else
+                if predicate2 el then
+                    p2True.Add el
+                else
+                    if predicate3 el then
+                        p3True.Add el
+                    else
+                        allFalse.Add el
+
+        p1True, p2True, p3True, allFalse
+
+    /// <summary>Splits the collection into five collections, 
+    /// first  containing the elements for which the given predicate1 returns <c>true</c> ,
+    /// second containing the elements for which the given predicate2 returns <c>true</c> (and all previous predicates returned <c>false</c>),
+    /// third  containing the elements for which the given predicate3 returns <c>true</c> (and all previous predicates returned <c>false</c>),
+    /// fourth containing the elements for which the given predicate4 returns <c>true</c> (and all previous predicates returned <c>false</c>),
+    /// fith the rest.</summary>
+    /// <param name="predicate1">The first  function to test the input elements.</param>
+    /// <param name="predicate2">The second function to test the input elements.</param>
+    /// <param name="predicate3">The third  function to test the input elements.</param>
+    /// <param name="predicate4">The fourth function to test the input elements.</param>
+    /// <param name="rarr">The input Rarr.</param>
+    /// <returns>Five Rarrs. </returns>
+    let partition5 (predicate1:'T->bool) (predicate2:'T->bool) (predicate3:'T->bool) (predicate4:'T->bool)  (rarr : Rarr<'T>) : Rarr<'T> * Rarr<'T>* Rarr<'T>* Rarr<'T>* Rarr<'T> = 
+        let p1True  = Rarr()
+        let p2True = Rarr()
+        let p3True = Rarr()
+        let p4True = Rarr()
+        let allFalse = Rarr()
+        let len = rarr.Count
+        let li = rarr.List
+        for i = 0 to len - 1 do
+            let el = li.[i]
+            if predicate1 el then
+                p1True.Add el
+            else
+                if predicate2 el then
+                    p2True.Add el
+                else
+                    if predicate3 el then
+                        p3True.Add el
+                    else
+                        if predicate4 el then
+                            p4True.Add el
+                        else
+                            allFalse.Add el
+
+        p1True, p2True, p3True, p4True, allFalse
+
 
 
     //--------------------------------------------------------------------------------------------------------------------
@@ -713,10 +809,10 @@ module Rarr =
         else 1
 
 
-    /// <summary>Builds a new Rarr that contains the elements of each of the given sequence of Rarrs.</summary>
+    /// <summary>Builds a new Rarr that contains the elements of each of the given sequence of sequences.</summary>
     /// <param name="rarrs">The input sequence of Rarrs.</param>
     /// <returns>The concatenation of the sequence of input Rarrs.</returns>
-    let concat (rarrs: seq<Rarr<'T>>) : Rarr<'T>= 
+    let concat (rarrs: seq<#seq<'T>>) : Rarr<'T>= 
         //let concat (rarrs: Rarr<Rarr<'T>>) : Rarr<'T> =  // test don't pass with this
         //if rarrs.Count = 0 then
         if Seq.isEmpty rarrs then

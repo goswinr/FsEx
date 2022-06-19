@@ -42,6 +42,7 @@ FsEx is an FSharp extension and utility library.
 - better Error messages
 - add IO.createDirectoriesOfFilePath
 - better toNiceString
+- more Rarr.partition functions
 
 `0.10.1` 
 - add MathUtil.interpolateTable function
