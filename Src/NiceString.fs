@@ -422,14 +422,28 @@ module internal NiceStringImplementation  =
     let rec internal typeName (typ:Type) = 
         let name = typ.Name |> before '`' |> before '@'
         let fullPath = if String.IsNullOrEmpty typ.Namespace then name else typ.Namespace   + "." + name
-        let cleaned = 
+        let cleaned0 = 
             if fullPath.StartsWith "System." then
-                fullPath.Substring(7)
+                fullPath.Substring(7)            
             else
                 fullPath
                     .Replace("Microsoft.FSharp.Collections.mkSeq","seq")
                     .Replace("Microsoft.FSharp.Collections.","")
                     .Replace("Microsoft.FSharp.Core.","")
+        
+        let cleaned =             
+            match cleaned0 with 
+            | "Boolean"   -> "bool"  
+            | "Byte"      -> "byte"            
+            | "Int32"     -> "int"   
+            | "UInt32"    -> "uint"  
+            | "Int64"     -> "int64" 
+            | "UInt64"    -> "uint64"
+            | "Double"    -> "float"
+            | "Single"    -> "float32"
+            | "FSharpRef" -> "ref"
+            | _ -> cleaned0
+        
         let param = 
             match typ.GetGenericArguments() with
             | null   -> ""
@@ -476,7 +490,9 @@ module internal NiceStringImplementation  =
 
     and getIList (nps:NicePrintSettings) depth (x:obj) (xs:Collections.IList ) :Lines = // non generic ICollection
         // count is always available        
-        let name =  typeName (x.GetType())
+        let typ = x.GetType()
+        let isArray =  typ.Name.EndsWith "[]"
+        let name = typeName (typ) + if isArray then "[]" else ""
         let desc = 
             if xs.Count = 0 then sprintf "empty %s "  name
             else                 sprintf "%s with %d items"  name xs.Count
@@ -492,8 +508,8 @@ module internal NiceStringImplementation  =
                 lines.[lines.Count-2] <- (xs.Count-2, getLines nps (depth+1) xs.[xs.Count-2])
             
             
-            if name.EndsWith "[]" then Header {title=desc; openBracket="[|"; items=lines; closingBracket="|]"}
-            else                       Header {title=desc; openBracket="[" ; items=lines; closingBracket="]" }
+            if isArray then Header {title=desc; openBracket="[|"; items=lines; closingBracket="|]" }
+            else            Header {title=desc; openBracket="[" ; items=lines; closingBracket= "]" }
 
 
     and getSeq (nps:NicePrintSettings) depth (x:obj) (xs:System.Collections.IEnumerable) :Lines = // non generic IEnumerable
@@ -538,7 +554,7 @@ module internal NiceStringImplementation  =
             | :? float   as v -> (if depth=0 then v |> NiceFormat.floatR   else  v |> NiceFormat.float  ) |> Element
             | :? single  as v -> (if depth=0 then v |> NiceFormat.singleR  else  v |> NiceFormat.single ) |> Element
             | :? decimal as d -> (if depth=0 then d |> NiceFormat.decimalR else  d |> NiceFormat.decimal) |> Element
-            | :? Ref<int>   as r ->  "ref " + NiceFormat.int r.Value                                      |> Element
+            | :? Ref<int>   as r ->  "ref " + NiceFormat.int   r.Value                                    |> Element
             | :? Ref<int64> as r ->  "ref " + NiceFormat.int64 r.Value + "L"                              |> Element
             | :? Ref<float> as r ->  "ref " + NiceFormat.float r.Value                                    |> Element
             | :? Char    as c -> c.ToString()                                                             |> Element // "'" + c.ToString() + "'" // or add qotes?
