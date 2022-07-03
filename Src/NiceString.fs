@@ -376,6 +376,12 @@ module NiceFormat  =  // used by Rhino.Scripting
                     }
             else
                 s  
+
+    let date (d:DateTime) = 
+        if d.Hour=0 && d.Minute=0 && d.Second = 0 then d.ToString("yyyy-MM-dd") else d.ToString("yyyy-MM-dd HH:mm:ss")
+    
+    let dateWithOffset (d:DateTimeOffset) = 
+        d.ToString("yyyy-MM-dd HH:mm:ss K") 
   
 module internal NiceStringImplementation  =     
     open Microsoft.FSharp.Reflection
@@ -560,6 +566,8 @@ module internal NiceStringImplementation  =
             | :? Char    as c -> c.ToString()                                                             |> Element // "'" + c.ToString() + "'" // or add qotes?
             | :? string  as s -> formatStringByDepth nps depth s                                          |> Element                                  
             | :? Guid    as g -> sprintf "Guid[%O]" g                                                     |> Element
+            | :? DateTime       as d -> date d                                                            |> Element
+            | :? DateTimeOffset as d -> dateWithOffset d                                                  |> Element
             | :? Collections.IList       as xs -> getIList nps depth x xs
             | :? Collections.IEnumerable as xs -> getSeq   nps depth x xs
             | _ ->
