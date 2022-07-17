@@ -12,7 +12,7 @@ module String =
 
     /// Takes at most a given amount of chars from string.
     /// If input is shorter than truncateLength returns input string unchanged.
-    /// Alternativly use the functoons that include formating: 
+    /// Alternatively use the functions that include formatting: 
     /// FsEx.NiceFormat.stringTruncated and 
     /// FsEx.NiceFormat.stringInOneLine
     /// FsEx.NiceFormat.stringTruncatedToMaxLines
@@ -22,7 +22,7 @@ module String =
         if truncateLength >= fromString.Length then fromString
         else fromString.Substring(0,truncateLength)
 
-    /// For string formating in exceptions below. Including surrounding quotes
+    /// For string formatting in exceptions below. Including surrounding quotes
     let private exnf s  = s |> NiceFormat.stringTruncated 80 |> NiceFormat.stringInOneLine        
 
     // TODO removed inline to get compile times down in FSI ?
@@ -263,20 +263,20 @@ module String =
 
     /// Counts how often a substring appears in a string
     /// Uses StringComparison.Ordinal
-    let (*inline*) countSubString (subString:string) (textToSerach:string) = 
-        if isNull textToSerach then FsExStringException.Raise "FsEx.String.countSubString: textToSerach is null, subString: %s" (exnf subString)
-        if isNull subString    then FsExStringException.Raise "FsEx.String.countSubString: subString is null, textToSerach: %s" (exnf textToSerach)        
+    let (*inline*) countSubString (subString:string) (textToSearch:string) = 
+        if isNull textToSearch then FsExStringException.Raise "FsEx.String.countSubString: textToSearch is null, subString: %s" (exnf subString)
+        if isNull subString    then FsExStringException.Raise "FsEx.String.countSubString: subString is null, textToSearch: %s" (exnf textToSearch)        
         let rec find fromIdx k = 
-            let r = textToSerach.IndexOf(subString, fromIdx, StringComparison.Ordinal)
+            let r = textToSearch.IndexOf(subString, fromIdx, StringComparison.Ordinal)
             if r < 0 then k
             else find (r + subString.Length) (k + 1)
         find 0 0
 
     /// Counts how often a character appears in a string    
-    let (*inline*) countChar (chr:char) (textToSerach:string) = 
-        if isNull textToSerach then FsExStringException.Raise "FsEx.String.countChar: textToSerach is null, chr: %c" chr       
+    let (*inline*) countChar (chr:char) (textToSearch:string) = 
+        if isNull textToSearch then FsExStringException.Raise "FsEx.String.countChar: textToSearch is null, chr: %c" chr       
         let rec find fromIdx k = 
-            let r = textToSerach.IndexOf(chr, fromIdx)
+            let r = textToSearch.IndexOf(chr, fromIdx)
             if r < 0 then k
             else find (r + 1) (k + 1)
         find 0 0
@@ -293,10 +293,17 @@ module String =
         |> String.Concat
         |> fun s -> txt.Normalize(NormalizationForm.FormC)
 
-    /// Add a sufix to string   
-    let (*inline*) addSufix (sufix:string) (txt:string) = 
-        if isNull txt then FsExStringException.Raise "FsEx.String.addSufix: txt is null"      
-        txt+sufix
+    /// Add a suffix to string 
+    [<Obsolete("Has a typo, use addSuffix instead")>]  
+    let (*inline*) addSufix (suffix:string) (txt:string) = 
+        if isNull txt then FsExStringException.Raise "FsEx.String.addSuffix: txt is null"      
+        txt+suffix
+
+    /// Add a suffix to string   
+    let (*inline*) addSuffix (suffix:string) (txt:string) = 
+        if isNull txt then FsExStringException.Raise "FsEx.String.addSuffix: txt is null"      
+        txt+suffix
+        
 
     /// Add a prefix to string   
     let (*inline*) addPrefix (prefix:string) (txt:string) = 
@@ -354,16 +361,16 @@ module String =
         String.Compare(strA, strB, StringComparison.OrdinalIgnoreCase )
 
     /// Determines whether the end of this string instance matches the specified string, using StringComparison.Ordinal.
-    let (*inline*) endsWith (stringToFindAtEnd : string) (stringSerachInAtEnd:string)  = 
-        if isNull stringToFindAtEnd then FsExStringException.Raise "FsEx.String.endsWith: stringToFindAtEnd is null. (stringSerachInAtEnd:%s) " (exnf stringSerachInAtEnd)
-        if isNull stringSerachInAtEnd then FsExStringException.Raise "FsEx.String.endsWith: stringSerachInAtEnd is null. (stringToFindAtEnd:%s) " (exnf stringToFindAtEnd)
-        stringSerachInAtEnd.EndsWith(stringToFindAtEnd, StringComparison.Ordinal)
+    let (*inline*) endsWith (stringToFindAtEnd : string) (stringSearchInAtEnd:string)  = 
+        if isNull stringToFindAtEnd then FsExStringException.Raise "FsEx.String.endsWith: stringToFindAtEnd is null. (stringSearchInAtEnd:%s) " (exnf stringSearchInAtEnd)
+        if isNull stringSearchInAtEnd then FsExStringException.Raise "FsEx.String.endsWith: stringSearchInAtEnd is null. (stringToFindAtEnd:%s) " (exnf stringToFindAtEnd)
+        stringSearchInAtEnd.EndsWith(stringToFindAtEnd, StringComparison.Ordinal)
 
     /// Determines whether the end of this string instance matches the specified string, using StringComparison.OrdinalIgnoreCase.
-    let (*inline*) endsWithIgnoreCase (stringToFindAtEnd : string) (stringSerachInAtEnd:string)  = 
-        if isNull stringToFindAtEnd then FsExStringException.Raise "FsEx.String.endsWithIgnoreCase: stringToFindAtEnd is null. (stringSerachInAtEnd:%s) " (exnf stringSerachInAtEnd)
-        if isNull stringSerachInAtEnd then FsExStringException.Raise "FsEx.String.endsWithIgnoreCase: stringSerachInAtEnd is null. (stringToFindAtEnd:%s) " (exnf stringToFindAtEnd)
-        stringSerachInAtEnd.EndsWith(stringToFindAtEnd, StringComparison.OrdinalIgnoreCase)
+    let (*inline*) endsWithIgnoreCase (stringToFindAtEnd : string) (stringSearchInAtEnd:string)  = 
+        if isNull stringToFindAtEnd then FsExStringException.Raise "FsEx.String.endsWithIgnoreCase: stringToFindAtEnd is null. (stringSearchInAtEnd:%s) " (exnf stringSearchInAtEnd)
+        if isNull stringSearchInAtEnd then FsExStringException.Raise "FsEx.String.endsWithIgnoreCase: stringSearchInAtEnd is null. (stringToFindAtEnd:%s) " (exnf stringToFindAtEnd)
+        stringSearchInAtEnd.EndsWith(stringToFindAtEnd, StringComparison.OrdinalIgnoreCase)
 
     /// Determines whether the beginning of this string instance matches the specified string, using StringComparison.Ordinal..
     let (*inline*) startsWith (stringToFindAtStart:string) (stringToSearchIn:string)  = 
@@ -526,7 +533,7 @@ module String =
         if isNull txt then FsExStringException.Raise "FsEx.String.replace: txt is null. (oldValue:%s)  (newValue:%s) " (exnf oldValue) (exnf newValue)
         txt.Replace(oldValue, newValue) // will return the same instance if text to replace is not found
 
-    /// Concats string with Environment.NewLine
+    /// Concatenates string with Environment.NewLine
     let inline concatLines  (lines:string seq) = 
         String.concat Environment.NewLine lines
 
@@ -661,9 +668,11 @@ module String =
 
     (*
     obsolete! use: 
-    NiceFormat.stringInOneLine
-    NiceFormat.stringTruncated
+    FsEx.NiceFormat.stringInOneLine
+    FsEx.NiceFormat.stringTruncated
     FsEx.NiceFormat.stringTruncatedToMaxLines
+
+    instead
     
     /// replaces new lines with custom string
     let (*inline*) inOneLine (newLineReplacment:string) (stringToMakeOneLine:string) = 
@@ -678,8 +687,8 @@ module String =
     /// Replace line breaks with '\r\n' or '\n' literal
     /// Does not include surrounding quotes
     /// If string is null returns "-null string-"
-    let truncateFormatedInOneLine (stringToTrim:string) :string = 
-        if isNull stringToTrim then FsExStringException.Raise "FsEx.String.truncateFormatedInOneLine: stringToTrim is null" 
+    let truncateFormattedInOneLine (stringToTrim:string) :string = 
+        if isNull stringToTrim then FsExStringException.Raise "FsEx.String.truncateFormattedInOneLine: stringToTrim is null" 
         else
             let s = 
                 let maxChars = 80
@@ -699,8 +708,8 @@ module String =
     /// Not enclosed in quotes.
     /// Fails on null.
     /// Alternatively use String.formatInOneShortLine that will not fail on null.
-    let truncateFormated (maxChars:int) (stringToTrim:string) = 
-        if isNull stringToTrim then FsExStringException.Raise "FsEx.String.truncateFormated: stringToTrim is null, maxChar: %d" maxChars
+    let truncateFormatted (maxChars:int) (stringToTrim:string) = 
+        if isNull stringToTrim then FsExStringException.Raise "FsEx.String.truncateFormatted: stringToTrim is null, maxChar: %d" maxChars
         if stringToTrim.Length <= maxChars + 20 then sprintf "%s"stringToTrim
         else
             let len   = stringToTrim.Length

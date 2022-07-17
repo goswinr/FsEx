@@ -59,7 +59,7 @@ module Dict =
                 true
     
     /// If the key ist not present calls the default function, set it as value at the key and return the value.
-    /// This function is an alternative to the DefaultDict type. Use it if you need to provide a custom implemantation of the default function depending on the key.
+    /// This function is an alternative to the DefaultDict type. Use it if you need to provide a custom implementation of the default function depending on the key.
     let getOrSetDefault (getDefault:'Key -> 'Value) (key:'Key)  (dic:IDictionary<'Key,'Value>)   = 
         match box key with // or https://stackoverflow.com/a/864860/969070
         | null -> ArgumentNullException.Raise "Dict.getOrSetDefault key is null "

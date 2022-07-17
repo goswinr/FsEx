@@ -5,7 +5,7 @@ open System.Collections.Generic
 
 
 /// A thin wrapper over System.Collections.Generic.Dictionary<'K,'V>) with nicer Error messages on accessing missing keys.
-/// There is a hidden member called "Dictionary" to access the underlaying Collections.Generic.Dictionary<'K,'V> directly.
+/// There is a hidden member called "Dictionary" to access the underlying Collections.Generic.Dictionary<'K,'V> directly.
 /// In F# use #nowarn "44" to disable the obsolete warning for this hidden member.
 [<NoComparison>]
 [<NoEquality>] // TODO add structural equality
@@ -88,7 +88,7 @@ type Dict<'K,'V when 'K:equality > private (dic : Dictionary<'K,'V>) =
                 true
     
     /// If the key ist not present calls the default function, set it as value at the key and return the value.
-    /// This function is an alternative to the DefaultDict type. Use it if you need to provide a custom implemantation of the default function depending on the key.
+    /// This function is an alternative to the DefaultDict type. Use it if you need to provide a custom implementation of the default function depending on the key.
     member _.getOrSetDefault (getDefault:'K -> 'V) (key:'K)   = 
         match box key with // or https://stackoverflow.com/a/864860/969070
         | null -> ArgumentNullException.Raise "Dict.getOrSetDefault key is null "

@@ -13,7 +13,7 @@ open NiceString
 /// It has all members and interfaces of List<'T> implemented.
 /// Just like F# Arrays and F# lists, Rarr equality is also structural.
 /// The name Rarr is derived from of the F# type ResizeArray.
-/// There is a hidden member called "List" to access the underlaying List<'T> directly.
+/// There is a hidden member called "List" to access the underlying List<'T> directly.
 /// In F# use #nowarn "44" to disable the obsolete warning for this hidden member.
 [<Sealed;NoComparison>]
 type Rarr<'T> private (xs:List<'T>) = 
@@ -145,7 +145,7 @@ type Rarr<'T> private (xs:List<'T>) =
         if xs.Count = 0 then IndexOutOfRangeException.Raise  "FsEx.Rarr.FirstOnly: Failed to get first item of empty Rarr<%s>" (typeof<'T>).FullName
         if xs.Count > 1 then IndexOutOfRangeException.Raise  "FsEx.Rarr.FirstOnly: Rarr<%s> is expected to have only one item but has %d Rarr: %s" (typeof<'T>).FullName xs.Count this.ToNiceStringLong
         xs.[0]
-       
+        
 
     /// Get (or set) the second item in the FsEx.Rarr.
     /// Equal to this.[1]
@@ -171,7 +171,11 @@ type Rarr<'T> private (xs:List<'T>) =
     member _.IsEmpty =  xs.Count = 0
 
     /// Checks if this.Count = 1
+    [<Obsolete("Has a typo, use IsSingleton instead")>]
     member _.IsSingelton =  xs.Count = 1
+
+    /// Checks if this.Count = 1
+    member _.IsSingleton =  xs.Count = 1    
 
     /// Checks if this.Count > 0
     /// Same as xs.HasItems
@@ -346,13 +350,13 @@ type Rarr<'T> private (xs:List<'T>) =
 
 
     /// A property like the ToString() method,
-    /// But with richer formating
+    /// But with richer formatting
     /// Listing includes the first 6 items
     member this.ToNiceString = 
         NiceString.toNiceString this
 
     /// A property like the ToString() method,
-    /// But with richer formating
+    /// But with richer formatting
     /// Listing includes the first 50 items
     member this.ToNiceStringLong = 
         NiceString.toNiceStringLong this

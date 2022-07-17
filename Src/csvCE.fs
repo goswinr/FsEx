@@ -7,7 +7,7 @@ open System.Text
 module ComputationalExpressionsBuilderCsv = 
     let mutable csvSepEn = ','
     let mutable csvSepDe = ';'
-   
+    
     let inline private addCsvEn   (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepEn)                               |> ignore<StringBuilder>
     let inline private addCsvEnLn (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepEn).Append(Environment.NewLine)   |> ignore<StringBuilder>
     let inline private addCsvDe   (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepDe)                               |> ignore<StringBuilder>
@@ -62,7 +62,7 @@ module ComputationalExpressionsBuilderCsv =
 
         member inline this.Using(disposable: #IDisposable, body: #IDisposable -> StringBuilder -> unit) =            
             this.TryFinally(  body disposable ,  fun (b: StringBuilder)  ->  if not <| Object.ReferenceEquals(disposable,null) then disposable.Dispose() ) // might be disposed already                        
-       
+        
 
 
     type CsvBuilderDE () = 
@@ -127,14 +127,14 @@ module AutoOpenComputationalExpressionCSV  =
     /// Computational Expression for making csv files in English culture:
     /// use 'yield' to append text and a  subsequent comma
     /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
-    /// accepts ints and floats too. (floats are printed in full length using f.AsString)
+    /// accepts integers and floats too. (floats are printed in full length using f.AsString)
     let csvEN = CsvBuilderEN ()
 
 
     /// Computational Expression for making csv files German culture:
     /// use 'yield' to append text and a  subsequent semicolon
     /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
-    /// accepts ints and floats too. (floats are printed in full length using f.AsStringDE)
+    /// accepts integers and floats too. (floats are printed in full length using f.AsStringDE)
     let csvDE = CsvBuilderDE ()
 
 

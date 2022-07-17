@@ -118,20 +118,21 @@ module ExtensionsIList =
         /// Get (or set) the third item in the IList.
         /// equal to this.[2]
         member inline this.Third
-           with get() = 
-               if this.Count < 3 then IndexOutOfRangeException.Raise "IList.Third: Failed to get third item of %s" (NiceString.toNiceStringFull this)
-               this.[2]
-           and set (v:'T) = 
-               if this.Count < 3 then IndexOutOfRangeException.Raise "IList.Third: Failed to set third item of %s to %A" (NiceString.toNiceStringFull this) v
-               this.[2] <- v
+            with get() = 
+                if this.Count < 3 then IndexOutOfRangeException.Raise "IList.Third: Failed to get third item of %s" (NiceString.toNiceStringFull this)
+                this.[2]
+            and set (v:'T) = 
+                if this.Count < 3 then IndexOutOfRangeException.Raise "IList.Third: Failed to set third item of %s to %A" (NiceString.toNiceStringFull this) v
+                this.[2] <- v
 
 
-        /// Gets a subrange of the IList
+        /// Gets a sub-range of the IList
         /// Allows for negative indices too. ( -1 is last item, like Python)
         /// The resulting IList includes the end index.
         /// The built in slicing notation (e.g. a.[1..3]) for ILists does not allow for negative indices.
         /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
-        member inline this.Slice(startIdx:int, endIdx:int) : 'T Rarr = // to use slicing notation e.g. : this.[ 1 .. -1] // don't overload .GetSlive .[ x ... y] directly, this would be a casting horror for Lists and ILists wher neg indices  Slices dont work
+        member inline this.Slice(startIdx:int, endIdx:int) : 'T Rarr = // to use slicing notation e.g. : this.[ 1 .. -1] 
+            // this cant be implemented as an overload of .GetSlice .[ x ... y] directly, this would be a casting horror for Lists and ILists where neg indices  Slices don't work
             let count = this.Count
             let st  = if startIdx< 0 then count + startIdx        else startIdx
             let len = if endIdx  < 0 then count + endIdx - st + 1 else endIdx - st + 1

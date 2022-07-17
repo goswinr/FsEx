@@ -5,11 +5,11 @@ open System
 
 
 /// Adds extension members on Collections.Generic.Array<'T>
-/// for geting and setting first, second, last and similar indices.
+/// for getting and setting first, second, last and similar indices.
 /// Also adds functionality for negative indices and a.Slice(startIdx:int , endIdx: int) that works  with negative numbers
 module ExtensionsArray = 
 
-    // overrides of existing methods are unfortunatly silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
+    // overrides of existing methods are unfortunately silently ignored and not possible. see https://github.com/dotnet/fsharp/issues/3692#issuecomment-334297164
 
     type ``[]``<'T>  with //Generic Array
 
@@ -17,7 +17,11 @@ module ExtensionsArray =
         member inline this.IsEmpty =  this.Length = 0
 
         /// Checks if this.Count = 1
+        [<Obsolete("Has a typo, use IsSingleton instead")>]
         member inline this.IsSingelton =  this.Length = 1
+
+        /// Checks if this.Count = 1
+        member inline this.IsSingleton =  this.Length = 1
 
         /// Checks if this.Count > 0
         member inline this.IsNotEmpty =  this.Length > 0

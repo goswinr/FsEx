@@ -59,8 +59,8 @@ module NiceStringSettings =
     
     /// Allows to inject an optional formatter that gets called before main formatter
     /// This formatter shall return None if the main formatter should be used
-    /// use externalFormater for types defined in other assemblies
-    let mutable externalFormater : obj -> option<Lines>  = fun _ -> None
+    /// use externalFormatter for types defined in other assemblies
+    let mutable externalFormatter : obj -> option<Lines>  = fun _ -> None
 
     /// Set this to change the printing of floats larger than 10'000
     let mutable thousandSeparator = '\'' // = just one quote '
@@ -71,7 +71,7 @@ module NiceStringSettings =
     /// This value can be set for example by hosting apps that have a build in absolute tolerance like Rhino3d
     let mutable roundToZeroBelow = 1e-24 // Double.Epsilon
 
-/// For formating simple types like int, float, very long strings for nice printing
+/// For formatting simple types like int, float, very long strings for nice printing
 /// Used by NiceString Module
 module NiceFormat  =  // used by Rhino.Scripting
 
@@ -108,7 +108,7 @@ module NiceFormat  =  // used by Rhino.Scripting
     //let internal deDE = Globalization.CultureInfo("de-DE")
     let internal invC = Globalization.CultureInfo.InvariantCulture
 
-    /// Assumes a string that represent a float or int with '.' as decimal separator and no other input formating
+    /// Assumes a string that represent a float or int with '.' as decimal separator and no other input formatting
     let internal addThousandSeparators (s:string) =         
         let b = Text.StringBuilder(s.Length + s.Length / 3 + 1)
         let inline add (c:char) = b.Append(c) |> ignoreObj
@@ -128,7 +128,7 @@ module NiceFormat  =  // used by Rhino.Scripting
                 add s.[i]
 
         let start = 
-            if s.[0] = '-' then  add '-'; 1 /// add minus if present and move start location
+            if s.[0] = '-' then  add '-'; 1 // add minus if present and move start location
             else                          0
 
         match s.IndexOf('.') with
@@ -186,7 +186,7 @@ module NiceFormat  =  // used by Rhino.Scripting
         if x = Int64.MinValue || abs (x) >= 1000L then x.ToString() |> addThousandSeparators
         else                                           x.ToString()
 
-    /// Formating with automatic precision
+    /// Formatting with automatic precision
     /// e.g.: 0 digits behind comma if above 1000
     /// if there are more than 15 zeros behind the comma just '~0.0' will be displayed
     /// if the value is smaller than NiceStringSettings.roundToZeroBelow '0.0' will be shown.
@@ -228,7 +228,7 @@ module NiceFormat  =  // used by Rhino.Scripting
            
 
 
-    /// Formating with automatic precision
+    /// Formatting with automatic precision
     /// e.g.: 0 digits behind comma if above 1000
     let decimal  (x:Decimal) = 
         if x = 0M then "0.0" // not "0" as in sprintf "%g"
@@ -251,7 +251,7 @@ module NiceFormat  =  // used by Rhino.Scripting
     let decimalR  (d:Decimal) = 
         d.ToString("R") |> addThousandSeparators
 
-    /// Formating with automatic precision
+    /// Formatting with automatic precision
     /// e.g.: 0 digits behind comma if above 1000
     let single (x:float32) = 
         if   Single.IsNaN x then Literals.NaN
@@ -284,11 +284,11 @@ module NiceFormat  =  // used by Rhino.Scripting
             
 
 
-    /// Reduces a string length for diplay to a maxiumum Length.
-    /// Shows (..) as placeholder for skiped characters if string is longer than maxCharCount.
+    /// Reduces a string length for display to a maximum Length.
+    /// Shows (..) as placeholder for skipped characters if string is longer than maxCharCount.
     /// If maxChars is bigger than 35 the placeholder will include the count of skipped characters: e.g. [< ..99 more chars.. >].
     /// maxCharCount will be set to be minimum 6. 
-    /// Returned strings are enclosed in quotaion marks.
+    /// Returned strings are enclosed in quotation marks.
     /// If input is null it returns <*null string*>
     let stringTruncated maxCharCount (s:string):string = 
         let maxChar = max 8 maxCharCount
@@ -319,7 +319,7 @@ module NiceFormat  =  // used by Rhino.Scripting
 
     /// Joins string into one line. 
     /// Replaces line break with space character.
-    /// Skips leading whitespaces on each line.
+    /// Skips leading whitespace on each line.
     /// Does not include surrounding quotes.
     /// If string is null returns "<*null string*>"
     let stringInOneLine(s:string) =
@@ -475,11 +475,11 @@ module internal NiceStringImplementation  =
         let enum = xs.GetEnumerator()
         let mutable chars = titleLength 
         let mutable i=0
-        // Important: enum.MoveNext() needs to be evalauted last 
+        // Important: enum.MoveNext() needs to be evaluated last 
         while  (i < nps.maxVertItems-1 || chars < nps.maxHorChars) && enum.MoveNext() do // don't iter full sequence if only the first few items are printed
             let ln = getLines nps depth (box enum.Current)
             match ln with
-            |Element s  -> chars <- chars + s.Length + 2 // +2 for seperator "; "
+            |Element s  -> chars <- chars + s.Length + 2 // +2 for separator "; "
             |EarlyEnd   -> chars <- chars + 4
             |Header _   -> chars <- max 99_999 chars //  don't do nested seq in one line !, avoid overflow by using max
             rs.Add(i, ln)            
@@ -509,7 +509,7 @@ module internal NiceStringImplementation  =
             
             if xs.Count > nps.maxVertItems then   // add last element 
                 lines.Add(xs.Count-1, getLines nps (depth+1) xs.LastObj)
-            /// in special case where xs.Count=nps.maxVertItems+1 replace the early end with the acatual item
+            // in special case where xs.Count=nps.maxVertItems+1 replace the early end with the actual item
             if xs.Count=nps.maxVertItems+1 then 
                 lines.[lines.Count-2] <- (xs.Count-2, getLines nps (depth+1) xs.[xs.Count-2])
             
@@ -550,7 +550,7 @@ module internal NiceStringImplementation  =
 
     ///  x is boxed already
     and getLines  (nps:NicePrintSettings) (depth:int) (x:obj) : Lines = 
-        match NiceStringSettings.externalFormater x with // first check if externalFormater provides a string , this is used e.g. for types from RhinoCommon.dll
+        match NiceStringSettings.externalFormatter x with // first check if externalFormatter provides a string , this is used e.g. for types from RhinoCommon.dll
         | Some ln -> ln
         | None -> 
             match x with // boxed already
@@ -657,7 +657,7 @@ module internal NiceStringImplementation  =
                 sb.appendLine(" "+h.closingBracket)  
                 true 
         
-    // TODO implement this formater with colorful lines for Seff:
+    // TODO implement this formatter with colorful lines for Seff:
     
     let formatLines  (nps:NicePrintSettings) (lines:Lines) : string = 
         let inde = 4 // indent size
@@ -709,7 +709,7 @@ module NiceString  =
 
     //TODO sync the docstring here with print and printfull in module Print and the shadowing one in Rhino.Scripting
 
-    /// Nice formating for numbers including thousand Separator, records and (nested) sequences, 
+    /// Nice formatting for numbers including thousand Separator, records and (nested) sequences, 
     /// NicePrintSettings:
     /// maxDepth          = 3     , how deep the content of nested seq is printed (printFull ignores this)
     /// maxVertItems      = 6     , how many items per seq are printed in vertical list(printFull ignores this)
@@ -722,7 +722,7 @@ module NiceString  =
         x |> box |> getLines nps 0 |> formatLines nps
 
 
-    /// Nice formating for numbers including thousand Separator, records and (nested) sequences, 
+    /// Nice formatting for numbers including thousand Separator, records and (nested) sequences, 
     /// NicePrintSettings:
     /// maxDepth          = 3     , how deep the content of nested seq is printed (printFull ignores this)
     /// maxVertItems      = 50    , how many items per seq are printed in vertical list(printFull ignores this)
@@ -736,7 +736,7 @@ module NiceString  =
         x |> box |> getLines nps 0 |> formatLines nps
 
 
-    /// Nice formating for numbers including thousand Separator, records and (nested) sequences, 
+    /// Nice formatting for numbers including thousand Separator, records and (nested) sequences, 
     /// NicePrintSettings:
     /// maxDepth          = 24        , how deep the content of nested seq is printed (printFull ignores this)
     /// maxVertItems      = 100'000   , how many items per seq are printed in vertical list(printFull ignores this)
@@ -756,7 +756,7 @@ module NiceString  =
         x |> box |> getLines nps 0 |> formatLines nps
 
 
-    /// Nice formating for numbers including thousand Separator, records and (nested) sequences, 
+    /// Nice formatting for numbers including thousand Separator, records and (nested) sequences, 
     /// Provide custom NicePrintSettings:
     /// maxDepth          : how deep the content of nested seq is printed (printFull ignores this)
     /// maxVertItems      : how many items per seq are printed in vertical list(printFull ignores this)

@@ -4,13 +4,6 @@ open System
 open System.Globalization
 open System.Collections.Generic
 
-/// A struct of two floats representing start and end of a range
-//[<Struct>]
-//type Range = {
-//         start:float
-//         ende :float
-//         }
-
 /// Math Utils.
 /// When opened the module shadows the built in trigonometric asin and acos function to include clamping if values are slightly above -1.0 or 1.0
 module UtilMath = 
@@ -36,7 +29,7 @@ module UtilMath =
         if x < -1.00001<_> then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.acos failed on %f , input must be between -1.00001 and +1.00001" x
         if x >  1.00001<_>  then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.acos failed on %f , input must be between -1.00001 and +1.00001" x
         else x  |> float|> clamp -1.0 1.0 |> System.Math.Acos
-         
+        
     /// Shadows the built in 'asin' (Inverse Sine) function to include clamping if values are slightly above -1.0 or 1.0
     /// Tolerance: 0.00001
     /// Returns angel in Radians
@@ -108,7 +101,7 @@ module UtilMath =
             if   c >= '0' && c <= '9'       then sb.Append(c)   |> ignore
             elif c = '.'                    then sb.Append(c)   |> ignore
             elif c = '-' && sb.Length = 0   then sb.Append(c)   |> ignore //only add minus before digits if stringbuilder is still empty
-            elif c = ','                    then sb.Append('.') |> ignore // german formating
+            elif c = ','                    then sb.Append('.') |> ignore // german formatting
         match Double.TryParse(sb.ToString(), NumberStyles.Float, enUs) with
         | true, f -> Some  f
         | _ ->   None
@@ -123,7 +116,7 @@ module UtilMath =
             if   c >= '0' && c <= '9'       then sb.Append(c)   |> ignore
             elif c = '.'                    then sb.Append(c)   |> ignore
             elif c = '-' && sb.Length = 0   then sb.Append(c)   |> ignore //only add minus before digits if stringbuilder is still empty
-            elif c = ','                    then sb.Append('.') |> ignore // german formating
+            elif c = ','                    then sb.Append('.') |> ignore // german formatting
         match Double.TryParse(sb.ToString(), NumberStyles.Float, enUs) with
         | true, f -> Some (LanguagePrimitives.FloatWithMeasure f)
         | _ ->   None
@@ -195,7 +188,7 @@ module UtilMath =
                 let stepOut = snd table.[1] - snd table.[0]
                 let distIn  = fst table.[0] - x 
                 if abs(float stepIn) < 1e-16 then  
-                    ArgumentException.RaiseBase "FsEx.UtilMath.interpolateTable: Table query %g is smaller than first element in table %A and the first two Input elemnts are almost the same, so a meaningful prediction is not possible." x table.[0]
+                    ArgumentException.RaiseBase "FsEx.UtilMath.interpolateTable: Table query %g is smaller than first element in table %A and the first two Input elements are almost the same, so a meaningful prediction is not possible." x table.[0]
                     snd table.[0]
                 else
                     let sc  = distIn / stepIn 
@@ -207,14 +200,14 @@ module UtilMath =
                 let stepIn  = fst table.[li] - fst table.[li-1]
                 let stepOut = snd table.[li] - snd table.[li-1]
                 let distIn  = x - fst table.[li]
-                if abs(float stepIn) < 1e-16 then  // last are dulicates 
-                    ArgumentException.RaiseBase "FsEx.UtilMath.interpolateTable: Table query %g is bigger than last element in table %A and the last two Input elemnts are almost the same, so a meaningful prediction is not possible."   x table.[li] 
+                if abs(float stepIn) < 1e-16 then  // last are duplicates 
+                    ArgumentException.RaiseBase "FsEx.UtilMath.interpolateTable: Table query %g is bigger than last element in table %A and the last two Input elements are almost the same, so a meaningful prediction is not possible."   x table.[li] 
                     //snd table.[li]
                 else
                     let sc  = distIn / stepIn
                     snd table.[li] + stepOut * sc        
             else
-                let hiIdx = table |> Seq.findIndex ( fun v ->  fst v >= x) // finding could be optimised with binary search since its sorted    
+                let hiIdx = table |> Seq.findIndex ( fun v ->  fst v >= x) // finding could be optimized with binary search since its sorted    
                 if hiIdx = 0 then
                     snd table.[0]
                 else
@@ -235,7 +228,7 @@ module UtilMath =
     /// Includes a check that both list have the same length
     let interpolateLists (input: float<'Input> IList) ( output: float<'Output> IList ) : (float<'T> ->  float<'U>) = 
         if input.Count <> output.Count then
-            ArgumentException.RaiseBase "FsEx.UtilMath.interpolateLists: Tables length dont match:\r\n%s\r\nand %s" (NiceString.toNiceString input)  (NiceString.toNiceString output)        
+            ArgumentException.RaiseBase "FsEx.UtilMath.interpolateLists: Tables length don't match:\r\n%s\r\nand %s" (NiceString.toNiceString input)  (NiceString.toNiceString output)        
         interpolateTable(Seq.zip input output|> Array.ofSeq)
 
 
@@ -314,27 +307,27 @@ module UtilMath =
     /// Numeric Stepping:Converts floats to ints within defined integer step sizes.
     /// Always rounding down like the int function
     /// = int (v / float prec) * prec
-    let inline stepedInt (prec:int) (v:float) : int = 
-        if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.stepedInt: given input for 'v' is NaN or Infinity."
-        if prec < 1        then raise <| ArgumentException "FsEx.UtilMath.stepedInt: prec value is negative or Zero."
+    let inline steppedInt (prec:int) (v:float) : int = 
+        if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.steppedInt: given input for 'v' is NaN or Infinity."
+        if prec < 1        then raise <| ArgumentException "FsEx.UtilMath.steppedInt: prec value is negative or Zero."
         int (v / float prec) * prec
 
     /// Numeric Stepping:Converts floats to floats within defined float step sizes.
     /// Always rounding down like the int function)
     /// = float (int (v / prec)) * prec
-    let inline stepedFloat (prec:float) (v:float) : float = 
-        if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.stepedFloat: given input for 'v' is NaN or Infinity."
-        if isNanOrInf prec then raise <| ArgumentException "FsEx.UtilMath.stepedFloat: given input for 'prec' is NaN or Infinity."
-        if prec < 1e-16    then raise <| ArgumentException "FsEx.UtilMath.stepedFloat: prec value is negative or almost Zero, less than +1e-16."
+    let inline steppedFloat (prec:float) (v:float) : float = 
+        if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.steppedFloat: given input for 'v' is NaN or Infinity."
+        if isNanOrInf prec then raise <| ArgumentException "FsEx.UtilMath.steppedFloat: given input for 'prec' is NaN or Infinity."
+        if prec < 1e-16    then raise <| ArgumentException "FsEx.UtilMath.steppedFloat: prec value is negative or almost Zero, less than +1e-16."
         float (int (v / prec)) * prec
 
     /// Numeric Stepping:Converts floats to floats within defined float step sizes.
     /// Always rounding mid point  like the round function)
     /// =  (round (v / prec)) * prec
-    let inline stepedFloatMid (prec:float) (v:float) : float = 
-        if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.stepedFloatMid: given input for 'v' is NaN or Infinity."
-        if isNanOrInf prec then raise <| ArgumentException "FsEx.UtilMath.stepedFloatMid: given input for 'prec' is NaN or Infinity."
-        if prec < 1e-16    then raise <| ArgumentException "FsEx.UtilMath.stepedFloatMid: prec value is negative or almost Zero, less than +1e-16."
+    let inline steppedFloatMid (prec:float) (v:float) : float = 
+        if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.steppedFloatMid: given input for 'v' is NaN or Infinity."
+        if isNanOrInf prec then raise <| ArgumentException "FsEx.UtilMath.steppedFloatMid: given input for 'prec' is NaN or Infinity."
+        if prec < 1e-16    then raise <| ArgumentException "FsEx.UtilMath.steppedFloatMid: prec value is negative or almost Zero, less than +1e-16."
         (round (v / prec)) * prec
 
     /// This float range function ensures that the end is always included.

@@ -4,7 +4,7 @@ open System
 
 module ComputationalExpressionsRarr =
 
-    //TODO: optimise with 
+    //TODO: optimize with 
     // [<InlineIfLambda>] as in https://gist.github.com/Tarmil/afcf5f50e45e90200eb7b01615b0ffc0
     // or https://github.com/fsharp/fslang-design/blob/main/FSharp-6.0/FS-1099-list-collector.md
 

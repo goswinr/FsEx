@@ -37,7 +37,7 @@ module AutoOpenExtensionsStringBuilder =
         /// Always uses StringComparison.Ordinal
         member sb.IndexOf (t:string, from:int):int= 
             // could in theory be improved be using a rolling hash value
-            // see also Arra.findArray implementation
+            // see also Array.findArray implementation
             // or https://stackoverflow.com/questions/12261344/fastest-search-method-in-stringbuilder
             let ls = sb.Length
             let lt = t.Length

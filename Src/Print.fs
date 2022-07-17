@@ -76,7 +76,7 @@ module AutoOpenPrint =
 
 
     /// Print to standard out. 
-    /// Nice formating for numbers including thousand Separator, records and (nested) sequences, 
+    /// Nice formatting for numbers including thousand Separator, records and (nested) sequences, 
     /// NicePrintSettings:
     /// maxDepth          = 3     , how deep the content of nested seq is printed (printFull ignores this)
     /// maxVertItems      = 6     , how many items per seq are printed in vertical list(printFull ignores this)
@@ -88,7 +88,7 @@ module AutoOpenPrint =
         Console.WriteLine (toNiceString x) // Console.WriteLine is about 2-3 times faster than printf "%s"
 
     /// Print to standard out.
-    /// Nice formating for numbers including thousand Separator, records and (nested) sequences, 
+    /// Nice formatting for numbers including thousand Separator, records and (nested) sequences, 
     /// NicePrintSettings:
     /// maxDepth          = 24        , how deep the content of nested seq is printed (printFull ignores this)
     /// maxVertItems      = 100'000   , how many items per seq are printed in vertical list(printFull ignores this)

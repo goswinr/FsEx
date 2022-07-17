@@ -4,7 +4,7 @@ open System
 
 
 /// A performance timer that also measures Garbage Collection Generations.
-/// includes nice formating of ms , sec, and minutes
+/// includes nice formatting of ms , sec, and minutes
 /// Similar to the #time;; statement built in to FSI
 /// The timer starts immediately when created
 type Timer() = 

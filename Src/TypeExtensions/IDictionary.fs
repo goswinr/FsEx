@@ -48,7 +48,7 @@ module ExtensionsIDictionary =
             seq { for KeyValue(k, v) in d -> k, v}
 
         /// A property like the ToString() method,
-        /// But with richer formating for collections
+        /// But with richer formatting for collections
         member obj.ToNiceString = 
             NiceString.toNiceString obj
 

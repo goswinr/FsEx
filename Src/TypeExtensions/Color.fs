@@ -110,14 +110,14 @@ module Color =
         lastHue <- lastHue + 0.6180334 // golden angle conjugate
         lastHue <- lastHue % 1.0 // loop it between 0.0 and 1.0    
         let mutable s = Rand.NextDouble() 
-        s <- s*s*s*s  //  0.0 - 1.0 increases the probalility that the number is small( )
+        s <- s*s*s*s  //  0.0 - 1.0 increases the probability that the number is small( )
         s <- s*0.7    //  0.0 - 0.7 make sure it is less than 0.6
         s <- 1.1 - s  //  1.1 - 0.6  
         s <- UtilMath.clamp01 s //  1.0 - 0.6 
         let mutable l = Rand.NextDouble() 
-        l <- l * l     //  0.0 - 1.0 increases the probalility that the number is small( )
+        l <- l * l     //  0.0 - 1.0 increases the probability that the number is small( )
         l <- l * 0.35 * s   //  0.0 - 0.25 , and scale down with saturation too
-        l <- if lumUp then lumUp<-false;  0.5+l*1.1 else lumUp<-true ;  0.5-l //alternate luminace up or down,  mor on the bright side
+        l <- if lumUp then lumUp<-false;  0.5+l*1.1 else lumUp<-true ;  0.5-l //alternate luminance up or down,  mor on the bright side
         if l > 0.3 && lastHue > 0.10 && lastHue < 0.22 then  // exclude yellow unless dark
             randomForRhino() 
         else    

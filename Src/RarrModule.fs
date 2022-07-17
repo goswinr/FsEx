@@ -179,10 +179,20 @@ module Rarr =
 
 
     /// Returns a Rarr containing just one element
+    [<Obsolete("Has a typo, use Rarr.singleton instead")>]
     let singelton  (element: 'T) : Rarr<'T> = 
         let r = Rarr(1)
         r.List.Add element
         r
+
+    
+    /// <summary>Returns a Rarr that contains one item only.</summary>
+    /// <param name="value">The input item.</param>
+    /// <returns>The result Rarr of one item.</returns>
+    let inline singleton value = 
+        let res = Rarr(1)
+        res.Add value
+        res
 
     /// <summary>Considers List circular and move elements up or down
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
@@ -204,11 +214,17 @@ module Rarr =
 
     /// Returns true if the given Rarr has just one item.
     /// Same as  Rarr.hasOne
+    [<Obsolete("Has a typo, use Rarr.isSingleton instead")>]
     let inline isSingelton (rarr : Rarr<'T>) : bool = 
+        rarr.Count = 1
+    
+    /// Returns true if the given Rarr has just one item.
+    /// Same as  Rarr.hasOne
+    let inline isSingleton (rarr : Rarr<'T>) : bool = 
         rarr.Count = 1
 
     /// Returns true if the given Rarr has just one item.
-    /// Same as  Rarr.isSingelton
+    /// Same as  Rarr.isSingleton
     let inline hasOne (rarr : Rarr<'T>) : bool = 
         rarr.Count = 1
 
@@ -403,7 +419,7 @@ module Rarr =
     /// <returns>The index of the smallest element.</returns>
     let inline minIndBy  (projection : 'T -> 'Key) (rarr: Rarr<'T>) : int = 
         rarr |> MinMax.indexByFun (<) projection
-   
+
     /// <summary>Returns the index of the greatest of all elements of the Rarr, compared via Operators.max on the function result.</summary>
     /// <param name="projection">The function to transform the elements into a type supporting comparison.</param>
     /// <param name="rarr">The input Rarr.</param>
@@ -546,20 +562,20 @@ module Rarr =
     
     /// Returns all elements that exists more than once in Rarr.
     /// Each element that exists more than once is only returned once.
-    /// Returned order is by first occurnce of first duplicate.
+    /// Returned order is by first occurrence of first duplicate.
     let duplicates (xs:Rarr<'T>) = 
         let h = Hashset<'T>()
         let t = Hashset<'T>() 
-        // first Add shoulds be false, second Add true, to recognice the first occurenace of a duplicate:
+        // first Add should be false, second Add true, to recognize the first occurrence of a duplicate:
         xs.FindAll (System.Predicate  (fun x -> if h.Add x then false else t.Add x)) 
     
     /// Returns all elements that exists more than once in Rarr.
     /// Each element that exists more than once is only returned once.
-    /// Returned order is by first occurnce of first duplicate.
+    /// Returned order is by first occurrence of first duplicate.
     let duplicatesBy (f:'T->'U) (xs:Rarr<'T>) = 
         let h = Hashset<'U>()
         let t = Hashset<'U>()
-        // first Add shoulds be false, second Add true, to recognice the first occurenace of a duplicate: 
+        // first Add should be false, second Add true, to recognize the first occurrence of a duplicate: 
         xs.FindAll (System.Predicate  (fun x -> let y = f x in  if h.Add y then false else t.Add y)) 
 
     
@@ -625,7 +641,7 @@ module Rarr =
     /// second containing the elements for which the given predicate2 returns <c>true</c> (and all previous predicates returned <c>false</c>),
     /// third  containing the elements for which the given predicate3 returns <c>true</c> (and all previous predicates returned <c>false</c>),
     /// fourth containing the elements for which the given predicate4 returns <c>true</c> (and all previous predicates returned <c>false</c>),
-    /// fith the rest.</summary>
+    /// fifth the rest.</summary>
     /// <param name="predicate1">The first  function to test the input elements.</param>
     /// <param name="predicate2">The second function to test the input elements.</param>
     /// <param name="predicate3">The third  function to test the input elements.</param>
@@ -676,8 +692,8 @@ module Rarr =
         static member Comparer = 
             let gcomparer = HashIdentity.Structural<'T>
             { new IEqualityComparer<StructBox<'T>> with
-                   member _.GetHashCode(v) = gcomparer.GetHashCode(v.Value)
-                   member _.Equals(a,b)    = gcomparer.Equals(a.Value, b.Value) }
+                member _.GetHashCode(v) = gcomparer.GetHashCode(v.Value)
+                member _.Equals(a,b)    = gcomparer.Equals(a.Value, b.Value) }
 
     /// <summary>Returns a new Rarr that contains all pairings (or combinations)  of elements from the first and second Rarrs.</summary>
     /// <param name="rarr1">The first input Rarr.</param>
@@ -1278,8 +1294,8 @@ module Rarr =
 
 
     /// <summary>Applies a key-generating function to each element of a Rarr and yields a Dict of
-    /// unique keys and respective elements that match to this key. As opposeds to Rarr.groupBy the key may not be null or Option.None</summary>
-    /// <param name="projection">A function that transforms an element of the Rarr into a comparable key. As opposeds to Rarr.groupBy the key may not be null or Option.None </param>
+    /// unique keys and respective elements that match to this key. As opposed to Rarr.groupBy the key may not be null or Option.None</summary>
+    /// <param name="projection">A function that transforms an element of the Rarr into a comparable key. As opposed to Rarr.groupBy the key may not be null or Option.None </param>
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The result Rarr.</returns>
     let groupByDict (projection:'T -> 'Key) (rarr:Rarr<'T>) :  Dict<'Key,Rarr<'T>> = 
@@ -1438,8 +1454,8 @@ module Rarr =
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The Rarr of transformed elements.</returns>
     let inline map ( mapping: 'T -> 'U) (rarr: Rarr<'T>) : Rarr<'U> = 
-         // TODO replace with F# implementation using [<InlineIfLambda>] for performance?? Test on non Lambdas too.
-         rarr.ConvertAll (System.Converter mapping)
+        // TODO replace with F# implementation using [<InlineIfLambda>] for performance?? Test on non Lambdas too.
+        rarr.ConvertAll (System.Converter mapping)
 
     /// <summary>Builds a new collection whose elements are the results of applying the given function
     /// to the corresponding elements of the two collections pairwise. The two input
@@ -1797,7 +1813,6 @@ module Rarr =
             result.Add li.[i]
         result
 
-
     /// <summary>Like <c>fold</c>, but return the intermediary and final results.</summary>
     /// <param name="folder">The function to update the state given the input elements.</param>
     /// <param name="stateInit">The initial state.</param>
@@ -1844,13 +1859,6 @@ module Rarr =
         rarr.[index] <- value
 
 
-    /// <summary>Returns a Rarr that contains one item only.</summary>
-    /// <param name="value">The input item.</param>
-    /// <returns>The result Rarr of one item.</returns>
-    let inline singleton value = 
-        let res = Rarr(1)
-        res.Add value
-        res
 
 
     /// <summary>Builds a new Rarr that contains the elements of the given Rarr, excluding the first N elements.</summary>

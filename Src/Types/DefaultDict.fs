@@ -7,7 +7,7 @@ open System.Collections.Generic
 /// A System.Collections.Generic.Dictionary with default Values that get created upon accessing a missing key.
 /// If accessing a non exiting key , the default function is called to create and set it.
 /// Like defaultdict in Python
-/// If you need to provide a custom implemantation of the default function depending on the key
+/// If you need to provide a custom implementation of the default function depending on the key
 /// then use the Dict type and its method <c>dict.getOrSetDefault func key</c>.
 [<NoComparison>]
 [<NoEquality>] // TODO add structural equality

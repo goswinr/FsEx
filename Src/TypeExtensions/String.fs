@@ -41,7 +41,7 @@ module ExtensionsString =
     /// An Exception for the string functions defined in FsEx
     type FsExStringException(txt:string)= 
         inherit Exception(txt)
-        /// Raise the exception with F# printf string formating
+        /// Raise the exception with F# printf string formatting
         static member inline Raise msg = 
             Printf.kprintf (fun s -> raise (new FsExStringException(s))) msg
 
@@ -142,7 +142,7 @@ module ExtensionsString =
 
 
             if st+len > count then
-                FsExStringException.Raise "FsEx.ExtensionsString: string.GetSlice: End index %d is out of range. Allowed values are -%d upto %d for String '%s' of %d chars" startIdx count (count-1) s count
+                FsExStringException.Raise "FsEx.ExtensionsString: string.GetSlice: End index %d is out of range. Allowed values are -%d up to %d for String '%s' of %d chars" startIdx count (count-1) s count
 
 
             if len < 0 then

@@ -90,19 +90,19 @@ module ExtensionsBclStructs =
         /// int(round(x))
         member inline x.ToInt = int(round(x))
 
-        /// With automatic formating of display reduced precision depending on float size
+        /// With automatic formatting of display reduced precision depending on float size
         /// also includes thousands separators
         member x.ToNiceString = NiceFormat.float x
 
         /// Similar to f.ToString() using InvariantCulture
-        /// with automatic formating to never use scientific notation
+        /// with automatic formatting to never use scientific notation
         /// will have maximum 15 decimal places
         /// f.ToString( "0.###############" , InvariantCulture )
         member x.AsString = x.ToString( "0.###############",invC)
 
         /// Similar to f.ToString()
         /// but with German culture using comma (,) as decimal separator
-        /// with automatic formating to never use scientific notation
+        /// with automatic formatting to never use scientific notation
         /// will have maximum 15 decimal places
         /// f.ToString( "0.###############" , CultureInfo("de-DE") )
         member x.AsStringDE = x.ToString( "0.###############",deDE)
@@ -118,19 +118,19 @@ module ExtensionsBclStructs =
 
     type Single with
 
-        /// with automatic formating of display reduced precision depending on single size
+        /// with automatic formatting of display reduced precision depending on single size
         /// also includes thousands separators
         member x.ToNiceString = NiceFormat.single x
 
         /// Similar to f.ToString()
-        /// with automatic formating to never use scientific notation
+        /// with automatic formatting to never use scientific notation
         /// will have maximum 7 decimal places
         /// f.ToString( "0.###############" , InvariantCulture)
         member x.AsString = x.ToString( "0.#######" , invC)
 
         /// Similar to f.ToString()
         /// but with German culture using comma (,) as decimal separator
-        /// with automatic formating to never use scientific notation
+        /// with automatic formatting to never use scientific notation
         /// will have maximum 7 decimal places
         /// f.ToString( "0.###############" , CultureInfo("de-DE"))
         member x.AsStringDE = x.ToString( "0.#######" , deDE)
@@ -150,19 +150,19 @@ module ExtensionsBclStructs =
         /// int(round(x))
         member inline x.ToInt = int(round(x))
 
-        /// With automatic formating of display reduced precision depending on float size
+        /// With automatic formatting of display reduced precision depending on float size
         /// also includes thousands separators
         member x.ToNiceString = NiceFormat.decimal x
 
         /// Similar to f.ToString()
-        /// with automatic formating to never use scientific notation
+        /// with automatic formatting to never use scientific notation
         /// will have maximum 15 decimal places
         /// f.ToString( "0.###############" , InvariantCulture)
         member x.AsString = x.ToString( "0.###############" , invC)
 
         /// Similar to f.ToString()
         /// but with German culture using comma (,) as decimal separator
-        /// with automatic formating to never use scientific notation
+        /// with automatic formatting to never use scientific notation
         /// will have maximum 15 decimal places
         /// f.ToString( "0.###############" , CultureInfo("de-DE"))
         member x.AsStringDE = x.ToString( "0.###############" , deDE)

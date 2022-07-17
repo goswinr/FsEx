@@ -108,14 +108,14 @@ module AutoOpenComputationalExpressions  =
     let maybe = MaybeBuilder()
 
     /// Computational Expression String Builder:
-    /// use 'yield' to append text, or seq of strinsg seprated by a new line
+    /// use 'yield' to append text, or seq of strings separated by a new line
     /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
     /// accepts ints, guids and chars too.
     [<Obsolete("Use the short name of this builder via str{} ")>]
     let stringBuffer = StringBufferBuilder ()
 
     /// Computational Expression String Builder:
-    /// use 'yield' to append text, or seq of strinsg seprated by a new line
+    /// use 'yield' to append text, or seq of strings separated by a new line
     /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
     /// accepts ints, guids and chars  too. 
     let str = StringBufferBuilder ()

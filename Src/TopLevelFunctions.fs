@@ -7,39 +7,39 @@ open System.Collections.Generic
 
 
 /// This module is set to auto open.
-/// Static Extension methods on Exceptions to cal Excn.Raise "%A" x with F# printf string formating
+/// Static Extension methods on Exceptions to cal Exception.Raise "%A" x with F# printf string formatting
 [<AutoOpen>] // so that extension become available on opening FsEx
 module AutoOpenExtensionsExceptions = 
 
     // type FsExStringException is now defined in String Module
 
     type ArgumentException with
-        /// Raise ArgumentException with F# printf string formating
+        /// Raise ArgumentException with F# printf string formatting
         /// this is also the base class of ArgumentOutOfRangeException and ArgumentNullException
         static member inline RaiseBase msg =  Printf.kprintf (fun s -> raise (ArgumentException(s))) msg
 
     type ArgumentOutOfRangeException with
-        /// Raise ArgumentOutOfRangeException with F# printf string formating
+        /// Raise ArgumentOutOfRangeException with F# printf string formatting
         static member inline Raise msg =  Printf.kprintf (fun s -> raise (ArgumentOutOfRangeException(s))) msg
 
     type ArgumentNullException with
-        /// Raise ArgumentNullException with F# printf string formating
+        /// Raise ArgumentNullException with F# printf string formatting
         static member inline Raise msg =  Printf.kprintf (fun s -> raise (ArgumentNullException(s))) msg
 
     type IndexOutOfRangeException with
-        /// Raise IndexOutOfRangeException with F# printf string formating
+        /// Raise IndexOutOfRangeException with F# printf string formatting
         static member inline Raise msg =  Printf.kprintf (fun s -> raise (IndexOutOfRangeException(s))) msg
 
     type KeyNotFoundException with
-        /// Raise KeyNotFoundException with F# printf string formating
+        /// Raise KeyNotFoundException with F# printf string formatting
         static member inline Raise msg =  Printf.kprintf (fun s -> raise (KeyNotFoundException(s))) msg
 
     type FileNotFoundException with
-        /// Raise FileNotFoundException with F# printf string formating
+        /// Raise FileNotFoundException with F# printf string formatting
         static member inline Raise msg =  Printf.kprintf (fun s -> raise (FileNotFoundException(s))) msg
 
     type DirectoryNotFoundException with
-        /// Raise DirectoryNotFoundException with F# printf string formating
+        /// Raise DirectoryNotFoundException with F# printf string formatting
         static member inline Raise msg =  Printf.kprintf (fun s -> raise (DirectoryNotFoundException(s))) msg
 
 
@@ -95,7 +95,7 @@ module AutoOpenUtil =
 
     /// Returns false if the value is null.
     /// The opposite of isNull
-    let inline notNull (value :'T when 'T: null) = // FSharp core does it like this too. don't use Obejct.RefrenceEquals (because of Generics)
+    let inline notNull (value :'T when 'T: null) = // FSharp core does it like this too. don't use Object.ReferenceEquals (because of Generics)
         match value with
         | null -> false
         | _ -> true

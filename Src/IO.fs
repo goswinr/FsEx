@@ -32,7 +32,7 @@ module IO =
         if not (IO.Directory.Exists s) then  raise (DirectoryNotFoundException("Directory missing or path wrong: '" + s + "'"))
 
     /// Given the full path to a file. This function creates all directories to this files if they dont exist yet.
-    /// However it does not creat the file itself.
+    /// However it does not create the file itself.
     let createDirectoriesOfFilePath s = 
        let fi = FileInfo(s)
        Directory.CreateDirectory(fi.DirectoryName)
@@ -250,10 +250,10 @@ module IO =
         /// If other calls to this function have been made then only the last call will be written as file.
         /// Also ensures that no reading happens while writing.
         /// Writes Exceptions to errorLogger
-        member this.WriteIfLast ( getText: unit->string, delayMillisSeconds:int) = 
+        member this.WriteIfLast ( getText: unit->string, delayMilliSeconds:int) = 
             async{
                 let k = Interlocked.Increment counter
-                do! Async.Sleep(delayMillisSeconds) // delay to see if this is the last of many events (otherwise there is a noticeable lag in dragging window around, for example, when saving window position)
+                do! Async.Sleep(delayMilliSeconds) // delay to see if this is the last of many events (otherwise there is a noticeable lag in dragging window around, for example, when saving window position)
                 if counter.Value = k then //k > 2L &&   //do not save on startup && only save last event after a delay if there are many save events in a row ( eg from window size change)(ignore first two event from creating window)
                     try
                         let text = getText()

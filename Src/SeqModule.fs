@@ -12,7 +12,7 @@ open FsEx.ExtensionsSeq
 module Seq = 
     
     /// Gets the only element in Seq. 
-    /// Fails if there is not excactly one element in the Seq. 
+    /// Fails if there is not exactly one element in the Seq. 
     let headAndOnly  (xs: seq<'T>) =
         use e = xs.GetEnumerator()        
         if e.MoveNext() then
@@ -137,20 +137,20 @@ module Seq =
 
     /// Returns all elements that exists more than once in Seq.
     /// Each element that exists more than once is only returned once.
-    /// Returned order is by first occurnce of first duplicate.
+    /// Returned order is by first occurrence of first duplicate.
     let duplicates (xs:seq<'T>) = 
         let h = Hashset<'T>()
         let t = Hashset<'T>() 
-        // first Add shoulds be false, second Add true, to recognice the first occurenace of a duplicate:
+        // first Add shoulds be false, second Add true, to recognize the first occurrence of a duplicate:
         xs |> Seq.filter (fun x -> if h.Add x then false else t.Add x) 
     
     /// Returns all elements that exists more than once in Seq.
     /// Each element that exists more than once is only returned once.
-    /// Returned order is by first occurnce of first duplicate.
+    /// Returned order is by first occurrence of first duplicate.
     let duplicatesBy (f:'T->'U) (xs:seq<'T>) = 
         let h = Hashset<'U>()
         let t = Hashset<'U>()
-        // first Add shoulds be false, second Add true, to recognice the first occurenace of a duplicate: 
+        // first Add shoulds be false, second Add true, to recognize the first occurrence of a duplicate: 
         xs |> Seq.filter (fun x -> let y = f x in  if h.Add y then false else t.Add y)    
 
 
