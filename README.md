@@ -8,7 +8,7 @@
 
 ![Logo](https://raw.githubusercontent.com/goswinr/FsEx/main/Doc/logo.png)
 
-FsEx is an FSharp extension and utility library. 
+FsEx is an FSharp extension and utility library mostly focused on collections and strings. 
 
 
 ### It Includes: 
@@ -31,10 +31,11 @@ FsEx is an FSharp extension and utility library.
 ### Changelog
 
 `0.11.0`
+- add String.beforeOrInput, .afterOrInput and .bewteenOrInput
 - improve randomness of random color
 - rename Dict and DefaultDict members Add and Set
 - add getOrSetDefault to Dict
-- add String.addPrefix String.addSuffix
+- add String.addPrefix, String.addSuffix
 - add Seq.tryFindDuplicate and Seq.duplicates
 - rename Dict.setOnce to Dict.setIfKeyAbsent 
 - remove cmp
