@@ -69,7 +69,7 @@ module NiceStringSettings =
     /// Default = 1e-24. 
     /// Double.Epsilon = no rounding down
     /// This value can be set for example by hosting apps that have a build in absolute tolerance like Rhino3d
-    let mutable veryCloseToZero = 1e-24 // Double.Epsilon
+    let mutable userZeroTolerance = 1e-24 // Double.Epsilon
 
 /// For formatting simple types like int, float, very long strings for nice printing
 /// Used by NiceString Module
@@ -101,7 +101,7 @@ module NiceFormat  =  // used by Rhino.Scripting
         let CloseToZeroNegative = "≈-0.0"
     
         [<Literal>]
-        let VeryCloseToZero = "~0.0"
+        let BelowUserZeroTolerance = "~0.0"
 
     open NiceStringSettings
 
@@ -168,7 +168,7 @@ module NiceFormat  =  // used by Rhino.Scripting
         |Literals.RhinoMathUnsetSingle -> None //Some -1.234321e+38f // for https://developer.rhino3d.com/api/RhinoCommon/html/F_Rhino_RhinoMath_UnsetSingle.htm
         |Literals.CloseToZeroPositive ->    Some 0.0
         |Literals.CloseToZeroNegative->  Some 0.0
-        |Literals.VeryCloseToZero -> Some 0.0
+        |Literals.BelowUserZeroTolerance -> Some 0.0
         | _ ->
             let cleanFloat = s.Replace(string(thousandSeparator),"") // no need to take care of decimal comma here. nice string never has one
             match Double.TryParse(cleanFloat, NumberStyles.Float, invC) with
@@ -199,22 +199,22 @@ module NiceFormat  =  // used by Rhino.Scripting
         elif x = 0.0 then "0.0" // not "0" as in sprintf "%g"
         else
             let  a = abs x
-            if   a >= 10000.     then x.ToString("#")|> addThousandSeparators
-            elif a >= 1000.      then x.ToString("#")
-            elif a >= 100.       then x.ToString("#.#" , invC)
-            elif a >= 10.        then x.ToString("0.0#" , invC)
-            elif a >= 1.         then x.ToString("0.0##" , invC)
-            elif a >= 0.1        then x.ToString("0.####" , invC)
-            elif a >= 0.01       then x.ToString("0.#####" , invC)
-            elif a >= 0.001      then x.ToString("0.######" , invC)|> addThousandSeparators
-            elif a >= 0.0001     then x.ToString("0.#######" , invC)|> addThousandSeparators
-            elif a >= 0.00001    then x.ToString("0.########" , invC)|> addThousandSeparators
-            elif a >= 0.000001   then x.ToString("0.#########" , invC)|> addThousandSeparators
-            elif a >= 0.0000001  then x.ToString("0.##########" , invC)|> addThousandSeparators
-            elif a >= 0.000000000000001 then x.ToString("0.###############" , invC)|> addThousandSeparators // 15 decimal paces for doubles
-            elif a <  veryCloseToZero then Literals.VeryCloseToZero
-            elif x >= 0.0 then Literals.CloseToZeroPositive
-            else Literals.CloseToZeroNegative
+            if   a <  userZeroTolerance then Literals.BelowUserZeroTolerance // do this check up here, value might be very high
+            elif a >= 10000.          then x.ToString("#")|> addThousandSeparators
+            elif a >= 1000.           then x.ToString("#")
+            elif a >= 100.            then x.ToString("#.#" , invC)
+            elif a >= 10.             then x.ToString("0.0#" , invC)
+            elif a >= 1.              then x.ToString("0.0##" , invC)
+            elif a >= 0.1             then x.ToString("0.####" , invC)
+            elif a >= 0.01            then x.ToString("0.#####" , invC)
+            elif a >= 0.001           then x.ToString("0.######" , invC)|> addThousandSeparators
+            elif a >= 0.000_1         then x.ToString("0.#######" , invC)|> addThousandSeparators
+            elif a >= 0.000_01        then x.ToString("0.########" , invC)|> addThousandSeparators
+            elif a >= 0.000_001       then x.ToString("0.#########" , invC)|> addThousandSeparators
+            elif a >= 0.000_0001      then x.ToString("0.##########" , invC)|> addThousandSeparators
+            elif a >= 0.000_000_001   then x.ToString("0.#############" , invC)|> addThousandSeparators            
+            elif x >= 0.0             then Literals.CloseToZeroPositive
+            else                           Literals.CloseToZeroNegative
     
     /// prints float via x.ToString("R"), then still adds Thousand Separators
     /// The round-trip ("R") format specifier attempts to ensure that a numeric value that is converted to a string is parsed back into the same numeric value.
@@ -238,21 +238,21 @@ module NiceFormat  =  // used by Rhino.Scripting
         if x = 0M then "0.0" // not "0" as in sprintf "%g"
         else
             let  a = abs x
-            if   a >= 10000M      then x.ToString("#")|> addThousandSeparators
-            elif a >= 1000M       then x.ToString("#")
-            elif a >= 100M        then x.ToString("#.#" , invC)
-            elif a >= 10M         then x.ToString("0.0#" , invC)
-            elif a >= 1M          then x.ToString("0.0##" , invC)
-            elif a >= 0.1M        then x.ToString("0.####" , invC)
-            elif a >= 0.01M       then x.ToString("0.#####" , invC) 
-            elif a >= 0.001M      then x.ToString("0.######" , invC) |> addThousandSeparators
-            elif a >= 0.0001M     then x.ToString("0.#######" , invC) |> addThousandSeparators
-            elif a >= 0.00001M    then x.ToString("0.########" , invC)|> addThousandSeparators
-            elif a >= 0.000001M   then x.ToString("0.#########" , invC)|> addThousandSeparators
-            elif a >= 0.0000001M  then x.ToString("0.##########" , invC)|> addThousandSeparators
-            elif a <  decimal(veryCloseToZero) then Literals.VeryCloseToZero
-            elif x >= 0.0M then Literals.CloseToZeroPositive
-            else Literals.CloseToZeroNegative
+            if   a <  decimal userZeroTolerance then Literals.BelowUserZeroTolerance // do this check up here, value might be very high
+            elif a >= 10000M       then x.ToString("#")|> addThousandSeparators
+            elif a >= 1000M        then x.ToString("#")
+            elif a >= 100M         then x.ToString("#.#" , invC)
+            elif a >= 10M          then x.ToString("0.0#" , invC)
+            elif a >= 1M           then x.ToString("0.0##" , invC)
+            elif a >= 0.1M         then x.ToString("0.####" , invC)
+            elif a >= 0.01M        then x.ToString("0.#####" , invC) 
+            elif a >= 0.001M       then x.ToString("0.######" , invC) |> addThousandSeparators
+            elif a >= 0.000_1M     then x.ToString("0.#######" , invC) |> addThousandSeparators
+            elif a >= 0.000_01M    then x.ToString("0.########" , invC)|> addThousandSeparators
+            elif a >= 0.000_001M   then x.ToString("0.#########" , invC)|> addThousandSeparators
+            elif a >= 0.000_0001M  then x.ToString("0.##########" , invC)|> addThousandSeparators            
+            elif x >= 0.0M         then Literals.CloseToZeroPositive
+            else                        Literals.CloseToZeroNegative
     
     /// prints decimal via x.ToString("R"), then still adds Thousand Separators
     /// The round-trip ("R") format specifier attempts to ensure that a numeric value that is converted to a string is parsed back into the same numeric value.
@@ -269,19 +269,19 @@ module NiceFormat  =  // used by Rhino.Scripting
         elif x = 0.0f then "0.0" // not "0" as in sprintf "%g"
         else
             let  a = abs x
-            if   a >= 10000.f     then x.ToString("#")|> addThousandSeparators            
-            elif a >= 1000.f      then x.ToString("#")
-            elif a >= 100.f       then x.ToString("#.#" , invC)
-            elif a >= 10.f        then x.ToString("0.0#" , invC)
-            elif a >= 1.f         then x.ToString("0.0##" , invC)
-            elif a >= 0.1f        then x.ToString("0.####" , invC)
-            elif a >= 0.01f       then x.ToString("0.#####" , invC) 
-            elif a >= 0.001f      then x.ToString("0.######" , invC) |> addThousandSeparators
-            elif a >= 0.0001f     then x.ToString("0.#######" , invC) |> addThousandSeparators
-            elif a >= 0.00001f    then x.ToString("0.########" , invC)|> addThousandSeparators
-            elif a <  float32(veryCloseToZero) then Literals.VeryCloseToZero
-            elif x >= 0.0f then Literals.CloseToZeroPositive
-            else Literals.CloseToZeroNegative
+            if   a <  float32 userZeroTolerance then Literals.BelowUserZeroTolerance // do this check up here, value might be very high
+            elif a >= 10000.f       then x.ToString("#")|> addThousandSeparators         
+            elif a >= 1000.f       then x.ToString("#")
+            elif a >= 100.f        then x.ToString("#.#" , invC)
+            elif a >= 10.f         then x.ToString("0.0#" , invC)
+            elif a >= 1.f          then x.ToString("0.0##" , invC)
+            elif a >= 0.1f         then x.ToString("0.####" , invC)
+            elif a >= 0.01f        then x.ToString("0.#####" , invC) 
+            elif a >= 0.001f       then x.ToString("0.######" , invC) |> addThousandSeparators
+            elif a >= 0.000_1f     then x.ToString("0.#######" , invC) |> addThousandSeparators
+            elif a >= 0.000_01f    then x.ToString("0.########" , invC)|> addThousandSeparators            
+            elif x >= 0.0f         then Literals.CloseToZeroPositive
+            else                        Literals.CloseToZeroNegative
     
     /// prints single via x.ToString("R"), then still adds Thousand Separators
     /// The round-trip ("R") format specifier attempts to ensure that a numeric value that is converted to a string is parsed back into the same numeric value.
