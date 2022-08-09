@@ -3,7 +3,7 @@
 open System
 open System.Drawing
 
-
+/// TODO : don't use System.Drawing !? https://docs.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/system-drawing-common-windows-only
 
 /// This module is set to auto open.
 /// It provides EqualsARGB member
@@ -13,7 +13,6 @@ module AutoOpenExtensionsColor =
     type Drawing.Color with
 
         /// Compares to another color only by Alpha, Red, Green and Blue values ignoring other fields such as IsNamedColor
-
         member inline this.EqualsARGB(other:Drawing.Color)= 
             this.A = other.A &&
             this.R = other.R &&
@@ -40,7 +39,7 @@ module Color =
     let isEqualARGB (this:Color) (other:Color) = 
         this.EqualsARGB(other)
 
-    /// Given Hue,Saturation,Luminance in range of 0.0 to 1.0, returns a Drawing.Color
+    /// Given Hue, Saturation, Luminance in range of 0.0 to 1.0, returns a Drawing.Color
     let fromHSL (hue:float, saturation:float, luminance:float) = 
         // from http://stackoverflow.com/questions/2942/hsl-in-net
         // or http://bobpowell.net/RGBHSB.aspx

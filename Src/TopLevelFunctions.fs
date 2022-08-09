@@ -6,12 +6,13 @@ open System.Collections.Generic
 
 
 
-/// This module is set to auto open.
+/// This module is set to auto open when opening FsEx namespace.
 /// Static Extension methods on Exceptions to cal Exception.Raise "%A" x with F# printf string formatting
-[<AutoOpen>] // so that extension become available on opening FsEx
+[<AutoOpen>] 
 module AutoOpenExtensionsExceptions = 
 
     // type FsExStringException is now defined in String Module
+    // TODO add argument checking via https://stackoverflow.com/questions/73284201/f-kprintf-missing-warning-about-about-redundant-arguments
 
     type ArgumentException with
         /// Raise ArgumentException with F# printf string formatting
@@ -43,18 +44,23 @@ module AutoOpenExtensionsExceptions =
         static member inline Raise msg =  Printf.kprintf (fun s -> raise (DirectoryNotFoundException(s))) msg
 
 
-/// This module is set to auto open.
+/// This module is set to auto open when opening FsEx namespace.
 /// General Utility functions
-[<AutoOpen>] // so that extension become available on opening FsEx
+[<AutoOpen>] 
 module AutoOpenUtil = 
 
     type Collections.IList with 
+        /// Returns the last element of a non generic Collections.IList
         member this.LastObj =  this.[this.Count-1] 
 
     type Collections.Generic.IList<'T> with 
+        /// Returns the last element of a generic Collections.Generic.IList<'T>
         member this.Last =  this.[this.Count-1] 
     
     type Collections.Generic.List<'T> with 
+        /// Applies a function to all elements of a generic Collections.Generic.IList<'T>
+        /// Returns a new List<'T> also called ResizeArray<'T> in F#
+        /// Just does: this.ConvertAll (System.Converter mapping) 
         member this.Map(mapping: 'T -> 'U)  = this.ConvertAll (System.Converter mapping)
 
 
@@ -67,7 +73,7 @@ module AutoOpenUtil =
     /// This function is useful to check values in piping
     let inline failIf (projection:'T -> bool) (failMsg:string) (value:'T) : 'T = 
         if projection value then raise <| Exception( "FsEx.failIf: " + failMsg ) else value  
-     
+    
     
     /// Throws an exception with 'msg' as Error message if 'value' is false.
     /// This function is useful to follow up on any methods that return booleans indication success or failure
@@ -118,7 +124,7 @@ module AutoOpenUtil =
 
     /// Null coalescing:
     /// Returns the value on the left unless it is null, then it returns the value on the right.
-    let inline (|?) (a:'T) (b:'T)  = 
+    let inline ( |? ) (a:'T) (b:'T)  = 
         // a more fancy version: https://gist.github.com/jbtule/8477768#file-nullcoalesce-fs
         match a with
         | null -> b
@@ -130,7 +136,7 @@ module AutoOpenUtil =
     /// let inline (|>!) x f =  f x |> ignore ; x
     /// Be aware of correct indenting see:
     /// https://stackoverflow.com/questions/64784154/indentation-change-after-if-else-expression-not-taken-into-account
-    let inline (|>!) x f = 
+    let inline ( |>! ) x f = 
         f x |> ignore //https://twitter.com/GoswinR/status/1316988132932407296
         x
 
@@ -169,7 +175,7 @@ module AutoOpenUtil =
         negIdxLooped i length
 
     /// If condition is true return f(x) else just x
-    let inline ifDo condition (f:'T->'T)  (x:'T) = 
+    let inline ifDo condition (f:'T->'T) (x:'T) = 
         if condition then f x else x
 
     /// Caches the results of a function in a Map.
@@ -216,7 +222,7 @@ module SaveIgnore =
     let inline ignoreObj (x:obj) = ()
 
 /// Functions to deal with integer ref objects
-/// Also works with ints augmented with Units of Measure (UoM)
+/// Also works with integers augmented with Units of Measure (UoM)
 module IntRef = 
 
     /// Increment a ref cell by one
