@@ -196,9 +196,11 @@ module Printf =
 
     /// Like printf but in Random Color if used in Seff Editor. Does not add a new line at end.
     /// Very light, whithish and yellowish colors are excluded
+    /// The colors used by subsequent calls to this functions will have very distinct hues.
+    /// This is achieved by using a golden-ratio-loop and an internal cache of the last generated color.
     let colorRnd msg = 
         let c = Color.randomForRhino()
-        Printf.kprintf (fun s -> Seff.PrintColor c.R.ToInt c.G.ToInt c.B.ToInt s)  msg
+        Printf.kprintf (fun s -> Seff.PrintColor c.Red.ToInt c.Green.ToInt c.Blue.ToInt s)  msg
 
 
 /// Tries to printfn with colors if running in Seff Editor.
@@ -259,6 +261,9 @@ module Printfn =
     let cyan msg = Printf.kprintf (fun s -> Seff.PrintLineColor 0 150 150 s)  msg
 
     /// Like printfn but in random Color if used in Seff Editor. Adds a new line at end.
+    /// Very light, whithish and yellowish colors are excluded
+    /// The colors used by subsequent calls to this functions will have very distinct hues.
+    /// This is achieved by using a golden-ratio-loop and an internal cache of the last generated color.
     let colorRnd msg = 
         let c = Color.randomForRhino()
-        Printf.kprintf (fun s -> Seff.PrintLineColor c.R.ToInt c.G.ToInt c.B.ToInt s)  msg
+        Printf.kprintf (fun s -> Seff.PrintLineColor c.Red.ToInt c.Green.ToInt c.Blue.ToInt s)  msg
