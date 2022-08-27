@@ -31,11 +31,10 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 ### Changelog
 
 `0.11.0`
-- add String.beforeOrInput, .afterOrInput and .bewteenOrInput
 - improve randomness of random color
 - rename Dict and DefaultDict members Add and Set
 - add getOrSetDefault to Dict
-- add String.addPrefix, String.addSuffix
+- add String.addPrefix String.addSuffix
 - add Seq.tryFindDuplicate and Seq.duplicates
 - rename Dict.setOnce to Dict.setIfKeyAbsent 
 - remove cmp
@@ -43,7 +42,9 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 - better Error messages
 - add IO.createDirectoriesOfFilePath
 - better toNiceString
-- more Rarr.partition functions
+- add String.beforeOrInput, .afterOrInput and .betweenOrInput
+- remove dependency on System.Drawing
+- rename Rarr.find to Rarr.findValue
 
 `0.10.1` 
 - add MathUtil.interpolateTable function

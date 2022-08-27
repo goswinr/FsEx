@@ -61,7 +61,7 @@ module Array =
     /// Find first index where searchFor occurs in searchIn array.
     /// Give lower and upper bound index for search space.
     /// Returns -1 if not found
-    let find (searchFor:'T) fromIdx  tillIdx (searchIn:'T[])  :int = 
+    let findValue (searchFor:'T) fromIdx  tillIdx (searchIn:'T[])  :int = 
         if fromIdx < 0                then IndexOutOfRangeException.Raise    "FsEx.Array.find: fromIdx Index is too small: %d for array of %d items" fromIdx searchIn.Length
         if tillIdx >= searchIn.Length then IndexOutOfRangeException.Raise    "FsEx.Array.find: tillIdx Index is too big:   %d for array of %d items" tillIdx searchIn.Length
         if tillIdx < fromIdx          then ArgumentOutOfRangeException.Raise "FsEx.Array.find: tillIdx Index %d is smaller than fromIdx Index %d for array of %d items" tillIdx fromIdx searchIn.Length
@@ -75,7 +75,7 @@ module Array =
     /// Find last index where searchFor occurs in searchIn array. Searching from end.
     /// Give lower and upper bound index for search space.
     /// Returns -1 if not found
-    let findLast (searchFor:'T) fromIdx  tillIdx (searchIn:'T[])   :int = 
+    let findLastValue (searchFor:'T) fromIdx  tillIdx (searchIn:'T[])   :int = 
         if fromIdx < 0                then IndexOutOfRangeException.Raise    "FsEx.Array.findBack: fromIdx Index is too small: %d for array of %d items" fromIdx searchIn.Length
         if tillIdx >= searchIn.Length then IndexOutOfRangeException.Raise    "FsEx.Array.findBack: tillIdx Index is too big:   %d for array of %d items" tillIdx searchIn.Length
         if tillIdx < fromIdx          then ArgumentOutOfRangeException.Raise "FsEx.Array.findBack: tillIdx Index %d is smaller than fromIdx Index %d for array of %d items" tillIdx fromIdx searchIn.Length

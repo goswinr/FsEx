@@ -261,12 +261,14 @@ module Rarr =
     module private MinMax = 
         //TODO test keeping of order if equal !
 
+        (*
         let inline simple cmpF (xs:Rarr<'T>) = 
             if xs.Count < 1 then ArgumentException.RaiseBase "Rarr.MinMax.simple: Count must be at least one: %s"  xs.ToNiceStringLong
             let mutable m = xs.[0]
             for i=1 to xs.Count-1 do
                 if cmpF xs.List.[i] m then m <- xs.List.[i]
             m
+        *)
 
         let inline simple2 cmpF (xs:Rarr<'T>) = 
             if xs.Count < 2 then ArgumentException.RaiseBase "Rarr.MinMax.simple2: Count must be at least two: %s"  xs.ToNiceStringLong
@@ -395,20 +397,10 @@ module Rarr =
             i1,i2,i3
 
 
-    (* covered by part copied from Array module
-
-        // Returns the smallest element of the Rarr.
+    (* covered by part copied from Array module:
         let min rarr =     rarr |> MinMax.simple (<)
-
-        // Returns the biggest element of the Rarr.
         let max rarr =     rarr |> MinMax.simple (>)
-
-        // Returns the smallest element of the Rarr.
-        // Elements are compared by applying the predicate function first.
         let minBy f rarr = let i = rarr |> MinMax.indexByFun (<) f in rarr.List.[i]
-
-        // Returns the biggest element of the Rarr.
-        // Elements are compared by applying the predicate function first.
         let maxBy f rarr = let i = rarr |> MinMax.indexByFun (>) f in rarr.List.[i]
         *)
 
