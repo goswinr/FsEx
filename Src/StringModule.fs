@@ -361,10 +361,15 @@ module String =
         if isNull txt then FsExStringException.Raise "FsEx.String.addPrefix: txt is null"      
         prefix+txt
 
-    /// Add a double quote at start and end  
+    /// Add a double quote (") at start and end.  
     let (*inline*) inQuotes (txt:string) = 
         if isNull txt then FsExStringException.Raise "FsEx.String.inQuotes: txt is null"      
         "\"" + txt + "\""
+
+    /// Add a single quote (') at start and end.  
+    let (*inline*) inSingleQuotes (txt:string) = 
+        if isNull txt then FsExStringException.Raise "FsEx.String.inSingleQuotes: txt is null"      
+        "'" + txt + "'"
 
 
 

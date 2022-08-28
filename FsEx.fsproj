@@ -22,20 +22,21 @@
     <FileVersion>0.11.0</FileVersion>  
 	  
     <PackageReleaseNotes>
-      - improve randomness of random color
-      - rename Dict and DefaultDict members Add and Set
-      - add getOrSetDefault to Dict
-      - add String.addPrefix String.addSuffix
-      - add Seq.tryFindDuplicate and Seq.duplicates
-      - rename Dict.setOnce to Dict.setIfKeyAbsent 
-      - remove cmp
-      - Array.second, Array.last and similar functions
-      - better Error messages
-      - add IO.createDirectoriesOfFilePath
-      - better toNiceString
-      - add String.beforeOrInput, .afterOrInput and .betweenOrInput
-      - remove dependency on System.Drawing
-      - rename Rarr.find to Rarr.findValue
+		- improve randomness of random color
+		- rename Dict and DefaultDict members Add and Set
+		- add getOrSetDefault to Dict
+		- add String.addPrefix String.addSuffix
+		- add Seq.tryFindDuplicate and Seq.duplicates
+		- rename Dict.setOnce to Dict.setIfKeyAbsent
+		- remove cmp
+		- Array.second, Array.last and similar functions
+		- better Error messages
+		- add IO.createDirectoriesOfFilePath
+		- better toNiceString
+		- add String.beforeOrInput, .afterOrInput and .betweenOrInput
+		- remove dependency on System.Drawing
+		- rename Rarr.find to Rarr.findValue
+		- add Rarr.getInternalList
 	</PackageReleaseNotes>
 
     <Authors>GoswinR</Authors>

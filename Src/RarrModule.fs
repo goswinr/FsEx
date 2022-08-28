@@ -18,6 +18,11 @@ module Rarr =
     //        extensions added only in FsEx: (not in FSharp.Core Array module)
     //----------------------------------------------------
 
+    /// Access the underlying Collections.Generic.List<'T> of the Rarr directly.
+    /// This is NOT even a shallow copy, mutating it will also change the input Instance of FsEx.Rarr.
+    let inline getInternalList (rarr: Rarr<'T>) = 
+        rarr.List
+
     /// Gets an item in the Rarr by index.
     /// Allows for negative index too ( -1 is last item,  like Python)
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
@@ -1804,6 +1809,13 @@ module Rarr =
         for i = len - 1 downto 0 do
             result.Add li.[i]
         result
+
+    /// <summary>Reverses the order of Rarr in place.</summary>
+    /// <param name="rarr">The input Rarr.</param>
+    /// <returns>unit</returns>
+    let revInPlace (rarr: Rarr<'T>) = 
+        rarr.List.Reverse()       
+
 
     /// <summary>Like <c>fold</c>, but return the intermediary and final results.</summary>
     /// <param name="folder">The function to update the state given the input elements.</param>
