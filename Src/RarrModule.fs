@@ -1454,6 +1454,40 @@ module Rarr =
         // TODO replace with F# implementation using [<InlineIfLambda>] for performance?? Test on non Lambdas too.
         rarr.ConvertAll (System.Converter mapping)
 
+    /// <summary>Builds a new Rarr whose elements are the results of applying the given function
+    /// to each of the elements of the Array.</summary>
+    /// <param name="mapping">The function to transform elements of the Rarr.</param>
+    /// <param name="arr">The input Array.</param>
+    /// <returns>The Rarr of transformed elements.</returns>
+    let inline mapFromArray ( mapping: 'T -> 'U) (arr: array<'T>) : Rarr<'U> =         
+        let res = Rarr<'U>(arr.Length)
+        for i = 0 to arr.Length-1 do
+            res.Add(mapping arr.[i])
+        res
+   
+    /// <summary>Builds a new Rarr whose elements are the results of applying the given function
+    /// to each of the elements of a collection with IList interface.</summary>
+    /// <param name="mapping">The function to transform elements of the Rarr.</param>
+    /// <param name="list">The input collection with IList interface.</param>
+    /// <returns>The Rarr of transformed elements.</returns>
+    let inline mapFromIList ( mapping: 'T -> 'U) (list: IList<'T>) : Rarr<'U> =         
+        let res = Rarr<'U>(list.Count)
+        for i = 0 to list.Count-1 do
+            res.Add(mapping list.[i])
+        res
+
+    /// <summary>Builds a new Rarr whose elements are the results of applying the given function
+    /// to each of the elements of an IEnumerable.</summary>
+    /// <param name="mapping">The function to transform elements of the Rarr.</param>
+    /// <param name="sequence">The input IEnumerable.</param>
+    /// <returns>The Rarr of transformed elements.</returns>
+    let inline mapFromSeq ( mapping: 'T -> 'U) (sequence: seq<'T>) : Rarr<'U> =         
+        let res = Rarr<'U>()
+        use e = sequence.GetEnumerator()        
+        while e.MoveNext() do
+            res.Add(mapping e.Current)            
+        res
+
     /// <summary>Builds a new collection whose elements are the results of applying the given function
     /// to the corresponding elements of the two collections pairwise. The two input
     /// Rarrs must have the same lengths, otherwise an <c>ArgumentException</c> is

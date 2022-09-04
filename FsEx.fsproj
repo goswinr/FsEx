@@ -37,6 +37,7 @@
 		- remove dependency on System.Drawing
 		- rename Rarr.find to Rarr.findValue
 		- add Rarr.getInternalList
+		- add Rarr.mapFromIList .mapFromSeq and .mapFromArray
 	</PackageReleaseNotes>
 
     <Authors>GoswinR</Authors>
