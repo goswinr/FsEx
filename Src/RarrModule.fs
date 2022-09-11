@@ -256,7 +256,7 @@ module Rarr =
         if i<>j then
             if j < 0 then IndexOutOfRangeException.Raise "Rarr.swap: index j can't be less than 0: %d (i: %d)" j i
             if j >= xs.Count then IndexOutOfRangeException.Raise "Rarr.swap: index j can't be bigger than %d but is %d (i: %d)" (xs.Count-1) j i
-            // operate on underlaying list since indices are checked
+            // operate on underlying list since indices are checked
             let ti = xs.List.[i]
             xs.List.[i] <- xs.List.[j]
             xs.List.[j] <- ti
@@ -461,11 +461,11 @@ module Rarr =
     let inline max2IndBy f rarr = rarr |> MinMax.index2ByFun (>) f
 
     /// Returns the smallest three elements of the Rarr.
-    /// If they are equal then the  order is kept
+    /// If they are equal then the order is kept
     let inline min3 rarr =  rarr |> MinMax.simple3 (<)
 
     /// Returns the biggest three elements of the Rarr.
-    /// If they are equal then the  order is kept
+    /// If they are equal then the order is kept
     let inline max3 rarr =  rarr |> MinMax.simple3 (>)
 
     /// Returns the smallest three elements of the Rarr.
@@ -1240,7 +1240,7 @@ module Rarr =
         rarr.[index]
 
 
-    /// <summary>Builds a new Rarr that contains the given subrange specified by starting index and length.</summary>
+    /// <summary>Builds a new Rarr that contains the given sub-range specified by starting index and length.</summary>
     /// <param name="rarr">The input Rarr.</param>
     /// <param name="startIndex">The index of the first element of the sub Rarr.</param>
     /// <param name="count">The length of the sub Rarr.</param>
@@ -1253,7 +1253,7 @@ module Rarr =
     let inline private groupByImpl (comparer: IEqualityComparer<'SafeKey>) (keyf: 'T->'SafeKey) (getKey: 'SafeKey->'Key) (rarr: Rarr<'T>) :  Rarr<'Key * Rarr<'T>>= 
         let length = rarr.Count
         if length = 0 then
-           Rarr(0)
+            Rarr(0)
         else
             let dict = Dictionary<_, Rarr<_>> comparer
             // Build the groupings
@@ -1283,10 +1283,10 @@ module Rarr =
     let groupBy (projection:'T -> 'Key) (rarr:Rarr<'T>) :  Rarr<'Key * Rarr<'T>> = 
         if typeof<'Key>.IsValueType then
             // We avoid wrapping a StructBox, because under 64 JIT we get some "hard" tail-calls which affect performance
-             groupByImpl HashIdentity.Structural<'Key> projection id rarr
+            groupByImpl HashIdentity.Structural<'Key> projection id rarr
         else
             // Wrap a StructBox around all keys in case the key type is itself a type using null as a representation
-             groupByImpl StructBox<'Key>.Comparer (fun t -> StructBox (projection t)) (fun sb -> sb.Value) rarr
+            groupByImpl StructBox<'Key>.Comparer (fun t -> StructBox (projection t)) (fun sb -> sb.Value) rarr
 
 
 
