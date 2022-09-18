@@ -38,7 +38,8 @@
 		- rename Rarr.find to Rarr.findValue
 		- add Rarr.getInternalList
 		- add Rarr.mapFromIList .mapFromSeq and .mapFromArray
-	</PackageReleaseNotes>
+		- add rarr.InternalList to access internal ResizeArray
+	  </PackageReleaseNotes>
 
     <Authors>GoswinR</Authors>
     <Copyright>Goswin Rothenthal 2021</Copyright>
@@ -79,7 +80,7 @@
 
     <Compile Include="Src/TopLevelFunctions.fs" />
     <Compile Include="Src/Timer.fs" />
-	<Compile Include="Src/ComputationalExpressions.fs" />
+	  <Compile Include="Src/ComputationalExpressions.fs" />
     <Compile Include="Src/NiceString.fs" />
     <Compile Include="Src/UtilMath.fs" />
     <Compile Include="Src/MinMaxSortCompare.fs" />
@@ -88,7 +89,7 @@
 
     <Compile Include="Src/Types/Rarr.fs" />
 
-    <Compile Include="Src/Types\RarrCE.fs" />
+    <Compile Include="Src/Types/RarrCE.fs" />
     <Compile Include="Src/Types/Dict.fs" />
     <Compile Include="Src/Types/DefaultDict.fs" />
     <Compile Include="Src/Types/StuctTuples.fs" />

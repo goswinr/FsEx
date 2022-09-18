@@ -86,11 +86,15 @@ type Rarr<'T> private (xs:List<'T>) =
         if isNull xs then ArgumentNullException.Raise "Seq in FsEx.Rarr.CreateFromSeq is null."
         new Rarr<'T>(new List<'T>(xs))
 
-    /// Access the underlying Collections.Generic.List<'T>
+    /// Access the internally used Collections.Generic.List<'T>
     /// This is NOT even a shallow copy, mutating it will also change this Instance of FsEx.Rarr!
     /// Use "#nowarn "44" to disable the obsolete warning
     [<Obsolete("It is not actually obsolete, but normally not used, so hidden from editor tools. In F# use #nowarn \"44\" to disable the obsolete warning.")>]
     member _.List:List<'T> = xs
+
+    /// Access the internally used Collections.Generic.List<'T>
+    /// This is NOT even a shallow copy, mutating it will also change this Instance of FsEx.Rarr!
+    member _.InternalList:List<'T> = xs
 
     /// Gets the index of the last item in the FsEx.Rarr.
     /// Equal to this.Count - 1

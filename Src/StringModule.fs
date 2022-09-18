@@ -723,12 +723,14 @@ module String =
 
 
     (*
-    obsolete! use: 
+    obsolete! 
+    use: 
+
     FsEx.NiceFormat.stringInOneLine
     FsEx.NiceFormat.stringTruncated
     FsEx.NiceFormat.stringTruncatedToMaxLines
 
-    instead
+    instead.
     
     /// replaces new lines with custom string
     let (*inline*) inOneLine (newLineReplacment:string) (stringToMakeOneLine:string) = 

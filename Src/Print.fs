@@ -195,7 +195,7 @@ module Printf =
     let cyan msg = Printf.kprintf (fun s -> Seff.PrintColor 0 150 150 s)  msg
 
     /// Like printf but in Random Color if used in Seff Editor. Does not add a new line at end.
-    /// Very light, whithish and yellowish colors are excluded
+    /// Very light, white and yellow colors are excluded
     /// The colors used by subsequent calls to this functions will have very distinct hues.
     /// This is achieved by using a golden-ratio-loop and an internal cache of the last generated color.
     let colorRnd msg = 
@@ -261,7 +261,7 @@ module Printfn =
     let cyan msg = Printf.kprintf (fun s -> Seff.PrintLineColor 0 150 150 s)  msg
 
     /// Like printfn but in random Color if used in Seff Editor. Adds a new line at end.
-    /// Very light, whithish and yellowish colors are excluded
+    /// Very light, white and yellow colors are excluded
     /// The colors used by subsequent calls to this functions will have very distinct hues.
     /// This is achieved by using a golden-ratio-loop and an internal cache of the last generated color.
     let colorRnd msg = 
