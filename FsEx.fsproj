@@ -39,6 +39,7 @@
 		- add Rarr.getInternalList
 		- add Rarr.mapFromIList .mapFromSeq and .mapFromArray
 		- add rarr.InternalList to access internal ResizeArray
+		- add Rarr.trim
 	  </PackageReleaseNotes>
 
     <Authors>GoswinR</Authors>

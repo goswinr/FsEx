@@ -103,13 +103,25 @@ module Rarr =
     let inline third  (rarr: Rarr<'T>)= 
         if rarr.Count < 3 then IndexOutOfRangeException.Raise "Rarr.third: Failed to get third item of %s" rarr.ToNiceStringLong
         rarr.List.[2]
-
+    
+    /// Slice the Rarr given start and end index.
     /// Allows for negative indices too. ( -1 is last item, like Python)
     /// The resulting Rarr includes the end index.
+    /// Raises an ArgumentException if indices are out of range.
+    /// If you dont want an exception to be raised for index overflow use Rarr.trim.
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
-    let inline slice startIdx endIdx (rarr: Rarr<_>)  = 
+    let inline slice startIdx endIdx (rarr: Rarr<'T>) : Rarr<'T> = 
         rarr.GetSlice(startIdx, endIdx)
-
+    
+    
+    /// Trim items from start and end.
+    /// If the sum of fromStartCount and fromEndCount is bigger than rarr.Count it returns an empty Rarr.
+    /// If you want an exception to be raised for index overflow use Rarr.slice with negative end index.
+    let inline trim fromStartCount fromEndCount (rarr: Rarr<'T>) : Rarr<'T> = 
+        let c = rarr.Count
+        if fromStartCount + fromEndCount >= c then Rarr<'T>(0)
+        else rarr.GetRange(fromStartCount, c-fromStartCount-fromEndCount)
+        
 
     (*
 

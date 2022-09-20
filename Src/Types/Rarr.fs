@@ -277,6 +277,7 @@ type Rarr<'T> private (xs:List<'T>) =
         xs.Count - offset - 1
 
     /// Defines F# slicing notation operator use including negative indices. The resulting FsEx.Rarr includes the end index.
+    /// Raises an ArgumentException if indices are out of range.
     /// For indexing from the end use the ^ prefix. E.g. ^0 for the last item.
     member _.GetSlice(startIdx: option<int>, endIdx: option<int>) : Rarr<'T> = 
         //.GetSlice maps onto slicing operator .[1..3]
