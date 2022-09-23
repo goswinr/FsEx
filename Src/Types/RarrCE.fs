@@ -56,5 +56,5 @@ module ComputationalExpressionsRarr =
 [<AutoOpen>]
 module AutoOpenComputationalExpressionsRarr  =     
 
-    /// Computational Expression:  use 'yield' to add elements to a Rarr (= Collections.Generic.List).
+    /// Computational Expression:  use 'yield' to add elements to a Rarr (a wraper over Collections.Generic.List).
     let rarr<'T> = new ComputationalExpressionsRarr.RarrBuilder<'T> ()               

@@ -157,6 +157,7 @@ module Seq =
     //------------------------------------------------------------------
     //---------------------prev-this-next ------------------------------
     //------------------------------------------------------------------
+    // these functions below also exist on Rarr module:
 
     /// Yields a looped Seq from (first, second)  up to (last, first)
     /// The length of the resulting seq is the same as the input seq.

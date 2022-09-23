@@ -18,37 +18,37 @@ module ComputationalExpressionsBuilders =
         // The builder approach is from Matthew Podwysocki's excellent Creating Extended Builders series
         // http://codebetter.com/blogs/matthew.podwysocki/archive/2010/01/18/much-ado-about-monads-creating-extended-builders.aspx.
 
-        member this.Return(x) = Some x
+        member inline this.Return(x) = Some x
 
-        member this.ReturnFrom(m: option<'T>) = m
+        member inline this.ReturnFrom(m: option<'T>) = m
 
-        member this.Bind(m, f) = Option.bind f m
+        member inline this.Bind(m, f) = Option.bind f m
 
-        member this.Zero() = None
+        member inline this.Zero() = None
 
-        member this.Combine(m, f) = Option.bind f m
+        member inline this.Combine(m, f) = Option.bind f m
 
-        member this.Delay(f: unit -> _) = f
+        member inline this.Delay(f: unit -> _) = f
 
-        member this.Run(f) = f()
+        member inline this.Run(f) = f()
 
-        member this.TryWith(m, h) = 
+        member inline this.TryWith(m, h) = 
             try this.ReturnFrom(m)
             with e -> h e
 
-        member this.TryFinally(m, compensation) = 
+        member inline  this.TryFinally(m, compensation) = 
             try this.ReturnFrom(m)
             finally compensation()
 
-        member this.Using(res:#IDisposable, body) = 
+        member inline  this.Using(res:#IDisposable, body) = 
             this.TryFinally(body res, fun () -> match res with null -> () | disp -> disp.Dispose())
 
-        member this.While(guard, f) = 
+        member inline  this.While(guard, f) = 
             if not (guard()) then Some () else
             do f() |> ignore<StringBuilder>
             this.While(guard, f)
 
-        member this.For(sequence:seq<_>, body) = 
+        member inline  this.For(sequence:seq<_>, body) = 
             this.Using(sequence.GetEnumerator(), fun enum -> this.While(enum.MoveNext, this.Delay(fun () -> body enum.Current)))
 
 

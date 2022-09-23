@@ -29,7 +29,7 @@ module Rarr =
     let inline getNeg index  (rarr: Rarr<'T>)= 
         let len = rarr.Count
         let ii =  if index < 0 then len + index else index
-        if ii<0 || ii >= len then ArgumentException.RaiseBase "Rarr.GetNeg: Failed to get index %d from Rarr of %d items: %s" index rarr.Count rarr.ToNiceStringLong
+        if ii<0 || ii >= len then ArgumentException.RaiseBase "FsEx.Rarr.GetNeg: Failed to get index %d from Rarr of %d items: %s" index rarr.Count rarr.ToNiceStringLong
         rarr.List.[ii] // access List directly to not check index twice
 
     /// Sets an item in the Rarr by index.
@@ -38,14 +38,14 @@ module Rarr =
     let inline setNeg index value (rarr: Rarr<'T>)= 
         let len = rarr.Count
         let ii =  if index < 0 then len + index else index
-        if ii<0 || ii >= len then ArgumentException.RaiseBase "Rarr.SetNeg: Failed to set index %d to %s from Rarr of %d items: %s" index (toNiceString value) rarr.Count rarr.ToNiceStringLong
+        if ii<0 || ii >= len then ArgumentException.RaiseBase "FsEx.Rarr.SetNeg: Failed to set index %d to %s from Rarr of %d items: %s" index (toNiceString value) rarr.Count rarr.ToNiceStringLong
         rarr.List.[ii] <- value     // access List directly to not check index twice
 
     /// Any index will return a value.
     /// Rarr is treated as an endless loop in positive and negative direction
     let inline getLooped index  (rarr: Rarr<'T>)= 
         let len = rarr.Count
-        if len=0 then ArgumentException.RaiseBase "Rarr.GetLooped: Failed to get index %d from Rarr of 0 items" index
+        if len=0 then ArgumentException.RaiseBase "FsEx.Rarr.GetLooped: Failed to get index %d from Rarr of 0 items" index
         let t = index % len
         let ii = if t >= 0 then t  else t + len
         rarr.List.[ii]   // access List directly to not check index twice
@@ -54,7 +54,7 @@ module Rarr =
     /// Rarr is treated as an endless loop in positive and negative direction
     let inline setLooped index value  (rarr: Rarr<'T>) = 
         let len = rarr.Count
-        if len=0 then ArgumentException.RaiseBase "Rarr.SetLooped: Failed to Set index %d to %s in Rarr of 0 items" index (toNiceString value)
+        if len=0 then ArgumentException.RaiseBase "FsEx.Rarr.SetLooped: Failed to Set index %d to %s in Rarr of 0 items" index (toNiceString value)
         let t = index % len
         let ii = if t >= 0 then t  else t + len
         rarr.List.[ii] <- value // access List directly to not check index twice
@@ -70,19 +70,19 @@ module Rarr =
     /// Gets the second last item in the Rarr.
     /// Same as  this.[this.Count - 2]
     let inline secondLast  (rarr: Rarr<'T>)= 
-        if rarr.Count < 2 then  IndexOutOfRangeException.Raise "Rarr.secondLast: Failed to get second last item of %s" rarr.ToNiceStringLong
+        if rarr.Count < 2 then  IndexOutOfRangeException.Raise "FsEx.Rarr.secondLast: Failed to get second last item of %s" rarr.ToNiceStringLong
         rarr.List.[rarr.Count - 2]
 
     /// Gets the third last item in the Rarr.
     /// Same as   this.[this.Count - 3]
     let inline thirdLast  (rarr: Rarr<'T>)= 
-        if rarr.Count < 3 then  IndexOutOfRangeException.Raise "Rarr.thirdLast: Failed to get third last item of %s" rarr.ToNiceStringLong
+        if rarr.Count < 3 then  IndexOutOfRangeException.Raise "FsEx.Rarr.thirdLast: Failed to get third last item of %s" rarr.ToNiceStringLong
         rarr.List.[rarr.Count - 3]
 
     /// Gets the first item in the Rarr.
     /// Same as   this.[0]
     let inline first  (rarr: Rarr<'T>)= 
-        if rarr.Count = 0 then IndexOutOfRangeException.Raise "Rarr.first: Failed to get first item of %s" rarr.ToNiceStringLong
+        if rarr.Count = 0 then IndexOutOfRangeException.Raise "FsEx.Rarr.first: Failed to get first item of %s" rarr.ToNiceStringLong
         rarr.List.[0]
 
     /// Gets the the only item in the FsEx.Rarr.
@@ -101,14 +101,14 @@ module Rarr =
     /// Gets the third item in the Rarr.
     /// Same as   this.[2]
     let inline third  (rarr: Rarr<'T>)= 
-        if rarr.Count < 3 then IndexOutOfRangeException.Raise "Rarr.third: Failed to get third item of %s" rarr.ToNiceStringLong
+        if rarr.Count < 3 then IndexOutOfRangeException.Raise "FsEx.Rarr.third: Failed to get third item of %s" rarr.ToNiceStringLong
         rarr.List.[2]
     
     /// Slice the Rarr given start and end index.
     /// Allows for negative indices too. ( -1 is last item, like Python)
     /// The resulting Rarr includes the end index.
     /// Raises an ArgumentException if indices are out of range.
-    /// If you dont want an exception to be raised for index overflow use Rarr.trim.
+    /// If you don't want an exception to be raised for index overflow use Rarr.trim.
     /// (from the release of F# 5 on a negative index can also be done with '^' prefix. E.g. ^0 for the last item)
     let inline slice startIdx endIdx (rarr: Rarr<'T>) : Rarr<'T> = 
         rarr.GetSlice(startIdx, endIdx)
@@ -121,79 +121,79 @@ module Rarr =
         let c = rarr.Count
         if fromStartCount + fromEndCount >= c then Rarr<'T>(0)
         else rarr.GetRange(fromStartCount, c-fromStartCount-fromEndCount)
-        
+    
+    //------------------------------------------------------------------
+    //---------------------prev-this-next ------------------------------
+    //------------------------------------------------------------------
+    // these functions below also exist on Seq module:
 
-    (*
+    /// Yields Seq from (first, second)  up to (second-last, last).
+    /// Not looped.
+    /// The resulting seq is one element shorter than the input Rarr.
+    let windowed2 (rarr:Rarr<'T>) =         
+        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.windowed2 input has less than two items:\r\n%s" rarr.ToNiceString
+        seq {   for i = 0 to rarr.Count-2 do   rarr.[i], rarr.[i+1] }
 
-            implement those with cashing to avoid repeated index lookup, see Seq module
+    /// Yields looped Seq from (first, second)  up to (last, first).
+    /// The resulting seq has the same element count as the input Rarr.
+    let thisNext (rarr:Rarr<'T>) = 
+        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.thisNext input has less than two items:\r\n%s" rarr.ToNiceString
+        seq {   for i = 0 to rarr.Count-2 do  rarr.[i], rarr.[i+1]
+                rarr.[rarr.Count-1], rarr.[0] }
 
-            /// Yields Seq from (first, second)  up to (second-last, last)
-            /// not looped
-            /// the resulting seq is one element shorter than the input Rarr
-            let windowed2 (a:Rarr<'T>) = 
-                checkCount 2 "windowed2" a
-                seq {   for i = 0 to a.Count-2 do  yield a.[i], a.[i+1] }
+    /// Yields looped Seq from (last,first)  up to (second-last, last).
+    /// The resulting seq has the same element count as the input Rarr.
+    let prevThis (rarr:Rarr<'T>) = 
+        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.prevThis input has less than two items:\r\n%s" rarr.ToNiceString
+        seq {   rarr.[rarr.Count-1], rarr.[0]
+                for i = 0 to rarr.Count-2 do  rarr.[i], rarr.[i+1] }
 
-            /// Yields looped Seq from (first, second)  up to (last, first)
-            /// the resulting seq has the same element count as the input Rarr
-            let thisNext (a:Rarr<'T>) = 
-                checkCount 2 "thisNext" a
-                seq {   for i = 0 to a.Count-2 do yield a.[i], a.[i+1]
-                        yield a.[a.Count-1], a.[0] }
+    /// Yields Seq from (first, second, third)  up to (third-last, second-last, last).
+    /// Not looped.
+    /// The resulting seq is two elements shorter than the input Rarr.
+    let windowed3 (rarr:Rarr<'T>) = 
+        if rarr.Count <= 3 then ArgumentException.RaiseBase "FsEx.Rarr.windowed3 input has less than three items:\r\n%s" rarr.ToNiceString
+        seq { for i = 0 to rarr.Count-3 do  rarr.[i], rarr.[i+1], rarr.[i+2] }
 
-            /// Yields looped Seq from (last,first)  up to (second-last, last)
-            /// the resulting seq has the same element count as the input Rarr
-            let prevThis (a:Rarr<'T>) = 
-                checkCount 2 "prevThis" a
-                seq {   yield a.[a.Count-1], a.[0]
-                        for i = 0 to a.Count-2 do yield a.[i], a.[i+1] }
+    /// Yields looped Seq of  from (last, first, second)  up to (second-last, last, first).
+    /// The resulting seq has the same element count as the input Rarr.
+    let prevThisNext (rarr:Rarr<'T>) = 
+        if rarr.Count <= 3 then ArgumentException.RaiseBase "FsEx.Rarr.prevThisNext input has less than three items:\r\n%s" rarr.ToNiceString
+        seq{rarr.[rarr.Count-1], rarr.[0], rarr.[1]
+            for i = 0 to rarr.Count-3 do  rarr.[i], rarr.[i+1], rarr.[i+2]
+            rarr.[rarr.Count-2],rarr.[rarr.Count-1], rarr.[0] }
 
-            /// Yields Seq from (first, second, third)  up to (third-last, second-last, last)
-            /// not looped
-            /// the resulting seq is two elements shorter than the input Rarr
-            let windowed3 (a:Rarr<'T>) = 
-                checkCount 3 "windowed3" a
-                seq {   for i = 0 to a.Count-3 do yield a.[i], a.[i+1], a.[i+2] }
+    /// Yields Seq from (0,first, second)  up to (lastIndex-1 , second-last, last).
+    /// Not looped.
+    /// The resulting seq is one element shorter than the input Rarr.
+    let windowed2i (rarr:Rarr<'T>) = 
+        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.windowed2i input has less than two items:\r\n%s" rarr.ToNiceString
+        seq { for i = 0 to rarr.Count-2 do  i, rarr.[i], rarr.[i+1] }
 
-            /// Yields looped Seq of  from (last, first, second)  up to (second-last, last, first)
-            /// the resulting seq has the same element count as the input Rarr
-            let prevThisNext (a:Rarr<'T>) = 
-                checkCount 3 "prevThisNext" a
-                seq{    yield  a.[a.Count-1], a.[0], a.[1]
-                        for i = 0 to a.Count-3 do yield a.[i], a.[i+1], a.[i+2]
-                        yield  a.[a.Count-2],a.[a.Count-1], a.[0] }
+    /// Yields looped Seq  from (0,first, second)  up to (lastIndex, last, first).
+    /// The resulting seq has the same element count as the input Rarr.
+    let iThisNext (rarr:Rarr<'T>) = 
+        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.iThisNext input has less than two items:\r\n%s" rarr.ToNiceString
+        seq {   for i = 0 to rarr.Count-2 do  i, rarr.[i], rarr.[i+1]
+                rarr.Count-1, rarr.[rarr.Count-1], rarr.[0] }
 
-            /// Yields Seq from (0,first, second)  up to (lastIndex-1 , second-last, last)
-            /// not looped
-            /// the resulting seq is one element shorter than the input Rarr
-            let windowed2i (a:Rarr<'T>) = 
-                checkCount 2 "windowed2i" a
-                seq {   for i = 0 to a.Count-2 do yield i, a.[i], a.[i+1] }
+    /// Yields Seq from (1, first, second, third)  up to (lastIndex-1 , third-last, second-last, last).
+    /// Not looped.
+    /// The resulting seq is two elements shorter than the input Rarr.
+    let windowed3i (rarr:Rarr<'T>) = 
+        if rarr.Count <= 3 then ArgumentException.RaiseBase "FsEx.Rarr.windowed3i input has less than three items:\r\n%s" rarr.ToNiceString
+        seq { for i = 0 to rarr.Count-3 do  i+1, rarr.[i], rarr.[i+1], rarr.[i+2] }
 
-            /// Yields looped Seq  from (0,first, second)  up to (lastIndex, last, first)
-            /// the resulting seq has the same element count as the input Rarr
-            let iThisNext (a:Rarr<'T>) = 
-                checkCount 2 "iThisNext" a
-                seq {   for i = 0 to a.Count-2 do yield i, a.[i], a.[i+1]
-                        yield  a.Count-1, a.[a.Count-1], a.[0] }
-
-            /// Yields Seq from (1, first, second, third)  up to (lastIndex-1 , third-last, second-last, last)
-            /// not looped
-            /// the resulting seq is two elements shorter than the input Rarr
-            let windowed3i (a:Rarr<'T>) = 
-                checkCount 3 "windowed3i" a
-                seq {   for i = 0 to a.Count-3 do yield i+1, a.[i], a.[i+1], a.[i+2] }
-
-            /// Yields looped Seq from (1, last, first, second)  up to (lastIndex, second-last, last, first)
-            /// the resulting seq has the same element count as the input Rarr
-            let iPrevThisNext (a:Rarr<'T>) = 
-                checkCount 3 "iPrevThisNext" a
-                seq {   yield  0, a.[a.Count-1], a.[0], a.[1]
-                        for i = 0 to a.Count-3 do yield i+1, a.[i], a.[i+1], a.[i+2]
-                        yield  a.Count-1, a.[a.Count-2],a.[a.Count-1], a.[0] }
-
-            *)
-
+    /// Yields looped Seq from (1, last, first, second)  up to (lastIndex, second-last, last, first)
+    /// The resulting seq has the same element count as the input Rarr.
+    let iPrevThisNext (rarr:Rarr<'T>) = 
+        if rarr.Count <= 3 then ArgumentException.RaiseBase "FsEx.Rarr.iPrevThisNext input has less than three items:\r\n%s" rarr.ToNiceString
+        seq {   0, rarr.[rarr.Count-1], rarr.[0], rarr.[1]
+                for i = 0 to rarr.Count-3 do  i+1, rarr.[i], rarr.[i+1], rarr.[i+2]
+                rarr.Count-1, rarr.[rarr.Count-2],rarr.[rarr.Count-1], rarr.[0] }
+            
+    //------------------------------------------------------------------    
+    
 
     /// Returns a Rarr containing just one element
     [<Obsolete("Has a typo, use Rarr.singleton instead")>]
@@ -263,11 +263,11 @@ module Rarr =
 
     /// Swap the values of two given indices in Rarr
     let inline swap i j (xs:Rarr<'T>) : unit = 
-        if i < 0 then IndexOutOfRangeException.Raise "Rarr.swap: index i can't be less than 0: %d (j: %d)" i j
-        if i >= xs.Count then IndexOutOfRangeException.Raise "Rarr.swap: index i can't be bigger than %d but is %d (j: %d)" (xs.Count-1) i j
+        if i < 0 then IndexOutOfRangeException.Raise "FsEx.Rarr.swap: index i can't be less than 0: %d (j: %d)" i j
+        if i >= xs.Count then IndexOutOfRangeException.Raise "FsEx.Rarr.swap: index i can't be bigger than %d but is %d (j: %d)" (xs.Count-1) i j
         if i<>j then
-            if j < 0 then IndexOutOfRangeException.Raise "Rarr.swap: index j can't be less than 0: %d (i: %d)" j i
-            if j >= xs.Count then IndexOutOfRangeException.Raise "Rarr.swap: index j can't be bigger than %d but is %d (i: %d)" (xs.Count-1) j i
+            if j < 0 then IndexOutOfRangeException.Raise "FsEx.Rarr.swap: index j can't be less than 0: %d (i: %d)" j i
+            if j >= xs.Count then IndexOutOfRangeException.Raise "FsEx.Rarr.swap: index j can't be bigger than %d but is %d (i: %d)" (xs.Count-1) j i
             // operate on underlying list since indices are checked
             let ti = xs.List.[i]
             xs.List.[i] <- xs.List.[j]
@@ -280,7 +280,7 @@ module Rarr =
 
         (*
         let inline simple cmpF (xs:Rarr<'T>) = 
-            if xs.Count < 1 then ArgumentException.RaiseBase "Rarr.MinMax.simple: Count must be at least one: %s"  xs.ToNiceStringLong
+            if xs.Count < 1 then ArgumentException.RaiseBase "FsEx.Rarr.MinMax.simple: Count must be at least one: %s"  xs.ToNiceStringLong
             let mutable m = xs.[0]
             for i=1 to xs.Count-1 do
                 if cmpF xs.List.[i] m then m <- xs.List.[i]
@@ -288,7 +288,7 @@ module Rarr =
         *)
 
         let inline simple2 cmpF (xs:Rarr<'T>) = 
-            if xs.Count < 2 then ArgumentException.RaiseBase "Rarr.MinMax.simple2: Count must be at least two: %s"  xs.ToNiceStringLong
+            if xs.Count < 2 then ArgumentException.RaiseBase "FsEx.Rarr.MinMax.simple2: Count must be at least two: %s"  xs.ToNiceStringLong
             let mutable m1 = xs.List.[0]
             let mutable m2 = xs.List.[1]
             for i=1 to xs.Count-1 do
@@ -332,7 +332,7 @@ module Rarr =
                     else                   2,1,0
 
         let inline simple3 cmpF (xs:Rarr<'T>) = 
-            if xs.Count < 3 then ArgumentException.RaiseBase "Rarr.MinMax.simple3: Count must be at least three: %s"  xs.ToNiceStringLong
+            if xs.Count < 3 then ArgumentException.RaiseBase "FsEx.Rarr.MinMax.simple3: Count must be at least three: %s"  xs.ToNiceStringLong
             let e1 = xs.List.[0]
             let e2 = xs.List.[1]
             let e3 = xs.List.[2]
@@ -352,7 +352,7 @@ module Rarr =
             m1,m2,m3
 
         let inline indexByFun cmpF func (xs:Rarr<'T>) = 
-            if xs.Count < 1 then ArgumentException.RaiseBase "Rarr.MinMax.indexByFun: Count must be at least one: %s"  xs.ToNiceStringLong
+            if xs.Count < 1 then ArgumentException.RaiseBase "FsEx.Rarr.MinMax.indexByFun: Count must be at least one: %s"  xs.ToNiceStringLong
             let mutable f = func xs.List.[0]
             let mutable mf = f
             let mutable ii = 0
@@ -365,7 +365,7 @@ module Rarr =
             ii
 
         let inline index2ByFun cmpF func (xs:Rarr<'T>) = 
-            if xs.Count < 2 then ArgumentException.RaiseBase "Rarr.MinMax.index2ByFun: Count must be at least two: %s"  xs.ToNiceStringLong
+            if xs.Count < 2 then ArgumentException.RaiseBase "FsEx.Rarr.MinMax.index2ByFun: Count must be at least two: %s"  xs.ToNiceStringLong
             let mutable i1 = 0
             let mutable i2 = 1
             let mutable mf1 = func xs.List.[i1]
@@ -386,7 +386,7 @@ module Rarr =
 
 
         let inline index3ByFun (cmpOp:'U->'U->bool)  (byFun:'T->'U) (xs:Rarr<'T>) = 
-            if xs.Count < 3 then ArgumentException.RaiseBase "Rarr.MinMax.index3ByFun: Count must be at least three: %s"  xs.ToNiceStringLong
+            if xs.Count < 3 then ArgumentException.RaiseBase "FsEx.Rarr.MinMax.index3ByFun: Count must be at least three: %s"  xs.ToNiceStringLong
             // sort first 3
             let mutable i1,i2,i3 =  indexOfSort3By byFun cmpOp xs.[0] xs.[1] xs.[2] // otherwise would fail on sorting first 3, test on Rarr([5;6;3;1;2;0])|> Rarr.max3
             let mutable e1 =  byFun xs.List.[i1]
@@ -733,7 +733,7 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when <c>Rarr</c> is empty.</exception>
     /// <returns>The average of the elements in the Rarr.</returns>
     let inline average (rarr: Rarr<'T>) = 
-        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.average: Count must be at least one: %s" rarr.ToNiceStringLong
+        if rarr.Count = 0 then ArgumentException.RaiseBase "FsEx.Rarr.average: Count must be at least one: %s" rarr.ToNiceStringLong
         let mutable acc = LanguagePrimitives.GenericZero< ^T>
         let li = rarr.List
         for i = 0 to li.Count - 1 do
@@ -747,15 +747,15 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when <c>Rarr</c> is empty.</exception>
     /// <returns>The computed average.</returns>
     let inline averageBy (projection: 'T -> ^Key) (rarr: Rarr<'T>) : ^Key = 
-        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.averageBy: Count must be at least one: %s" rarr.ToNiceStringLong
+        if rarr.Count = 0 then ArgumentException.RaiseBase "FsEx.Rarr.averageBy: Count must be at least one: %s" rarr.ToNiceStringLong
         let mutable acc = LanguagePrimitives.GenericZero< ^Key>
         let li = rarr.List
         for i = 0 to li.Count - 1 do
             acc <- Checked.(+) acc (projection li.[i])
         LanguagePrimitives.DivideByInt< ^Key> acc rarr.Count
 
-    /// <summary>Applies the given function to each element of the Rarr. Returns
-    /// the Rarr comprised of the results "x" for each element where
+    /// <summary>Applies the given function to each element of the Rarr. 
+    /// Returns the Rarr comprised of the results "x" for each element where
     /// the function returns Some(x)</summary>
     /// <param name="chooser">The function to generate options from the elements.</param>
     /// <param name="rarr">The input Rarr.</param>
@@ -776,7 +776,7 @@ module Rarr =
     /// <returns>The Rarr divided into chunks.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when <c>chunkSize</c> is not positive.</exception>
     let chunkBySize chunkSize (rarr: Rarr<'T>) : Rarr<Rarr<'T>> = 
-        if chunkSize <= 0 then ArgumentException.RaiseBase "Rarr.chunkBySize: chunkSize %d must be bigger than 0" chunkSize
+        if chunkSize <= 0 then ArgumentException.RaiseBase "FsEx.Rarr.chunkBySize: chunkSize %d must be bigger than 0" chunkSize
         let len = rarr.Count
         if len = 0 then
             Rarr(0)
@@ -871,11 +871,11 @@ module Rarr =
     /// <param name="count">The number of elements to copy.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when any of sourceIndex,targetStartIndex or count are negative, or when there aren't enough elements in source or target.</exception>
     let inline blit (source: Rarr<'T>) (sourceIndex: int) (target: Rarr<'T>) (targetStartIndex: int) (count: int) :unit= 
-        if sourceIndex < 0  then  ArgumentException.RaiseBase "Rarr.blit: sourceIndex %d cannot be negative." sourceIndex
-        if targetStartIndex < 0  then  ArgumentException.RaiseBase "Rarr.blit:targetStartIndex %d cannot be negative." targetStartIndex
-        if count < 0  then  ArgumentException.RaiseBase "Rarr.blit: count %d cannot be negative." count
-        if source.Count < sourceIndex + count then  ArgumentException.RaiseBase "Rarr.blit: source.Count %d is smaller than  sourceIndex %d + count %d."   source.Count  sourceIndex  count
-        if target.Count < targetStartIndex + count then  ArgumentException.RaiseBase "Rarr.blit: target.Count %d is smaller than  targetStartIndex %d + count %d."  target.Count  targetStartIndex count
+        if sourceIndex < 0  then  ArgumentException.RaiseBase "FsEx.Rarr.blit: sourceIndex %d cannot be negative." sourceIndex
+        if targetStartIndex < 0  then  ArgumentException.RaiseBase "FsEx.Rarr.blit:targetStartIndex %d cannot be negative." targetStartIndex
+        if count < 0  then  ArgumentException.RaiseBase "FsEx.Rarr.blit: count %d cannot be negative." count
+        if source.Count < sourceIndex + count then  ArgumentException.RaiseBase "FsEx.Rarr.blit: source.Count %d is smaller than  sourceIndex %d + count %d."   source.Count  sourceIndex  count
+        if target.Count < targetStartIndex + count then  ArgumentException.RaiseBase "FsEx.Rarr.blit: target.Count %d is smaller than  targetStartIndex %d + count %d."  target.Count  targetStartIndex count
         let mutable j = targetStartIndex
         for i = sourceIndex to sourceIndex + count - 1 do
             target.[j] <- source.[i]
@@ -890,11 +890,11 @@ module Rarr =
     /// <param name="count">The number of elements to copy.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when any of sourceIndex, targetStartIndex or count are negative, or when there aren't enough elements in source.</exception>
     let inline blitExtend (source: Rarr<'T>) (sourceIndex: int) (target: Rarr<'T>) (targetStartIndex: int) (count: int) :unit= 
-        if sourceIndex < 0  then  ArgumentException.RaiseBase "Rarr.blit: sourceIndex %d cannot be negative." sourceIndex
-        if targetStartIndex < 0  then  ArgumentException.RaiseBase "Rarr.blit: targetStartIndex %d cannot be negative." targetStartIndex
-        if count < 0  then  ArgumentException.RaiseBase "Rarr.blit: count %d cannot be negative." count
-        if source.Count < sourceIndex + count then  ArgumentException.RaiseBase "Rarr.blit: source.Count %d is smaller than  sourceIndex %d + count %d." source.Count sourceIndex  count
-        if target.Count < targetStartIndex then  ArgumentException.RaiseBase "Rarr.blit: target.Count %d is smaller than  targetStartIndex %d." target.Count targetStartIndex
+        if sourceIndex < 0  then  ArgumentException.RaiseBase "FsEx.Rarr.blit: sourceIndex %d cannot be negative." sourceIndex
+        if targetStartIndex < 0  then  ArgumentException.RaiseBase "FsEx.Rarr.blit: targetStartIndex %d cannot be negative." targetStartIndex
+        if count < 0  then  ArgumentException.RaiseBase "FsEx.Rarr.blit: count %d cannot be negative." count
+        if source.Count < sourceIndex + count then  ArgumentException.RaiseBase "FsEx.Rarr.blit: source.Count %d is smaller than  sourceIndex %d + count %d." source.Count sourceIndex  count
+        if target.Count < targetStartIndex then  ArgumentException.RaiseBase "FsEx.Rarr.blit: target.Count %d is smaller than  targetStartIndex %d." target.Count targetStartIndex
         let mutable j = targetStartIndex
         let tlasti = target.Count-1
         for i = sourceIndex to sourceIndex + count - 1 do
@@ -944,7 +944,7 @@ module Rarr =
     /// <returns>The created Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when count is negative.</exception>
     let create (count: int) (value: 'T) = 
-        if count < 0 then  ArgumentException.RaiseBase "Rarr.create: count %d cannot be negative." count
+        if count < 0 then  ArgumentException.RaiseBase "FsEx.Rarr.create: count %d cannot be negative." count
         let rarr= Rarr(count)
         for i = 0 to count-1 do
             rarr.Add value
@@ -1001,7 +1001,7 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when the input does not have precisely one element.</exception>
     let exactlyOne (rarr: Rarr<'T>) = 
         if rarr.Count = 1 then rarr.List.[0]
-        else ArgumentException.RaiseBase "Rarr.exactlyOne: Rarr has %d elements, not one." rarr.Count
+        else ArgumentException.RaiseBase "FsEx.Rarr.exactlyOne: Rarr has %d elements, not one." rarr.Count
 
 
     /// <summary>Returns a new list with the distinct elements of the input Rarr which do not appear in the itemsToExclude sequence.
@@ -1047,7 +1047,7 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarrs differ in length.</exception>
     let exists2 (predicate:'T->'U->bool) (rarr1: Rarr<'T>) (rarr2: Rarr<'U>) :bool = 
         let len1 = rarr1.Count
-        if len1 <> rarr2.Count then ArgumentException.RaiseBase "Rarr.exists2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
+        if len1 <> rarr2.Count then ArgumentException.RaiseBase "FsEx.Rarr.exists2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(predicate)
         let rec loop i = i < len1 && (f.Invoke(rarr1.List.[i], rarr2.List.[i]) || loop (i+1))
         loop 0
@@ -1059,9 +1059,9 @@ module Rarr =
     /// <param name="value">The value to set.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when either startIndex or count is negative.</exception>
     let fill (target: Rarr<'T>) (startIndex: int) (count: int) (value: 'T) = 
-        if startIndex < 0  then  ArgumentException.RaiseBase "Rarr.fill: startIndex %d cannot be negative." startIndex
-        if count < 0  then  ArgumentException.RaiseBase "Rarr.fill: count %d cannot be negative." count
-        if target.Count < startIndex then  ArgumentException.RaiseBase "Rarr.fill: target.Count %d is smaller than  startIndex %d."   target.Count  startIndex
+        if startIndex < 0  then  ArgumentException.RaiseBase "FsEx.Rarr.fill: startIndex %d cannot be negative." startIndex
+        if count < 0  then  ArgumentException.RaiseBase "FsEx.Rarr.fill: count %d cannot be negative." count
+        if target.Count < startIndex then  ArgumentException.RaiseBase "FsEx.Rarr.fill: target.Count %d is smaller than  startIndex %d."   target.Count  startIndex
         let tlasti = target.Count-1
         for j = startIndex to startIndex + count - 1 do
             if j > tlasti then
@@ -1089,7 +1089,7 @@ module Rarr =
         let elementIndex =  rarr.FindIndex (System.Predicate predicate)
         match elementIndex with
         | -1 ->
-            KeyNotFoundException.Raise "Rarr.find did not find for predicate in Rarr of %d items." rarr.Count
+            KeyNotFoundException.Raise "FsEx.Rarr.find did not find for predicate in Rarr of %d items." rarr.Count
         | index ->
             rarr.List.[index]
 
@@ -1103,7 +1103,7 @@ module Rarr =
         let li = rarr.List
         let rec loop i = 
             if i < 0 then
-                KeyNotFoundException.Raise "Rarr.findBack: not found in %d items %s" rarr.Count rarr.ToNiceStringLong
+                KeyNotFoundException.Raise "FsEx.Rarr.findBack: not found in %d items %s" rarr.Count rarr.ToNiceStringLong
             else
                 if predicate li.[i] then li.[i]  else loop (i-1)
         loop (li.Count - 1)
@@ -1119,7 +1119,7 @@ module Rarr =
         let elementIndex =  rarr.FindIndex (System.Predicate predicate)
         match elementIndex with
         | -1 ->
-            KeyNotFoundException.Raise "Rarr.findIndex did not find for predicate in Rarr of %d items." rarr.Count
+            KeyNotFoundException.Raise "FsEx.Rarr.findIndex did not find for predicate in Rarr of %d items." rarr.Count
         | index ->
             index
 
@@ -1135,7 +1135,7 @@ module Rarr =
         let li = rarr.List
         let rec go n = 
             if n < 0 then
-                KeyNotFoundException.Raise "Rarr.findIndexBack: not found in %s" rarr.ToNiceStringLong
+                KeyNotFoundException.Raise "FsEx.Rarr.findIndexBack: not found in %s" rarr.ToNiceStringLong
             elif predicate li.[n] then
                 n
             else go (n-1)
@@ -1170,7 +1170,7 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarrs differ in length.</exception>
     /// <returns>The final state.</returns>
     let fold2<'T1, 'T2, 'State>  folder (state: 'State) (rarr1: 'T1 Rarr) (rarr2: 'T2  Rarr) = 
-        if rarr1.Count <> rarr2.Count then ArgumentException.RaiseBase "Rarr.fold2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
+        if rarr1.Count <> rarr2.Count then ArgumentException.RaiseBase "FsEx.Rarr.fold2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
         let f = OptimizedClosures.FSharpFunc<_, _, _, _>.Adapt(folder)
         let mutable state = state
         for i = 0 to rarr1.Count-1 do
@@ -1206,7 +1206,7 @@ module Rarr =
     /// <returns>The final state.</returns>
     let foldBack2<'T1, 'T2, 'State>  folder (rarr1: 'T1 Rarr) (rarr2: 'T2  Rarr) (state: 'State) = 
         let len = rarr1.Count
-        if len <> rarr2.Count then ArgumentException.RaiseBase "Rarr.foldBack2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
+        if len <> rarr2.Count then ArgumentException.RaiseBase "FsEx.Rarr.foldBack2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
         let mutable res = state
         let f = OptimizedClosures.FSharpFunc<_, _, _, _>.Adapt(folder)
         for i = len-1 downto 0 do
@@ -1238,7 +1238,7 @@ module Rarr =
     /// <returns><c>true</c> if all of the Rarr elements satisfy the predicate.</returns>
     let forall2 (predicate:'T->'U->bool) (rarr1: Rarr<'T>) (rarr2: Rarr<'U>) : bool = 
         let len1 = rarr1.Count
-        if len1 <> rarr2.Count then ArgumentException.RaiseBase "Rarr.forall2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
+        if len1 <> rarr2.Count then ArgumentException.RaiseBase "FsEx.Rarr.forall2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(predicate)
         let rec loop i = i >= len1 || (f.Invoke(rarr1.List.[i], rarr2.List.[i]) && loop (i+1))
         loop 0
@@ -1329,7 +1329,7 @@ module Rarr =
     /// <returns>The first element of the Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarr is empty.</exception>
     let inline head (rarr: Rarr<'T>) = 
-        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.head: The input Rarr is empty." else rarr.List.[0]
+        if rarr.Count = 0 then ArgumentException.RaiseBase "FsEx.Rarr.head: The input Rarr is empty." else rarr.List.[0]
 
 
     /// <summary>Builds a new Rarr whose elements are the corresponding elements of the input Rarr
@@ -1349,7 +1349,7 @@ module Rarr =
     /// <returns>The created Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when count is negative.</exception>
     let inline init (count:int) (initializer:int->'T) = 
-        if count < 0 then ArgumentException.RaiseBase "Rarr.init: count %d is negative." count
+        if count < 0 then ArgumentException.RaiseBase "FsEx.Rarr.init: count %d is negative." count
         let res = Rarr(count)
         for i = 0 to count-1 do
             res.Add (initializer i)
@@ -1362,7 +1362,7 @@ module Rarr =
     /// <returns>The result Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when index is below not within source.Count.</exception>
     let insertAt (index: int) (value: 'T) (source: Rarr<'T>) : Rarr<'T> = 
-        if index < 0 || index > source.Count then ArgumentException.RaiseBase "Rarr.insertAt: index %d not within source.Count %d." index source.Count
+        if index < 0 || index > source.Count then ArgumentException.RaiseBase "FsEx.Rarr.insertAt: index %d not within source.Count %d." index source.Count
         let r = source.Clone()
         r.Insert(index,value)
         r
@@ -1375,7 +1375,7 @@ module Rarr =
     /// <returns>The result Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when index is below not within source.Count.</exception>
     let insertManyAt (index: int) (values: seq<'T>) (source: Rarr<'T>) : Rarr<'T> = 
-        if index < 0 || index > source.Count  then ArgumentException.RaiseBase "Rarr.insertManyAt: index %d and  not within source.Count %d." index source.Count
+        if index < 0 || index > source.Count  then ArgumentException.RaiseBase "FsEx.Rarr.insertManyAt: index %d and  not within source.Count %d." index source.Count
         let r = source.Clone()
         r.InsertRange(index,values)
         r
@@ -1411,7 +1411,7 @@ module Rarr =
     /// <param name="rarr2">The second input Rarr.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarrs differ in length.</exception>
     let inline iter2 (action : 'T -> 'U -> unit) (rarr1: Rarr<'T>) (rarr2: Rarr<'U>) = 
-        if rarr1.Count <> rarr2.Count then ArgumentException.RaiseBase "Rarr.iter2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
+        if rarr1.Count <> rarr2.Count then ArgumentException.RaiseBase "FsEx.Rarr.iter2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(action)
         for i = 0 to rarr1.Count-1 do
             f.Invoke(rarr1.List.[i], rarr2.List.[i])
@@ -1436,7 +1436,7 @@ module Rarr =
     /// <param name="rarr2">The second input Rarr.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarrs differ in length.</exception>
     let inline iteri2 (action : int -> 'T -> 'U -> unit)  (rarr1: Rarr<'T>) (rarr2: Rarr<'U>) = 
-        if rarr1.Count <> rarr2.Count then ArgumentException.RaiseBase "Rarr.iteri2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
+        if rarr1.Count <> rarr2.Count then ArgumentException.RaiseBase "FsEx.Rarr.iteri2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
         let f = OptimizedClosures.FSharpFunc<_, _, _, _>.Adapt(action)
         for i = 0 to rarr1.Count-1 do
             f.Invoke(i, rarr1.List.[i], rarr2.List.[i])
@@ -1447,7 +1447,7 @@ module Rarr =
     /// <returns>The last element of the Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when the input does not have any elements.</exception>
     let inline last (rarr: Rarr<'T>) = 
-        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.last: The input Rarr is empty."
+        if rarr.Count = 0 then ArgumentException.RaiseBase "FsEx.Rarr.last: The input Rarr is empty."
         rarr.List.[rarr.Count-1]
 
 
@@ -1510,7 +1510,7 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarrs differ in length.</exception>
     /// <returns>The Rarr of transformed elements.</returns>
     let map2 (mapping: 'T1 ->'T2 ->'U) (rarr1: Rarr<'T1>) (rarr2: Rarr<'T2>) : Rarr<'U> = 
-        if rarr1.Count <> rarr2.Count then ArgumentException.RaiseBase "Rarr.map2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
+        if rarr1.Count <> rarr2.Count then ArgumentException.RaiseBase "FsEx.Rarr.map2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(mapping)
         let res = Rarr<'U>(rarr1.Count)
         for i = 0 to rarr1.Count-1 do
@@ -1529,7 +1529,7 @@ module Rarr =
     /// <returns>The Rarr of transformed elements.</returns>
     let map3 (mapping: 'T1 ->'T2 ->'T3 ->'U)  (rarr1: Rarr<'T1> ) (rarr2: Rarr<'T2> ) (rarr3: Rarr<'T3> ) : Rarr<'U> = 
         let len1 = rarr1.Count
-        if len1 <> rarr2.Count || len1 <> rarr3.Count then ArgumentException.RaiseBase "Rarr.map3: count of rarr1 %d does not match rarr2 %d or rarr3 %d" rarr1.Count rarr2.Count rarr3.Count
+        if len1 <> rarr2.Count || len1 <> rarr3.Count then ArgumentException.RaiseBase "FsEx.Rarr.map3: count of rarr1 %d does not match rarr2 %d or rarr3 %d" rarr1.Count rarr2.Count rarr3.Count
         let f = OptimizedClosures.FSharpFunc<_, _, _, _>.Adapt(mapping)
         let res = Rarr(len1)
         for i = 0 to rarr1.Count-1 do
@@ -1604,7 +1604,7 @@ module Rarr =
     /// <returns>The Rarr of transformed elements.</returns>
     let mapi2 (mapping: int -> 'T1 -> 'T2-> 'U) (rarr1: Rarr<'T1>) (rarr2: Rarr<'T2>) : Rarr<'U>  = 
         let f = OptimizedClosures.FSharpFunc<_, _, _, _>.Adapt(mapping)
-        if rarr1.Count <> rarr2.Count then ArgumentException.RaiseBase "Rarr.mapi2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
+        if rarr1.Count <> rarr2.Count then ArgumentException.RaiseBase "FsEx.Rarr.mapi2: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
         let res = Rarr(rarr1.Count)
         for i = 0 to rarr1.Count-1 do
             res.Add <|  f.Invoke(i, rarr1.List.[i], rarr2.List.[i])
@@ -1616,7 +1616,7 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarr is empty.</exception>
     /// <returns>The maximum element.</returns>
     let inline max (rarr: Rarr<'T>) = 
-        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.max: Count must be at least one: %s"  rarr.ToNiceStringLong
+        if rarr.Count = 0 then ArgumentException.RaiseBase "FsEx.Rarr.max: Count must be at least one: %s"  rarr.ToNiceStringLong
         let mutable acc = rarr.List.[0]        
         let li = rarr.List
         for i = 1 to li.Count - 1 do
@@ -1631,7 +1631,7 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarr is empty.</exception>
     /// <returns>The maximum element.</returns>
     let inline maxBy (projection : 'T -> 'Key) (rarr: Rarr<'T>) : 'T = 
-        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.maxBy: Count must be at least one: %s"  rarr.ToNiceStringLong
+        if rarr.Count = 0 then ArgumentException.RaiseBase "FsEx.Rarr.maxBy: Count must be at least one: %s"  rarr.ToNiceStringLong
         let mutable accv = rarr.List.[0]
         if rarr.Count =  1 then 
             accv // if len = 1 then don't call the projection not even once !
@@ -1651,7 +1651,7 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarr is empty.</exception>
     /// <returns>The minimum element.</returns>
     let inline min (rarr: Rarr<'T>) : 'T= 
-        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.min: Count must be at least one: %s"  rarr.ToNiceStringLong
+        if rarr.Count = 0 then ArgumentException.RaiseBase "FsEx.Rarr.min: Count must be at least one: %s"  rarr.ToNiceStringLong
         let mutable acc = rarr.List.[0]
         let li = rarr.List
         for i = 1 to li.Count - 1 do
@@ -1666,7 +1666,7 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarr is empty.</exception>
     /// <returns>The minimum element.</returns>
     let inline minBy ((*[<InlineIfLambda>]*) projection : 'T -> 'Key) (rarr: Rarr<'T>) : 'T = 
-        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.minBy: Count must be at least one: %s"  rarr.ToNiceStringLong
+        if rarr.Count = 0 then ArgumentException.RaiseBase "FsEx.Rarr.minBy: Count must be at least one: %s"  rarr.ToNiceStringLong
         let mutable accv = rarr.List.[0]
         if rarr.Count =  1 then 
             accv // if len = 1 then don't call the projection not even once !
@@ -1745,11 +1745,11 @@ module Rarr =
         let li = rarr.List
         for i = 0 to li.Count - 1 do
             let j = indexMap i
-            if j < 0 || j >= rarr.Count then ArgumentException.RaiseBase "Rarr.permute: the indexMap generated %d from %d but only 0 to %d is allowed" j i (li.Count - 1)
+            if j < 0 || j >= rarr.Count then ArgumentException.RaiseBase "FsEx.Rarr.permute: the indexMap generated %d from %d but only 0 to %d is allowed" j i (li.Count - 1)
             res.[j] <- li.[i]
             inv.[j] <- 1uy
         for i = 0 to li.Count - 1 do
-            if inv.[i] <> 1uy then ArgumentException.RaiseBase "Rarr.permute: the indexMap function did not generated %d a new value for " i
+            if inv.[i] <> 1uy then ArgumentException.RaiseBase "FsEx.Rarr.permute: the indexMap function did not generated %d a new value for " i
         res
 
 
@@ -1765,7 +1765,7 @@ module Rarr =
         let li = rarr.List
         let rec loop i = 
             if i >= rarr.Count then
-                KeyNotFoundException.Raise "Rarr.pick: Key not found in %d elements" rarr.Count
+                KeyNotFoundException.Raise "FsEx.Rarr.pick: Key not found in %d elements" rarr.Count
             else
                 match chooser li.[i] with
                 | None -> loop(i+1)
@@ -1782,7 +1782,7 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarr is empty.</exception>
     /// <returns>The final result of the reductions.</returns>
     let reduce (reduction:'T -> 'T -> 'T) (rarr: Rarr<'T>) = 
-        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.reduce: Count must be at least one: %s"  rarr.ToNiceStringLong
+        if rarr.Count = 0 then ArgumentException.RaiseBase "FsEx.Rarr.reduce: Count must be at least one: %s"  rarr.ToNiceStringLong
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(reduction)
         let li = rarr.List
         let mutable res = li.[0]
@@ -1800,7 +1800,7 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarr is empty.</exception>
     /// <returns>The final result of the reductions.</returns>
     let reduceBack (reduction:'T -> 'T -> 'T) (rarr: Rarr<'T>) = 
-        if rarr.Count = 0 then ArgumentException.RaiseBase "Rarr.reduceBack: Count must be at least one: %s"  rarr.ToNiceStringLong
+        if rarr.Count = 0 then ArgumentException.RaiseBase "FsEx.Rarr.reduceBack: Count must be at least one: %s"  rarr.ToNiceStringLong
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(reduction)
         let mutable res = rarr.Last
         let li = rarr.List
@@ -1816,7 +1816,7 @@ module Rarr =
     /// <returns>The result Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when index is outside 0..source.Length - 1</exception>
     let removeAt (index: int) (source: Rarr<'T>) : Rarr<'T> = 
-        if index < 0 || index >= source.Count then ArgumentException.RaiseBase "Rarr.removeAt: index %d not within source.Count %d." index source.Count
+        if index < 0 || index >= source.Count then ArgumentException.RaiseBase "FsEx.Rarr.removeAt: index %d not within source.Count %d." index source.Count
         let r = source.Clone()
         r.RemoveAt(index)
         r
@@ -1828,7 +1828,7 @@ module Rarr =
     /// <returns>The result Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when index is outside 0..source.Length - count</exception>
     let removeManyAt (index: int) (count: int) (source: Rarr<'T>) : Rarr<'T> = 
-        if index < 0 || index > source.Count  - count then ArgumentException.RaiseBase "Rarr.removeManyAt: index %d and count %d not within source.Count %d." index count source.Count
+        if index < 0 || index > source.Count  - count then ArgumentException.RaiseBase "FsEx.Rarr.removeManyAt: index %d and count %d not within source.Count %d." index count source.Count
         let r = source.Clone()
         r.RemoveRange(index,count)
         r
@@ -1839,7 +1839,7 @@ module Rarr =
     /// <returns>The generated Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when count is negative.</exception>
     let replicate count (initial:'T) = 
-        if count < 0 then  ArgumentException.RaiseBase "Rarr.replicate: count %d cannot be negative "count
+        if count < 0 then  ArgumentException.RaiseBase "FsEx.Rarr.replicate: count %d cannot be negative "count
         let arr = Rarr(count)
         for _ = 0 to count-1 do
             arr.Add ( initial)
@@ -1918,7 +1918,7 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when count is negative or exceeds the number of
     /// elements in the Rarr.</exception>
     let skip count (rarr: Rarr<'T>) = 
-        if count < 0 || count > rarr.Count then ArgumentException.RaiseBase "Rarr.skip: count %d is not in range of 0 to rarr.Count %d " count rarr.Count
+        if count < 0 || count > rarr.Count then ArgumentException.RaiseBase "FsEx.Rarr.skip: count %d is not in range of 0 to rarr.Count %d " count rarr.Count
         if count = rarr.Count then
             Rarr()
         else
@@ -2039,7 +2039,7 @@ module Rarr =
     /// <returns>The two split Rarrs.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when split index exceeds the number of elements in the Rarr.</exception>
     let splitAt index (rarr: Rarr<'T>) = 
-        if index < 0 || index > rarr.Count then ArgumentException.RaiseBase "Rarr.splitAt: index %d is not in range  0 to rarr.Count-1 (%d)" index (rarr.Count-1)
+        if index < 0 || index > rarr.Count then ArgumentException.RaiseBase "FsEx.Rarr.splitAt: index %d is not in range  0 to rarr.Count-1 (%d)" index (rarr.Count-1)
         rarr.GetRange(0, index), rarr.GetRange(index, rarr.Count-index)
 
 
@@ -2050,7 +2050,7 @@ module Rarr =
     /// <returns>The Rarr split into chunks.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when <c>count</c> is not positive.</exception>
     let splitInto (chunkCount:int) (rarr: Rarr<'T>) : Rarr<Rarr<'T>> = 
-        if chunkCount < 1  then ArgumentException.RaiseBase "Rarr.splitInto: count %d is less than 1" chunkCount
+        if chunkCount < 1  then ArgumentException.RaiseBase "FsEx.Rarr.splitInto: count %d is less than 1" chunkCount
         let len = rarr.Count
         if len = 0 then
             Rarr(0)
@@ -2105,7 +2105,7 @@ module Rarr =
     /// <exception cref="T:System.ArgumentException">Thrown when the Rarr is empty.</exception>
     /// <returns>A new Rarr containing the elements of the original except the first element.</returns>
     let tail (rarr: Rarr<'T>) = 
-        if rarr.Count = 0  then ArgumentException.RaiseBase "Rarr.tail: input Rarr is empty"
+        if rarr.Count = 0  then ArgumentException.RaiseBase "FsEx.Rarr.tail: input Rarr is empty"
         rarr.GetRange(1,rarr.Count-1)
 
 
@@ -2117,12 +2117,12 @@ module Rarr =
     /// <returns>The result Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarr is empty or count exceeds the number of elements in the list.</exception>
     let take count (rarr: Rarr<'T>) = 
-        if count < 0 then  ArgumentException.RaiseBase "Rarr.take: count %d cannot be negative." count
+        if count < 0 then  ArgumentException.RaiseBase "FsEx.Rarr.take: count %d cannot be negative." count
         if count = 0 then
             Rarr(0)
         else
             if count > rarr.Count then
-                ArgumentException.RaiseBase "Rarr.take: count %d > rarr.Count %d." count rarr.Count
+                ArgumentException.RaiseBase "FsEx.Rarr.take: count %d > rarr.Count %d." count rarr.Count
             rarr.GetRange(0,count)
 
 
@@ -2175,7 +2175,7 @@ module Rarr =
             let lenInner = rarrs.[0].Count
             for j in 1..len-1 do
                 if lenInner <> rarrs.[j].Count then
-                    ArgumentException.RaiseBase "Rarr.transpose: the count %d in sub Rarr %d does not match the count of the first Rarr %d." rarrs.[j].Count j lenInner
+                    ArgumentException.RaiseBase "FsEx.Rarr.transpose: the count %d in sub Rarr %d does not match the count of the first Rarr %d." rarrs.[j].Count j lenInner
             let result = Rarr(lenInner)
             for i in 0..lenInner-1 do
                 let sub = Rarr(len)
@@ -2362,7 +2362,7 @@ module Rarr =
     /// <returns>The result Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when index is not within  source.Count </exception>
     let updateAt (index: int) (value: 'T) (source: Rarr<'T>) : Rarr<'T> = 
-        if index < 0 || index >= source.Count  then ArgumentException.RaiseBase "Rarr.updateAt: index %d  not within source.Count %d." index  source.Count
+        if index < 0 || index >= source.Count  then ArgumentException.RaiseBase "FsEx.Rarr.updateAt: index %d  not within source.Count %d." index  source.Count
         let r = source.Clone()
         r.List.[index] <- value
         r
@@ -2383,7 +2383,7 @@ module Rarr =
     /// <returns>The result Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when windowSize is not positive.</exception>
     let windowed windowSize (rarr: Rarr<'T>) = 
-        if windowSize <= 0 then  ArgumentException.RaiseBase "Rarr.windowed: windowSize %d cannot be negative or 0." windowSize
+        if windowSize <= 0 then  ArgumentException.RaiseBase "FsEx.Rarr.windowed: windowSize %d cannot be negative or 0." windowSize
         let len = rarr.Count
         if windowSize > len then
             Rarr(0)
@@ -2401,7 +2401,7 @@ module Rarr =
     /// <returns>The Rarr of tupled elements.</returns>
     let zip (rarr1: Rarr<'T>) (rarr2: Rarr<'U>) = 
         let len1 = rarr1.Count
-        if len1 <> rarr2.Count then ArgumentException.RaiseBase "Rarr.zip: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
+        if len1 <> rarr2.Count then ArgumentException.RaiseBase "FsEx.Rarr.zip: count of rarr1 %d does not match rarr2 %d." rarr1.Count rarr2.Count
         let res = Rarr(len1)
         for i = 0 to rarr1.Count-1 do
             res.Add (rarr1.List.[i], rarr2.List.[i])
@@ -2416,7 +2416,7 @@ module Rarr =
     /// <returns>The Rarr of tupled elements.</returns>
     let zip3 (rarr1: Rarr<'T>) (rarr2: Rarr<'U>) (rarr3: Rarr<'V>) = 
         let len1 = rarr1.Count
-        if len1 <> rarr2.Count || len1 <> rarr3.Count then ArgumentException.RaiseBase "Rarr.zip3: count of rarr1 %d does not match rarr2 %d or rarr3 %d." rarr1.Count rarr2.Count rarr3.Count
+        if len1 <> rarr2.Count || len1 <> rarr3.Count then ArgumentException.RaiseBase "FsEx.Rarr.zip3: count of rarr1 %d does not match rarr2 %d or rarr3 %d." rarr1.Count rarr2.Count rarr3.Count
         let res = Rarr(len1)
         for i = 0 to rarr1.Count-1 do
             res.Add (rarr1.List.[i], rarr2.List.[i], rarr3.List.[i])
