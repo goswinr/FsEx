@@ -42,6 +42,9 @@ module NiceStringSettings =
        
         /// how many characters of a string might be printed at once.
         maxCharsInString :int
+
+        /// print top level numbers with full precision ?
+        fullPrecision:bool
         
         }
 
@@ -55,6 +58,7 @@ module NiceStringSettings =
         maxVertItems      = 6
         maxHorChars       = 120
         maxCharsInString  = 2000 
+        fullPrecision     = false
         }
     
     /// Allows to inject an optional formatter that gets called before main formatter
@@ -572,9 +576,9 @@ module internal NiceStringImplementation  =
             | null -> "'null' (or Option.None)"                                                           |> Element
             | :? int     as i -> i |> NiceFormat.int                                                      |> Element
             | :? int64   as i -> i |> NiceFormat.int64                                                    |> Element
-            | :? float   as v -> (if depth=0 then v |> NiceFormat.floatFull   else  v |> NiceFormat.float  ) |> Element
-            | :? single  as v -> (if depth=0 then v |> NiceFormat.singleFull  else  v |> NiceFormat.single ) |> Element
-            | :? decimal as d -> (if depth=0 then d |> NiceFormat.decimalFull else  d |> NiceFormat.decimal) |> Element
+            | :? float   as v -> (if depth=0 && nps.fullPrecision then v |> NiceFormat.floatFull   else  v |> NiceFormat.float  ) |> Element
+            | :? single  as v -> (if depth=0 && nps.fullPrecision then v |> NiceFormat.singleFull  else  v |> NiceFormat.single ) |> Element
+            | :? decimal as d -> (if depth=0 && nps.fullPrecision then d |> NiceFormat.decimalFull else  d |> NiceFormat.decimal) |> Element
             | :? Ref<int>   as r ->  "ref " + NiceFormat.int   r.Value                                    |> Element
             | :? Ref<int64> as r ->  "ref " + NiceFormat.int64 r.Value + "L"                              |> Element
             | :? Ref<float> as r ->  "ref " + NiceFormat.float r.Value                                    |> Element
@@ -766,7 +770,8 @@ module NiceString  =
             maxDepth          = 24
             maxVertItems      = 100_000
             maxHorChars       = 240
-            maxCharsInString  = 1_000_000  
+            maxCharsInString  = 1_000_000 
+            fullPrecision     = true
             }
         x |> box |> getLines nps 0 |> formatLines nps
 

@@ -48,10 +48,8 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 - add Rarr.getInternalList
 - add Rarr.mapFromIList .mapFromSeq and .mapFromArray
 - add rarr.InternalList to access internal ResizeArray
-<<<<<<< Updated upstream
-=======
 - add Rarr.trim
->>>>>>> Stashed changes
+- prev-this-next for Rarr
 
 `0.10.1` 
 - add MathUtil.interpolateTable function

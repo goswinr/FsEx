@@ -40,10 +40,10 @@ module ComputationalExpressionsBuilders =
             try this.ReturnFrom(m)
             finally compensation()
 
-        member inline  this.Using(res:#IDisposable, body) = 
+        member inline this.Using(res:#IDisposable, body) = 
             this.TryFinally(body res, fun () -> match res with null -> () | disp -> disp.Dispose())
 
-        member inline  this.While(guard, f) = 
+        member this.While(guard, f) = 
             if not (guard()) then Some () else
             do f() |> ignore<StringBuilder>
             this.While(guard, f)
