@@ -11,6 +11,15 @@ open FsEx.ExtensionsSeq
 [<RequireQualifiedAccess>]
 module Seq = 
     
+    /// like Seq.iter but with an additional index argument.
+    let iterIndexed ( func: int-> 'T -> unit) (xs: seq<'T>) =
+        use e = xs.GetEnumerator() 
+        let mutable i = 0
+        while e.MoveNext() do
+            func i e.Current
+            i <- i + 1
+            
+
     /// Gets the only element in Seq. 
     /// Fails if there is not exactly one element in the Seq. 
     let headAndOnly  (xs: seq<'T>) =

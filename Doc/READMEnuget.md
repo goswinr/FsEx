@@ -17,7 +17,7 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 - A thin wrapper over the generic `Dictionary` type called `Dict`. It provides additional members and more detailed error messages when a given Key is not found.
 - An implementation of [defaultdict](https://docs.python.org/3/library/collections.html#collections.defaultdict) called `DefDict` , a dictionary that creates a key when its accessed but missing.
 - [A comprehensive module](https://www.fuget.org/packages/FsEx/0.11.0/lib/netstandard2.0/FsEx.dll/FsEx/StringModule) for working with `string`, including nice error messages.
-- Useful extension members to existing collections like seq, array, Dictionary, Stringbuilder.
+- Useful extension members to existing collections like seq, array, Dictionary, StringBuilder.
 - Computational Expressions for building `Rarr`, `strings`, and CSV-files. Like they exist for `seq`, `list` and `array` in `FSharp.Core` 
 - Pretty printing for collections
 - and more ..
@@ -28,6 +28,9 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 [MIT](https://raw.githubusercontent.com/goswinr/FsEx/main/LICENSE.txt)
 
 ### Changelog
+
+`0.11.1`
+- add Seq.iterIndexed
 
 `0.11.0`
 - improve randomness of random color
