@@ -23,7 +23,7 @@ module Seq =
             else
                 el
         else
-           IndexOutOfRangeException.Raise "FsEx.Seq.headOnly: Empty Input Sequence"
+            IndexOutOfRangeException.Raise "FsEx.Seq.headOnly: Empty Input Sequence"
 
     /// Counts for how many items of the Seq the predicate returns true.
     /// same as Seq.filter and then Seq.length
@@ -141,7 +141,7 @@ module Seq =
     let duplicates (xs:seq<'T>) = 
         let h = Hashset<'T>()
         let t = Hashset<'T>() 
-        // first Add shoulds be false, second Add true, to recognize the first occurrence of a duplicate:
+        // first Add should be false, second Add true, to recognize the first occurrence of a duplicate:
         xs |> Seq.filter (fun x -> if h.Add x then false else t.Add x) 
     
     /// Returns all elements that exists more than once in Seq.
@@ -150,7 +150,7 @@ module Seq =
     let duplicatesBy (f:'T->'U) (xs:seq<'T>) = 
         let h = Hashset<'U>()
         let t = Hashset<'U>()
-        // first Add shoulds be false, second Add true, to recognize the first occurrence of a duplicate: 
+        // first Add should be false, second Add true, to recognize the first occurrence of a duplicate: 
         xs |> Seq.filter (fun x -> let y = f x in  if h.Add y then false else t.Add y)    
 
 
@@ -223,7 +223,7 @@ module Seq =
 
     /// Yields a Seq from (0,first, second) up to (secondLastIndex, second last, last)
     /// The length of the resulting seq is one shorter than input seq.
-    /// Use Seq.iTthisNext if you want a looped sequence till (lastIndex,last, first)
+    /// Use Seq.iThisNext if you want a looped sequence till (lastIndex,last, first)
     let windowed2i (xs:seq<'T>): seq<int *'T*'T> = 
         seq{use e = xs.GetEnumerator()
             let mutable kk =  0

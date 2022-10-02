@@ -310,7 +310,7 @@ module NiceFormat  =  // used by Rhino.Scripting
     /// maxCharCount will be set to be minimum 6. 
     /// Returned strings are enclosed in quotation marks.
     /// If input is null it returns <*null string*>
-    let stringTruncated maxCharCount (s:string):string = 
+    let stringTruncated maxCharCount (s:string) : string = 
         let maxChar = max 8 maxCharCount
         if isNull s then 
             if maxChar >= 15 then 
@@ -477,9 +477,9 @@ module internal NiceStringImplementation  =
         cleaned+param
 
     let getNiceOrDefault(typ:Type, x:obj) : Lines =
-        let nstr = typ.GetProperty("ToNiceString")
-        if notNull nstr then 
-            match nstr.GetValue(x) with 
+        let nStr = typ.GetProperty("ToNiceString")
+        if notNull nStr then 
+            match nStr.GetValue(x) with 
             |null -> sprintf "%A" x 
             | :? string as s -> s   
             | _ -> sprintf "%A" x   
@@ -582,7 +582,7 @@ module internal NiceStringImplementation  =
             | :? Ref<int>   as r ->  "ref " + NiceFormat.int   r.Value                                    |> Element
             | :? Ref<int64> as r ->  "ref " + NiceFormat.int64 r.Value + "L"                              |> Element
             | :? Ref<float> as r ->  "ref " + NiceFormat.float r.Value                                    |> Element
-            | :? Char    as c -> c.ToString()                                                             |> Element // "'" + c.ToString() + "'" // or add qotes?
+            | :? Char    as c -> c.ToString()                                                             |> Element // "'" + c.ToString() + "'" // or add quotes?
             | :? string  as s -> formatStringByDepth nps depth s                                          |> Element                                  
             | :? Guid    as g -> sprintf "Guid[%O]" g                                                     |> Element
             | :? DateTime       as d -> date d                                                            |> Element
@@ -679,16 +679,16 @@ module internal NiceStringImplementation  =
     // TODO implement this formatter with colorful lines for Seff:
     
     let formatLines  (nps:NicePrintSettings) (lines:Lines) : string = 
-        let inde = 4 // indent size
+        let indent = 4 // indent size
         let colonAfterNumber = ": "
         let sb = Text.StringBuilder()
         let inline prefix(pos,depth)= // add indent with number
             if depth > 0 then
                 if pos >=0 then  
-                    sb.append(pos.ToString().PadLeft(inde*depth,' ')) 
+                    sb.append(pos.ToString().PadLeft(indent * depth,' ')) 
                     sb.append(colonAfterNumber) 
                 else // to be able to skip pos number on "..." or for records
-                    sb.append(String(' ',inde*depth-1))
+                    sb.append(String(' ', indent * depth - 1 ))
 
 
         let rec loop (numbering:int) depth (lns:Lines) = 
@@ -710,7 +710,7 @@ module internal NiceStringImplementation  =
                         for i,x in h.items do
                             loop i (depth+1) x
                         // ad indent and closing bracket
-                        sb.append(String(' ',inde*(depth+1)-1 ))
+                        sb.append(String(' ', indent * (depth+1)-1 ))
                         sb.appendLine(h.closingBracket)    
         loop 0 0 lines
 
@@ -726,7 +726,7 @@ module NiceString  =
     open NiceStringImplementation
     open NiceStringSettings
 
-    //TODO sync the docstring here with print and printfull in module Print and the shadowing one in Rhino.Scripting
+    //TODO sync the docstring here with print and printFull in module Print and the shadowing one in Rhino.Scripting
 
     /// Nice formatting for numbers including thousand Separator, records and (nested) sequences, 
     /// NicePrintSettings:

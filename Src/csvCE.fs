@@ -107,15 +107,15 @@ module ComputationalExpressionsBuilderCsv =
             do f b
             b.ToString()        
         
-         member inline  _.TryWith(body: StringBuilder -> unit, handler: exn ->  StringBuilder -> unit) =
-             fun (b: StringBuilder) -> 
-                 try body b with e -> handler e b
+        member inline  _.TryWith(body: StringBuilder -> unit, handler: exn ->  StringBuilder -> unit) =
+            fun (b: StringBuilder) -> 
+                try body b with e -> handler e b
         
-         member inline  _.TryFinally(body: StringBuilder -> unit, compensation:  StringBuilder -> unit) =
-             fun (b: StringBuilder) ->  
-                 try body b finally compensation  b
+        member inline  _.TryFinally(body: StringBuilder -> unit, compensation:  StringBuilder -> unit) =
+            fun (b: StringBuilder) ->  
+                try body b finally compensation  b
         
-         member inline this.Using(disposable: #IDisposable, body: #IDisposable -> StringBuilder -> unit) =            
+        member inline this.Using(disposable: #IDisposable, body: #IDisposable -> StringBuilder -> unit) =            
              this.TryFinally(  body disposable ,  fun (b: StringBuilder)  ->  if not <| Object.ReferenceEquals(disposable,null) then disposable.Dispose() ) // might be disposed already                        
         
     

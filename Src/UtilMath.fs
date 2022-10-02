@@ -100,7 +100,7 @@ module UtilMath =
         for c in s do
             if   c >= '0' && c <= '9'       then sb.Append(c)   |> ignore
             elif c = '.'                    then sb.Append(c)   |> ignore
-            elif c = '-' && sb.Length = 0   then sb.Append(c)   |> ignore //only add minus before digits if stringbuilder is still empty
+            elif c = '-' && sb.Length = 0   then sb.Append(c)   |> ignore //only add minus before digits if stringBuilder is still empty
             elif c = ','                    then sb.Append('.') |> ignore // german formatting
         match Double.TryParse(sb.ToString(), NumberStyles.Float, enUs) with
         | true, f -> Some  f
@@ -115,7 +115,7 @@ module UtilMath =
         for c in s do
             if   c >= '0' && c <= '9'       then sb.Append(c)   |> ignore
             elif c = '.'                    then sb.Append(c)   |> ignore
-            elif c = '-' && sb.Length = 0   then sb.Append(c)   |> ignore //only add minus before digits if stringbuilder is still empty
+            elif c = '-' && sb.Length = 0   then sb.Append(c)   |> ignore //only add minus before digits if stringBuilder is still empty
             elif c = ','                    then sb.Append('.') |> ignore // german formatting
         match Double.TryParse(sb.ToString(), NumberStyles.Float, enUs) with
         | true, f -> Some (LanguagePrimitives.FloatWithMeasure f)
@@ -169,7 +169,7 @@ module UtilMath =
 
 
 
-    /// Returns a functiopn to find linear interpolations in one table.
+    /// Returns a function to find linear interpolations in one table.
     /// The input table is a sorted (increasing) array of tuples of input and respective output values.
     let interpolateTable (table: IList< float<'Input> * float<'Output> > ) : float<'Input> -> float<'Output> = 
 
@@ -297,38 +297,38 @@ module UtilMath =
 
     /// Numeric Stepping: Converts floats to ints, divided by precision.
     /// Like rounding floats to integers but with another step size than 1.0
-    /// = int (v / prec)
-    let inline precInt (prec:float) (v:float) : int = 
-        if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.precInt: given input for 'v' is NaN or Infinity."
-        if isNanOrInf prec then raise <| ArgumentException "FsEx.UtilMath.precInt: given input for 'prec' is NaN or Infinity."
-        if prec < 1e-16    then raise <| ArgumentException "FsEx.UtilMath.precInt: prec value is negative or almost Zero, less than +1e-16."
-        int (v / prec)
+    /// = int (v / precision)
+    let inline precisionInt (precision:float) (v:float) : int = 
+        if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.precisionInt: given input for 'v' is NaN or Infinity."
+        if isNanOrInf precision then raise <| ArgumentException "FsEx.UtilMath.precisionInt: given input for 'precision' is NaN or Infinity."
+        if precision < 1e-16    then raise <| ArgumentException "FsEx.UtilMath.precisionInt: precision value is negative or almost Zero, less than +1e-16."
+        int (v / precision)
 
     /// Numeric Stepping:Converts floats to ints within defined integer step sizes.
     /// Always rounding down like the int function
-    /// = int (v / float prec) * prec
-    let inline steppedInt (prec:int) (v:float) : int = 
+    /// = int (v / float precision) * precision
+    let inline steppedInt (precision:int) (v:float) : int = 
         if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.steppedInt: given input for 'v' is NaN or Infinity."
-        if prec < 1        then raise <| ArgumentException "FsEx.UtilMath.steppedInt: prec value is negative or Zero."
-        int (v / float prec) * prec
+        if precision < 1   then raise <| ArgumentException "FsEx.UtilMath.steppedInt: precision value is negative or Zero."
+        int (v / float precision) * precision
 
     /// Numeric Stepping:Converts floats to floats within defined float step sizes.
     /// Always rounding down like the int function)
-    /// = float (int (v / prec)) * prec
-    let inline steppedFloat (prec:float) (v:float) : float = 
+    /// = float (int (v / precision)) * precision
+    let inline steppedFloat (precision:float) (v:float) : float = 
         if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.steppedFloat: given input for 'v' is NaN or Infinity."
-        if isNanOrInf prec then raise <| ArgumentException "FsEx.UtilMath.steppedFloat: given input for 'prec' is NaN or Infinity."
-        if prec < 1e-16    then raise <| ArgumentException "FsEx.UtilMath.steppedFloat: prec value is negative or almost Zero, less than +1e-16."
-        float (int (v / prec)) * prec
+        if isNanOrInf precision then raise <| ArgumentException "FsEx.UtilMath.steppedFloat: given input for 'precision' is NaN or Infinity."
+        if precision < 1e-16    then raise <| ArgumentException "FsEx.UtilMath.steppedFloat: precision value is negative or almost Zero, less than +1e-16."
+        float (int (v / precision)) * precision
 
     /// Numeric Stepping:Converts floats to floats within defined float step sizes.
     /// Always rounding mid point  like the round function)
-    /// =  (round (v / prec)) * prec
-    let inline steppedFloatMid (prec:float) (v:float) : float = 
+    /// =  (round (v / precision)) * precision
+    let inline steppedFloatMid (precision:float) (v:float) : float = 
         if isNanOrInf v    then raise <| ArgumentException "FsEx.UtilMath.steppedFloatMid: given input for 'v' is NaN or Infinity."
-        if isNanOrInf prec then raise <| ArgumentException "FsEx.UtilMath.steppedFloatMid: given input for 'prec' is NaN or Infinity."
-        if prec < 1e-16    then raise <| ArgumentException "FsEx.UtilMath.steppedFloatMid: prec value is negative or almost Zero, less than +1e-16."
-        (round (v / prec)) * prec
+        if isNanOrInf precision then raise <| ArgumentException "FsEx.UtilMath.steppedFloatMid: given input for 'precision' is NaN or Infinity."
+        if precision < 1e-16    then raise <| ArgumentException "FsEx.UtilMath.steppedFloatMid: precision value is negative or almost Zero, less than +1e-16."
+        (round (v / precision)) * precision
 
     /// This float range function ensures that the end is always included.
     /// The F# build in range fails for example on [0.0 .. 0.1 .. 0.2 ] , it equals [0.0 .. 0.1 .. 0.3 ]
@@ -337,7 +337,7 @@ module UtilMath =
         if isNanOrInf start then raise <| ArgumentException "FsEx.UtilMath.floatRange: given input for 'start' is NaN or Infinity."
         if isNanOrInf stop then raise <| ArgumentException "FsEx.UtilMath.floatRange: given input for 'stop' is NaN or Infinity."
         if isNanOrInf step then raise <| ArgumentException "FsEx.UtilMath.floatRange: given input for 'step' is NaN or Infinity."
-        if step = LanguagePrimitives.FloatWithMeasure<'T> 0.0 then  ArgumentOutOfRangeException.Raise "FsEx.UtilMath.floatRange: stepsize cannot be zero: start: %f step: %f stop: %f " start step stop
+        if step = LanguagePrimitives.FloatWithMeasure<'T> 0.0 then  ArgumentOutOfRangeException.Raise "FsEx.UtilMath.floatRange: step-size cannot be zero: start: %f step: %f stop: %f " start step stop
         let range = stop - start
                     |> float
                     |> BitConverter.DoubleToInt64Bits //https://float.exposed/0x3ff0000000000000

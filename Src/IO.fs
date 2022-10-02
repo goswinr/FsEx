@@ -6,6 +6,7 @@ open System.Text
 open System.Threading
 
 
+/// FsEx.IO  I/O utilities
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide IO namespace in C# assemblies
 module IO = 
    
@@ -31,12 +32,12 @@ module IO =
     let checkIfDirectoryExists s = 
         if not (IO.Directory.Exists s) then  raise (DirectoryNotFoundException("Directory missing or path wrong: '" + s + "'"))
 
-    /// Given the full path to a file. This function creates all directories to this files if they dont exist yet.
+    /// Given the full path to a file. This function creates all directories to this files if they don't exist yet.
     /// However it does not create the file itself.
     let createDirectoriesOfFilePath s = 
-       let fi = FileInfo(s)
-       Directory.CreateDirectory(fi.DirectoryName)
-       |> ignore      
+        let fi = FileInfo(s)
+        Directory.CreateDirectory(fi.DirectoryName)
+        |> ignore      
 
 
     /// Returns all files in folder and sub-folders.
@@ -81,8 +82,8 @@ module IO =
                     let dirs = try Directory.GetDirectories(dir) with _ -> [||]
                     Array.Sort(dirs)// a before Z
                     //Array.sortInPlace dirs // Z before a
-                    for subdir in dirs do
-                        yield! getAll subdir }
+                    for subDir in dirs do
+                        yield! getAll subDir }
         getAll(directory)
     
     /// Returns all files in this folder and parent folders that fit pattern (e.g. '*.pdf').
@@ -106,7 +107,7 @@ module IO =
 
 
     /// Determines a text file's encoding by analyzing its byte order mark (BOM).
-    /// Returns None  when detection of the text file's endianness fails.( might be ASCII or UTF-8 without BOM)
+    /// Returns None  when detection of the text file's Endian kind fails.( might be ASCII or UTF-8 without BOM)
     /// (Encoding.Unicode = UTF-16LE)
     [<Obsolete("The results of this cannot be relied upon. see https://stackoverflow.com/a/12853721/969070")>]
     let getEncoding(filename:string)= 
@@ -135,11 +136,11 @@ module IO =
         let readAllBytesNonBlocking (path:string) = 
             // using a stream allows for non blocking file access
             use stream  = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-            use mstream = new MemoryStream(int stream.Length)
-            stream.CopyTo(mstream)
-            let arr = mstream.ToArray()
+            use mStream = new MemoryStream(int stream.Length)
+            stream.CopyTo(mStream)
+            let arr = mStream.ToArray()
             stream.Dispose()
-            mstream.Dispose()
+            mStream.Dispose()
             arr
 
         /// Returns a memory stream, the file stream used is closed and disposed.
@@ -148,10 +149,10 @@ module IO =
         let getNonBlockingStream (path:string) = 
             // using a stream allows for non blocking file access
             use stream  = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-            let mstream = new MemoryStream(int stream.Length)
-            stream.CopyTo(mstream)
+            let mStream = new MemoryStream(int stream.Length)
+            stream.CopyTo(mStream)
             stream.Dispose()
-            mstream
+            mStream
 
         /// A curried version of IO.File.WriteAllText(path,content)
         let writeAllText (path:string) (content:string) = 
@@ -172,9 +173,10 @@ module IO =
 
         let lockObj = new Object()       
 
-        /// Calls IO.File.Exists(path)
+        /// Returns true if file to write to exists.
         member this.FileExists = IO.File.Exists(path)
 
+        /// Returns true if file to write to does not exist yet.
         member this.FileDoesNotExists = not <| IO.File.Exists(path)
 
         /// The full file path

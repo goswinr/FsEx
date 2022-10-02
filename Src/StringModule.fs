@@ -721,76 +721,29 @@ module String =
         if isNull txt then FsExStringException.Raise "FsEx.String.trimStartChars: txt is null. (trimChars:%A) " trimChars
         txt.TrimStart(trimChars)
 
+    /// Joins string into one line. 
+    /// Replaces line break with space character.
+    /// Skips leading whitespace on each line.
+    /// If string is null returns "<*null string*>"
+    /// Does not include surrounding quotes.
+    /// This function just calls FsEx.NiceFormat.stringInOneLine
+    let formatInOneLine txt = 
+        NiceFormat.stringInOneLine txt
 
-    (*
-    obsolete! 
-    use: 
+    /// Reduces a string length for display to a maximum Length.
+    /// Shows (..) as placeholder for skipped characters if string is longer than maxCharCount.
+    /// If maxChars is bigger than 35 the placeholder will include the count of skipped characters: e.g. [< ..99 more chars.. >].
+    /// maxCharCount will be set to be minimum 6. 
+    /// Returned strings are enclosed in quotation marks.
+    /// If input is null it returns <*null string*>
+    /// This function just calls FsEx.NiceFormat.stringTruncated
+    let formatTruncated txt = 
+        NiceFormat.stringTruncated txt
 
-    FsEx.NiceFormat.stringInOneLine
-    FsEx.NiceFormat.stringTruncated
-    FsEx.NiceFormat.stringTruncatedToMaxLines
+    /// Adds a note about trimmed line count if there are more [< ... and %d more lines.>].
+    /// Does not include surrounding quotes.
+    /// If string is null returns "<*null string*>" .
+    /// This function just calls FsEx.NiceFormat.stringTruncatedToMaxLines
+    let formatTruncatedToMaxLines (maxLineCount:int) (txt:string) = 
+        NiceFormat.stringTruncatedToMaxLines maxLineCount txt
 
-    instead.
-    
-    /// replaces new lines with custom string
-    let (*inline*) inOneLine (newLineReplacment:string) (stringToMakeOneLine:string) = 
-        if isNull stringToMakeOneLine then FsExStringException.Raise "FsEx.String.inOneLine: stringToMakeOneLine is null, newLineReplacment: %s" (exnf newLineReplacment)
-        if isNull newLineReplacment   then FsExStringException.Raise "FsEx.String.inOneLine: newLineReplacment is null, stringToMakeOneLine: %s" (exnf stringToMakeOneLine)
-        if stringToMakeOneLine.Contains("\n") || stringToMakeOneLine.Contains("\r") then
-            StringBuilder(stringToMakeOneLine).Replace("\r", "").Replace("\n", newLineReplacment).ToString()
-        else stringToMakeOneLine
-
-    /// Trims strings to 80 chars for showing in one line.
-    /// It returns the input string trimmed to 80 chars, a count of skipped characters and the last 5 characters
-    /// Replace line breaks with '\r\n' or '\n' literal
-    /// Does not include surrounding quotes
-    /// If string is null returns "-null string-"
-    let truncateFormattedInOneLine (stringToTrim:string) :string = 
-        if isNull stringToTrim then FsExStringException.Raise "FsEx.String.truncateFormattedInOneLine: stringToTrim is null" 
-        else
-            let s = 
-                let maxChars = 80
-                if stringToTrim.Length <= maxChars + 20 then  stringToTrim
-                else
-                    let len   = stringToTrim.Length
-                    let st    = stringToTrim.Substring(0,maxChars)
-                    let last5 = stringToTrim.Substring(len-6)
-                    sprintf "%s[..%d more chars..]%s" st (len - maxChars - 5) last5
-            s.Replace("\r","\\r").Replace("\n","\\n")
-    
-
-    /// If the input string is longer than maxChars variable plus twenty tolerance then
-    /// it returns the input string trimmed to maxChars, a count of skipped characters and the last 5 characters
-    /// e.g. "abcde[..20 more Chars..]vwxyz"
-    /// Else, if the input string is less than maxChars + 20, it is still returned in full.
-    /// Not enclosed in quotes.
-    /// Fails on null.
-    /// Alternatively use String.formatInOneShortLine that will not fail on null.
-    let truncateFormatted (maxChars:int) (stringToTrim:string) = 
-        if isNull stringToTrim then FsExStringException.Raise "FsEx.String.truncateFormatted: stringToTrim is null, maxChar: %d" maxChars
-        if stringToTrim.Length <= maxChars + 20 then sprintf "%s"stringToTrim
-        else
-            let len   = stringToTrim.Length
-            let st    = stringToTrim.Substring(0,maxChars)
-            let last6 = stringToTrim.Substring(len-6)
-            sprintf "%s[..%d more chars..]%s" st (len - maxChars - 5) last6
-
-    /// Trims strings to maximum line count.
-    /// Adds note about trimmed line count if there are more [ ... and %d more lines.]
-    /// Does not include surrounding quotes
-    /// If string is null returns "-null string-"
-    let truncateToMaxLines (maxLineCount:int) (stringToTrim:string) :string = 
-        if isNull stringToTrim then FsExStringException.Raise "FsEx.String.truncateToMaxLines: stringToTrim is null, maxLineCount: %d" maxLineCount
-        else
-            let lns = stringToTrim.Split([|'\n'|],StringSplitOptions.None)
-            let t = 
-                lns
-                |> Seq.truncate maxLineCount
-                |> Seq.map ( fun l -> l.TrimEnd() )
-                |> String.concat Environment.NewLine
-
-            if lns.Length > maxLineCount then 
-                sprintf "%s\%s[ ... and %d more lines.]" t Environment.NewLine (lns.Length - maxLineCount)
-            else
-                t
-    *)

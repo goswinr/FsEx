@@ -5,6 +5,27 @@ open System.Text
 //open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
 module ComputationalExpressionsBuilders = 
+    (*
+    Create an efficient computation expression builder using InlineIfLambda
+
+    from
+    https://zenn.dev/gnico/articles/5f133dac0585f5#english-version
+
+    type NewOptionBuilder2 () =
+        member inline __.Bind<'T, 'T2>(x : 'T voption, [<InlineIfLambda>] code : 'T -> 'T2 voption) : 'T2 voption = 
+            match x with
+                | ValueNone -> ValueNone
+                | ValueSome v -> code v // let!
+        member inline __.BindReturn<'T, 'T2>(x : 'T voption, [<InlineIfLambda>] f : 'T -> 'T2) : 'T2 voption =
+            match x with
+                | ValueNone -> ValueNone
+                | ValueSome v -> ValueSome (f v) // let! .. return
+        member inline __.Return<'T>(x : 'T) : 'T voption = ValueSome x // return
+        member inline __.MergeSources<'T, 'T2>(x1 : 'T voption, x2 : 'T2 voption) : struct('T * 'T2) voption =
+            if x1.IsSome && x2.IsSome  then ValueSome struct(x1.Value, x2.Value) else ValueNone // and!
+    
+    let newOption2 = NewOptionBuilder2()
+    *)
 
     let inline private addChr   (b: StringBuilder) (c:char)   = b.Append      c   |> ignore<StringBuilder>
     let inline private addLnChr (b: StringBuilder) (c:char)   = b.Append(c).AppendLine()   |> ignore<StringBuilder>
@@ -51,7 +72,10 @@ module ComputationalExpressionsBuilders =
         member inline  this.For(sequence:seq<_>, body) = 
             this.Using(sequence.GetEnumerator(), fun enum -> this.While(enum.MoveNext, this.Delay(fun () -> body enum.Current)))
 
-
+    /// Computational Expression String Builder:
+    /// use 'yield' to append text, or seq of strings separated by a new line
+    /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
+    /// accepts ints, guids and chars  too. 
     type StringBufferBuilder () = 
         // adapted from https://github.com/fsharp/fslang-suggestions/issues/775
 
@@ -98,7 +122,7 @@ module ComputationalExpressionsBuilders =
 
         member inline this.Using(disposable: #IDisposable, body: #IDisposable -> StringBuilder -> unit) =            
             this.TryFinally(  body disposable ,  fun (b: StringBuilder)  ->  if not <| Object.ReferenceEquals(disposable,null) then disposable.Dispose() ) // might be disposed already                        
-     
+    
  
 [<AutoOpen>]
 module AutoOpenComputationalExpressions  = 
