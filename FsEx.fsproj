@@ -22,8 +22,9 @@
     <FileVersion>0.11.1</FileVersion>  
 	  
     <PackageReleaseNotes>
-	    - add Seq.iterIndexed
-	  </PackageReleaseNotes>
+		- add Seq.iterIndexed
+		- add Seq.repeat
+	</PackageReleaseNotes>
 
     <Authors>GoswinR</Authors>
     <Copyright>Goswin Rothenthal 2021</Copyright>

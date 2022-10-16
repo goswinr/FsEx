@@ -96,6 +96,9 @@ module Seq =
             while e.MoveNext() && k <= count do  k <- k+1
             k <= count
 
+    /// Returns a sequence that repeats the input sequence x times.
+    let repeat times (xs:seq<'T>) = 
+        seq{ for i=1 to times do yield! xs}
 
     /// Allows for negative indices too, -1 is the last element.
     /// The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5

@@ -529,11 +529,21 @@ module Rarr =
 
     /// Build a Rarr from the given Array.
     let inline ofArray (arr : 'T[]) : Rarr<'T> = 
-        Rarr(arr)
+        let l = ResizeArray(arr.Length)
+        for i=0 to arr.Length-1 do 
+            l.Add arr.[i]        
+        Rarr.createDirectly l
+
+    /// Build a Rarr from the given IList Interface.
+    let inline ofIList (arr : IList<'T>) : Rarr<'T> = 
+        let l = ResizeArray(arr.Count)
+        for i=0 to arr.Count-1 do 
+            l.Add arr.[i]        
+        Rarr.createDirectly l
 
     /// Return a fixed-length Array containing the elements of the input Rarr.
     let inline toArray (rarr : Rarr<'T>) : 'T[] = 
-        rarr.ToArray ()
+        rarr.ToArray()
 
     /// <summary>
     /// Splits the collection into two (2) collections, containing the elements for which the
