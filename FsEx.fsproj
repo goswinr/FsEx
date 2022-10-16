@@ -24,6 +24,7 @@
     <PackageReleaseNotes>
 		- add Seq.iterIndexed
 		- add Seq.repeat
+		- add FloatMathOperators module
 	</PackageReleaseNotes>
 
     <Authors>GoswinR</Authors>

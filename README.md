@@ -33,6 +33,7 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 `0.11.1`
 - add Seq.iterIndexed
 - add Seq.repeat
+- add FloatMathOperators module
 
 `0.11.0`
 - improve randomness of random color

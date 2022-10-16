@@ -6,6 +6,7 @@ open System.Collections.Generic
 
 
 
+
 /// This module is set to auto open when opening FsEx namespace.
 /// Static Extension methods on Exceptions to cal Exception.Raise "%A" x with F# printf string formatting
 [<AutoOpen>] 
@@ -261,4 +262,41 @@ module FloatRef =
 
     /// Set ref cell to given float if it is smaller than current ref cell  value
     let inline setMin i (x:float<'UoM>) = if x < !i then i := x
+
+
+/// Provides generic math operators for adding, subtracting, multiplying and dividing 
+/// numbers that can be converted to a floats.
+/// The new operators are: +.  .+   -.  .-   *.  .*   /.  ./   
+/// There the period is always on the side of the non float value.
+/// A Units of Measure on the non-float number gets ignored and lost however.
+module FloatMathOperators = 
+    open Microsoft.FSharp.Core.LanguagePrimitives
+
+    /// Multiplies a float with A-number-that-can-be-converted-to-a-float
+    let inline ( *. ) (x:float<'M>) (y) : float<'M> = x * (float y)
+    
+    /// Multiplies a-number-that-can-be-converted-to-a-float with a float
+    let inline ( .* ) (x) (y :float<'N>) : float<'M> = (float x) * y
+
+    /// Add a float to A-number-that-can-be-converted-to-a-float
+    let inline ( +. ) (x:float<'M>) (y) : float<'M> = x + FloatWithMeasure<'M>(float y)
+    
+    /// Add A-number-that-can-be-converted-to-a-float to a float
+    let inline ( .+ ) (x) (y :float<'M>) : float<'M> = FloatWithMeasure<'M>(float x) + y
+
+    /// Subtract a float from A-number-that-can-be-converted-to-a-float
+    let inline ( -. ) (x:float<'M>) (y) : float<'M> = x - FloatWithMeasure<'M>(float y)
+    
+    /// Subtract A-number-that-can-be-converted-to-a-float to a float
+    let inline ( .- ) (x) (y :float<'M>) : float<'M> = FloatWithMeasure<'M>(float x) - y
+
+    /// Divide a float by A-number-that-can-be-converted-to-a-float
+    let inline ( /. ) (x:float<'M>) (y) : float<'M>=  x / (float y)
+    
+    /// Divide A-number-that-can-be-converted-to-a-float by a float
+    let inline ( ./ ) (x) (y :float) : float = (float x) / y
+
+
+
+
 
