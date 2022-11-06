@@ -192,6 +192,20 @@ module AutoOpenUtil =
                 cache := (!cache).Add(x,res)
                 res
 
+    /// Caches the results of a function in a Dictionary.
+    /// The argument to the function will be used as key in the Map.
+    /// The argument can NOT be unit, null or Option.None
+    /// While less flexible this function has better performance than the memoize function using a F# Map.
+    let memoizeInDict f = 
+        let cache = Dictionary() // using a Dictionary would fail on a null or unit key
+        fun x ->
+            match cache.TryGetValue(x) with
+            | true, res -> res
+            | false, _ ->
+                let res = f x
+                cache.Add(x,res)
+                res
+
     /// Generic parser that infers desired return type
     let inline tryParse<'a when 'a: (static member TryParse: string * byref<'a> -> bool)> x = 
         // https://twitter.com/mvsmal/status/1317020301046259712

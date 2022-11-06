@@ -22,6 +22,7 @@
     <FileVersion>0.12.0</FileVersion>  
 	  
     <PackageReleaseNotes>
+    - add memoizeInDict
     - add IList module to match Rarr module
     - remove Rarr.createFromSeq
 		- add Seq.iterIndexed
