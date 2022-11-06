@@ -60,31 +60,25 @@ type Rarr<'T> private (xs:List<'T>) =
         if isNull collection then ArgumentNullException.Raise "The IEnumerable given in new FsEx.Rarr(IEnumerable) constructor is null."
         new Rarr<'T>(new List<'T>(collection))
     
-    /// Copies the content of two Sequences into a new Rarr
+    /// Operator ++ to copies the contents of two Sequences into a new Rarr
     static member (++) (a : seq<'T>, b : seq<'T>) =
         let r = new Rarr<'T>()
         r.AddRange a
         r.AddRange b
         r   
 
-    /// Copies the content of two Rarrs into a new Rarr
+    /// Operator ++ to copies the contents of two Rarrs into a new Rarr
     static member (++) (a : Rarr<'T>, b : Rarr<'T>) =
         let c: int = a.Count + b.Count
         let l = new List<'T>(c)
         for i=0 to a.Count-1 do l.Add(a.[i])
         for i=0 to b.Count-1 do l.Add(b.[i])        
-        Rarr(l) 
-
+        Rarr(l)
 
     /// Constructs a new FsEx.Rarr by using the supplied List<'T>  directly, without any copying of items.
     static member createDirectly (xs:List<'T> ) = 
         if isNull xs then ArgumentNullException.Raise "List in FsEx.Rarr.CreateDirectly is null."
         new Rarr<'T>(xs)
-
-    /// Constructs a new FsEx.Rarr by copying each item from the IEnumerable<'T>
-    static member createFromSeq (xs:seq<'T> ) = 
-        if isNull xs then ArgumentNullException.Raise "Seq in FsEx.Rarr.CreateFromSeq is null."
-        new Rarr<'T>(new List<'T>(xs))
 
     /// Access the internally used Collections.Generic.List<'T>
     /// This is NOT even a shallow copy, mutating it will also change this Instance of FsEx.Rarr!
@@ -296,7 +290,7 @@ type Rarr<'T> private (xs:List<'T>) =
             | None -> count-1
             | Some ei ->
                 if ei < 0 || ei >= count then
-                     ArgumentException.RaiseBase  "FsEx.Rarr.[%s..%s], GetSlice: end index must be between 0 and %d for Rarr of %d items." (debugTxt startIdx) (debugTxt endIdx)  (count-1) count
+                    ArgumentException.RaiseBase  "FsEx.Rarr.[%s..%s], GetSlice: end index must be between 0 and %d for Rarr of %d items." (debugTxt startIdx) (debugTxt endIdx)  (count-1) count
                 else
                     ei
 
@@ -326,7 +320,7 @@ type Rarr<'T> private (xs:List<'T>) =
             | None -> count-1
             | Some ei ->
                 if ei < 0 || ei >= count then
-                     ArgumentException.RaiseBase  "FsEx.Rarr.[%s..%s], GetSlice: end index must be between 0 and %d for Rarr of %d items." (debugTxt startIdx) (debugTxt endIdx)  (count-1) count
+                    ArgumentException.RaiseBase  "FsEx.Rarr.[%s..%s], GetSlice: end index must be between 0 and %d for Rarr of %d items." (debugTxt startIdx) (debugTxt endIdx)  (count-1) count
                 else
                     ei
 
@@ -809,16 +803,20 @@ type Rarr<'T> private (xs:List<'T>) =
         xs.TrueForAll(matchValue)
 
 
-    ///------------------------[<CustomEquality>]------------------------------
+    //------------------------[<CustomEquality>]------------------------------
 
+    /// Structural equality.
+    /// Compares each element in both lists for equality . Rarrs must also be of same Count
     member inline internal this.IsEqualTo(other:Rarr<'T>) = 
         if Object.ReferenceEquals(this,other) then true
         elif this.Count <> other.Count then false
         else
             let comparer = EqualityComparer<'T>.Default // for  structural equality to be implemented on this class without putting the <'T when 'T : equality> constraint on 'T?
+            let ts = this.List
+            let os = other.List
             let rec eq i = 
                 if i < this.Count then
-                    if comparer.Equals(this.List.[i] , other.List.[i]) then
+                    if comparer.Equals(ts.[i] , os.[i]) then
                         eq (i+1)
                     else
                         false
@@ -833,20 +831,24 @@ type Rarr<'T> private (xs:List<'T>) =
             let x = xs.[i]
             res <- combineHash res (LanguagePrimitives.GenericHash x)
         res
-
+    
+    /// Structural equality.
+    /// Compares each element in both lists for equality . Rarrs must also be of same Count
     override this.Equals(that:obj) = 
         match that with
         | :? Rarr<'T> as that -> this.IsEqualTo(that)
         | _ -> false
-
+    
+    /// Structural equality.
+    /// Compares each element in both lists for equality . Rarrs must also be of same Count
     interface IEquatable<Rarr<'T>> with
         member this.Equals(that:Rarr<'T>) = 
-             this.IsEqualTo(that)
+            this.IsEqualTo(that)
 
 
     //---------------------------------------Interfaces of  System.Collections.Generic.List-------------------------------------
 
-    // TODO add XML doc str
+    // TODO add XML doc str:
 
     interface IEnumerable<'T> with
         member _.GetEnumerator() = (xs:>IEnumerable<'T>).GetEnumerator()

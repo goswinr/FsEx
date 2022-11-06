@@ -131,20 +131,20 @@ module Rarr =
     /// Not looped.
     /// The resulting seq is one element shorter than the input Rarr.
     let windowed2 (rarr:Rarr<'T>) =         
-        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.windowed2 input has less than two items:\r\n%s" rarr.ToNiceString
+        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.windowed2 input has less than two items:\r\n%s" rarr.ToNiceStringLong
         seq {   for i = 0 to rarr.Count-2 do   rarr.[i], rarr.[i+1] }
 
     /// Yields looped Seq from (first, second)  up to (last, first).
     /// The resulting seq has the same element count as the input Rarr.
     let thisNext (rarr:Rarr<'T>) = 
-        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.thisNext input has less than two items:\r\n%s" rarr.ToNiceString
+        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.thisNext input has less than two items:\r\n%s" rarr.ToNiceStringLong
         seq {   for i = 0 to rarr.Count-2 do  rarr.[i], rarr.[i+1]
                 rarr.[rarr.Count-1], rarr.[0] }
 
     /// Yields looped Seq from (last,first)  up to (second-last, last).
     /// The resulting seq has the same element count as the input Rarr.
     let prevThis (rarr:Rarr<'T>) = 
-        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.prevThis input has less than two items:\r\n%s" rarr.ToNiceString
+        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.prevThis input has less than two items:\r\n%s" rarr.ToNiceStringLong
         seq {   rarr.[rarr.Count-1], rarr.[0]
                 for i = 0 to rarr.Count-2 do  rarr.[i], rarr.[i+1] }
 
@@ -152,13 +152,13 @@ module Rarr =
     /// Not looped.
     /// The resulting seq is two elements shorter than the input Rarr.
     let windowed3 (rarr:Rarr<'T>) = 
-        if rarr.Count <= 3 then ArgumentException.RaiseBase "FsEx.Rarr.windowed3 input has less than three items:\r\n%s" rarr.ToNiceString
+        if rarr.Count <= 3 then ArgumentException.RaiseBase "FsEx.Rarr.windowed3 input has less than three items:\r\n%s" rarr.ToNiceStringLong
         seq { for i = 0 to rarr.Count-3 do  rarr.[i], rarr.[i+1], rarr.[i+2] }
 
     /// Yields looped Seq of  from (last, first, second)  up to (second-last, last, first).
     /// The resulting seq has the same element count as the input Rarr.
     let prevThisNext (rarr:Rarr<'T>) = 
-        if rarr.Count <= 3 then ArgumentException.RaiseBase "FsEx.Rarr.prevThisNext input has less than three items:\r\n%s" rarr.ToNiceString
+        if rarr.Count <= 3 then ArgumentException.RaiseBase "FsEx.Rarr.prevThisNext input has less than three items:\r\n%s" rarr.ToNiceStringLong
         seq{rarr.[rarr.Count-1], rarr.[0], rarr.[1]
             for i = 0 to rarr.Count-3 do  rarr.[i], rarr.[i+1], rarr.[i+2]
             rarr.[rarr.Count-2],rarr.[rarr.Count-1], rarr.[0] }
@@ -167,13 +167,13 @@ module Rarr =
     /// Not looped.
     /// The resulting seq is one element shorter than the input Rarr.
     let windowed2i (rarr:Rarr<'T>) = 
-        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.windowed2i input has less than two items:\r\n%s" rarr.ToNiceString
+        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.windowed2i input has less than two items:\r\n%s" rarr.ToNiceStringLong
         seq { for i = 0 to rarr.Count-2 do  i, rarr.[i], rarr.[i+1] }
 
     /// Yields looped Seq  from (0,first, second)  up to (lastIndex, last, first).
     /// The resulting seq has the same element count as the input Rarr.
     let iThisNext (rarr:Rarr<'T>) = 
-        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.iThisNext input has less than two items:\r\n%s" rarr.ToNiceString
+        if rarr.Count <= 2 then ArgumentException.RaiseBase "FsEx.Rarr.iThisNext input has less than two items:\r\n%s" rarr.ToNiceStringLong
         seq {   for i = 0 to rarr.Count-2 do  i, rarr.[i], rarr.[i+1]
                 rarr.Count-1, rarr.[rarr.Count-1], rarr.[0] }
 
@@ -181,13 +181,13 @@ module Rarr =
     /// Not looped.
     /// The resulting seq is two elements shorter than the input Rarr.
     let windowed3i (rarr:Rarr<'T>) = 
-        if rarr.Count <= 3 then ArgumentException.RaiseBase "FsEx.Rarr.windowed3i input has less than three items:\r\n%s" rarr.ToNiceString
+        if rarr.Count <= 3 then ArgumentException.RaiseBase "FsEx.Rarr.windowed3i input has less than three items:\r\n%s" rarr.ToNiceStringLong
         seq { for i = 0 to rarr.Count-3 do  i+1, rarr.[i], rarr.[i+1], rarr.[i+2] }
 
     /// Yields looped Seq from (1, last, first, second)  up to (lastIndex, second-last, last, first)
     /// The resulting seq has the same element count as the input Rarr.
     let iPrevThisNext (rarr:Rarr<'T>) = 
-        if rarr.Count <= 3 then ArgumentException.RaiseBase "FsEx.Rarr.iPrevThisNext input has less than three items:\r\n%s" rarr.ToNiceString
+        if rarr.Count <= 3 then ArgumentException.RaiseBase "FsEx.Rarr.iPrevThisNext input has less than three items:\r\n%s" rarr.ToNiceStringLong
         seq {   0, rarr.[rarr.Count-1], rarr.[0], rarr.[1]
                 for i = 0 to rarr.Count-3 do  i+1, rarr.[i], rarr.[i+1], rarr.[i+2]
                 rarr.Count-1, rarr.[rarr.Count-2],rarr.[rarr.Count-1], rarr.[0] }
@@ -550,8 +550,8 @@ module Rarr =
     /// given function returns <c>Choice1Of2</c> or <c>Choice2Of2</c>, respectively. This function is similar to
     /// <c>Rarr.partition</c>, but it allows the returned collections to have different element types.</summary>
     let inline mapPartition partitioner (rarr : Rarr<'T>) : Rarr<'U1> * Rarr<'U2> = 
-        let results1 = Rarr ()
-        let results2 = Rarr ()
+        let results1 = Rarr()
+        let results2 = Rarr()
         let len = rarr.Count
         let li = rarr.List
         for i = 0 to len - 1 do
@@ -771,7 +771,7 @@ module Rarr =
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The Rarr of results.</returns>
     let inline choose (chooser : 'T -> 'U option) (rarr : Rarr<'T>) : Rarr<'U> = 
-        let result = Rarr ()        
+        let result = Rarr()        
         let li = rarr.List
         for i = 0 to li.Count - 1 do
             match chooser li.[i] with
@@ -1287,7 +1287,7 @@ module Rarr =
                 if dict.TryGetValue(safeKey, &prev) then
                     prev.Add v
                 else
-                    let prev = Rarr ()
+                    let prev = Rarr()
                     dict.[safeKey] <- prev
                     prev.Add v
             // Return the rarr-of-rarrs.
@@ -1327,7 +1327,7 @@ module Rarr =
             match dict.TryGetValue k with
             |true, r -> r.Add v
             |_ -> 
-                let r = Rarr ()
+                let r = Rarr()
                 dict.[k] <- r
                 r.Add v
         Dict.CreateDirectly dict
@@ -1709,7 +1709,7 @@ module Rarr =
         match source with
         | :? Rarr<'T> as r -> r
         | :? Collections.Generic.List<'T> as l -> Rarr.createDirectly(l)
-        | _  -> Rarr (source)
+        | _  -> Rarr(source)
 
 
     /// <summary>Returns a Rarr of each element in the input Rarr and its predecessor, with the
@@ -1832,7 +1832,7 @@ module Rarr =
         r
 
     /// <summary>Return a new Rarr with the number of items starting at a given index removed. (does NOT modify in place !)</summary>
-    /// <param name="index">The index of the item to be removed.</param>
+    /// <param name="index">The index of the first item to be removed.</param>
     /// <param name="count">The number of items to remove.</param>
     /// <param name="source">The input Rarr.</param>
     /// <returns>The result Rarr.</returns>
@@ -1860,7 +1860,7 @@ module Rarr =
     /// <returns>The reversed Rarr.</returns>
     let rev (rarr: Rarr<'T>) = 
         let len = rarr.Count
-        let result = Rarr (len)
+        let result = Rarr(len)
         let li = rarr.List
         for i = len - 1 downto 0 do
             result.Add li.[i]
@@ -1881,7 +1881,7 @@ module Rarr =
     let scan<'T, 'State> (folder:'State -> 'T -> 'State) (stateInit: 'State) (rarr: Rarr<'T>) :Rarr<'State> = 
         let folder = OptimizedClosures.FSharpFunc<_,_,_>.Adapt folder
         // Holds the initial and intermediate state values.
-        let results = Rarr (rarr.Count+1)
+        let results = Rarr(rarr.Count+1)
         results.Add stateInit
         // Fold over the specified range of items.
         let mutable state = stateInit
@@ -1898,7 +1898,7 @@ module Rarr =
     /// <returns>The Rarr of state values. Count = input count + 1 </returns>
     let scanBack<'T, 'State> (folder:'T -> 'State -> 'State) (rarr: Rarr<'T>) (stateInit: 'State) : Rarr<'State> = 
         let folder = OptimizedClosures.FSharpFunc<_,_,_>.Adapt folder
-        let results = Rarr (rarr.Count+1)// Holds the initial and intermediate state values.
+        let results = Rarr(rarr.Count+1)// Holds the initial and intermediate state values.
         for _ = 0 to rarr.Count do // to fill up list +1 with default values
             results.Add stateInit
         // Fold over the specified range of items.
