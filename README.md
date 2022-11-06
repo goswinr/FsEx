@@ -30,7 +30,9 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 
 ### Changelog
 
-`0.11.1`
+`0.12.0`
+- add IList module to match Rarr module
+- remove Rarr.createFromSeq
 - add Seq.iterIndexed
 - add Seq.repeat
 - add FloatMathOperators module
