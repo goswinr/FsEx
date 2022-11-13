@@ -141,6 +141,16 @@ module AutoOpenUtil =
         f x |> ignore //https://twitter.com/GoswinR/status/1316988132932407296
         x
 
+    /// Chain functions, like >> , but ignore result of second function.
+    /// Return output from first function.
+    /// fun x -> let r = f1(x) ;  f2(r) |> ignore ; r            
+    /// Also see |>! operator
+    let inline (>>!) f1 f2 =  
+        fun x ->  
+            let r = f1(x)
+            f2(r) |> ignore 
+            r
+
     /// Get first element of Triple (Tuple of three elements)
     let inline t1 (a,_,_) = a
 

@@ -6,14 +6,14 @@ open NiceString
 
 #nowarn "44" // to disable the obsolete warning on accessing Rarr.List
 
-/// A mutable list. Just like F# ResizeArray. It is just a thin wrapper over  Collections.Generic.List<'T>
+/// A FsEx.Rarr is a mutable list. Just like F# ResizeArray. It is just a thin wrapper over  Collections.Generic.List<'T>
 /// but with more detailed error messages on using bad indices
 /// and some more useful methods like this.First or this.Last.
 /// It has all members and interfaces of List<'T> implemented.
-/// The corresponding Rarr module provides all function of the Fsharp.Core Array module and more. 
-/// Just like F# Arrays and F# lists, Rarr equality is also structural.
+/// The corresponding Rarr module provides all function of the Fsharp.Core.Array module and more. 
+/// Just like F# arrays and F# lists, Rarr equality is also structural.
 /// The name Rarr is derived from of the F# type ResizeArray.
-/// There is a member called "InternalList" to access the underlying List<'T> directly.
+/// There is a member called 'InternalList' to access the underlying List<'T> directly.
 [<Sealed;NoComparison>]
 type Rarr<'T> private (xs:List<'T>) = 
 
@@ -23,23 +23,30 @@ type Rarr<'T> private (xs:List<'T>) =
     // https://stackoverflow.com/a/29956903/969070
 
 
+    /// docstring taken from https://github.com/microsoft/referencesource/blob/master/mscorlib/system/collections/generic/list.cs
+    
+
     /// Constructs a new FsEx.Rarr.
-    /// A FsEx.Rarr is a mutable list like Collections.Generic.List<'T>
-    /// but with more detailed error messages on using bad indices.
-    /// It's just a very thin wrapper over a System.Collections.Generic.List<'T>
-    /// and has all its members and interfaces implemented.
-    /// The name Rarr is derived from of the F# type ResizeArray
+    /// A FsEx.Rarr is a mutable list. Just like F# ResizeArray. It is just a thin wrapper over  Collections.Generic.List<'T>
+    /// but with more detailed error messages on using bad indices
+    /// and some more useful methods like this.First or this.Last.
+    /// It has all members and interfaces of List<'T> implemented.
+    /// The corresponding Rarr module provides all function of the Fsharp.Core.Array module and more. 
+    /// Just like F# arrays and F# lists, Rarr equality is also structural.
+    /// The name Rarr is derived from of the F# type ResizeArray.
     /// The list is initially empty and has a capacity
     /// of zero. Upon adding the first element to the list the capacity is
-    /// increased to 16, and then increased in multiples of two as required.
+    /// increased to 4, and then increased in multiples of two or the required size required.
     new () = 
         new Rarr<'T>(new List<'T>())
 
     /// Constructs a new FsEx.Rarr with a given initial capacity.
-    /// A FsEx.Rarr is a mutable list like Collections.Generic.List<'T>
-    /// but with more detailed error messages on using bad indices.
-    /// It's just a very thin wrapper over a System.Collections.Generic.List<'T>
-    /// and has all its members and interfaces implemented.
+    /// A FsEx.Rarr is a mutable list. Just like F# ResizeArray. It is just a thin wrapper over  Collections.Generic.List<'T>
+    /// but with more detailed error messages on using bad indices
+    /// and some more useful methods like this.First or this.Last.
+    /// It has all members and interfaces of List<'T> implemented.
+    /// The corresponding Rarr module provides all function of the Fsharp.Core.Array module and more. 
+    /// Just like F# arrays and F# lists, Rarr equality is also structural.
     /// The name Rarr is derived from of the F# type ResizeArray. The list is
     /// initially empty, but will have room for the given number of elements
     /// before any reallocations are required.
@@ -48,30 +55,34 @@ type Rarr<'T> private (xs:List<'T>) =
         new Rarr<'T>(new List<'T>(capacity))
 
     /// Constructs a new FsEx.Rarr, copying the contents of the given collection.
-    /// A FsEx.Rarr is a mutable list like Collections.Generic.List<'T>
-    /// but with more detailed error messages on using bad indices.
-    /// It's just a very thin wrapper over a System.Collections.Generic.List<'T>
-    /// and has all its members and interfaces implemented.
+    /// A FsEx.Rarr is a mutable list. Just like F# ResizeArray. It is just a thin wrapper over  Collections.Generic.List<'T>
+    /// but with more detailed error messages on using bad indices
+    /// and some more useful methods like this.First or this.Last.
+    /// It has all members and interfaces of List<'T> implemented.
+    /// The corresponding Rarr module provides all function of the Fsharp.Core.Array module and more. 
+    /// Just like F# arrays and F# lists, Rarr equality is also structural.
     /// The name Rarr is derived from of the F# type ResizeArray.
-    /// The size and capacity of the new list will both be equal to the size of the
-    /// given collection.
+    /// If the given seq is also a ICollection<'T> the size and capacity of 
+    /// the new list will both be equal to the size of the given collection.
+    /// and the operation is faster than adding the items one by one.
     new (collection : IEnumerable<'T>)  = 
         if isNull collection then ArgumentNullException.Raise "The IEnumerable given in new FsEx.Rarr(IEnumerable) constructor is null."
         new Rarr<'T>(new List<'T>(collection))
     
-    /// Operator ++ to copies the contents of two Sequences into a new Rarr
-    static member (++) (a : seq<'T>, b : seq<'T>) =
+    // Operator +++ to copies the contents of two Sequences into a new Rarr
+    static member (+++) (a : seq<'T>, b : seq<'T>) =
         let r = new Rarr<'T>()
         r.AddRange a
         r.AddRange b
         r   
 
-    /// Operator ++ to copies the contents of two Rarrs into a new Rarr
-    static member (++) (a : Rarr<'T>, b : Rarr<'T>) =
+    /// Operator ++ to copies the contents of two ICollection<'T> into a new Rarr.
+    /// The capacity of the new Rarr is the sum of the Count of the two ICollection<'T>.
+    static member (++) (a : ICollection<'T>, b : ICollection<'T>) =
         let c: int = a.Count + b.Count
         let l = new List<'T>(c)
-        for i=0 to a.Count-1 do l.Add(a.[i])
-        for i=0 to b.Count-1 do l.Add(b.[i])        
+        l.AddRange a
+        l.AddRange b       
         Rarr(l)
 
     /// Constructs a new FsEx.Rarr by using the supplied List<'T>  directly, without any copying of items.
@@ -79,14 +90,14 @@ type Rarr<'T> private (xs:List<'T>) =
         if isNull xs then ArgumentNullException.Raise "List in FsEx.Rarr.CreateDirectly is null."
         new Rarr<'T>(xs)
 
-    /// Access the internally used Collections.Generic.List<'T>
-    /// This is NOT even a shallow copy, mutating it will also change this Instance of FsEx.Rarr!
-    /// Use "#nowarn "44" to disable the obsolete warning
-    [<Obsolete("It is not actually obsolete, but normally not used, so hidden from editor tools. In F# use #nowarn \"44\" to disable the obsolete warning.")>]
-    member _.List:List<'T> = xs
+    // Access the internally used Collections.Generic.List<'T>
+    // This is NOT even a shallow copy, mutating it will also change this Instance of FsEx.Rarr!
+    // Use "#nowarn "44" to disable the obsolete warning
+    //[<Obsolete("It is not actually obsolete, but normally not used, so hidden from editor tools. In F# use #nowarn \"44\" to disable the obsolete warning.")>]
+    //member _.List:List<'T> = xs
 
     /// Access the internally used Collections.Generic.List<'T>
-    /// This is NOT even a shallow copy, mutating it will also change this Instance of FsEx.Rarr!
+    /// This is NOT even a shallow copy, mutating it will also change this instance of FsEx.Rarr!
     member _.InternalList:List<'T> = xs
 
     /// Gets the index of the last item in the FsEx.Rarr.
@@ -396,9 +407,11 @@ type Rarr<'T> private (xs:List<'T>) =
     /// before adding the new element.
     member _.Add(item : 'T) =                                                         xs.Add item
 
-    // Adds the elements of the given collection to the end of this list. If
-    // required, the capacity of the list is increased to twice the previous
-    // capacity or the new size, whichever is larger.
+    /// Adds the elements of the given collection to the end of this list. If
+    /// required, the capacity of the list is increased to twice the previous
+    /// capacity or the new size, whichever is larger.
+    /// If the given seq is a ICollection<'T> the this operation is faster 
+    /// than adding the items one by one.
     member  _.AddRange(collection : IEnumerable<'T>) =                                xs.AddRange collection
 
     /// Returns a read-only System.Collections.ObjectModel.ReadOnlyCollection
@@ -811,8 +824,8 @@ type Rarr<'T> private (xs:List<'T>) =
         elif this.Count <> other.Count then false
         else
             let comparer = EqualityComparer<'T>.Default // for  structural equality to be implemented on this class without putting the <'T when 'T : equality> constraint on 'T?
-            let ts = this.List
-            let os = other.List
+            let ts = this.InternalList
+            let os = other.InternalList
             let rec eq i = 
                 if i < this.Count then
                     if comparer.Equals(ts.[i] , os.[i]) then
@@ -838,9 +851,10 @@ type Rarr<'T> private (xs:List<'T>) =
         | :? Rarr<'T> as that -> this.IsEqualTo(that)
         | _ -> false
     
-    /// Structural equality.
-    /// Compares each element in both lists for equality . Rarrs must also be of same Count
     interface IEquatable<Rarr<'T>> with
+        
+        /// Structural equality.
+        /// Compares each element in both lists for equality . Rarrs must also be of same Count
         member this.Equals(that:Rarr<'T>) = 
             this.IsEqualTo(that)
 

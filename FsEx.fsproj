@@ -22,6 +22,8 @@
     <FileVersion>0.12.0</FileVersion>  
 	  
     <PackageReleaseNotes>
+    - add >>! operator
+    - cleanup Rarr docstr
     - add memoizeInDict
     - add IList module to match Rarr module
     - remove Rarr.createFromSeq
