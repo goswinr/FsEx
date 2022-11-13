@@ -6,15 +6,14 @@ open NiceString
 
 #nowarn "44" // to disable the obsolete warning on accessing Rarr.List
 
-/// A mutable list. Just like Collections.Generic.List<'T>
+/// A mutable list. Just like F# ResizeArray. It is just a thin wrapper over  Collections.Generic.List<'T>
 /// but with more detailed error messages on using bad indices
 /// and some more useful methods like this.First or this.Last.
-/// It's a very thin wrapper over a System.Collections.Generic.List<'T>
 /// It has all members and interfaces of List<'T> implemented.
+/// The corresponding Rarr module provides all function of the Fsharp.Core Array module and more. 
 /// Just like F# Arrays and F# lists, Rarr equality is also structural.
 /// The name Rarr is derived from of the F# type ResizeArray.
-/// There is a hidden member called "List" to access the underlying List<'T> directly.
-/// In F# use #nowarn "44" to disable the obsolete warning for this hidden member.
+/// There is a member called "InternalList" to access the underlying List<'T> directly.
 [<Sealed;NoComparison>]
 type Rarr<'T> private (xs:List<'T>) = 
 

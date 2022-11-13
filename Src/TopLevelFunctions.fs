@@ -179,17 +179,17 @@ module AutoOpenUtil =
     let inline ifDo condition (f:'T->'T) (x:'T) = 
         if condition then f x else x
 
-    /// Caches the results of a function in a Map.
+    /// Caches the results of a function in an F# Map.
     /// The argument to the function will be used as key in the Map.
     /// The argument can be unit or null(=None) too.
     let memoize f = 
         let cache = ref Map.empty // using a Dictionary would fail on a null or unit key
         fun x ->
-            match (!cache).TryFind(x) with
+            match cache.Value.TryFind(x) with
             | Some res -> res
             | None ->
                 let res = f x
-                cache := (!cache).Add(x,res)
+                cache.Value <- cache.Value.Add(x,res)
                 res
 
     /// Caches the results of a function in a Dictionary.
@@ -197,7 +197,7 @@ module AutoOpenUtil =
     /// The argument can NOT be unit, null or Option.None
     /// While less flexible this function has better performance than the memoize function using a F# Map.
     let memoizeInDict f = 
-        let cache = Dictionary() // using a Dictionary would fail on a null or unit key
+        let cache = Dictionary() // using a Dictionary  fails on a null or unit key
         fun x ->
             match cache.TryGetValue(x) with
             | true, res -> res
