@@ -121,7 +121,7 @@ module String =
         if start = -1 then stringToSearchIn
         else stringToSearchIn.Substring(0, start)
 
-    /// Returns everything before first occurrence of a given splitting string.
+    /// Returns everything after first occurrence of a given splitting string.
     /// Or fails if splitter is not found.
     /// Uses StringComparison.Ordinal
     let (*inline*) after (splitter:string) (stringToSearchIn:string) :string = 
@@ -129,7 +129,7 @@ module String =
         if isNull splitter         then FsExStringException.Raise "FsEx.String.after: splitter is null (stringToSearchIn:%s)" (exnf stringToSearchIn)
         let start = stringToSearchIn.IndexOf(splitter, StringComparison.Ordinal)
         if start = -1 then FsExStringException.Raise "FsEx.String.after: splitter %s not found in stringToSearchIn:%s" (exnf splitter) (exnf stringToSearchIn)
-        else stringToSearchIn.Substring(start+1)//cant be out of bounds!
+        else stringToSearchIn.Substring(start+splitter.Length)//cant be out of bounds!
 
     /// Returns everything after first occurrence of a given splitting character.
     /// Or fails if splitter is not found
@@ -147,7 +147,7 @@ module String =
         if isNull splitter         then FsExStringException.Raise "FsEx.String.tryAfter: splitter is null (stringToSearchIn:%s)" (exnf stringToSearchIn)
         let start = stringToSearchIn.IndexOf(splitter, StringComparison.Ordinal)
         if start = -1 then None
-        else Some <|stringToSearchIn.Substring(start+1)//cant be out of bounds!
+        else Some <|stringToSearchIn.Substring(start+splitter.Length)//cant be out of bounds!
 
     /// Returns everything after first occurrence of a given splitting character.
     /// Or None if splitter is not found
@@ -157,7 +157,7 @@ module String =
         if start = -1 then None
         else Some <|stringToSearchIn.Substring(start+1)//cant be out of bounds!
     
-    /// Returns everything before first occurrence of a given splitting string.
+    /// Returns everything after first occurrence of a given splitting string.
     /// Or full input string if splitter is not found.
     /// Uses StringComparison.Ordinal
     let (*inline*) afterOrInput (splitter:string) (stringToSearchIn:string) :string = 
@@ -165,7 +165,7 @@ module String =
         if isNull splitter         then FsExStringException.Raise "FsEx.String.afterOrInput: splitter is null (stringToSearchIn:%s)" (exnf stringToSearchIn)
         let start = stringToSearchIn.IndexOf(splitter, StringComparison.Ordinal)
         if start = -1 then stringToSearchIn
-        else stringToSearchIn.Substring(start+1)
+        else stringToSearchIn.Substring(start+splitter.Length)
 
     /// Returns everything after first occurrence of a given splitting character.
     /// Or full input string if splitter is not found
