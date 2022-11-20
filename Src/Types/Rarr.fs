@@ -6,15 +6,17 @@ open NiceString
 
 #nowarn "44" // to disable the obsolete warning on accessing Rarr.List
 
-/// A FsEx.Rarr is a mutable list. Just like F# ResizeArray. It is just a thin wrapper over  Collections.Generic.List<'T>
-/// but with more detailed error messages on using bad indices
+/// A FsEx.Rarr is a mutable list. Just like F# ResizeArray. It is just a thin wrapper over Collections.Generic.List<'T>
+/// with more detailed error messages on using bad indices
 /// and some more useful methods like this.First or this.Last.
 /// It has all members and interfaces of List<'T> implemented.
 /// The corresponding Rarr module provides all function of the Fsharp.Core.Array module and more. 
 /// Just like F# arrays and F# lists, Rarr equality is also structural.
 /// The name Rarr is derived from of the F# type ResizeArray.
 /// There is a member called 'InternalList' to access the underlying List<'T> directly.
-[<Sealed;NoComparison>]
+[<Sealed>]
+[<NoComparison>]
+//[<CustomEquality>] // gives an error message, not needed . only this.Euqals override and the IEquatable interface is enough to make the '=' operator do structural equality correctly.
 type Rarr<'T> private (xs:List<'T>) = 
 
     // Rarr could potentially be turned into a struct.
@@ -23,12 +25,12 @@ type Rarr<'T> private (xs:List<'T>) =
     // https://stackoverflow.com/a/29956903/969070
 
 
-    /// docstring taken from https://github.com/microsoft/referencesource/blob/master/mscorlib/system/collections/generic/list.cs
+    // docstring taken from https://github.com/microsoft/referencesource/blob/master/mscorlib/system/collections/generic/list.cs
     
 
     /// Constructs a new FsEx.Rarr.
-    /// A FsEx.Rarr is a mutable list. Just like F# ResizeArray. It is just a thin wrapper over  Collections.Generic.List<'T>
-    /// but with more detailed error messages on using bad indices
+    /// A FsEx.Rarr is a mutable list. Just like F# ResizeArray. It is just a thin wrapper over Collections.Generic.List<'T>
+    /// with more detailed error messages on using bad indices
     /// and some more useful methods like this.First or this.Last.
     /// It has all members and interfaces of List<'T> implemented.
     /// The corresponding Rarr module provides all function of the Fsharp.Core.Array module and more. 
@@ -41,8 +43,8 @@ type Rarr<'T> private (xs:List<'T>) =
         new Rarr<'T>(new List<'T>())
 
     /// Constructs a new FsEx.Rarr with a given initial capacity.
-    /// A FsEx.Rarr is a mutable list. Just like F# ResizeArray. It is just a thin wrapper over  Collections.Generic.List<'T>
-    /// but with more detailed error messages on using bad indices
+    /// A FsEx.Rarr is a mutable list. Just like F# ResizeArray. It is just a thin wrapper over Collections.Generic.List<'T>
+    /// with more detailed error messages on using bad indices
     /// and some more useful methods like this.First or this.Last.
     /// It has all members and interfaces of List<'T> implemented.
     /// The corresponding Rarr module provides all function of the Fsharp.Core.Array module and more. 
@@ -69,7 +71,54 @@ type Rarr<'T> private (xs:List<'T>) =
         if isNull collection then ArgumentNullException.Raise "The IEnumerable given in new FsEx.Rarr(IEnumerable) constructor is null."
         new Rarr<'T>(new List<'T>(collection))
     
-    // Operator +++ to copies the contents of two Sequences into a new Rarr
+    //------------------------[<CustomEquality>]------------------------------
+    //Adding the this.Euqals override and the IEquatable interface is enough to make the '=' operator do structural equality correctly.
+    //also adding the [<CustomEquality>] would give an error message  FS0377
+
+    /// internal structural equality implementatiom .
+    /// Compares each element in both lists for equality . Rarrs must also be of same Count
+    member inline internal this.IsEqualTo(other:Rarr<'T>) = 
+        if Object.ReferenceEquals(this,other) then true
+        elif this.Count <> other.Count then false
+        else
+            let comparer = EqualityComparer<'T>.Default // for  structural equality to be implemented on this class without putting the <'T when 'T : equality> constraint on 'T?
+            let ts = this.InternalList
+            let os = other.InternalList
+            let rec eq i = 
+                if i < this.Count then
+                    if comparer.Equals(ts.[i] , os.[i]) then
+                        eq (i+1)
+                    else
+                        false
+                else
+                    true
+            eq 0
+    
+    /// Accumulates a hash code by combining the hashes of all elements
+    override this.GetHashCode() = 
+        let combineHash x y = (x <<< 1) + y + 631 //from FSharp.Core Set
+        let mutable res = 0
+        for i=0 to xs.Count - 1 do
+            let x = xs.[i]
+            res <- combineHash res (LanguagePrimitives.GenericHash x)
+        res
+    
+    /// Structural equality.
+    /// Compares each element in both lists for equality . Rarrs must also be of same Count
+    override this.Equals(that:obj) = 
+        match that with
+        | :? Rarr<'T> as that -> this.IsEqualTo(that)
+        | _ -> false
+    
+    interface IEquatable<Rarr<'T>> with
+        
+        /// Structural equality.
+        /// Compares each element in both lists for equality . Rarrs must also be of same Count
+        member this.Equals(that:Rarr<'T>) = 
+            this.IsEqualTo(that)
+    
+    
+    /// Operator +++ to copies the contents of two Sequences into a new Rarr
     static member (+++) (a : seq<'T>, b : seq<'T>) =
         let r = new Rarr<'T>()
         r.AddRange a
@@ -815,48 +864,7 @@ type Rarr<'T> private (xs:List<'T>) =
         xs.TrueForAll(matchValue)
 
 
-    //------------------------[<CustomEquality>]------------------------------
 
-    /// Structural equality.
-    /// Compares each element in both lists for equality . Rarrs must also be of same Count
-    member inline internal this.IsEqualTo(other:Rarr<'T>) = 
-        if Object.ReferenceEquals(this,other) then true
-        elif this.Count <> other.Count then false
-        else
-            let comparer = EqualityComparer<'T>.Default // for  structural equality to be implemented on this class without putting the <'T when 'T : equality> constraint on 'T?
-            let ts = this.InternalList
-            let os = other.InternalList
-            let rec eq i = 
-                if i < this.Count then
-                    if comparer.Equals(ts.[i] , os.[i]) then
-                        eq (i+1)
-                    else
-                        false
-                else
-                    true
-            eq 0
-
-    override this.GetHashCode() = 
-        let combineHash x y = (x <<< 1) + y + 631 //from FSharp.Core Set
-        let mutable res = 0
-        for i=0 to xs.Count - 1 do
-            let x = xs.[i]
-            res <- combineHash res (LanguagePrimitives.GenericHash x)
-        res
-    
-    /// Structural equality.
-    /// Compares each element in both lists for equality . Rarrs must also be of same Count
-    override this.Equals(that:obj) = 
-        match that with
-        | :? Rarr<'T> as that -> this.IsEqualTo(that)
-        | _ -> false
-    
-    interface IEquatable<Rarr<'T>> with
-        
-        /// Structural equality.
-        /// Compares each element in both lists for equality . Rarrs must also be of same Count
-        member this.Equals(that:Rarr<'T>) = 
-            this.IsEqualTo(that)
 
 
     //---------------------------------------Interfaces of  System.Collections.Generic.List-------------------------------------
