@@ -29,6 +29,9 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 [MIT](https://raw.githubusercontent.com/goswinr/FsEx/main/LICENSE.txt)
 
 ### Changelog
+`0.13.0`
+
+
 
 `0.12.0`
 - add >>! operator

@@ -103,30 +103,7 @@ module IO =
                 else  
                     yield! find par.FullName      }
         find directory 
-    
-
-
-    /// Determines a text file's encoding by analyzing its byte order mark (BOM).
-    /// Returns None  when detection of the text file's Endian kind fails.( might be ASCII or UTF-8 without BOM)
-    /// (Encoding.Unicode = UTF-16LE)
-    [<Obsolete("The results of this cannot be relied upon. see https://stackoverflow.com/a/12853721/969070")>]
-    let getEncoding(filename:string)= 
-        // https://stackoverflow.com/a/19283954/969070
-        // better: https://stackoverflow.com/a/12853721/969070
-        let bom = Array.zeroCreate 4
-        use  file = new FileStream(filename, FileMode.Open, FileAccess.Read) // Read the BOM
-        if file.Read(bom, 0, 4) <> 4 then None else
-            // Analyze the BOM
-            if   bom.[0] = 0x2buy && bom.[1] = 0x2fuy && bom.[2] = 0x76uy then  Some  Encoding.UTF7
-            elif bom.[0] = 0xefuy && bom.[1] = 0xbbuy && bom.[2] = 0xbfuy then  Some  Encoding.UTF8
-            elif bom.[0] = 0xffuy && bom.[1] = 0xfeuy && bom.[2] = 0uy && bom.[3] = 0uy then  Some  Encoding.UTF32 //UTF-32LE
-            elif bom.[0] = 0xffuy && bom.[1] = 0xfeuy then  Some  Encoding.Unicode; //UTF-16LE
-            elif bom.[0] = 0xfeuy && bom.[1] = 0xffuy then  Some  Encoding.BigEndianUnicode; //UTF-16BE
-            elif bom.[0] = 0uy    && bom.[1] = 0uy    && bom.[2] = 0xfeuy && bom.[3] = 0xffuy then Some  ( UTF32Encoding(true, true) :> Encoding)   //UTF-32BE
-            else
-                // We actually have no idea what the encoding is if we reach this point, might be ASCII or UTF-8 without BOM
-                None
-    
+   
     /// For non blocking File IO
     module File  = 
         

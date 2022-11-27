@@ -1,4 +1,4 @@
-﻿namespace FsEx
+namespace FsEx
 
 open System
 open System.Collections.Generic
@@ -483,7 +483,7 @@ type Rarr<'T> private (xs:List<'T>) =
     /// the search value should be inserted into the list in order for the list
     /// to remain sorted.
     /// The method uses the Array.BinarySearch method to perform the search.
-    member _.BinarySearch(index:int, count:int, item : 'T, comparer : IComparer<'T>) = 
+    member _.BinarySearch(index:int, count:int, item:'T, comparer : IComparer<'T>) = 
         if index < 0  then
             ArgumentException.RaiseBase "rarr.BinarySearch: The start index %d cannot be less than zero (for Rarr of %d elements)." index xs.Count
         elif count < 0 then
@@ -864,9 +864,6 @@ type Rarr<'T> private (xs:List<'T>) =
         xs.TrueForAll(matchValue)
 
 
-
-
-
     //---------------------------------------Interfaces of  System.Collections.Generic.List-------------------------------------
 
     // TODO add XML doc str:
@@ -915,21 +912,22 @@ type Rarr<'T> private (xs:List<'T>) =
             with get index = 
                 if index<0 || index >= xs.Count then ArgumentException.RaiseBase "Cant get index %d from FsEx.Rarr (cast to IReadOnlyList<_>) of %d items: %s" index xs.Count (toNiceString xs)
                 xs.[index]
-
-    interface Collections.IList with // Non generic
+    
+    
+    interface Collections.IList with // Non generic !!
         member _.Add(x)              = (xs:>Collections.IList).Add(x)
         member _.IndexOf(item)       = (xs:>Collections.IList).IndexOf(item)
         member _.Insert(index,item)  = (xs:>Collections.IList).Insert(index,item)
         member _.RemoveAt(index)     = 
-            if index<0 || index >= xs.Count then ArgumentException.RaiseBase "Cant rarr.RemoveAt(%d) in FsEx.Rarr (cast to non Generic IList) of %d items: %s " index  xs.Count  (toNiceString xs)
+            if index<0 || index >= xs.Count then ArgumentException.RaiseBase "Cant rarr.RemoveAt(%d) in FsEx.Rarr (cast to Non-Generic IList) of %d items: %s " index  xs.Count  (toNiceString xs)
             (xs:>Collections.IList).RemoveAt(index)
 
         member _.Item
             with get index = 
-                if index<0 || index >= xs.Count then ArgumentException.RaiseBase "Cant get index %d from FsEx.Rarr (cast to non Generic IList) of %d items: %s" index xs.Count (toNiceString xs)
+                if index<0 || index >= xs.Count then ArgumentException.RaiseBase "Cant get index %d from FsEx.Rarr (cast to Non-Generic IList) of %d items: %s" index xs.Count (toNiceString xs)
                 (xs:>Collections.IList).[index]
             and set index value = 
-                if index<0 || index >= xs.Count then ArgumentException.RaiseBase "Cant set index %d to %s in FsEx.Rarr (cast to non Generic IList) of %d items: %s " index (toNiceString value)  xs.Count  (toNiceString xs)
+                if index<0 || index >= xs.Count then ArgumentException.RaiseBase "Cant set index %d to %s in FsEx.Rarr (cast to Non-Generic IList) of %d items: %s " index (toNiceString value)  xs.Count  (toNiceString xs)
                 (xs:>Collections.IList).[index] <- value
 
         member _.Remove x =   (xs:>Collections.IList).Remove x
@@ -939,7 +937,7 @@ type Rarr<'T> private (xs:List<'T>) =
         member _.IsFixedSize = false
 
 (*
-TODO add a version of Rarr that requires a UoM on the index.
+TODO add a version of Rarr that requires a UoM on the index ??
 see https://twitter.com/mccrews/status/1489269693483405315 and 
 https://gist.github.com/matthewcrews/bea24372de6af4f040ec68a0640289ef
         

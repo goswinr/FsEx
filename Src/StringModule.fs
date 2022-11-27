@@ -317,7 +317,7 @@ module String =
     let (*inline*) countSubString (subString:string) (textToSearch:string) = 
         if isNull textToSearch then FsExStringException.Raise "FsEx.String.countSubString: textToSearch is null, subString: %s" (exnf subString)
         if isNull subString    then FsExStringException.Raise "FsEx.String.countSubString: subString is null, textToSearch: %s" (exnf textToSearch)        
-        let rec find fromIdx k = 
+        let rec find (fromIdx:int) k = 
             let r = textToSearch.IndexOf(subString, fromIdx, StringComparison.Ordinal)
             if r < 0 then k
             else find (r + subString.Length) (k + 1)
@@ -326,7 +326,7 @@ module String =
     /// Counts how often a character appears in a string    
     let (*inline*) countChar (chr:char) (textToSearch:string) = 
         if isNull textToSearch then FsExStringException.Raise "FsEx.String.countChar: textToSearch is null, chr: %c" chr       
-        let rec find fromIdx k = 
+        let rec find (fromIdx:int) k = 
             let r = textToSearch.IndexOf(chr, fromIdx)
             if r < 0 then k
             else find (r + 1) (k + 1)

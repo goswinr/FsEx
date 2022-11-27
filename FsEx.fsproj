@@ -2,7 +2,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>netstandard2.0</TargetFramework>    
+	<!--
+	  <TargetFramework>netstandard2.0</TargetFramework>
+	-->
+	<TargetFrameworks>netstandard2.0;net472;net6.0;net7.0</TargetFrameworks>    
     <LangVersion>preview</LangVersion>
     <OtherFlags>$(OtherFlags)--warnon:3390</OtherFlags>  <!-- warnon:3390 is to verify xml docstrings https://devblogs.microsoft.com/dotnet/announcing-f-5/#improved-compiler-analysis-for-library-authors -->
 
@@ -22,7 +25,7 @@
     <FileVersion>0.12.0</FileVersion>  
 	  
     <PackageReleaseNotes>
-    - add >>! operator
+    - add &gt;&gt;! operator
     - cleanup Rarr docstr
     - add memoizeInDict
     - add IList module to match Rarr module

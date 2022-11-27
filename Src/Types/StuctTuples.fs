@@ -52,14 +52,14 @@ module NonBoxingEqualityOperators =
     /// This avoids boxing of custom structs when comparing with (<>). A significant performance improvement.
     let inline (=!=) x y = not (eq x y)
 
-//open System.Runtime.CompilerServices // for ; IsByRefLike; IsReadOnly
+//open System.Runtime.CompilerServices // for ; IsByRefLike; IsReadOnly not available in netstandard
 
 /// A struct of two integers
 /// use operator (===) for fast equality test
 /// Avoid using this struct in Fsharp.Core functions like: List.contains value. boxing will occur
 /// Better: List.exists (fun v -> v === value)
 [<Struct; CustomEquality; NoComparison>]
-//[<IsByRefLike; IsReadOnly>] not available in netstandart https://bartoszsypytkowski.com/writing-high-performance-f-code/
+//[<IsByRefLike; IsReadOnly>] not available in netstandard https://bartoszsypytkowski.com/writing-high-performance-f-code/
 type  IntTup = 
     val a :int
     val b :int
@@ -106,7 +106,7 @@ type  IntTup =
 /// use operator (===) for fast equality test
 /// Avoid using this struct in Fsharp.Core functions like: List.contains value. boxing will occur
 /// Better: List.exists ( (===) value)
-//[<IsByRefLike; IsReadOnly>] not available in netstandart https://bartoszsypytkowski.com/writing-high-performance-f-code/
+//[<IsByRefLike; IsReadOnly>] not available in netstandard https://bartoszsypytkowski.com/writing-high-performance-f-code/
 [<Struct; CustomEquality; NoComparison>] 
 type IntTrip = 
     val a :int
