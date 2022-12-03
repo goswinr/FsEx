@@ -28,6 +28,9 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 [MIT](https://raw.githubusercontent.com/goswinr/FsEx/main/LICENSE.txt)
 
 ### Changelog
+`0.13.1`
+- print with a HighlightColor for a Regex in Seff
+
 `0.13.0`
 - move IO, Kernel32 and external Processes modules out to new package [FsEx.IO](https://github.com/goswinr/FsEx.IO)
 

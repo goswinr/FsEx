@@ -11,6 +11,7 @@ open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 module AutoOpenPrint = 
 
     open NiceString
+    
 
     /// Exposes functionality like print and clear of the Seff Editor, when FsEx is loaded there
     type internal Seff private () = // no public constructor
@@ -50,11 +51,13 @@ module AutoOpenPrint =
                             let clt = cl :?>unit -> unit
                             clear   <- clt                        
                 with ex ->
-                    eprintfn "Failed to get Seff.Model.ISeffLog.printnColor via Reflection, If you are not using the Seff Editor Plug-in this is normal."
-                    eprintfn "The function using color will just print to Console.Out."
-                    eprintfn "The ignored Error was: %A" ex
+                    eprintfn "The Seff was found but setting up color printing failed. The Error was: %A" ex
 
             |None -> ()
+                //eprintfn "Failed to get Seff.Model.ISeffLog.printnColor via Reflection, If you are not using the Seff F# Editor this message is normal."
+                //eprintfn "The print and Printfn functions using color will just print to Console.Out."
+                //eprintfn "The ignored Error was: %A" ex
+
                 //eprintfn "Only found:"
                 //AppDomain.CurrentDomain.GetAssemblies()
                 //|> Seq.map (fun a -> a.GetName().Name )
@@ -84,8 +87,22 @@ module AutoOpenPrint =
     /// maxCharsInString  = 2000  , how many characters of a string might be printed at once.
     /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
     /// .thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
+    /// .roundToZeroBelow  = 1e-24 , if the absolute value of a float is below this, display ±0.0
     let print x = 
         Console.WriteLine (toNiceString x) // Console.WriteLine is about 2-3 times faster than printf "%s"
+    
+    /// Print to standard out. 
+    /// Nice formatting for numbers including thousand Separator, records and (nested) sequences, 
+    /// NicePrintSettings:
+    /// maxDepth          = 3     , how deep the content of nested seq is printed (printFull ignores this)
+    /// maxVertItems      = 50    , how many items per seq are printed in vertical list(printFull ignores this)
+    /// maxHorChars       = 120   , how  many chars can be in one line before switching to vertical sequencing of items in collection.
+    /// maxCharsInString  = 2000  , how many characters of a string might be printed at once.
+    /// Settings that are exposed in FsEx.NiceString.NiceStringSettings:
+    /// .thousandSeparator = '     , set this to change the printing of floats and integers larger than 10'000
+    /// .roundToZeroBelow  = 1e-24 , if the absolute value of a float is below this, display ±0.0
+    let printLong x = 
+        Console.WriteLine (toNiceString x)
 
     /// Print to standard out.
     /// Nice formatting for numbers including thousand Separator, records and (nested) sequences, 
@@ -103,8 +120,8 @@ module AutoOpenPrint =
 
     /// Highlights every occurrence of the given word in the color of first three integers (red, green, blue)
     /// and the rest of the line in next three integers.
-    /// Adds line return at end.
-    let internal printWithHighlightColor wR wG wB fR fG fB (word:string) (fullLine:string)= 
+    /// Adds a line return at end.
+    let printWithHighlightColor wR wG wB fR fG fB (word:string) (fullLine:string)= 
         if String.IsNullOrWhiteSpace word then
             Seff.PrintLineColor fR fG fB (fullLine)// adds line return
         else
@@ -122,9 +139,35 @@ module AutoOpenPrint =
                         loop (i + word.Length)
             loop 0
 
+    /// Highlights every occurrence of the given Regex in the color of first three integers (red, green, blue)
+    /// and the rest of the line in next three integers.
+    /// Adds a line return at end.
+    let printWithHighlightColorRegex wR wG wB fR fG fB (re:Text.RegularExpressions.Regex) (fullLine:string)= 
+        if isNull re then
+            Seff.PrintLineColor fR fG fB (fullLine)// adds line return
+        else
+            let rec loop (fromIdx:int) = 
+                let m =  re.Match(fullLine, fromIdx)                
+                if m.Success then 
+                    let i = m.Index
+                    let length = m.Length
+                    let beforeLen =  i - fromIdx
+                    if beforeLen > 0 then Seff.PrintColor fR fG fB (fullLine.Substring(fromIdx,beforeLen))
+
+                    if i + length = fullLine.Length then
+                        Seff.PrintLineColor wR wG wB (fullLine.Substring(i,length)) // adds line return
+                    else
+                        Seff.PrintColor wR wG wB (fullLine.Substring(i,length)) // no line return
+                        loop (i + length)   
+                else 
+                    Seff.PrintLineColor fR fG fB (fullLine.Substring(fromIdx))// adds line return
+               
+            loop 0
+
+
     /// Tries to printf with colors if running inside Seff Editor.
     /// Highlights the given word in red in the line to print in gray.
-    /// Adds line return at end.
+    /// Adds a line return at end.
     let printWithHighlight (word:string) (fullLine:string)= 
         printWithHighlightColor 240 0 0 180 180 180 word fullLine
 

@@ -52,7 +52,8 @@ module NiceStringSettings =
     /// maxDepth          = 3
     /// maxVertItems      = 6
     /// maxHorChars       = 120  
-    /// maxCharsInString  = 2000    
+    /// maxCharsInString  = 2000 
+    /// fullPrecision     = false   
     let defaultNicePrintSettings = {
         maxDepth          = 3
         maxVertItems      = 6
@@ -736,6 +737,7 @@ module NiceString  =
     /// maxCharsInString  = 2000  , how many characters of a string might be printed at once.
     /// Settings are exposed in FsEx.NiceString.NiceStringSettings:
     /// .thousandSeparator       = '     ; set this to change the printing of floats and integers larger than 10'000
+    /// .roundToZeroBelow  = 1e-24 , if the absolute value of a float is below this, display ±0.0
     let toNiceString (x:'T) :string = 
         let nps = NiceStringSettings.defaultNicePrintSettings
         x |> box |> getLines nps 0 |> formatLines nps
