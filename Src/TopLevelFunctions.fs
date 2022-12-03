@@ -1,7 +1,6 @@
 ﻿namespace FsEx
 
 open System
-open System.IO
 open System.Collections.Generic
 
 
@@ -35,14 +34,6 @@ module AutoOpenExtensionsExceptions =
     type KeyNotFoundException with
         /// Raise KeyNotFoundException with F# printf string formatting
         static member inline Raise msg =  Printf.kprintf (fun s -> raise (KeyNotFoundException(s))) msg
-
-    type FileNotFoundException with
-        /// Raise FileNotFoundException with F# printf string formatting
-        static member inline Raise msg =  Printf.kprintf (fun s -> raise (FileNotFoundException(s))) msg
-
-    type DirectoryNotFoundException with
-        /// Raise DirectoryNotFoundException with F# printf string formatting
-        static member inline Raise msg =  Printf.kprintf (fun s -> raise (DirectoryNotFoundException(s))) msg
 
 
 /// This module is set to auto open when opening FsEx namespace.

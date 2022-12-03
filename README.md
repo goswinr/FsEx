@@ -30,7 +30,7 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 
 ### Changelog
 `0.13.0`
-
+- move IO, Kernel32 and external Processes modules out to new package [FsEx.IO](https://github.com/goswinr/FsEx.IO)
 
 
 `0.12.0`
