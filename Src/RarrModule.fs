@@ -1772,16 +1772,34 @@ module Rarr =
     /// <c>chooser</c> is <c>None</c>.</exception>
     /// <returns>The first result.</returns>
     let pick (chooser:'T -> 'U option) (rarr: Rarr<'T>) = 
-        let li = rarr.InternalList
+        let li = rarr.InternalList        
         let rec loop i = 
-            if i >= rarr.Count then
+            if i = rarr.Count then
                 KeyNotFoundException.Raise "FsEx.Rarr.pick: Key not found in %d elements" rarr.Count
             else
                 match chooser li.[i] with
-                | None -> loop(i+1)
                 | Some res -> res
+                | None -> loop(i+1)
         loop 0
-
+        
+    /// <summary>Starting from last element going backwards. Applies the given function to successive elements, returning the first
+    /// result where function returns <c>Some(x)</c> for some <c>x</c>. If the function
+    /// never returns <c>Some(x)</c> then <see cref="T:System.Collections.Generic.KeyNotFoundException"/> is raised.</summary>
+    /// <param name="chooser">The function to generate options from the elements.</param>
+    /// <param name="rarr">The input Rarr.</param>
+    /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">Thrown if every result from
+    /// <c>chooser</c> is <c>None</c>.</exception>
+    /// <returns>The first result. From the end of the Rarr.</returns>
+    let pickBack (chooser:'T -> 'U option) (rarr: Rarr<'T>) = 
+        let li = rarr.InternalList
+        let rec loop i = 
+            if i = -1 then
+                KeyNotFoundException.Raise "FsEx.Rarr.pickBack: Key not found in %d elements" rarr.Count
+            else
+                match chooser li.[i] with
+                | Some res -> res
+                | None -> loop(i-1)
+        loop (li.Count -  1)
 
     /// <summary>Applies a function to each element of the Rarr, threading an accumulator argument
     /// through the computation. If the input function is <c>f</c> and the elements are <c>i0...iN</c>
