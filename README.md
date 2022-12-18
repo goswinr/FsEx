@@ -32,6 +32,8 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 
 `0.13.2`
 - add Rarr.pickBack
+- add rotateUpTill
+- add rotateDownTill
 
 `0.13.1`
 - print with a HighlightColor for a Regex in Seff

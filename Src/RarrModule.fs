@@ -213,9 +213,10 @@ module Rarr =
         res.Add value
         res
 
-    /// <summary>Considers List circular and move elements up or down
+    /// <summary>Considers List circular and move elements up for positive integers or down for negative integers.
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
-    /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a] </summary>
+    /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a] 
+    /// the amount can even be bigger than the list's size. I will just rotate more than one loop.</summary>
     /// <param name="amount">How many elements to shift forward. Or backward if number is negative</param>
     /// <param name="rarr">The input Rarr.</param>
     /// <returns>The new result Rarr.</returns>
@@ -225,6 +226,126 @@ module Rarr =
         for i = 0 to li.Count - 1 do
             r.Add <| li.[negIdxLooped (i-amount) rarr.Count]
         r
+
+    /// <summary>Considers List circular and move elements up till condition is met for the first item.
+    /// The algorithm takes elements from the end and put them at the start till the first element in the list meets the condition. 
+    //  If the first element in the input meets the condition no changes are made. But still a shallow copy is returned.</summary>
+    /// <param name="condition">The condition to meet.</param>
+    /// <param name="rarr">The input Rarr.</param>
+    /// <returns>The new result Rarr.</returns>
+    let inline rotateUpTill (condition:'T->bool) (rarr: Rarr<'T>) :  Rarr<'T>  = 
+        let li = rarr.InternalList
+        if li.Count=0 then 
+            rarr
+        elif condition li.[0] then 
+            rarr.Clone()
+        else            
+            let li = rarr.InternalList
+            let rec findBackIdx i =
+                if i = -1 then 
+                    ArgumentException.RaiseBase "FsEx.Rarr.rotateUpTill: no item in the list meets the condition:\r\n%s" rarr.ToNiceStringLong
+                elif condition li.[i] then                    
+                    i
+                else
+                    findBackIdx (i-1)            
+            let fi = findBackIdx (li.Count-1)
+            let r = ResizeArray(rarr.Count)
+            for i = fi to li.Count - 1 do
+                r.Add <| li.[i]
+            for i = 0 to fi - 1 do
+                r.Add <| li.[i]
+            Rarr.createDirectly r
+
+    /// <summary>Considers List circular and move elements up till condition is met for the last item.    
+    /// The algorithm takes elements from the end and put them at the start till the last element in the list meets the condition. 
+    //  If the last element in the input meets the condition no changes are made. But still a shallow copy is returned.</summary>
+    /// <param name="condition">The condition to meet.</param>
+    /// <param name="rarr">The input Rarr.</param>
+    /// <returns>The new result Rarr.</returns>
+    let inline rotateUpTillLast (condition:'T->bool) (rarr: Rarr<'T>) :  Rarr<'T>  = 
+        let li = rarr.InternalList
+        if li.Count=0 then 
+            rarr
+        elif condition li.[li.Count-1] then 
+            rarr.Clone()
+        else            
+            let li = rarr.InternalList
+            let rec findBackIdx i =
+                if i = -1 then 
+                    ArgumentException.RaiseBase "FsEx.Rarr.rotateUpTill: no item in the list meets the condition:\r\n%s" rarr.ToNiceStringLong
+                elif condition li.[i] then                    
+                    i
+                else
+                    findBackIdx (i-1)            
+            let fi = findBackIdx (li.Count-1)
+            let r = ResizeArray(rarr.Count)
+            for i = fi+1 to li.Count - 1 do
+                r.Add <| li.[i]
+            for i = 0 to fi do
+                r.Add <| li.[i]
+            Rarr.createDirectly r
+
+    /// <summary>Considers List circular and move elements down till condition is met for the first item.
+    /// The algorithm takes elements from the start and put them at the end till the first element in the list meets the condition. 
+    //  If the first element in the input meets the condition no changes are made. But still a shallow copy is returned.</summary>
+    /// <param name="condition">The condition to meet.</param>
+    /// <param name="rarr">The input Rarr.</param>
+    /// <returns>The new result Rarr.</returns>
+    let inline rotateDownTill (condition:'T->bool) (rarr: Rarr<'T>) :  Rarr<'T>  = 
+        let li = rarr.InternalList
+        if li.Count=0 then 
+            rarr
+        elif condition li.[0] then 
+            rarr.Clone()
+        else 
+            let li = rarr.InternalList
+            let k= li.Count
+            let rec findIdx i =
+                if i = k then 
+                    ArgumentException.RaiseBase "FsEx.Rarr.rotateDownTill: no item in the list meets the condition:\r\n%s" rarr.ToNiceStringLong
+                elif condition li.[i] then                    
+                    i
+                else
+                    findIdx (i+1)            
+            let fi = findIdx (0)
+            let r = ResizeArray(rarr.Count)
+            for i = fi to li.Count - 1 do
+                r.Add <| li.[i]
+            for i = 0 to fi - 1 do
+                r.Add <| li.[i]
+            Rarr.createDirectly r
+
+    /// <summary>Considers List circular and move elements down till condition is met for the last item.
+    /// The algorithm takes elements from the start and put them at the end till the last element in the list meets the condition. 
+    //  If the last element in the input meets the condition no changes are made. But still a shallow copy is returned.</summary>
+    /// <param name="condition">The condition to meet.</param>
+    /// <param name="rarr">The input Rarr.</param>
+    /// <returns>The new result Rarr.</returns>
+    let inline rotateDownTillLast (condition:'T->bool) (rarr: Rarr<'T>) :  Rarr<'T>  = 
+        let li = rarr.InternalList
+        if li.Count=0 then 
+            rarr
+        elif condition li.[0] then 
+            rarr.Clone()
+        else 
+            let li = rarr.InternalList
+            let k= li.Count
+            let rec findIdx i =
+                if i = k then 
+                    ArgumentException.RaiseBase "FsEx.Rarr.rotateDownTill: no item in the list meets the condition:\r\n%s" rarr.ToNiceStringLong
+                elif condition li.[i] then                    
+                    i
+                else
+                    findIdx (i+1)            
+            let fi = findIdx (0)             
+            let r = ResizeArray(rarr.Count)
+            for i = fi+1 to li.Count - 1 do
+                r.Add <| li.[i]
+            for i = 0 to fi  do
+                r.Add <| li.[i]
+            Rarr.createDirectly r
+
+
 
     /// Structural equality.
     /// Compares each element in both lists for equality . Rarrs must also be of same Count

@@ -1440,3 +1440,53 @@ type TestRarrModule2() =
         Assert.AreEqual([0; 0], Rarr.insertManyAt 0 [0; 0] [||].asRarr )
         CheckThrowsArgumentException (fun () -> Rarr.insertManyAt -1 [0; 0] [|1|].asRarr  |> ignore)
         CheckThrowsArgumentException (fun () -> Rarr.insertManyAt 2 [0; 0] [|1|].asRarr  |> ignore)
+
+
+    //--------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------tests vor custom functions-------------------------------------------------------
+    //--------------------------------------------------------------------------------------------------------------------
+
+    [<Fact>]
+    member this.rotate() = 
+        let xs = [|0; 1; 2; 3; 4; 5|].asRarr
+        Assert.AreEqual(xs |> Rarr.rotate  2 , [|4; 5; 0; 1; 2; 3 |].asRarr)
+        Assert.AreEqual(xs |> Rarr.rotate  1 , [|5; 0; 1; 2; 3; 4 |].asRarr)
+        Assert.AreEqual(xs |> Rarr.rotate -2 , [|2; 3; 4; 5; 0; 1|].asRarr)
+        Assert.AreEqual(xs |> Rarr.rotate -1 , [|1; 2; 3; 4; 5; 0|].asRarr)
+        Assert.AreEqual(xs |> Rarr.rotate -6 , xs)
+        Assert.AreEqual(xs |> Rarr.rotate  12 , xs)
+        Assert.AreEqual(xs |> Rarr.rotate -12 , xs)
+        Assert.AreEqual(xs |> Rarr.rotate -13 , xs|> Rarr.rotate -1)
+        Assert.AreEqual(xs |> Rarr.rotate  13 , xs|> Rarr.rotate  1)
+   
+    [<Fact>]
+    member this.rotateDownTill() = 
+        let xs = [|0; 7; 2; 3; 7; 5|].asRarr
+        Assert.AreEqual(xs |> Rarr.rotateDownTill(fun i -> i = 7)     , [|7; 2; 3; 7; 5; 0 |].asRarr)
+        CheckThrowsArgumentException (fun () -> xs |> Rarr.rotateDownTill (fun i -> i = 99) |> ignore  )
+
+
+    [<Fact>]
+    member this.rotateDownTillLast() = 
+        let xs = [|0; 7; 2; 3; 7; 5|].asRarr
+        Assert.AreEqual(xs |> Rarr.rotateDownTillLast(fun i -> i = 7) , [|2; 3; 7; 5; 0; 7 |].asRarr)
+        CheckThrowsArgumentException (fun () -> xs |> Rarr.rotateDownTillLast (fun i -> i = 99) |> ignore  )
+
+
+    [<Fact>]
+    member this.rotateUpTill() = 
+        let xs = [|0; 7; 2; 3; 7; 5|].asRarr
+        Assert.AreEqual(xs |> Rarr.rotateUpTill(fun i -> i = 7)       , [|7; 5; 0; 7; 2; 3 |].asRarr)
+        CheckThrowsArgumentException (fun () -> xs |> Rarr.rotateUpTill (fun i -> i = 99) |> ignore  )
+
+
+    [<Fact>]
+    member this.rotateUpTillLast() = 
+        let xs = [|0; 7; 2; 3; 7; 5|].asRarr
+        Assert.AreEqual(xs |> Rarr.rotateUpTillLast(fun i -> i = 7)   , [|5; 0; 7; 2; 3; 7 |].asRarr)
+        CheckThrowsArgumentException (fun () -> xs |> Rarr.rotateUpTillLast (fun i -> i = 99) |> ignore  )
+
+
+
+
+
