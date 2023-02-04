@@ -109,9 +109,9 @@ type Color =
         if not (-0.001 <. hue        .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.createFromHSL: H is bigger than 1.0 or smaller than 0.0: %f" hue
         if not (-0.001 <. saturation .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.createFromHSL: S is bigger than 1.0 or smaller than 0.0: %f" saturation
         if not (-0.001 <. luminance  .< 1.001) then ArgumentOutOfRangeException.Raise "FsEx.Color.createFromHSL: L is bigger than 1.0 or smaller than 0.0: %f" luminance
-        let H = UtilMath.clamp 0. 1. hue
-        let S = UtilMath.clamp 0. 1. saturation
-        let L = UtilMath.clamp 0. 1. luminance
+        let H = UtilMath.clamp01 hue
+        let S = UtilMath.clamp01 saturation
+        let L = UtilMath.clamp01 luminance
         let v = if L <= 0.5 then L * (1.0 + S) else L + S - L * S
         let r,g,b = 
             if v > 0.001 then

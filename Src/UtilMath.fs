@@ -122,7 +122,7 @@ module UtilMath =
         | _ ->   None
   
 
-   /// To make sure a value is between 0.0 and 1.0 range
+    /// To make sure a value is between 0.0 and 1.0 range
     let inline clamp01 (value:'T) :'T = 
         // if isNan value then ArgumentException.RaiseBase "FsEx.UtilMath.clamp01: given input is NaN."
         if   value > LanguagePrimitives.GenericOne< ^T>  then LanguagePrimitives.GenericOne< ^T>
