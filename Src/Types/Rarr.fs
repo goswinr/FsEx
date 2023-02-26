@@ -16,7 +16,7 @@ open NiceString
 /// There is a member called 'InternalList' to access the underlying List<'T> directly.
 [<Sealed>]
 [<NoComparison>]
-//[<CustomEquality>] // gives an error message, not needed . only this.Euqals override and the IEquatable interface is enough to make the '=' operator do structural equality correctly.
+//[<CustomEquality>] // gives an error message, not needed . only this.Equals override and the IEquatable interface is enough to make the '=' operator do structural equality correctly.
 type Rarr<'T> private (xs:List<'T>) = 
 
     // Rarr could potentially be turned into a struct.
@@ -72,12 +72,12 @@ type Rarr<'T> private (xs:List<'T>) =
         new Rarr<'T>(new List<'T>(collection))
     
     //------------------------[<CustomEquality>]------------------------------
-    //Adding the this.Euqals override and the IEquatable interface is enough to make the '=' operator do structural equality correctly.
+    //Adding the this.Equals override and the IEquatable interface is enough to make the '=' operator do structural equality correctly.
     //also adding the [<CustomEquality>] would give an error message  FS0377
 
-    /// internal structural equality implementatiom .
-    /// Compares each element in both lists for equality . Rarrs must also be of same Count
-    member inline internal this.IsEqualTo(other:Rarr<'T>) = 
+    /// Structural equality comparison.
+    /// Compares each element in both lists for equality. Rarrs must also be of same Count.
+    member inline this.IsEqualTo(other:Rarr<'T>) = 
         if Object.ReferenceEquals(this,other) then true
         elif this.Count <> other.Count then false
         else
@@ -104,7 +104,7 @@ type Rarr<'T> private (xs:List<'T>) =
         res
     
     /// Structural equality.
-    /// Compares each element in both lists for equality . Rarrs must also be of same Count
+    /// Compares each element in both lists for equality. Rarrs must also be of same Count
     override this.Equals(that:obj) = 
         match that with
         | :? Rarr<'T> as that -> this.IsEqualTo(that)
@@ -113,7 +113,7 @@ type Rarr<'T> private (xs:List<'T>) =
     interface IEquatable<Rarr<'T>> with
         
         /// Structural equality.
-        /// Compares each element in both lists for equality . Rarrs must also be of same Count
+        /// Compares each element in both lists for equality. Rarrs must also be of same Count
         member this.Equals(that:Rarr<'T>) = 
             this.IsEqualTo(that)
     
@@ -401,10 +401,10 @@ type Rarr<'T> private (xs:List<'T>) =
     //            xs.RemoveAt(i)
 
 
-    /// Calls NiceString.toNiceString this
-    /// Listing includes the first 6 items
+    /// Returns a simple class name and the item count.
+    /// For a nicer content listing use this.ToNiceString().    
     override this.ToString() = 
-        NiceString.toNiceString this
+        sprintf "A FsEx.Rarr<%s> with %d items." (typeof<'T>).FullName this.Count
 
 
     /// A property like the ToString() method,

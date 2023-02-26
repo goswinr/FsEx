@@ -113,7 +113,7 @@ module IList =
         r    
     
     /// Trim items from start and end.
-    /// If the sum of fromStartCount and fromEndCount is bigger than iList.Count it returns an empty IList.
+    /// If the sum of fromStartCount and fromEndCount is bigger than iList.Count it returns an empty Rarr.
     /// If you want an exception to be raised for index overflow use IList.slice with negative end index.
     let inline trim fromStartCount fromEndCount (iList: IList<'T>) : Rarr<'T> = 
         let c = iList.Count
@@ -194,21 +194,21 @@ module IList =
     //------------------------------------------------------------------    
     
     
-    /// <summary>Returns a IList that contains one item only.</summary>
+    /// <summary>Returns a new Rarr that contains one item only.</summary>
     /// <param name="value">The input item.</param>
-    /// <returns>The result IList of one item.</returns>
+    /// <returns>A Rarr with one item.</returns>
     let inline singleton value = 
-        let res = Rarr(1)
+        let res = ResizeArray(1)
         res.Add value
-        res
+        res |>  Rarr.createDirectly 
 
     /// <summary>Considers List circular and move elements up or down
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
     /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a] </summary>
     /// <param name="amount">How many elements to shift forward. Or backward if number is negative</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The new result IList.</returns>
-    let inline rotate amount (iList: IList<'T>) :  IList<'T>  = 
+    /// <returns>The new result Rarr.</returns>
+    let inline rotate amount (iList: IList<'T>) :  Rarr<'T>  = 
         let r = Rarr(iList.Count)
         let li = iList
         for i = 0 to li.Count - 1 do
@@ -217,7 +217,7 @@ module IList =
 
     /// Structural equality.
     /// Compares each element in both lists for equality. ILists must also be of same Count
-    let equals (this: IList<'T>) (other: IList<'T>) :bool = 
+    let equals (this: IList<'T>) (other: IList<'T>) : bool = 
         if Object.ReferenceEquals(this,other) then true
         elif this.Count <> other.Count then false
         else
@@ -562,7 +562,7 @@ module IList =
     /// Returns all elements that exists more than once in IList.
     /// Each element that exists more than once is only returned once.
     /// Returned order is by first occurrence of first duplicate.
-    let duplicates (xs:IList<'T>) = 
+    let duplicates (xs:IList<'T>) : Rarr<'T> = 
         let h = Hashset<'T>()
         let t = Hashset<'T>() 
         let r = Rarr()
@@ -577,7 +577,7 @@ module IList =
     /// Returns all elements that exists more than once in IList.
     /// Each element that exists more than once is only returned once.
     /// Returned order is by first occurrence of first duplicate.
-    let duplicatesBy (f:'T->'U) (xs:IList<'T>) = 
+    let duplicatesBy (f:'T->'U) (xs:IList<'T>) : Rarr<'T> = 
         let h = Hashset<'U>()
         let t = Hashset<'U>()
         let r = Rarr()
@@ -597,7 +597,7 @@ module IList =
     /// <param name="predicate1">The first function to test the input elements.</param>
     /// <param name="predicate2">The second function to test the input elements.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>Three Rarrs. </returns>
+    /// <returns>Three Rarrs.</returns>
     let partition3 (predicate1:'T->bool) (predicate2:'T->bool) (iList : IList<'T>) : Rarr<'T> * Rarr<'T>* Rarr<'T> = 
         let p1True  = Rarr()
         let p2True = Rarr()
@@ -624,7 +624,7 @@ module IList =
     /// <param name="predicate2">The second function to test the input elements.</param>
     /// <param name="predicate3">The third  function to test the input elements.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>Four Rarrs. </returns>
+    /// <returns>Four Rarrs.</returns>
     let partition4 (predicate1:'T->bool) (predicate2:'T->bool) (predicate3:'T->bool) (iList : IList<'T>) : Rarr<'T> * Rarr<'T>* Rarr<'T>* Rarr<'T> = 
         let p1True  = Rarr()
         let p2True = Rarr()
@@ -658,7 +658,7 @@ module IList =
     /// <param name="predicate3">The third  function to test the input elements.</param>
     /// <param name="predicate4">The fourth function to test the input elements.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>Five Rarrs. </returns>
+    /// <returns>Five Rarrs.</returns>
     let partition5 (predicate1:'T->bool) (predicate2:'T->bool) (predicate3:'T->bool) (predicate4:'T->bool)  (iList : IList<'T>) : Rarr<'T> * Rarr<'T>* Rarr<'T>* Rarr<'T>* Rarr<'T> = 
         let p1True = Rarr()
         let p2True = Rarr()
@@ -704,24 +704,24 @@ module IList =
                 member _.GetHashCode(v) = gcomparer.GetHashCode(v.Value)
                 member _.Equals(a,b)    = gcomparer.Equals(a.Value, b.Value) }
 
-    /// <summary>Returns a new IList that contains all pairings (or combinations)  of elements from the first and second Rarrs.</summary>
+    /// <summary>Returns a new Rarr that contains all pairings (or combinations)  of elements from the first and second Rarrs.</summary>
     /// <param name="iList1">The first input IList.</param>
     /// <param name="iList2">The second input IList.</param>
-    /// <returns>The resulting IList of pairs of length: iList1.Count * iList2.Count.</returns>
+    /// <returns>The resulting Rarr of pairs of length: iList1.Count * iList2.Count.</returns>
     let allPairs (iList1: IList<'T>) (iList2: IList<'U>) :Rarr<'T*'U> = 
-        let res = Rarr(iList1.Count * iList2.Count)
+        let res = ResizeArray(iList1.Count * iList2.Count)
         let l1 = iList1
         let l2 = iList2
         for i = 0 to iList1.Count-1 do
             for j = 0 to iList2.Count-1 do
                 res.Add (l1.[i], l2.[j])
-        res
+        res |>  Rarr.createDirectly 
 
 
-    /// <summary>Builds a new IList that contains the elements of the first IList followed by the elements of the second IList.</summary>
+    /// <summary>Builds a new Rarr that contains the elements of the first IList followed by the elements of the second IList.</summary>
     /// <param name="iList1">The first input IList.</param>
     /// <param name="iList2">The second input IList.</param>
-    /// <returns>The resulting IList of length: iList1.Count + iList2.Count..</returns>
+    /// <returns>The resulting Rarr of length: iList1.Count + iList2.Count..</returns>
     let inline append (iList1: IList<'T>) (iList2: IList<'T>) = 
         let res = Rarr.ofIList iList1
         res.AddRange(iList2)
@@ -759,7 +759,7 @@ module IList =
     /// the function returns Some(x)</summary>
     /// <param name="chooser">The function to generate options from the elements.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The IList of results.</returns>
+    /// <returns>A Rarr of results.</returns>
     let inline choose (chooser : 'T -> 'U option) (iList : IList<'T>) : Rarr<'U> = 
         let result = Rarr()        
         let li = iList
@@ -773,7 +773,7 @@ module IList =
     /// <summary>Divides the input IList into chunks of size at most <c>chunkSize</c>.</summary>
     /// <param name="chunkSize">The maximum size of each chunk.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The IList divided into chunks.</returns>
+    /// <returns>A Rarr divided into chunks.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when <c>chunkSize</c> is not positive.</exception>
     let chunkBySize chunkSize (iList: IList<'T>) : Rarr<Rarr<'T>> = 
         if chunkSize <= 0 then ArgumentException.RaiseBase "FsEx.IList.chunkBySize: chunkSize %d must be bigger than 0" chunkSize
@@ -784,7 +784,7 @@ module IList =
             Rarr.singleton (Rarr.ofIList iList)
         else
             let chunkCount = (len - 1) / chunkSize + 1
-            let res = Rarr(chunkCount)
+            let res = ResizeArray(chunkCount)
             let mutable sub = Rarr(0)
             let li = iList
             for i=0 to li.Count - 1 do
@@ -792,17 +792,17 @@ module IList =
                     sub <- Rarr(chunkSize)
                     res.Add(sub)
                 sub.Add li.[i]
-            res
+            res  |>  Rarr.createDirectly 
 
-    /// <summary>For each element of the IList, applies the given function. Concatenates all the results and return the combined IList.</summary>
+    /// <summary>For each element of the IList, applies the given function. Concatenates all the results and return the combined IList as Rarr.</summary>
     /// <param name="mapping">The function to create sub-Rarrs from the input IList elements.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The concatenation of the sub-Rarrs.</returns>
+    /// <returns>The concatenation of the sub-ILists as Rarr.</returns>
     let collect (mapping: 'T -> IList<'U>)  (iList: IList<'T>) : Rarr<'U> =         
-        let res = Rarr(iList.Count)
+        let res = ResizeArray(iList.Count)
         for e in iList do
             res.AddRange(mapping e)
-        res
+        res |>  Rarr.createDirectly 
 
     /// <summary>Compares two Rarrs using the given comparison function, element by element.</summary>
     /// <param name="comparer">A function that takes an element from each IList and returns an int.
@@ -833,17 +833,17 @@ module IList =
         else 1
 
 
-    /// <summary>Builds a new IList that contains the elements of each of the given sequence of sequences.</summary>
+    /// <summary>Builds a new Rarr that contains the elements of each of the given sequence of sequences.</summary>
     /// <param name="seqOfSeq">The input sequence of Rarrs.</param>
     /// <returns>The concatenation of the sequence of input Rarrs.</returns>
     let concat (seqOfSeq: seq<#seq<'T>>) : Rarr<'T>=         
         if Seq.isEmpty seqOfSeq then
             Rarr(0)
         else
-            let res = Rarr() //iLists.[0].Clone()
+            let res = ResizeArray() //iLists.[0].Clone()
             for r in seqOfSeq do res.AddRange(r)
             //for i=1 to iLists.(xs.Count-1) do res.AddRange(iLists.[i])
-            res
+            res |>  Rarr.createDirectly 
 
     /// <summary>Tests if the IList contains the specified element.</summary>
     /// <param name="value">The value to locate in the input IList.</param>
@@ -909,16 +909,17 @@ module IList =
                     dict.[safeKey] <- prev + 1
                 else
                     dict.[safeKey] <- 1
-            let res = Rarr(dict.Count)
+            let res = ResizeArray(dict.Count)
             for group in dict do
                 res.Add( getKey group.Key, group.Value)
-            res
-    /// <summary>Applies a key-generating function to each element of a IList and returns a IList yielding unique
+            res |>  Rarr.createDirectly 
+
+    /// <summary>Applies a key-generating function to each element of a IList and Returns a new Rarr yielding unique
     /// keys and their number of occurrences in the original IList.</summary>
     /// <param name="projection">A function transforming each item of the input IList into a key to be
     /// compared against the others.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     let countBy (projection: 'T->'Key) (iList: IList<'T>) : Rarr<'Key * int> = 
         if typeof<'Key>.IsValueType
             // We avoid wrapping a StructBox, because under 64 JIT we get some "hard" tail-calls which affect performance
@@ -928,10 +929,10 @@ module IList =
             else countByImpl StructBox<'Key>.Comparer (fun t -> StructBox (projection t)) (fun sb -> sb.Value) iList
 
 
-    /// <summary>Creates a IList whose elements are all initially the given value.</summary>
+    /// <summary>Creates a IList as Rarr whose elements are all initially the given value.</summary>
     /// <param name="count">The length of the IList to create.</param>
     /// <param name="value">The value for the elements.</param>
-    /// <returns>The created IList.</returns>
+    /// <returns>The created Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when count is negative.</exception>
     let create (count: int) (value: 'T) = 
         if count < 0 then  ArgumentException.RaiseBase "FsEx.IList.create: count %d cannot be negative." count
@@ -941,11 +942,11 @@ module IList =
         iList
 
 
-    /// <summary>Returns a IList that contains no duplicate entries according to generic hash and
+    /// <summary>Returns a new Rarr that contains no duplicate entries according to generic hash and
     /// equality comparisons on the entries.
     /// If an element occurs multiple times in the IList then the later occurrences are discarded.</summary>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     let distinct (iList: IList<'T>) = 
         let temp = Rarr()
         let hashSet = HashSet<'T>(HashIdentity.Structural<'T>)
@@ -957,12 +958,12 @@ module IList =
         temp
 
 
-    /// <summary>Returns a IList that contains no duplicate entries according to the
+    /// <summary>Returns a new Rarr that contains no duplicate entries according to the
     /// generic hash and equality comparisons on the keys returned by the given key-generating function.
     /// If an element occurs multiple times in the IList then the later occurrences are discarded.</summary>
     /// <param name="projection">A function transforming the IList items into comparable keys.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     let distinctBy (projection:'T -> 'Key) (iList: IList<'T>) : Rarr<'T> = 
         if iList.Count < 2 then
             Rarr.ofIList iList // 0 or 1 item, just clone
@@ -992,19 +993,19 @@ module IList =
     /// <param name="itemsToExclude">A sequence whose elements that also occur in the input IList will cause those elements to be
     /// removed from the result.</param>
     /// <param name="iList">A IList whose elements that are not also in itemsToExclude will be returned.</param>
-    /// <returns>A IList that contains the distinct elements of <c>IList</c> that do not appear in <c>itemsToExclude</c>.</returns>
+    /// <returns>A Rarr that contains the distinct elements of <c>IList</c> that do not appear in <c>itemsToExclude</c>.</returns>
     let except (itemsToExclude: seq<'T>) (iList: IList<'T>) : Rarr<'T> = 
         if iList.Count = 0 then
             Rarr(0)
         else
             let cached = HashSet(itemsToExclude, HashIdentity.Structural)
-            let res = Rarr()
+            let res = ResizeArray()
             let li = iList
             for i=0 to li.Count - 1 do
                 let e = li.[i]
                 if cached.Add e then
                     res.Add e
-            res
+            res |>  Rarr.createDirectly 
 
     /// <summary>Tests if any element of the IList satisfies the given predicate.
     /// The predicate is applied to the elements of the input IList. If any application
@@ -1058,7 +1059,7 @@ module IList =
     /// for which the given predicate returns <c>true</c>.</summary>
     /// <param name="predicate">The function to test the input elements.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>A IList containing the elements for which the given predicate returns true.</returns>
+    /// <returns>A Rarr containing the elements for which the given predicate returns true.</returns>
     let inline filter (predicate:'T->bool) (iList: IList<'T>) = 
         let r = Rarr()
         for i = 0 to iList.Count - 1 do
@@ -1249,16 +1250,16 @@ module IList =
         iList.[index]
 
 
-    /// <summary>Builds a new IList that contains the given sub-range specified by starting index and length.</summary>
+    /// <summary>Builds a new Rarr that contains the given sub-range specified by starting index and length.</summary>
     /// <param name="iList">The input IList.</param>
     /// <param name="startIndex">The index of the first element of the sub IList.</param>
     /// <param name="count">The length of the sub IList.</param>
     /// <returns>The created sub IList.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when either startIndex or count is negative, or when there aren't enough elements in the input IList.</exception>
-    let sub (iList: IList<'T>) (startIndex: int) (count: int) = 
-        let r = new Rarr<'T>(count)
+    let sub (iList: IList<'T>) (startIndex: int) (count: int) : Rarr<'T>= 
+        let r = new ResizeArray<'T>(count)
         for i = startIndex to startIndex+count-1 do r.Add iList.[i] 
-        r
+        r |>  Rarr.createDirectly 
         
 
     let inline private groupByImpl (comparer: IEqualityComparer<'SafeKey>) (keyf: 'T->'SafeKey) (getKey: 'SafeKey->'Key) (iList: IList<'T>) :  Rarr<'Key * Rarr<'T>>= 
@@ -1290,7 +1291,7 @@ module IList =
     /// to this key.</summary>
     /// <param name="projection">A function that transforms an element of the IList into a comparable key. Null or Option.None is allowed as key.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     let groupBy (projection:'T -> 'Key) (iList:IList<'T>) :  Rarr<'Key * Rarr<'T>> = 
         if typeof<'Key>.IsValueType then
             // We avoid wrapping a StructBox, because under 64 JIT we get some "hard" tail-calls which affect performance
@@ -1305,7 +1306,7 @@ module IList =
     /// unique keys and respective elements that match to this key. As opposed to IList.groupBy the key may not be null or Option.None</summary>
     /// <param name="projection">A function that transforms an element of the IList into a comparable key. As opposed to IList.groupBy the key may not be null or Option.None </param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     let groupByDict (projection:'T -> 'Key) (iList:IList<'T>) :  Dict<'Key,Rarr<'T>> = 
         let dict = Dictionary<'Key, Rarr<'T>>()
         // Build the groupings
@@ -1322,7 +1323,6 @@ module IList =
         Dict.CreateDirectly dict
 
 
-
     /// <summary>Returns the first element of the IList.</summary>
     /// <param name="iList">The input IList.</param>
     /// <returns>The first element of the IList.</returns>
@@ -1331,53 +1331,56 @@ module IList =
         if iList.Count = 0 then ArgumentException.RaiseBase "FsEx.IList.head: The input IList is empty." else iList.[0]
 
 
-    /// <summary>Builds a new IList whose elements are the corresponding elements of the input IList
+    /// <summary>Builds a new Rarr whose elements are the corresponding elements of the input IList
     /// paired with the integer index (from 0) of each element.</summary>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The IList of indexed elements.</returns>
+    /// <returns>A Rarr of indexed elements.</returns>
     let indexed (iList: IList<'T>) :  Rarr<int * 'T> = 
-        let res = Rarr(iList.Count)
+        let res = ResizeArray(iList.Count)
         let li = iList
         for i = 0 to li.Count - 1 do
             res.Add (i, li.[i])
-        res
+        res |>  Rarr.createDirectly 
 
     /// <summary>Creates a IList given the dimension and a generator function to compute the elements.</summary>
     /// <param name="count">The number of elements to initialize.</param>
     /// <param name="initializer">The function to generate the initial values for each index.</param>
-    /// <returns>The created IList.</returns>
+    /// <returns>The created Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when count is negative.</exception>
-    let inline init (count:int) (initializer:int->'T) = 
+    let inline init (count:int) (initializer:int->'T) : Rarr<'T> = 
         if count < 0 then ArgumentException.RaiseBase "FsEx.IList.init: count %d is negative." count
-        let res = Rarr(count)
+        let res = ResizeArray(count)
         for i = 0 to count-1 do
             res.Add (initializer i)
-        res
+        res |>  Rarr.createDirectly 
 
-    /// <summary>Return a new IList with a new item inserted before the given index.(does NOT modify in place !)</summary>
+    /// <summary>Returns a new Rarr with a new item inserted before the given index.(does NOT modify in place !)</summary>
     /// <param name="index">The index where the item should be inserted.</param>
     /// <param name="value">The value to insert.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when index is below not within iList.Count.</exception>
     let insertAt (index: int) (value: 'T) (iList: IList<'T>) : Rarr<'T> = 
-        if index < 0 || index > iList.Count then ArgumentException.RaiseBase "FsEx.IList.insertAt: index %d not within iList.Count %d." index iList.Count
-        let r = Rarr.ofIList iList //TODO can be optimized by using a loop
-        r.Insert(index,value)
-        r
+        let r = ResizeArray(iList.Count+1)
+        for i=0 to index-1 do r.Add iList.[i]
+        r.Add value
+        for i=index to iList.Count-1 do r.Add iList.[i]        
+        r |>  Rarr.createDirectly 
 
 
-    /// <summary>Return a new IList with new items inserted before the given index.(does NOT modify in place !) If required increases the count of the IList.</summary>
+    /// <summary>Returns a new Rarr with new items inserted before the given index.(does NOT modify in place !) If required increases the count of the IList.</summary>
     /// <param name="index">The index where the items should be inserted.</param>
     /// <param name="values">The values to insert.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when index is below not within iList.Count.</exception>
-    let insertManyAt (index: int) (values: seq<'T>) (iList: IList<'T>) : Rarr<'T> = 
+    let insertManyAt (index: int) (values: ICollection<'T>) (iList: IList<'T>) : Rarr<'T> = 
         if index < 0 || index > iList.Count  then ArgumentException.RaiseBase "FsEx.IList.insertManyAt: index %d and  not within iList.Count %d." index iList.Count
-        let r = Rarr.ofIList iList //TODO can be optimized by using a loop
-        r.InsertRange(index,values)
-        r
+        let r = ResizeArray(iList.Count + values.Count)
+        for i=0 to index-1 do r.Add iList.[i]
+        for v in values do r.Add v
+        for i=index to iList.Count-1 do r.Add iList.[i]        
+        r |>  Rarr.createDirectly 
 
     /// <summary>Returns true if the given IList is empty, otherwise false.</summary>
     /// <param name="iList">The input IList.</param>
@@ -1456,11 +1459,11 @@ module IList =
     let inline length (iList: IList<'T>) = 
         iList.Count
 
-    /// <summary>Builds a new IList whose elements are the results of applying the given function
+    /// <summary>Builds a new Rarr whose elements are the results of applying the given function
     /// to each of the elements of the IList.</summary>
     /// <param name="mapping">The function to transform elements of the IList.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The IList of transformed elements.</returns>
+    /// <returns>A Rarr of transformed elements.</returns>
     let inline map ( mapping: 'T -> 'U) (iList: IList<'T>) : Rarr<'U> = 
         // TODO use [<InlineIfLambda>] for performance?? 
         let r = new Rarr<'U>(iList.Count)
@@ -1468,33 +1471,33 @@ module IList =
         r        
        
 
-    /// <summary>Builds a new IList whose elements are the results of applying the given function
+    /// <summary>Builds a new Rarr whose elements are the results of applying the given function
     /// to each of the elements of the Array.</summary>
     /// <param name="mapping">The function to transform elements of the IList.</param>
     /// <param name="arr">The input Array.</param>
-    /// <returns>The IList of transformed elements.</returns>
+    /// <returns>A Rarr of transformed elements.</returns>
     let inline mapFromArray ( mapping: 'T -> 'U) (arr: array<'T>) : Rarr<'U> =         
         let res = Rarr<'U>(arr.Length)
         for i = 0 to arr.Length-1 do
             res.Add(mapping arr.[i])
         res
    
-    /// <summary>Builds a new IList whose elements are the results of applying the given function
+    /// <summary>Builds a new Rarr whose elements are the results of applying the given function
     /// to each of the elements of a collection with IList interface.</summary>
     /// <param name="mapping">The function to transform elements of the IList.</param>
     /// <param name="list">The input collection with IList interface.</param>
-    /// <returns>The IList of transformed elements.</returns>
+    /// <returns>A Rarr of transformed elements.</returns>
     let inline mapFromIList ( mapping: 'T -> 'U) (list: IList<'T>) : Rarr<'U> =         
         let res = Rarr<'U>(list.Count)
         for i = 0 to list.Count-1 do
             res.Add(mapping list.[i])
         res
 
-    /// <summary>Builds a new IList whose elements are the results of applying the given function
+    /// <summary>Builds a new Rarr whose elements are the results of applying the given function
     /// to each of the elements of an IEnumerable.</summary>
     /// <param name="mapping">The function to transform elements of the IList.</param>
     /// <param name="sequence">The input IEnumerable.</param>
-    /// <returns>The IList of transformed elements.</returns>
+    /// <returns>A Rarr of transformed elements.</returns>
     let inline mapFromSeq ( mapping: 'T -> 'U) (sequence: seq<'T>) : Rarr<'U> =         
         let res = Rarr<'U>()
         use e = sequence.GetEnumerator()        
@@ -1510,7 +1513,7 @@ module IList =
     /// <param name="iList1">The first input IList.</param>
     /// <param name="iList2">The second input IList.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarrs differ in length.</exception>
-    /// <returns>The IList of transformed elements.</returns>
+    /// <returns>A Rarr of transformed elements.</returns>
     let map2 (mapping: 'T1 ->'T2 ->'U) (iList1: IList<'T1>) (iList2: IList<'T2>) : Rarr<'U> = 
         if iList1.Count <> iList2.Count then ArgumentException.RaiseBase "FsEx.IList.map2: count of iList1 %d does not match iList2 %d." iList1.Count iList2.Count
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(mapping)
@@ -1528,50 +1531,50 @@ module IList =
     /// <param name="iList2">The second input IList.</param>
     /// <param name="iList3">The third input IList.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarrs differ in length.</exception>
-    /// <returns>The IList of transformed elements.</returns>
+    /// <returns>A Rarr of transformed elements.</returns>
     let map3 (mapping: 'T1 ->'T2 ->'T3 ->'U)  (iList1: IList<'T1> ) (iList2: IList<'T2> ) (iList3: IList<'T3> ) : Rarr<'U> = 
         let len1 = iList1.Count
         if len1 <> iList2.Count || len1 <> iList3.Count then ArgumentException.RaiseBase "FsEx.IList.map3: count of iList1 %d does not match iList2 %d or iList3 %d" iList1.Count iList2.Count iList3.Count
         let f = OptimizedClosures.FSharpFunc<_, _, _, _>.Adapt(mapping)
-        let res = Rarr(len1)
+        let res = ResizeArray(len1)
         for i = 0 to iList1.Count-1 do
             res.Add <|  f.Invoke(iList1.[i], iList2.[i], iList3.[i])
-        res
+        res |>  Rarr.createDirectly 
 
 
-    /// <summary>Combines map and fold. Builds a new IList whose elements are the results of applying the given function
+    /// <summary>Combines map and fold. Builds a new Rarr whose elements are the results of applying the given function
     /// to each of the elements of the input IList. The function is also used to accumulate a final value.</summary>
     /// <param name="mapping">The function to transform elements from the input IList and accumulate the final value.</param>
     /// <param name="state">The initial state.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The IList of transformed elements, and the final accumulated value.</returns>
-    let mapFold<'T, 'State, 'Result> (mapping: 'State -> 'T -> 'Result * 'State) state (iList:IList<'T>) : IList<'Result> * 'State = 
+    /// <returns>A Rarr of transformed elements, and the final accumulated value.</returns>
+    let mapFold<'T, 'State, 'Result> (mapping: 'State -> 'T -> 'Result * 'State) state (iList:IList<'T>) : Rarr<'Result> * 'State = 
         match iList.Count with
         | 0   -> Rarr(0), state
         | len ->
             let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(mapping)
             let mutable acc = state
-            let res = Rarr(len)
+            let res = ResizeArray(len)
             let li = iList
             for i = 0 to len-1 do
                 let h, s = f.Invoke(acc, li.[i])
                 res.Add h
                 acc <- s
-            res, acc
+            res |>  Rarr.createDirectly  , acc
 
-    /// <summary>Combines map and foldBack. Builds a new IList whose elements are the results of applying the given function
+    /// <summary>Combines map and foldBack. Builds a new Rarr whose elements are the results of applying the given function
     /// to each of the elements of the input IList. The function is also used to accumulate a final value.</summary>
     /// <param name="mapping">The function to transform elements from the input IList and accumulate the final value.</param>
     /// <param name="iList">The input IList.</param>
     /// <param name="state">The initial state.</param>
-    /// <returns>The IList of transformed elements, and the final accumulated value.</returns>
-    let mapFoldBack<'T, 'State, 'Result> (mapping: 'T -> 'State -> 'Result * 'State) (iList:IList<'T>) state : IList<'Result> * 'State= 
+    /// <returns>A Rarr of transformed elements, and the final accumulated value.</returns>
+    let mapFoldBack<'T, 'State, 'Result> (mapping: 'T -> 'State -> 'Result * 'State) (iList:IList<'T>) state : Rarr<'Result> * 'State= 
         match iList.Count with
         | 0 -> Rarr(0), state
         | len ->
             let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(mapping)
             let mutable acc = state
-            let res = Rarr(len)
+            let res = ResizeArray(len)
             for i = 0 to len-1 do
                 res.Add Unchecked.defaultof<'Result> // needs to be filled already because of 'downto' loop
             let li = iList
@@ -1579,21 +1582,21 @@ module IList =
                 let h, s = f.Invoke(li.[i], acc)
                 res.[i] <- h
                 acc <- s
-            res, acc
+            res |>  Rarr.createDirectly , acc
 
-    /// <summary>Builds a new IList whose elements are the results of applying the given function
+    /// <summary>Builds a new Rarr whose elements are the results of applying the given function
     /// to each of the elements of the IList. The integer index passed to the
     /// function indicates the index of element being transformed.</summary>
     /// <param name="mapping">The function to transform elements and their indices.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The IList of transformed elements.</returns>
+    /// <returns>A Rarr of transformed elements.</returns>
     let mapi (mapping: int -> 'T -> 'U) (iList: IList<'T>) : Rarr<'U> = 
         let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(mapping)
-        let res = Rarr(iList.Count)
+        let res = ResizeArray(iList.Count)
         let li = iList
         for i = 0 to li.Count - 1 do
             res.Add <|  f.Invoke(i, li.[i])
-        res
+        res |>  Rarr.createDirectly 
 
     /// <summary>Builds a new collection whose elements are the results of applying the given function
     /// to the corresponding elements of the two collections pairwise, also passing the index of
@@ -1603,14 +1606,14 @@ module IList =
     /// <param name="iList1">The first input IList.</param>
     /// <param name="iList2">The second input IList.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarrs differ in length.</exception>
-    /// <returns>The IList of transformed elements.</returns>
-    let mapi2 (mapping: int -> 'T1 -> 'T2-> 'U) (iList1: IList<'T1>) (iList2: IList<'T2>) : IList<'U>  = 
+    /// <returns>A Rarr of transformed elements.</returns>
+    let mapi2 (mapping: int -> 'T1 -> 'T2-> 'U) (iList1: IList<'T1>) (iList2: IList<'T2>) : Rarr<'U>  = 
         let f = OptimizedClosures.FSharpFunc<_, _, _, _>.Adapt(mapping)
         if iList1.Count <> iList2.Count then ArgumentException.RaiseBase "FsEx.IList.mapi2: count of iList1 %d does not match iList2 %d." iList1.Count iList2.Count
-        let res = Rarr(iList1.Count)
+        let res = ResizeArray(iList1.Count)
         for i = 0 to iList1.Count-1 do
             res.Add <|  f.Invoke(i, iList1.[i], iList2.[i])
-        res
+        res |>  Rarr.createDirectly 
 
     /// <summary>Returns the greatest of all elements of the IList, compared via Operators.max on the function result.
     /// Throws ArgumentException for empty Rarrs.</summary>
@@ -1684,10 +1687,10 @@ module IList =
             accv
 
 
-    /// <summary>Returns a IList of each element in the input IList and its predecessor, with the
+    /// <summary>Returns a new Rarr of each element in the input IList and its predecessor, with the
     /// exception of the first element which is only returned as the predecessor of the second element.</summary>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     let pairwise (iList: IList<'T>) = 
         if iList.Count < 2 then
             Rarr(0)
@@ -1716,10 +1719,10 @@ module IList =
         trueResults, falseResults
 
 
-    /// <summary>Returns a IList with all elements permuted according to the specified permutation.</summary>
+    /// <summary>Returns a new Rarr with all elements permuted according to the specified permutation.</summary>
     /// <param name="indexMap">The function that maps input indices to output indices.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The output IList.</returns>
+    /// <returns>The output Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when indexMap does not produce a valid permutation.</exception>
     let permute (indexMap:int -> int) (iList: IList<'T>) : Rarr<'T>= 
         let res  = Rarr.ofIList iList
@@ -1792,10 +1795,10 @@ module IList =
 
 
 
-    /// <summary>Return a new IList with the item at a given index removed. (does NOT modify in place !)</summary>
+    /// <summary>Returns a new Rarr with the item at a given index removed. (does NOT modify in place !)</summary>
     /// <param name="index">The index of the item to be removed.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when index is outside 0..iList.Length - 1</exception>
     let removeAt (index: int) (iList: IList<'T>) : Rarr<'T> = 
         if index < 0 || index >= iList.Count then ArgumentException.RaiseBase "FsEx.IList.removeAt: index %d not within iList.Count %d." index iList.Count
@@ -1805,11 +1808,11 @@ module IList =
                 r.Add iList.[i]
         r
 
-    /// <summary>Return a new IList with the number of items starting at a given index removed. (does NOT modify in place !)</summary>
+    /// <summary>Returns a new Rarr with the number of items starting at a given index removed. (does NOT modify in place !)</summary>
     /// <param name="index">The index of the first item to be removed.</param>
     /// <param name="count">The number of items to remove.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when index is outside 0..iList.Length - count</exception>
     let removeManyAt (index: int) (count: int) (iList: IList<'T>) : Rarr<'T> = 
         if index < 0 || index > iList.Count  - count then ArgumentException.RaiseBase "FsEx.IList.removeManyAt: index %d and count %d not within iList.Count %d." index count iList.Count
@@ -1823,7 +1826,7 @@ module IList =
     /// <summary>Creates a IList by replicating the given initial value.</summary>
     /// <param name="count">The number of elements to replicate.</param>
     /// <param name="initial">The value to replicate</param>
-    /// <returns>The generated IList.</returns>
+    /// <returns>The generated Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when count is negative.</exception>
     let replicate count (initial:'T) = 
         if count < 0 then  ArgumentException.RaiseBase "FsEx.IList.replicate: count %d cannot be negative "count
@@ -1832,9 +1835,9 @@ module IList =
             arr.Add ( initial)
         arr
 
-    /// <summary>Returns a new IList with the elements in reverse order.</summary>
+    /// <summary>Returns a new Rarr with the elements in reverse order.</summary>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The reversed IList.</returns>
+    /// <returns>The IList reversed as Rarr.</returns>
     let rev (iList: IList<'T>) = 
         let len = iList.Count
         let result = Rarr(len)
@@ -1847,7 +1850,7 @@ module IList =
     /// <param name="folder">The function to update the state given the input elements.</param>
     /// <param name="stateInit">The initial state.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The IList of state values. This IList has the initial state and the state for all elements in the input IList, so one more item than the input.</returns>
+    /// <returns>A Rarr of state values. This IList has the initial state and the state for all elements in the input IList, so one more item than the input.</returns>
     let scan<'T, 'State> (folder:'State -> 'T -> 'State) (stateInit: 'State) (iList: IList<'T>) :Rarr<'State> = 
         let folder = OptimizedClosures.FSharpFunc<_,_,_>.Adapt folder
         // Holds the initial and intermediate state values.
@@ -1865,7 +1868,7 @@ module IList =
     /// <param name="folder">The function to update the state given the input elements.</param>
     /// <param name="iList">The input IList.</param>
     /// <param name="stateInit">The initial state.</param>
-    /// <returns>The IList of state values. Count = input count + 1 </returns>
+    /// <returns>A Rarr of state values. Count = input count + 1 </returns>
     let scanBack<'T, 'State> (folder:'T -> 'State -> 'State) (iList: IList<'T>) (stateInit: 'State) : Rarr<'State> = 
         let folder = OptimizedClosures.FSharpFunc<_,_,_>.Adapt folder
         let results = Rarr(iList.Count+1)// Holds the initial and intermediate state values.
@@ -1890,13 +1893,13 @@ module IList =
 
 
 
-    /// <summary>Builds a new IList that contains the elements of the given IList, excluding the first N elements.</summary>
+    /// <summary>Builds a new Rarr that contains the elements of the given IList, excluding the first N elements.</summary>
     /// <param name="count">The number of elements to skip.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>A copy of the input IList, after removing the first N elements.</returns>
+    /// <returns>A copy of the input IList as Rarr, after removing the first N elements.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when count is negative or exceeds the number of
     /// elements in the IList.</exception>
-    let skip count (iList: IList<'T>) = 
+    let skip count (iList: IList<'T>) : Rarr<'T> = 
         if count < 0 || count > iList.Count then ArgumentException.RaiseBase "FsEx.IList.skip: count %d is not in range of 0 to iList.Count %d " count iList.Count
         if count = iList.Count then
             Rarr()
@@ -1906,11 +1909,11 @@ module IList =
 
 
     /// <summary>Bypasses elements in a IList while the given predicate returns <c>true</c>, and then returns
-    /// the remaining elements in a new IList.</summary>
+    /// the remaining elements in a new Rarr.</summary>
     /// <param name="predicate">A function that evaluates an element of the IList to a boolean value.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The created sub IList.</returns>
-    let skipWhile (predicate:'T->bool) (iList: IList<'T>) = 
+    /// <returns>The created sub IList as Rarr.</returns>
+    let skipWhile (predicate:'T->bool) (iList: IList<'T>) : Rarr<'T>= 
         let mutable i = 0
         let li = iList
         while i < iList.Count && predicate li.[i] do
@@ -1921,64 +1924,64 @@ module IList =
             sub iList i (iList.Count-i)
 
 
-    /// <summary>Sorts the elements of a IList, returning a new IList. Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
+    /// <summary>Sorts the elements of a IList, returning a new Rarr. Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
     /// This means "Z" is before "a". This is different from Collections.Generic.Sort() where "a" is before "Z" using IComparable interface.
     /// This is NOT a stable sort, i.e. the original order of equal elements is not necessarily preserved.
     /// For a stable sort, consider using Seq.Sort</summary>
     /// <param name="iList">The input IList.</param>
-    /// <returns>A new sorted IList.</returns>
+    /// <returns>A new sorted Rarr.</returns>
     let sort<'T when 'T : comparison> (iList : IList<'T>) : Rarr<'T> = 
         let r = sub iList 0 iList.Count
         r.Sort(Operators.compare)
         r
 
 
-    /// <summary>Sorts the elements of a IList, using the given projection for the keys and returning a new IList.
+    /// <summary>Sorts the elements of a IList, using the given projection for the keys and returning a new Rarr.
     /// Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
     /// This means "Z" is before "a". This is different from Collections.Generic.Sort() where "a" is before "Z" using IComparable interface.
     /// This is NOT a stable sort, i.e. the original order of equal elements is not necessarily preserved.
     /// For a stable sort, consider using Seq.sort.</summary>
     /// <param name="projection">The function to transform IList elements into the type that is compared.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The sorted IList.</returns>
+    /// <returns>The sorted Rarr.</returns>
     let sortBy<'T, 'Key when 'Key : comparison> (projection : 'T -> 'Key) (iList : IList<'T>) : Rarr<'T> = 
         let r = sub iList 0 iList.Count
         r.Sort (fun x y -> Operators.compare (projection x) (projection y))
         r
 
 
-    /// <summary>Sorts the elements of a IList, in descending order, using the given projection for the keys and returning a new IList.
+    /// <summary>Sorts the elements of a IList, in descending order, using the given projection for the keys and returning a new Rarr.
     /// Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
     /// This means in ascending sorting "Z" is before "a". This is different from Collections.Generic.Sort() where "a" is before "Z" using IComparable interface.
     /// This is NOT a stable sort, i.e. the original order of equal elements is not necessarily preserved.
     /// For a stable sort, consider using Seq.sort.</summary>
     /// <param name="projection">The function to transform IList elements into the type that is compared.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The sorted IList.</returns>
+    /// <returns>The sorted Rarr.</returns>
     let inline sortByDescending<'T, 'Key when 'Key : comparison> (projection : 'T -> 'Key) (iList : IList<'T>) : Rarr<'T> = 
         let r = sub iList 0 iList.Count
         r.Sort (fun x y -> Operators.compare (projection y) (projection x)) // x and y are swapped for descending order
         r
 
 
-    /// <summary>Sorts the elements of a IList, in descending order, returning a new IList. Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
+    /// <summary>Sorts the elements of a IList, in descending order, returning a new Rarr. Elements are compared using <see cref="M:Microsoft.FSharp.Core.Operators.compare"/>.
     /// This means in ascending sorting "Z" is before "a". This is different from Collections.Generic.Sort() where "a" is before "Z" using IComparable interface.
     /// This is NOT a stable sort, i.e. the original order of equal elements is not necessarily preserved.
     /// For a stable sort, consider using Seq.sort.</summary>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The sorted IList.</returns>
+    /// <returns>The sorted Rarr.</returns>
     let sortDescending<'T when 'T : comparison> (iList : IList<'T>) : Rarr<'T> = 
         let r = sub iList 0 iList.Count // fastest way to create a shallow copy
         r.Sort(Operators.compare) // Operators.compare is need to match sorting of Array.sort
         r.Reverse()
         r
 
-    /// <summary>Sorts the elements of a IList, using the given comparison function as the order, returning a new IList.
+    /// <summary>Sorts the elements of a IList, using the given comparison function as the order, returning a new Rarr.
     /// This is NOT a stable sort, i.e. the original order of equal elements is not necessarily preserved.
     /// For a stable sort, consider using Seq.sort.</summary>
     /// <param name="comparer">The function to compare pairs of IList elements.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The sorted IList.</returns>
+    /// <returns>The sorted Rarr.</returns>
     let sortWith (comparer : 'T -> 'T -> int) (iList : IList<'T>) : Rarr<'T> = 
         let r = sub iList 0 iList.Count // fastest way to create a shallow copy
         r.Sort (comparer)
@@ -1998,7 +2001,7 @@ module IList =
     /// If the list can not be split evenly the initial elements will be one bigger than the later elements. Just like with Array.splitInto.</summary>
     /// <param name="chunkCount">The maximum number of chunks.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The IList split into chunks.</returns>
+    /// <returns>A Rarr split into chunks.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when <c>count</c> is not positive.</exception>
     let splitInto (chunkCount:int) (iList: IList<'T>) : Rarr<Rarr<'T>> = 
         if chunkCount < 1  then ArgumentException.RaiseBase "FsEx.IList.splitInto: count %d is less than 1" chunkCount
@@ -2013,7 +2016,7 @@ module IList =
             let oneBiggerFor = len % chunkCount // so the first few list might be bigger
             let mutable k = 0
             let mutable sub = Rarr(chunksize)
-            let res = Rarr(chunkCount)
+            let res = ResizeArray(chunkCount)
             res.Add(sub)
             for i = 0 to len - 1 do
                 //printfn "i %d v: %d chunksize %d" i iList.[i] chunksize
@@ -2025,7 +2028,7 @@ module IList =
                         chunksize <- chunksize - 1
                 sub.Add(iList.[i])
                 k <- k+1
-            res
+            res |>  Rarr.createDirectly 
 
 
     /// <summary>Returns the sum of the elements in the IList.</summary>
@@ -2051,10 +2054,10 @@ module IList =
         acc
 
 
-    /// <summary>Returns a new IList containing the elements of the original except the first element.</summary>
+    /// <summary>Returns a new Rarr containing the elements of the original except the first element.</summary>
     /// <param name="iList">The input IList.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when the IList is empty.</exception>
-    /// <returns>A new IList containing the elements of the original except the first element.</returns>
+    /// <returns>A new Rarr containing the elements of the original except the first element.</returns>
     let tail (iList: IList<'T>) = 
         if iList.Count = 0  then ArgumentException.RaiseBase "FsEx.IList.tail: input IList is empty"
         sub iList 1 (iList.Count-1)
@@ -2065,9 +2068,9 @@ module IList =
     /// Use <c>IList.truncate</c> to returns as many items as the IList contains instead of throwing an exception.</summary>
     /// <param name="count">The number of items to take.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when the input IList is empty or count exceeds the number of elements in the list.</exception>
-    let take count (iList: IList<'T>) = 
+    let take count (iList: IList<'T>) : Rarr<'T> = 
         if count < 0 then  ArgumentException.RaiseBase "FsEx.IList.take: count %d cannot be negative." count
         if count = 0 then
             Rarr(0)
@@ -2078,12 +2081,12 @@ module IList =
 
 
 
-    /// <summary>Returns a IList that contains all elements of the original IList while the
+    /// <summary>Returns a new Rarr that contains all elements of the original IList while the
     /// given predicate returns <c>true</c>, and then returns no further elements.</summary>
     /// <param name="predicate">A function that evaluates to false when no more items should be returned.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
-    let takeWhile (predicate:'T->bool) (iList: IList<'T>) = 
+    /// <returns>A Rarr of the results.</returns>
+    let takeWhile (predicate:'T->bool) (iList: IList<'T>) : Rarr<'T> = 
         let li = iList
         if iList.Count = 0 then
             Rarr(0)
@@ -2097,7 +2100,7 @@ module IList =
 
     /// <summary>Builds a list from the given IList.</summary>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The list of IList elements.</returns>
+    /// <returns>A F# list build from the IList</returns>
     let toList (iList:IList<'T>) : list<'T> = 
         let li = iList
         let mutable res = []
@@ -2109,7 +2112,7 @@ module IList =
 
     /// <summary>Returns the transpose of the given sequence of Rarrs.</summary>
     /// <param name="iLists">The input sequence of Rarrs.</param>
-    /// <returns>The transposed IList.</returns>
+    /// <returns>The transposed IList as Rarr.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarrs differ in length.</exception>
     let transpose (iLists: IList<IList<'T>>) : Rarr<Rarr<'T>> = 
         // originally let transpose (iLists: seq<IList<'T>>) : IList<IList<'T>> = 
@@ -2130,10 +2133,10 @@ module IList =
             result
 
 
-    /// <summary>Returns at most N elements in a new IList. When count is negative return empty IList.</summary>
+    /// <summary>Returns at most N elements in a new Rarr. When count is negative returns an empty Rarr.</summary>
     /// <param name="count">The maximum number of items to return.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     let truncate count (iList: IList<'T>) : Rarr<'T> = 
         if count <= 0 then Rarr(0)
         else
@@ -2250,14 +2253,14 @@ module IList =
         loop 0
 
 
-    /// <summary>Returns a IList that contains the elements generated by the given computation.
+    /// <summary>Returns a new Rarr that contains the elements generated by the given computation.
     /// The given initial <c>state</c> argument is passed to the element generator.</summary>
     /// <param name="generator">A function that takes in the current state and returns an option tuple of the next
     /// element of the IList and the next state value.</param>
     /// <param name="state">The initial state value.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     let unfold<'T, 'State> (generator: 'State -> ('T*'State) option) (state: 'State) = 
-        let res = Rarr()
+        let res = ResizeArray()
         let rec loop state = 
             match generator state with
             | None -> ()
@@ -2265,7 +2268,7 @@ module IList =
                 res.Add(x)
                 loop s'
         loop state
-        res
+        res |>  Rarr.createDirectly 
 
 
     /// <summary>Splits a IList of pairs into two Rarrs.</summary>
@@ -2286,7 +2289,7 @@ module IList =
     /// <summary>Splits a IList of triples into three Rarrs.</summary>
     /// <param name="iList">The input IList.</param>
     /// <returns>The tuple of three Rarrs.</returns>
-    let unzip3 (iList: IList<'T*'U*'V>) = 
+    let unzip3 (iList: IList<'T*'U*'V>) : Rarr<'T>*Rarr<'U>*Rarr<'V>= 
         let len = iList.Count
         let res1 = Rarr(len)
         let res2 = Rarr(len)
@@ -2299,11 +2302,11 @@ module IList =
             res3.Add <|  z
         res1, res2, res3
 
-    /// <summary>Return a new IList with the item at a given index set to the new value.(does NOT modify in place !)</summary>
+    /// <summary>Returns a new Rarr with the item at a given index set to the new value.(does NOT modify in place !)</summary>
     /// <param name="index">The index of the item to be replaced.</param>
     /// <param name="value">The new value.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when index is not within  iList.Count </exception>
     let updateAt (index: int) (value: 'T) (iList: IList<'T>) : Rarr<'T> = 
         if index < 0 || index >= iList.Count  then ArgumentException.RaiseBase "FsEx.IList.updateAt: index %d  not within iList.Count %d." index  iList.Count
@@ -2312,21 +2315,21 @@ module IList =
         r
 
 
-    /// <summary>Returns a new IList containing only the elements of the IList
+    /// <summary>Returns a new Rarr containing only the elements of the IList
     /// for which the given predicate returns <c>true</c>.</summary>
     /// <param name="predicate">The function to test the input elements.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>a IList containing the elements for which the given predicate returns true.</returns>
-    let where (predicate:'T->bool) (iList: IList<'T>) = 
+    /// <returns>A Rarr containing the elements for which the given predicate returns true.</returns>
+    let where (predicate:'T->bool) (iList: IList<'T>) : Rarr<'T> = 
         filter predicate iList
 
 
-    /// <summary>Returns a IList of sliding windows containing elements drawn from the input IList. Each window is returned as a fresh IList.</summary>
+    /// <summary>Returns a new Rarr of sliding windows containing elements drawn from the input IList. Each window is returned as a fresh Rarr.</summary>
     /// <param name="windowSize">The number of elements in each window.</param>
     /// <param name="iList">The input IList.</param>
-    /// <returns>The result IList.</returns>
+    /// <returns>A Rarr of the results.</returns>
     /// <exception cref="T:System.ArgumentException">Thrown when windowSize is not positive.</exception>
-    let windowed windowSize (iList: IList<'T>) = 
+    let windowed windowSize (iList: IList<'T>) : Rarr<Rarr<'T>>= 
         if windowSize <= 0 then  ArgumentException.RaiseBase "FsEx.IList.windowed: windowSize %d cannot be negative or 0." windowSize
         let len = iList.Count
         if windowSize > len then
@@ -2342,14 +2345,14 @@ module IList =
     /// <param name="iList1">The first input IList.</param>
     /// <param name="iList2">The second input IList.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarrs differ in length.</exception>
-    /// <returns>The IList of tupled elements.</returns>
-    let zip (iList1: IList<'T>) (iList2: IList<'U>) = 
+    /// <returns>A Rarr of tupled elements.</returns>
+    let zip (iList1: IList<'T>) (iList2: IList<'U>) : Rarr<'T*'U> = 
         let len1 = iList1.Count
         if len1 <> iList2.Count then ArgumentException.RaiseBase "FsEx.IList.zip: count of iList1 %d does not match iList2 %d." iList1.Count iList2.Count
-        let res = Rarr(len1)
+        let res = ResizeArray(len1)
         for i = 0 to iList1.Count-1 do
             res.Add (iList1.[i], iList2.[i])
-        res
+        res |>  Rarr.createDirectly 
 
 
     /// <summary>Combines three Rarrs into a IList of pairs. The three Rarrs must have equal lengths, otherwise an <c>ArgumentException</c> is raised.</summary>
@@ -2357,14 +2360,14 @@ module IList =
     /// <param name="iList2">The second input IList.</param>
     /// <param name="iList3">The third input IList.</param>
     /// <exception cref="T:System.ArgumentException">Thrown when the input Rarrs differ in length.</exception>
-    /// <returns>The IList of tupled elements.</returns>
-    let zip3 (iList1: IList<'T>) (iList2: IList<'U>) (iList3: IList<'V>) = 
+    /// <returns>A Rarr of tupled elements.</returns>
+    let zip3 (iList1: IList<'T>) (iList2: IList<'U>) (iList3: IList<'V>) : Rarr<'T*'U*'V> = 
         let len1 = iList1.Count
         if len1 <> iList2.Count || len1 <> iList3.Count then ArgumentException.RaiseBase "FsEx.IList.zip3: count of iList1 %d does not match iList2 %d or iList3 %d." iList1.Count iList2.Count iList3.Count
-        let res = Rarr(len1)
+        let res = ResizeArray(len1)
         for i = 0 to iList1.Count-1 do
             res.Add (iList1.[i], iList2.[i], iList3.[i])
-        res
+        res |>  Rarr.createDirectly 
 
     /// Parallel operations on IList using Threading.Tasks.Parallel.For
     module Parallel = 
@@ -2378,7 +2381,7 @@ module IList =
         /// The order in which the given function is applied to elements of the input IList is not specified.</summary>
         /// <param name="chooser">The function to generate options from the elements.</param>
         /// <param name="iList">The input IList.</param>
-        /// <returns>The IList of results.</returns>
+        /// <returns>A Rarr of results.</returns>
         let choose (chooser: 'T -> option<'U> ) (iList: IList<'T>) : Rarr<'U>= 
             let inputLength = iList.Count
             let isChosen: bool[] = Array.zeroCreate inputLength
@@ -2406,12 +2409,12 @@ module IList =
 
 
 
-        /// <summary>For each element of the IList, apply the given function. Concatenate all the results and return the combined IList.
+        /// <summary>For each element of the IList, apply the given function. Concatenate all the results and return the combined Rarr.
         /// Performs the operation in parallel using <see cref="M:System.Threading.Tasks.Parallel.For" />.
         /// The order in which the given function is applied to elements of the input IList is not specified.</summary>
         /// <param name="mapping"></param>
         /// <param name="iList">The input IList.</param>
-        /// <returns>'U[]</returns>
+        /// <returns>A Rarr of 'U </returns>
         let collect (mapping: 'T -> IList<'U>)  (iList: IList<'T>) : Rarr<'U>= 
             let inputLength = iList.Count
             let result = create inputLength Unchecked.defaultof<_>
@@ -2426,7 +2429,7 @@ module IList =
         /// The order in which the given function is applied to indices is not specified.</summary>
         /// <param name="count"></param>
         /// <param name="initializer"></param>
-        /// <returns>The IList of results.</returns>
+        /// <returns>A Rarr of results.</returns>
         let init count (initializer:int->'T) : Rarr<'T> =
             let result = create count Unchecked.defaultof<_>
             Parallel.For (0, count, fun i -> result.[i] <- initializer i) |> ignore
@@ -2455,13 +2458,13 @@ module IList =
             Parallel.For (0, iList.Count, fun i -> f.Invoke(i, li.[i])) |> ignore
 
 
-        /// <summary>Build a new IList whose elements are the results of applying the given function
+        /// <summary>Build a new Rarr whose elements are the results of applying the given function
         /// to each of the elements of the IList.
         /// Performs the operation in parallel using <see cref="M:System.Threading.Tasks.Parallel.For" />.
         /// The order in which the given function is applied to elements of the input IList is not specified.</summary>
         /// <param name="mapping"></param>
         /// <param name="iList">The input IList.</param>
-        /// <returns>The IList of results.</returns>
+        /// <returns>A Rarr of results.</returns>
         let map (mapping: 'T -> 'U) (iList: IList<'T>) : Rarr<'U>= 
             let inputLength = iList.Count
             let result = create inputLength Unchecked.defaultof<_>
@@ -2471,14 +2474,14 @@ module IList =
             result
 
 
-        /// <summary>Build a new IList whose elements are the results of applying the given function
+        /// <summary>Build a new Rarr whose elements are the results of applying the given function
         /// to each of the elements of the IList. The integer index passed to the
         /// function indicates the index of element being transformed.
         /// Performs the operation in parallel using <see cref="M:System.Threading.Tasks.Parallel.For" />.
         /// The order in which the given function is applied to elements of the input IList is not specified.</summary>
         /// <param name="mapping"></param>
         /// <param name="iList">The input IList.</param>
-        /// <returns>The IList of results.</returns>
+        /// <returns>A Rarr of results.</returns>
         let mapi (mapping:int-> 'T -> 'U) (iList: IList<'T>) = 
             let f = OptimizedClosures.FSharpFunc<_, _, _>.Adapt(mapping)
             let inputLength = iList.Count

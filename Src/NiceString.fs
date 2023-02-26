@@ -540,7 +540,7 @@ module internal NiceStringImplementation  =
 
     and getSeq (nps:NicePrintSettings) depth (x:obj) (xs:System.Collections.IEnumerable) :Lines = // non generic IEnumerable
         // count may not be available , sequences are not only iterated till NiceStringSettings.maxItemsPerSeq
-        let name =   typeName(x.GetType())
+        let name = typeName(x.GetType())
         let ls = getItemsInSeq (name.Length + 16, nps, depth+1, xs) // +16 for "00 with 00 items"
         let desc = 
             if ls.Count = 0 then             sprintf "empty %s " name
@@ -554,7 +554,7 @@ module internal NiceStringImplementation  =
     /// tries to put the record in one line
     and getRecord (nps:NicePrintSettings) depth (x:obj) (typ:Type):Lines=
         let props = FSharp.Reflection.FSharpType.GetRecordFields(typ)
-        let title =  typeName (typ)        
+        let title = typeName (typ)        
         let ls = ResizeArray<int*Lines>()
         for p in props do 
             let n = p.Name

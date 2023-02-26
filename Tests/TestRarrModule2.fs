@@ -1255,7 +1255,7 @@ type TestRarrModule2() =
     member this.Zip() = 
         // integer array
         let resultInt =  Rarr.zip [|1..3 |].asRarr [|2..2..6 |].asRarr
-        if resultInt <!> [|(1,2);(2,4);(3,6) |].asRarr then Assert.Fail()
+        if resultInt <!> [|(1,2);(2,4);(3,6)|].asRarr then Assert.Fail()
 
         // string array
         let resultStr = Rarr.zip [|"A"; "B";  "C" ; "D"  |].asRarr [|"a";"b";"c";"d" |].asRarr
@@ -1427,19 +1427,19 @@ type TestRarrModule2() =
     [<Fact>]
     member this.InsertManyAt() = 
         // integer list
-        Assert.AreEqual([|0; 0; 1; 2; 3; 4; 5|].asRarr , (Rarr.insertManyAt 0 [0; 0] [|1..5|].asRarr ))
-        Assert.AreEqual([|1; 2; 0; 0; 3; 4; 5|].asRarr , (Rarr.insertManyAt 2 [0; 0] [|1..5|].asRarr ))
-        Assert.AreEqual([|1; 2; 3; 4; 0; 0; 5|].asRarr , (Rarr.insertManyAt 4 [0; 0] [|1..5|].asRarr ))
+        Assert.AreEqual([|0; 0; 1; 2; 3; 4; 5|].asRarr , (Rarr.insertManyAt 0 [|0; 0|] [|1..5|].asRarr ))
+        Assert.AreEqual([|1; 2; 0; 0; 3; 4; 5|].asRarr , (Rarr.insertManyAt 2 [|0; 0|] [|1..5|].asRarr ))
+        Assert.AreEqual([|1; 2; 3; 4; 0; 0; 5|].asRarr , (Rarr.insertManyAt 4 [|0; 0|] [|1..5|].asRarr ))
 
         //string list
-        Assert.AreEqual([|"0"; "0"; "1"; "2"; "3"; "4"; "5"|].asRarr , (Rarr.insertManyAt 0 ["0"; "0"] [|"1"; "2"; "3"; "4"; "5"|].asRarr ))
-        Assert.AreEqual([|"1"; "2"; "0"; "0"; "3"; "4"; "5"|].asRarr , (Rarr.insertManyAt 2 ["0"; "0"] [|"1"; "2"; "3"; "4"; "5"|].asRarr ))
-        Assert.AreEqual([|"1"; "2"; "3"; "4"; "0"; "0"; "5"|].asRarr , (Rarr.insertManyAt 4 ["0"; "0"] [|"1"; "2"; "3"; "4"; "5"|].asRarr ))
+        Assert.AreEqual([|"0"; "0"; "1"; "2"; "3"; "4"; "5"|].asRarr , (Rarr.insertManyAt 0 [|"0"; "0"|] [|"1"; "2"; "3"; "4"; "5"|].asRarr ))
+        Assert.AreEqual([|"1"; "2"; "0"; "0"; "3"; "4"; "5"|].asRarr , (Rarr.insertManyAt 2 [|"0"; "0"|] [|"1"; "2"; "3"; "4"; "5"|].asRarr ))
+        Assert.AreEqual([|"1"; "2"; "3"; "4"; "0"; "0"; "5"|].asRarr , (Rarr.insertManyAt 4 [|"0"; "0"|] [|"1"; "2"; "3"; "4"; "5"|].asRarr ))
 
         // empty list & out of bounds
-        Assert.AreEqual([0; 0], Rarr.insertManyAt 0 [0; 0] [||].asRarr )
-        CheckThrowsArgumentException (fun () -> Rarr.insertManyAt -1 [0; 0] [|1|].asRarr  |> ignore)
-        CheckThrowsArgumentException (fun () -> Rarr.insertManyAt 2 [0; 0] [|1|].asRarr  |> ignore)
+        Assert.AreEqual([0; 0], Rarr.insertManyAt 0 [|0; 0|] [||].asRarr )
+        CheckThrowsArgumentException (fun () -> Rarr.insertManyAt -1 [|0; 0|] [|1|].asRarr  |> ignore)
+        CheckThrowsArgumentException (fun () -> Rarr.insertManyAt  2 [|0; 0|] [|1|].asRarr  |> ignore)
 
 
     //--------------------------------------------------------------------------------------------------------------------

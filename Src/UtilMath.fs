@@ -5,59 +5,59 @@ open System.Globalization
 open System.Collections.Generic
 
 /// Math Utils.
-/// When opened the module shadows the built in trigonometric asin and acos function to include clamping if values are slightly above -1.0 or 1.0
+/// When opened the module shadows the built in trigonometric asin and acos function to include clamping if values are slightly above -1.0 or 1.0.
 module UtilMath = 
 
-    /// Test is a floating point number (with Measure)  is NaN (Not a Number) or Infinity
+    /// Test is a floating point number (with Measure)  is NaN (Not a Number) or Infinity.
     let inline isNanOrInf (f:float<'T>) = Double.IsInfinity (float f) || Double.IsNaN (float f)
 
     /// Test is a floating point number (with Measure)  is NaN (Not a Number)
     let inline isNan (f:float<'T>) = Double.IsNaN (float f)
 
-    /// To make sure a value is within a given range
+    /// To make sure a value is within a given range.
     /// minVal -> maxVal -> x -> clamped value.
     let inline clamp (minVal:'T) (maxVal:'T) (x:'T) :'T = 
         if maxVal < minVal then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.clamp: max value %g must be bigger than min %g" maxVal minVal
         if x > maxVal then maxVal elif x < minVal then minVal else x
 
-    /// Shadows the built in 'acos' (Inverse Cosine) function to include clamping if values are slightly above -1.0 or 1.0
+    /// Shadows the built in 'acos' (Inverse Cosine) function to include clamping if values are slightly above -1.0 or 1.0.
     /// Tolerance: 0.00001
-    /// This is useful on dot products from unit vectors
-    /// Returns angel in Radians
+    /// This is useful on dot products from unit vectors.
+    /// Returns angel in Radians.
     let inline acos (x:float<'T>) : float =  // no measure on returned float !
         if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.acos: given input is NaN or Infinity."
         if x < -1.00001<_> then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.acos failed on %f , input must be between -1.00001 and +1.00001" x
         if x >  1.00001<_>  then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.acos failed on %f , input must be between -1.00001 and +1.00001" x
         else x  |> float|> clamp -1.0 1.0 |> System.Math.Acos
         
-    /// Shadows the built in 'asin' (Inverse Sine) function to include clamping if values are slightly above -1.0 or 1.0
+    /// Shadows the built in 'asin' (Inverse Sine) function to include clamping if values are slightly above -1.0 or 1.0.
     /// Tolerance: 0.00001
-    /// Returns angel in Radians
+    /// Returns angel in Radians.
     let inline asin (x:float<'T>) : float= // no measure on returned float !
         if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.asin: given input is NaN or Infinity."
         if x < -1.00001<_> then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.asin failed on %f , input must be between -1.00001 and +1.00001" x
         if x >  1.00001<_> then ArgumentOutOfRangeException.Raise "FsEx.UtilMath.asin failed on %f , input must be between -1.00001 and +1.00001" x
         else x |> float |> clamp -1.0 1.0  |> System.Math.Asin 
 
-    /// Converts Angels from Degrees to Radians
+    /// Converts Angels from Degrees to Radians.
     let inline toRadians (degrees:float<'T>):float =  // no measure on returned float !
         if isNanOrInf degrees then raise <| ArgumentException "FsEx.UtilMath.toRadians: given input is NaN or Infinity."
         0.0174532925199433 * float degrees // 0.0174532925199433 = Math.PI / 180.
 
-    /// Converts Angels from Radians to Degrees
+    /// Converts Angels from Radians to Degrees.
     let inline toDegrees (radians:float<'T>) :float = // no measure on returned float !
         if isNanOrInf radians then raise <| ArgumentException "FsEx.UtilMath.toDegrees: given input is NaN or Infinity."
         57.2957795130823 * float radians // 57.2957795130823 = 180. / Math.PI
 
 
-    /// American English culture (used for float parsing)
+    /// American English culture (used for float parsing).
     let private enUs = CultureInfo.GetCultureInfo("en-US")
 
-    /// German culture (used for float parsing)
+    /// German culture (used for float parsing).
     let private deAt = CultureInfo.GetCultureInfo("de-DE")
 
     /// First tries to parses float with En-Us CultureInfo (period as decimal separator),
-    /// if this fails tries to parse parses float with De-At CultureInfo (comma as decimal separator)
+    /// if this fails tries to parse parses float with De-At CultureInfo (comma as decimal separator).
     let tryParseFloatEnDe (x:string) : option<float> = 
         match Double.TryParse(x, NumberStyles.Float, enUs) with
         | true, f -> Some f
@@ -65,9 +65,9 @@ module UtilMath =
                 | true, f -> Some f
                 | _ -> None
 
-    /// First tries to parses float with En-Us CultureInfo (period as decimal separator),
-    /// if this fails tries to parse parses float with De-At CultureInfo (comma as decimal separator),
-    /// with unit Of Measure Annotation.
+    /// First tries to parses float with En-Us CultureInfo (period as decimal separator).
+    /// If this fails tries to parse parses float with De-At CultureInfo (comma as decimal separator).
+    /// With unit Of Measure Annotation.
     let tryParseFloatEnDeAs<[<Measure>]'T> (x:string) : option<float<'T>> = 
         match Double.TryParse(x, NumberStyles.Float, enUs) with
         | true, f -> Some (LanguagePrimitives.FloatWithMeasure f)
@@ -76,16 +76,16 @@ module UtilMath =
                 | _ -> None
 
     
-    /// First tries to parses float with En-Us CultureInfo (period as decimal separator),
-    /// if this fails tries to parse parses float with De-At CultureInfo (comma as decimal separator)
+    /// First tries to parses float with En-Us CultureInfo (period as decimal separator).
+    /// If this fails tries to parse parses float with De-At CultureInfo (comma as decimal separator).
     let parseFloatEnDe (x:string) : float = 
         match tryParseFloatEnDe x  with
         | Some f -> f
         | None ->   ArgumentException.RaiseBase "FsEx.UtilMath.parseFloatEnDe Could not parse '%s' into a floating point number using English or German culture settings" x
 
-    /// First tries to parses float with En-Us CultureInfo (period as decimal separator),
-    /// if this fails tries to parse parses float with De-At CultureInfo (comma as decimal separator),
-    /// with unit Of Measure Annotation.
+    /// First tries to parses float with En-Us CultureInfo (period as decimal separator).
+    /// If this fails tries to parse parses float with De-At CultureInfo (comma as decimal separator).
+    /// With unit Of Measure Annotation.
     let parseFloatEnDeAs<[<Measure>]'T> (x:string) : float<'T> = 
         match tryParseFloatEnDeAs<'T> x  with
         | Some f -> f
@@ -122,7 +122,7 @@ module UtilMath =
         | _ ->   None
   
 
-    /// To make sure a value is between 0.0 and 1.0 range
+    /// To make sure a value is between 0.0 and 1.0 range.
     let inline clamp01 (value:'T) :'T = 
         // if isNan value then ArgumentException.RaiseBase "FsEx.UtilMath.clamp01: given input is NaN."
         if   value > LanguagePrimitives.GenericOne< ^T>  then LanguagePrimitives.GenericOne< ^T>
@@ -130,7 +130,7 @@ module UtilMath =
         else value
 
 
-    /// Checks if a number is between or on a lower and upper bound value .
+    /// Checks if a number is between or on a lower and upper bound value.
     /// x >= minVal && x <= maxVal
     let inline isInRange (minVal:'T) (maxVal:'T) (x:'T) :bool = 
         x >= minVal && x <= maxVal
@@ -150,7 +150,7 @@ module UtilMath =
         let mi = min (abs valueA) (abs valueB)
         abs(valueA - valueB) < relativeTolerance * mi
 
-    /// Compares two numbers to be within a tolerance for equality
+    /// Compares two numbers to be within a tolerance for equality.
     /// abs(a-b) < absoluteTolerance
     let inline equalsWithTolerance (absoluteTolerance:'T) (valueA:'T) (valueB:'T) :bool = 
         //if isNanOrInf valueA then raise <| ArgumentException("FsEx.UtilMath.equalsWithTolerance: given valueA is NaN or Infinity") // don't do this, keep it generic
@@ -158,15 +158,14 @@ module UtilMath =
         abs(valueA - valueB) < absoluteTolerance
 
 
-    /// Interpolates between start and end value Generic numbers
-    /// works on any type that implements  + , - and *
+    /// Interpolates between start and end value Generic numbers.
+    /// Works on any type that implements  + , - and *
     let inline interpolate (start:'T)  (ende:'T)  (rel:'T) :'T = 
         //if isNanOrInf start then raise <| ArgumentException "FsEx.UtilMath.interpolate: given input for 'start' is NaN or Infinity."
         //if isNanOrInf ende  then raise <| ArgumentException "FsEx.UtilMath.interpolate: given input for 'ende' is NaN or Infinity."
         //if isNanOrInf rel   then raise <| ArgumentException "FsEx.UtilMath.interpolate: given input for 'rel' is NaN or Infinity."
         //start + ( (ende - start) * (float rel) )
         start + ( (ende - start) * rel )
-
 
 
     /// Returns a function to find linear interpolations in one table.
@@ -246,10 +245,10 @@ module UtilMath =
     /// Multiplicative inverse or reciprocal:
     /// 1/x
     let inline inverse(x:float<'T>) : float< /'T > = 
-        if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is NaN or Infinity."  // don't do this, keep it generic
+        if isNanOrInf x then raise <| ArgumentException "FsEx.UtilMath.inverse: given input is NaN or Infinity."  // don't do this, keep it generic
         let a = abs(x) // don't do this, keep it generic?
-        if a < 1e-16<_> then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is almost Zero, less than + or - 1e-16."
-        if a > 1e24<_>  then raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is extremely large, more than + or - 1e24."  // don't do this, keep it generic
+        if a < 1e-16<_> then raise <| ArgumentException "FsEx.UtilMath.inverse: given input is almost Zero, less than + or - 1e-16."
+        if a > 1e24<_>  then raise <| ArgumentException "FsEx.UtilMath.inverse: given input is extremely large, more than + or - 1e24."  // don't do this, keep it generic
         1.0 / x
         //if x = LanguagePrimitives.GenericZero< ^T> then  raise <| ArgumentException "FsEx.UtilMath.reciprocal: given input is Zero" // generic alternative, not used to have safety checks
         //LanguagePrimitives.GenericOne< ^T> / x
@@ -353,8 +352,8 @@ module UtilMath =
         frange (start, 0.0 , steps)
 
     let internal rand = System.Random()
-    /// Given mean and standardDeviation returns a random value from this Gaussian distribution
-    /// if mean is 0 and stDev is 1 then 99% of values are within -2.3 to +2.3 ; 70% within -1 to +1
+    /// Given mean and standardDeviation returns a random value from this Gaussian distribution.
+    /// If mean is 0 and stDev is 1 then 99% of values are within -2.3 to +2.3 ; 70% within -1 to +1
     let randomStandardDeviation (mean:float<'T> , standardDeviation:float<'U>) : float<'T> = 
         if isNanOrInf mean then raise <| ArgumentException "FsEx.UtilMath.randomStandardDeviation: given input for 'mean' is NaN or Infinity."
         if isNanOrInf standardDeviation then raise <| ArgumentException "FsEx.UtilMath.randomStandardDeviation: given input for 'standardDeviation' is NaN or Infinity."

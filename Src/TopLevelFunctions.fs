@@ -243,22 +243,22 @@ module IntRef =
 
     /// Increment a ref cell by one
     /// Shadows built in 'incr' to allow Units of Measure (UoM)
-    let inline incr i (x:int<'UoM>) = i := !i + 1<_>
+    let inline incr (i:ref<int<'UoM>>) = i.Value <- i.Value + 1<_>
 
     /// Decrement a ref cell by one
-    let inline decr (i:ref<int<'UoM>>) = i := !i - 1<_>
+    let inline decr (i:ref<int<'UoM>>) = i.Value <- i.Value - 1<_>
 
     /// Increment a ref cell by a given int
-    let inline incrBy i (x:int<'UoM>) = i := !i + x
+    let inline incrBy (i:ref<int<'UoM>>) (x:int<'UoM>) = i.Value <- i.Value + x
 
     /// Decrement a ref cell by a given int
-    let inline decrBy i (x:int<'UoM>) = i := !i - x
+    let inline decrBy (i:ref<int<'UoM>>) (x:int<'UoM>) = i.Value <- i.Value - x
 
     /// Set ref cell to given int if it is bigger than current ref cell  value
-    let inline setMax i (x:int<'UoM>) = if x > !i then i := x
+    let inline setMax (i:ref<int<'UoM>>) (x:int<'UoM>) = if x > i.Value then i.Value <- x
 
     /// Set ref cell to given int if it is smaller than current ref cell  value
-    let inline setMin i (x:int<'UoM>) = if x < !i then i := x
+    let inline setMin (i:ref<int<'UoM>>)  (x:int<'UoM>) = if x < i.Value then i.Value <- x
 
 
 
@@ -267,16 +267,16 @@ module IntRef =
 module FloatRef = 
 
     /// Increment a ref cell by a given float
-    let inline incrBy i (x:float<'UoM>) = i := !i + x
+    let inline incrBy (f:ref<float<'UoM>>) (x:float<'UoM>) = f.Value <- f.Value + x
 
     /// Decrement a ref cell by a given float
-    let inline decrBy i (x:float<'UoM>) = i := !i - x
+    let inline decrBy (f:ref<float<'UoM>>) (x:float<'UoM>) = f.Value <- f.Value - x
 
     /// Set ref cell to given float if it is bigger than current ref cell  value
-    let inline setMax i (x:float<'UoM>) = if x > !i then i := x
+    let inline setMax (f:ref<float<'UoM>>) (x:float<'UoM>) = if x > f.Value then f.Value <- x
 
     /// Set ref cell to given float if it is smaller than current ref cell  value
-    let inline setMin i (x:float<'UoM>) = if x < !i then i := x
+    let inline setMin (f:ref<float<'UoM>>) (x:float<'UoM>) = if x < f.Value then f.Value <- x
 
 
 /// Provides generic math operators for adding, subtracting, multiplying and dividing 
