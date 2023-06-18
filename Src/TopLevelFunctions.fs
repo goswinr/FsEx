@@ -291,7 +291,7 @@ module FloatMathOperators =
     let inline ( *. ) (x:float<'M>) (y) : float<'M> = x * (float y)
     
     /// Multiplies a-number-that-can-be-converted-to-a-float with a float
-    let inline ( .* ) (x) (y :float<'N>) : float<'M> = (float x) * y
+    let inline ( .* ) (x) (y :float<'M>) : float<'M> = (float x) * y
 
     /// Add a float to A-number-that-can-be-converted-to-a-float
     let inline ( +. ) (x:float<'M>) (y) : float<'M> = x + FloatWithMeasure<'M>(float y)
@@ -310,6 +310,7 @@ module FloatMathOperators =
     
     /// Divide A-number-that-can-be-converted-to-a-float by a float
     let inline ( ./ ) (x) (y :float) : float = (float x) / y
+
 
 
 

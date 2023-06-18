@@ -34,7 +34,7 @@ module internal ColorUtil =
         else    
             lastHue, s, l
 
-/// don't use System.Drawing ! https://docs.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/system-drawing-common-windows-only
+// don't use System.Drawing : https://docs.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/system-drawing-common-windows-only
 
 /// A Red-Green-Blue Color made up of 3 bytes.
 /// ( NOT using System.Drawing.Color internally.)

@@ -66,7 +66,7 @@ module ComputationalExpressionsBuilders =
 
         member this.While(guard, f) = 
             if not (guard()) then Some () else
-            do f() |> ignore<StringBuilder>
+            do f() |> ignore
             this.While(guard, f)
 
         member inline  this.For(sequence:seq<_>, body) = 

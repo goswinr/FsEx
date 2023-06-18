@@ -372,7 +372,6 @@ module String =
         "'" + txt + "'"
 
 
-
     //-------------------------------------------------------------------------
     //-------------------------------------------------------------------------
     // taken and adapted from  FSharpx
@@ -385,6 +384,14 @@ module String =
         if isNull stringToSearchIn then FsExStringException.Raise "FsEx.String.contains: stringToSearchIn is null, stringToFind: %s"     (exnf stringToFind)
         if isNull stringToFind     then FsExStringException.Raise "FsEx.String.contains: stringToFind     is null, stringToSearchIn: %s" (exnf stringToSearchIn)
         stringToSearchIn.Contains(stringToFind)
+
+    /// Returns true if a specified substring occurs within this string ignoring casing.
+    /// uses: stringToSearchIn.IndexOf(stringToFind, StringComparison.OrdinalIgnoreCase) <> -1
+    let (*inline*) containsIgnoreCase (stringToFind:string) (stringToSearchIn:string) = 
+        if isNull stringToSearchIn then FsExStringException.Raise "FsEx.String.containsIgnoreCase: stringToSearchIn is null, stringToFind: %s"     (exnf stringToFind)
+        if isNull stringToFind     then FsExStringException.Raise "FsEx.String.containsIgnoreCase: stringToFind     is null, stringToSearchIn: %s" (exnf stringToSearchIn)
+        stringToSearchIn.IndexOf(stringToFind, StringComparison.OrdinalIgnoreCase) <> -1        
+        
 
     /// Returns true if a specified substring does NOT occurs within this string.
     let (*inline*) notContains (stringToFind:string) (stringToSearchIn:string) = 

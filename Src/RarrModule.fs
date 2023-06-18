@@ -851,15 +851,27 @@ module Rarr =
         res |>  Rarr.createDirectly 
 
 
-    /// <summary>Builds a new Rarr that contains the elements of the first Rarr followed by the elements of the second Rarr.</summary>
-    /// <param name="rarr1">The first input Rarr.</param>
-    /// <param name="rarr2">The second input Rarr.</param>
+    /// <summary>Builds a new Rarr that contains the elements of the first Rarr followed by the elements of the second Rarr.
+    /// When used with the pipeline operator |>  the first and only argument to this function with be at the start of the resulting list. 
+    /// This can be counter intuitive. Use the function Rarr.prepend instead to append the first argument at the end of the second argument.</summary>
+    /// <param name="rarr1">The input Rarr that will be at the beginning.</param>
+    /// <param name="rarr2">The input Rarr that will be at the end.</param>
     /// <returns>The resulting Rarr of length: rarr1.Count + rarr2.Count..</returns>
     let inline append (rarr1: Rarr<'T>) (rarr2: Rarr<'T>) = 
         let res = rarr1.Clone()
         res.AddRange(rarr2)
         res
 
+    /// <summary>Builds a new Rarr that contains the elements of the second Rarr followed by the elements of the first Rarr.
+    /// When used with the pipeline operator |>  the first and only argument to this function with be at the end of the resulting list.
+    /// Compared to Rarr.append this function has the order of its arguments flipped</summary>
+    /// <param name="rarr2">The input Rarr that will be at the end.</param>
+    /// <param name="rarr1">The input Rarr that will be at the beginning.</param>
+    /// <returns>The resulting Rarr of length: rarr2.Count + rarr1.Count..</returns>
+    let inline prepend (rarr2: Rarr<'T>) (rarr1: Rarr<'T>) = 
+        let res = rarr1.Clone()
+        res.AddRange(rarr2)
+        res
 
     /// <summary>Returns the average of the elements in the Rarr.</summary>
     /// <param name="rarr">The input Rarr.</param>
@@ -1156,6 +1168,18 @@ module Rarr =
                 if cached.Add e then
                     res.Add e
             res |>  Rarr.createDirectly 
+
+    /// <summary>Tests if none of the elements of the Rarr satisfies the given predicate.
+    /// The predicate is applied to the elements of the input Rarr. If any application
+    /// returns true then the overall result is <c>false</c> and no further elements are tested.
+    /// Otherwise, true is returned.</summary>
+    /// <param name="predicate">The function to test the input elements.</param>
+    /// <param name="rarr">The input Rarr.</param>
+    /// <returns><c>false</c> if any result from <c>predicate</c> is <c>true</c>.</returns>
+    let notExists (predicate: 'T -> bool) (rarr: Rarr<'T>) :bool = 
+        not (rarr.Exists (System.Predicate predicate))
+
+
 
     /// <summary>Tests if any element of the Rarr satisfies the given predicate.
     /// The predicate is applied to the elements of the input Rarr. If any application
