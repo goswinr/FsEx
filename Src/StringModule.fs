@@ -45,7 +45,7 @@ module String =
         fromString.Substring(0,takeLength)
 
 
-    /// Removes substring from a string if it exists. same as:
+    /// Removes all occurrences of a substring from a string if it exists. same as:
     /// (Will return the same string instance, if text to remove is not found)
     /// Code:fromString.Replace(textToRemove, "")
     let (*inline*) delete (textToRemove:string) (fromString:string) :string = 
