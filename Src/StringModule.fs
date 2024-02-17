@@ -342,7 +342,7 @@ module String =
         txt.Normalize(System.Text.NormalizationForm.FormD)
         |> Seq.filter ( fun c -> Globalization.CharUnicodeInfo.GetUnicodeCategory(c) <> Globalization.UnicodeCategory.NonSpacingMark  )
         |> String.Concat
-        |> fun s -> txt.Normalize(NormalizationForm.FormC)
+        |> fun s -> s.Normalize(NormalizationForm.FormC)
 
     /// Add a suffix to string 
     [<Obsolete("Has a typo, use addSuffix instead")>]  
