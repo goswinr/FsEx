@@ -465,7 +465,7 @@ type Rarr<'T> private (xs:List<'T>) =
 
     /// Returns a read-only System.Collections.ObjectModel.ReadOnlyCollection
     /// wrapper over the current collection.
-    member _.AsReadOnly() =                                                           xs.AsReadOnly
+    member _.AsReadOnly() =                                                           xs.AsReadOnly()
 
     /// Searches a section of the list for a given element using a binary search
     /// algorithm. Elements of the list are compared to the search value using
