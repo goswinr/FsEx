@@ -569,13 +569,13 @@ type Rarr<'T> private (xs:List<'T>) =
     /// <param name="count">The number of elements to copy.</param>
     member _.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int) = 
         if arrayIndex< 0 then
-            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): The start index of target Array %d cannot be less than zero. (for copying %d elements starting at %d from Rarr of %d into array of size %d starting at array position %d)" arrayIndex  count index xs.Count array.Length arrayIndex
+            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): The start index of target Array %d cannot be less than zero. (for copying %d elements starting at %d from Rarr of %d into array of size %d starting at array position %d)" arrayIndex count index xs.Count array.Length arrayIndex
         if index < 0 then
-            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): The start index of Rarr %d cannot be less than zero. (for copying %d elements starting at %d from Rarr of %d into array of size %d starting at array position %d)" index  count index xs.Count array.Length arrayIndex
+            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): The start index of Rarr %d cannot be less than zero. (for copying %d elements starting at %d from Rarr of %d into array of size %d starting at array position %d)" index count index xs.Count array.Length arrayIndex
         if index + count > xs.Count then
-            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): index + count is more than xs.Count (for copying %d elements starting at %d from Rarr of %d into array of size %d starting at array position %d)" index  count index xs.Count array.Length arrayIndex
+            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): index + count is more than xs.Count (for copying %d elements starting at %d from Rarr of %d into array of size %d starting at array position %d)" count index xs.Count array.Length arrayIndex
         if count + arrayIndex > array.Length then
-            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): count is more than array.Length - arrayIndex (for copying %d elements starting at %d from Rarr of %d into array of size %d starting at array position %d)" index  count index xs.Count array.Length arrayIndex
+            ArgumentException.RaiseBase "rarr.CopyTo(index:int, array : 'T[], arrayIndex:int, count:int): count is more than array.Length - arrayIndex (for copying %d elements starting at %d from Rarr of %d into array of size %d starting at array position %d)" count index xs.Count array.Length arrayIndex
         xs.CopyTo(index , array , arrayIndex , count)
 
     /// <summary>Determines whether the List contains elements that match the conditions defined by the specified predicate.</summary>
@@ -615,7 +615,7 @@ type Rarr<'T> private (xs:List<'T>) =
     /// <returns>The zero-based index of the first occurrence of an element that matches the conditions defined by matchValue, if found; otherwise, -1.</returns>
     member _.FindIndex(startIndex:int, count:int, matchValue : Predicate<'T>) = 
         if startIndex < 0  then
-            ArgumentException.RaiseBase "rarr.FindIndex: The startIndex %d cannot be less than zero. (with desired count %d,for Rarr of %d elements)." startIndex  xs.Count count xs.Count
+            ArgumentException.RaiseBase "rarr.FindIndex: The startIndex %d cannot be less than zero. (with desired count %d,for Rarr of %d elements)." startIndex  xs.Count count
         elif count < 0 then
             ArgumentException.RaiseBase "rarr.FindIndex: The desired count %d cannot be less than zero. (startIndex %d) for Rarr of %d elements." count startIndex xs.Count
         elif startIndex + count > xs.Count then
@@ -678,7 +678,7 @@ type Rarr<'T> private (xs:List<'T>) =
     /// <returns>A shallow copy of a range of elements in the source List.</returns>
     member _.GetRange(index:int, count:int) : Rarr<'T> = 
         if index < 0  then
-            ArgumentException.RaiseBase "rarr.GetRange: The start index %d cannot be less than zero . (with desired count %d,for Rarr of %d elements)." index  xs.Count count xs.Count
+            ArgumentException.RaiseBase "rarr.GetRange: The start index %d cannot be less than zero . (with desired count %d,for Rarr of %d elements)." index  xs.Count count
         elif count < 0 then
             ArgumentException.RaiseBase "rarr.GetRange: The desired count %d cannot be less than zero. (start index %d) for Rarr of %d elements." count index xs.Count
         elif index + count > xs.Count then
