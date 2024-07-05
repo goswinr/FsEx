@@ -677,7 +677,7 @@ module internal NiceStringImplementation  =
                 sb.appendLine(" "+h.closingBracket)  
                 true 
         
-    // TODO implement this formatter with colorful lines for Seff:
+    // TODO implement this formatter with colorful lines for Fesh:
     
     let formatLines  (nps:NicePrintSettings) (lines:Lines) : string = 
         let indent = 4 // indent size

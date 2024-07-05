@@ -126,7 +126,7 @@ module Array =
     //    let ab =  "ab".ToCharArray()
     //    let de =  "de".ToCharArray()
     //
-    //    clearSeffLog()
+    //    clearFeshLog()
     //    blue "%b" ( 0 = findArray ab 0 l i)
     //    blue "%b" (-1 = findArray ab 1 l i)
     //    blue "%b" ( 0 = findLastArray ab 0 l i)

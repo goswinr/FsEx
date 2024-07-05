@@ -2,15 +2,15 @@
 
 # FsEx
 
-![code size](https://img.shields.io/github/languages/code-size/goswinr/FsEx.svg) 
+![code size](https://img.shields.io/github/languages/code-size/goswinr/FsEx.svg)
 [![license](https://img.shields.io/github/license/goswinr/FsEx)](LICENSE)
 
 ![Logo](https://raw.githubusercontent.com/goswinr/FsEx/main/Doc/logo.png)
 
-FsEx is an FSharp extension and utility library mostly focused on collections and strings. 
+FsEx is an FSharp extension and utility library mostly focused on collections and strings.
 
 
-### It Includes: 
+### It Includes:
 
 - [A thin wrapper over the `ResizeArray` type called `Rarr`](https://www.fuget.org/packages/FsEx/0.14.1/lib/net6.0/FsEx.dll/FsEx/Rarr%601). It provides structural equality ,additional members and more detailed error messages when the List is used with out of bound indices.
 - [A `Rarr` module](https://www.fuget.org/packages/FsEx/0.14.1/lib/net6.0/FsEx.dll/FsEx/RarrModule) that provides all the functions for `Rarr` that the  `Array` module from `FSharp.Core` has. Including those for parallel computing.
@@ -18,7 +18,7 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 - An implementation of [defaultdict](https://docs.python.org/3/library/collections.html#collections.defaultdict) called `DefDict` , a dictionary that creates a key when its accessed but missing.
 - [A comprehensive module](https://www.fuget.org/packages/FsEx/0.14.1/lib/net6.0/FsEx.dll/FsEx/StringModule) for working with `string`, including nice error messages.
 - Useful extension members to existing collections like seq, array, Dictionary, StringBuilder.
-- Computational Expressions for building `Rarr`, `strings`, and CSV-files. Like they exist for `seq`, `list` and `array` in `FSharp.Core` 
+- Computational Expressions for building `Rarr`, `strings`, and CSV-files. Like they exist for `seq`, `list` and `array` in `FSharp.Core`
 - Pretty printing for collections
 - and more ..
 
@@ -28,6 +28,11 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 [MIT](https://raw.githubusercontent.com/goswinr/FsEx/main/LICENSE.txt)
 
 ### Changelog
+`0.15.0`
+- Printfn functions to find Fesh editor via Reflection
+- fix Rarr AsReadOnly
+- fix normalize str
+
 `0.14.1`
 - add Rarr.notExists
 - add Rarr.prepend
@@ -61,7 +66,7 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 - add getOrSetDefault to Dict
 - add String.addPrefix String.addSuffix
 - add Seq.tryFindDuplicate and Seq.duplicates
-- rename Dict.setOnce to Dict.setIfKeyAbsent 
+- rename Dict.setOnce to Dict.setIfKeyAbsent
 - remove cmp
 - Array.second, Array.last and similar functions
 - better Error messages
@@ -76,25 +81,25 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 - add Rarr.trim
 - prev-this-next for Rarr
 
-`0.10.1` 
+`0.10.1`
 - add MathUtil.interpolateTable function
 - improve NiceString formatting of F# records
 - rename stringbuffer to str
 - improve move and rename String.Truncate functions to NiceFormat module
 
-`0.9.0` 
+`0.9.0`
 - Fix xml doc that was broken in 0.8.0
 - Lower minimum FSharp.Core version to  4.5.2
 - add tryWith,tryFinally and Using to ComputationalExpressionsBuilders
-- fix typos in docstring 
+- fix typos in docstring
 
-`0.8.0` 
+`0.8.0`
 - update Process Module for running external Processes
 - improve float formatting in toNiceString module
 - add more colors for printing via Seff editor
 - fix typos in docstrings
 
-`0.7.0` 
+`0.7.0`
 - Add Process Module for running external Processes
 - Fix Rarr.rotate
 - Add Rarr.isNotEmpty
@@ -102,11 +107,11 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 - Typo in Timer μs is actually  ms
 - Add String.truncate, skip and take methods
 
-`0.5.1` 
+`0.5.1`
 - Updated `Rarr` and `RarrModule`
 - Updated `StringModule`
 - Improved Exception messages.
 - nicer pretty printing via `print` function
-    
-`0.4.0` 
+
+`0.4.0`
 - first public release

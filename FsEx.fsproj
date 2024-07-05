@@ -16,14 +16,13 @@
     <Title>FsEx</Title>
     <Product>FsEx</Product>
     <PackageId>FsEx</PackageId>
-    <Version>0.14.1</Version>
-    <AssemblyVersion>0.14.1</AssemblyVersion>
-    <FileVersion>0.14.1</FileVersion>
+    <Version>0.15.0</Version>
+    <AssemblyVersion>0.15.0</AssemblyVersion>
+    <FileVersion>0.15.0</FileVersion>
     <PackageReleaseNotes>
-      - add Rarr.notExists
-      - add Rarr.prepend
-      - add String.containsIgnoreCase
-      - fix maybe monad
+      - Printfn functions to find Fesh editor via Reflection
+      - fix Rarr AsReadOnly
+      - fix normalize str
 	  </PackageReleaseNotes>
     <Authors>GoswinR</Authors>
     <Copyright>Goswin Rothenthal 2021</Copyright>
