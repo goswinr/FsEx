@@ -4,7 +4,7 @@ open System
 open System.Text
 //open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
-module ComputationalExpressionsBuilders = 
+module ComputationalExpressionsBuilders =
     (*
     Create an efficient computation expression builder using InlineIfLambda
 
@@ -12,7 +12,7 @@ module ComputationalExpressionsBuilders =
     https://zenn.dev/gnico/articles/5f133dac0585f5#english-version
 
     type NewOptionBuilder2 () =
-        member inline __.Bind<'T, 'T2>(x : 'T voption, [<InlineIfLambda>] code : 'T -> 'T2 voption) : 'T2 voption = 
+        member inline __.Bind<'T, 'T2>(x : 'T voption, [<InlineIfLambda>] code : 'T -> 'T2 voption) : 'T2 voption =
             match x with
                 | ValueNone -> ValueNone
                 | ValueSome v -> code v // let!
@@ -23,7 +23,7 @@ module ComputationalExpressionsBuilders =
         member inline __.Return<'T>(x : 'T) : 'T voption = ValueSome x // return
         member inline __.MergeSources<'T, 'T2>(x1 : 'T voption, x2 : 'T2 voption) : struct('T * 'T2) voption =
             if x1.IsSome && x2.IsSome  then ValueSome struct(x1.Value, x2.Value) else ValueNone // and!
-    
+
     let newOption2 = NewOptionBuilder2()
     *)
 
@@ -31,9 +31,9 @@ module ComputationalExpressionsBuilders =
     let inline private addLnChr (b: StringBuilder) (c:char)   = b.Append(c).AppendLine()   |> ignore<StringBuilder>
     let inline private add      (b: StringBuilder) (s:string) = b.Append      s   |> ignore<StringBuilder>
     let inline private addLn    (b: StringBuilder) (s:string) = b.AppendLine  s   |> ignore<StringBuilder>
-    
+
     /// The maybe monad.
-    type MaybeBuilder() = 
+    type MaybeBuilder() =
         // from https://github.com/fsprojects/FSharpx.Extras/blob/master/src/FSharpx.Extras/ComputationExpressions/Option.fs
         // This monad is my own and uses an 'T option. Others generally make their own Maybe<'T> type from Option<'T>.
         // The builder approach is from Matthew Podwysocki's excellent Creating Extended Builders series
@@ -53,43 +53,43 @@ module ComputationalExpressionsBuilders =
 
         member inline this.Run(f) = f()
 
-        member inline this.TryWith(m, h) = 
+        member inline this.TryWith(m, h) =
             try this.ReturnFrom(m)
             with e -> h e
 
-        member inline  this.TryFinally(m, compensation) = 
+        member inline  this.TryFinally(m, compensation) =
             try this.ReturnFrom(m)
             finally compensation()
 
-        member inline this.Using(res:#IDisposable, body) = 
+        member inline this.Using(res:#IDisposable, body) =
             this.TryFinally(body res, fun () -> match res with null -> () | disp -> disp.Dispose())
 
-        member this.While(guard, f) = 
+        member this.While(guard, f) =
             if not (guard()) then Some () else
             do f() |> ignore
             this.While(guard, f)
 
-        member inline  this.For(sequence:seq<_>, body) = 
+        member inline  this.For(sequence:seq<_>, body) =
             this.Using(sequence.GetEnumerator(), fun enum -> this.While(enum.MoveNext, this.Delay(fun () -> body enum.Current)))
 
     /// Computational Expression String Builder:
     /// use 'yield' to append text, or seq of strings separated by a new line
     /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
-    /// accepts ints, guids and chars  too. 
-    type StringBufferBuilder () = 
+    /// accepts ints, guids and chars  too.
+    type StringBufferBuilder () =
         // adapted from https://github.com/fsharp/fslang-suggestions/issues/775
 
         member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  addChr b c
-        member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  add b txt        
+        member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  add b txt
         member inline _.Yield (i: int) =       fun (b: StringBuilder)  -> add b (i.ToString())
-        member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> add b (g.ToString())        
+        member inline _.Yield (g: Guid) =      fun (b: StringBuilder)  -> add b (g.ToString())
 
         member inline _.YieldFrom (txt: string) =  fun (b: StringBuilder) -> addLn b txt
         member inline _.YieldFrom (c: char) =      fun (b: StringBuilder) -> addLnChr b c
         member inline _.YieldFrom (i: int) =       fun (b: StringBuilder) -> addLn b (i.ToString())
         member inline _.YieldFrom (g: Guid) =      fun (b: StringBuilder) -> addLn b (g.ToString())
 
-        member inline _.Yield (strings: seq<string>) = 
+        member inline _.Yield (strings: seq<string>) =
             fun (b: StringBuilder) -> for s in strings do  addLn b s
 
         member inline _.Combine (f, g) = fun (b: StringBuilder) -> f b; g b
@@ -98,34 +98,34 @@ module ComputationalExpressionsBuilders =
 
         member inline _.Zero () = ignore
 
-        member inline _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) = 
+        member inline _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) =
             fun (b: StringBuilder) ->
                 use e = xs.GetEnumerator ()
                 while e.MoveNext() do  (f e.Current) b
 
-        member inline _.While (p: unit -> bool, f: StringBuilder -> unit) = 
-            fun (b: StringBuilder) -> 
+        member inline _.While (p: unit -> bool, f: StringBuilder -> unit) =
+            fun (b: StringBuilder) ->
                 while p () do f b
 
-        member inline _.Run (f: StringBuilder -> unit) = 
+        member inline _.Run (f: StringBuilder -> unit) =
             let b = StringBuilder()
             do f b
             b.ToString()
 
         member inline  _.TryWith(body: StringBuilder -> unit, handler: exn ->  StringBuilder -> unit) =
-            fun (b: StringBuilder) -> 
+            fun (b: StringBuilder) ->
                 try body b with e -> handler e b
 
         member inline  _.TryFinally(body: StringBuilder -> unit, compensation:  StringBuilder -> unit) =
-            fun (b: StringBuilder) ->  
+            fun (b: StringBuilder) ->
                 try body b finally compensation  b
 
-        member inline this.Using(disposable: #IDisposable, body: #IDisposable -> StringBuilder -> unit) =            
-            this.TryFinally(  body disposable ,  fun (b: StringBuilder)  ->  if not <| Object.ReferenceEquals(disposable,null) then disposable.Dispose() ) // might be disposed already                        
-    
- 
+        member inline this.Using(disposable: #IDisposable, body: #IDisposable -> StringBuilder -> unit) =
+            this.TryFinally(  body disposable ,  fun (_: StringBuilder)  ->  if not <| Object.ReferenceEquals(disposable,null) then disposable.Dispose() ) // might be disposed already
+
+
 [<AutoOpen>]
-module AutoOpenComputationalExpressions  = 
+module AutoOpenComputationalExpressions  =
     open ComputationalExpressionsBuilders
 
     /// A maybe monad for option types.
@@ -141,7 +141,7 @@ module AutoOpenComputationalExpressions  =
     /// Computational Expression String Builder:
     /// use 'yield' to append text, or seq of strings separated by a new line
     /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
-    /// accepts ints, guids and chars  too. 
+    /// accepts ints, guids and chars  too.
     let str = StringBufferBuilder ()
 
 

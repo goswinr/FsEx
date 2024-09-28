@@ -4,17 +4,17 @@ open System
 open System.Text
 //open FsEx.SaveIgnore //so that  |> ignore  can only be used on value types
 
-module ComputationalExpressionsBuilderCsv = 
+module ComputationalExpressionsBuilderCsv =
     let mutable csvSepEn = ','
     let mutable csvSepDe = ';'
-    
+
     let inline private addCsvEn   (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepEn)                               |> ignore<StringBuilder>
     let inline private addCsvEnLn (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepEn).Append(Environment.NewLine)   |> ignore<StringBuilder>
     let inline private addCsvDe   (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepDe)                               |> ignore<StringBuilder>
     let inline private addCsvDeLn (b: StringBuilder) (s:string) = b.Append(s).Append(csvSepDe).Append(Environment.NewLine)   |> ignore<StringBuilder>
 
 
-    type CsvBuilderEN () = 
+    type CsvBuilderEN () =
 
         member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  addCsvEn b txt
         member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  addCsvEn b (c.ToString())
@@ -36,36 +36,36 @@ module ComputationalExpressionsBuilderCsv =
 
         member inline _.Zero () = ignore
 
-        member inline _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) = 
+        member inline _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) =
             fun (b: StringBuilder) ->
                 use e = xs.GetEnumerator ()
                 while e.MoveNext() do
                     (f e.Current) b
 
-        member inline _.While (p: unit -> bool, f: StringBuilder -> unit) = 
+        member inline _.While (p: unit -> bool, f: StringBuilder -> unit) =
             fun (b: StringBuilder) ->
                 while p () do
                     f b
 
-        member inline _.Run (f: StringBuilder -> unit) = 
+        member inline _.Run (f: StringBuilder -> unit) =
             let b = StringBuilder()
             do f b
             b.ToString()
 
         member inline  _.TryWith(body: StringBuilder -> unit, handler: exn ->  StringBuilder -> unit) =
-            fun (b: StringBuilder) -> 
+            fun (b: StringBuilder) ->
                 try body b with e -> handler e b
 
         member inline  _.TryFinally(body: StringBuilder -> unit, compensation:  StringBuilder -> unit) =
-            fun (b: StringBuilder) ->  
+            fun (b: StringBuilder) ->
                 try body b finally compensation  b
 
-        member inline this.Using(disposable: #IDisposable, body: #IDisposable -> StringBuilder -> unit) =            
-            this.TryFinally(  body disposable ,  fun (b: StringBuilder)  ->  if not <| Object.ReferenceEquals(disposable,null) then disposable.Dispose() ) // might be disposed already                        
-        
+        member inline this.Using(disposable: #IDisposable, body: #IDisposable -> StringBuilder -> unit) =
+            this.TryFinally(  body disposable ,  fun (_: StringBuilder)  ->  if not <| Object.ReferenceEquals(disposable,null) then disposable.Dispose() ) // might be disposed already
 
 
-    type CsvBuilderDE () = 
+
+    type CsvBuilderDE () =
 
         member inline _.Yield (txt: string) =  fun (b: StringBuilder) ->  addCsvDe b txt
         member inline _.Yield (c: char) =      fun (b: StringBuilder) ->  addCsvDe b (c.ToString())
@@ -91,37 +91,37 @@ module ComputationalExpressionsBuilderCsv =
 
         member inline _.Zero () = ignore
 
-        member inline _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) = 
+        member inline _.For (xs: 'T seq, f: 'T -> StringBuilder -> unit) =
             fun (b: StringBuilder) ->
                 use e = xs.GetEnumerator ()
                 while e.MoveNext() do
                     (f e.Current) b
 
-        member inline _.While (p: unit -> bool, f: StringBuilder -> unit) = 
+        member inline _.While (p: unit -> bool, f: StringBuilder -> unit) =
             fun (b: StringBuilder) ->
                 while p () do
                     f b
 
-        member inline _.Run (f: StringBuilder -> unit) = 
+        member inline _.Run (f: StringBuilder -> unit) =
             let b = StringBuilder()
             do f b
-            b.ToString()        
-        
+            b.ToString()
+
         member inline  _.TryWith(body: StringBuilder -> unit, handler: exn ->  StringBuilder -> unit) =
-            fun (b: StringBuilder) -> 
+            fun (b: StringBuilder) ->
                 try body b with e -> handler e b
-        
+
         member inline  _.TryFinally(body: StringBuilder -> unit, compensation:  StringBuilder -> unit) =
-            fun (b: StringBuilder) ->  
+            fun (b: StringBuilder) ->
                 try body b finally compensation  b
-        
-        member inline this.Using(disposable: #IDisposable, body: #IDisposable -> StringBuilder -> unit) =            
-             this.TryFinally(  body disposable ,  fun (b: StringBuilder)  ->  if not <| Object.ReferenceEquals(disposable,null) then disposable.Dispose() ) // might be disposed already                        
-        
-    
- 
+
+        member inline this.Using(disposable: #IDisposable, body: #IDisposable -> StringBuilder -> unit) =
+             this.TryFinally(  body disposable ,  fun (_: StringBuilder)  ->  if not <| Object.ReferenceEquals(disposable,null) then disposable.Dispose() ) // might be disposed already
+
+
+
 [<AutoOpen>]
-module AutoOpenComputationalExpressionCSV  = 
+module AutoOpenComputationalExpressionCSV  =
     open ComputationalExpressionsBuilderCsv
 
     /// Computational Expression for making csv files in English culture:
@@ -135,6 +135,7 @@ module AutoOpenComputationalExpressionCSV  =
     /// use 'yield' to append text and a  subsequent semicolon
     /// and 'yield!' (with an exclamation mark)  to append text followed by a new line character.
     /// accepts integers and floats too. (floats are printed in full length using f.AsStringDE)
+
     let csvDE = CsvBuilderDE ()
 
 

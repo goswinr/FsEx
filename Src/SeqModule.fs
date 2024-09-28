@@ -9,21 +9,21 @@ open FsEx.ExtensionsSeq
 /// Additional functions to work with IEnumerable<'T>
 [<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>] //need this so doesn't hide Seq class in C# assemblies
 [<RequireQualifiedAccess>]
-module Seq = 
-    
+module Seq =
+
     /// like Seq.iter but with an additional index argument.
     let iterIndexed ( func: int-> 'T -> unit) (xs: seq<'T>) =
-        use e = xs.GetEnumerator() 
+        use e = xs.GetEnumerator()
         let mutable i = 0
         while e.MoveNext() do
             func i e.Current
             i <- i + 1
-            
 
-    /// Gets the only element in Seq. 
-    /// Fails if there is not exactly one element in the Seq. 
+
+    /// Gets the only element in Seq.
+    /// Fails if there is not exactly one element in the Seq.
     let headAndOnly  (xs: seq<'T>) =
-        use e = xs.GetEnumerator()        
+        use e = xs.GetEnumerator()
         if e.MoveNext() then
             let el = e.Current
             if e.MoveNext() then
@@ -45,14 +45,14 @@ module Seq =
 
     /// Applies a function to each element in Seq
     /// If resulting element meets the resultPredicate it is returned , otherwise the original input is returned.
-    let mapIfResult (resultPredicate:seq<'T> -> bool) (transform:seq<'T> -> seq<'T>)  (xs: seq<'T>) : seq<'T> = 
+    let mapIfResult (resultPredicate:seq<'T> -> bool) (transform:seq<'T> -> seq<'T>)  (xs: seq<'T>) : seq<'T> =
         let r = transform xs
         if resultPredicate r then r
         else xs
 
     /// Applies a function to each element in Seq if it meets the inputPredicate, otherwise just returns input element unchanged.
     /// If resulting element meets the resultPredicate it is returned , otherwise the original input element is returned.
-    let mapIfInputAndResult (inputPredicate:seq<'T> -> bool) (resultPredicate:seq<'T> -> bool) (transform:seq<'T> -> seq<'T>)  (xs: seq<'T>) : seq<'T> = 
+    let mapIfInputAndResult (inputPredicate:seq<'T> -> bool) (resultPredicate:seq<'T> -> bool) (transform:seq<'T> -> seq<'T>)  (xs: seq<'T>) : seq<'T> =
         if inputPredicate xs then
             let r = transform xs
             if resultPredicate r then r
@@ -61,7 +61,7 @@ module Seq =
             xs
 
     /// Returns true if the given Rarr has count items.
-    let hasItems count (xs : seq<'T>) : bool = 
+    let hasItems count (xs : seq<'T>) : bool =
         match xs with
         | :? ('T[]) as a ->     a.Length = count
         | :? ('T Rarr) as a  -> a.Count  = count
@@ -73,7 +73,7 @@ module Seq =
             k = count
 
     /// Returns true if the given Rarr has equal or more than count items.
-    let hasMinimumItems count (xs : seq<'T>) : bool = 
+    let hasMinimumItems count (xs : seq<'T>) : bool =
         match xs with
         | :? ('T[]) as a ->     a.Length >= count
         | :? ('T Rarr) as a  -> a.Count  >= count
@@ -85,7 +85,7 @@ module Seq =
             k >= count
 
     /// Returns true if the given Rarr has equal or less than count items.
-    let hasMaximumItems count (xs : seq<'T>) : bool = 
+    let hasMaximumItems count (xs : seq<'T>) : bool =
         match xs with
         | :? ('T[]) as a ->     a.Length <= count
         | :? ('T Rarr) as a  -> a.Count  <= count
@@ -97,23 +97,23 @@ module Seq =
             k <= count
 
     /// Returns a sequence that repeats the input sequence x times.
-    let repeat times (xs:seq<'T>) = 
-        seq{ for i=1 to times do yield! xs}
+    let repeat times (xs:seq<'T>) =
+        seq{ for _ = 1 to times do yield! xs}
 
     /// Allows for negative indices too, -1 is the last element.
     /// The resulting seq includes the item at slice-ending-index. like F# range expressions include the last integer e.g.: 0..5
-    let slice startIdx endIdx (xs:seq<'T>) = 
+    let slice startIdx endIdx (xs:seq<'T>) =
         xs.Slice(startIdx,endIdx)
 
     /// Gets an item by index position in the Seq
     /// Allows for negative index too (like Python)
-    let getNeg index  (xs:seq<'T>) = 
+    let getNeg index  (xs:seq<'T>) =
         xs.GetNeg(index)
 
     /// Considers sequence circular and move elements up or down
     /// e.g.: rotate +1 [ a, b, c, d] = [ d, a, b, c]
     /// e.g.: rotate -1 [ a, b, c, d] = [ b, c, d, a]
-    let rotate r (xs:seq<'T>) = 
+    let rotate r (xs:seq<'T>) =
         xs |> Rarr.ofSeq |> Rarr.rotate r
 
     /// Yields the Seq without the last element
@@ -129,41 +129,41 @@ module Seq =
 
     /// Splits seq in two, like Seq.filter but returning both
     /// the first Rarr has all elements where the filter function returned 'true'
-    let partition predicate (xs:seq<'T>) = 
+    let partition predicate (xs:seq<'T>) =
         let t=Rarr()
         let f=Rarr()
         for x in xs do
             if predicate x then t.Add(x)
             else                f.Add(x)
         t,f
-    
+
     /// Returns the first element that exists more than once in Seq.
-    let tryFindDuplicate (xs:seq<'T>) = 
+    let tryFindDuplicate (xs:seq<'T>) =
         let h = Hashset<'T>()
-        xs |> Seq.tryFind (h.Add >> not) 
-    
+        xs |> Seq.tryFind (h.Add >> not)
+
     /// Returns the first element that exists more than once in Seq.
-    let tryFindDuplicateBy (f:'T->'U) (xs:seq<'T>) = 
+    let tryFindDuplicateBy (f:'T->'U) (xs:seq<'T>) =
         let h = Hashset<'U>()
-        xs |> Seq.tryFind (f >> h.Add >> not) 
+        xs |> Seq.tryFind (f >> h.Add >> not)
 
     /// Returns all elements that exists more than once in Seq.
     /// Each element that exists more than once is only returned once.
     /// Returned order is by first occurrence of first duplicate.
-    let duplicates (xs:seq<'T>) = 
+    let duplicates (xs:seq<'T>) =
         let h = Hashset<'T>()
-        let t = Hashset<'T>() 
+        let t = Hashset<'T>()
         // first Add should be false, second Add true, to recognize the first occurrence of a duplicate:
-        xs |> Seq.filter (fun x -> if h.Add x then false else t.Add x) 
-    
+        xs |> Seq.filter (fun x -> if h.Add x then false else t.Add x)
+
     /// Returns all elements that exists more than once in Seq.
     /// Each element that exists more than once is only returned once.
     /// Returned order is by first occurrence of first duplicate.
-    let duplicatesBy (f:'T->'U) (xs:seq<'T>) = 
+    let duplicatesBy (f:'T->'U) (xs:seq<'T>) =
         let h = Hashset<'U>()
         let t = Hashset<'U>()
-        // first Add should be false, second Add true, to recognize the first occurrence of a duplicate: 
-        xs |> Seq.filter (fun x -> let y = f x in  if h.Add y then false else t.Add y)    
+        // first Add should be false, second Add true, to recognize the first occurrence of a duplicate:
+        xs |> Seq.filter (fun x -> let y = f x in  if h.Add y then false else t.Add y)
 
 
     //------------------------------------------------------------------
@@ -174,7 +174,7 @@ module Seq =
     /// Yields a looped Seq from (first, second)  up to (last, first)
     /// The length of the resulting seq is the same as the input seq.
     /// Use Seq.windowed2 if you don't want a looped sequence.
-    let thisNext (xs:seq<'T>) : seq<'T*'T> = 
+    let thisNext (xs:seq<'T>) : seq<'T*'T> =
         seq{use e = xs.GetEnumerator()
             if e.MoveNext() then
                 let mutable prev = e.Current
@@ -194,7 +194,7 @@ module Seq =
     /// Yields a Seq from (first, second)  up to (second last, last)
     /// The length of the resulting seq is one shorter than input seq.
     /// Use Seq.thisNext if you want a looped sequence till (last, first)
-    let windowed2 (xs:seq<'T>): seq<'T*'T> = 
+    let windowed2 (xs:seq<'T>): seq<'T*'T> =
         seq{use e = xs.GetEnumerator()
             if e.MoveNext() then
                 let mutable prev = e.Current
@@ -213,7 +213,7 @@ module Seq =
     /// Yields looped Seq from (0, first, second)  up to (lastIndex, last, first)
     /// The length of the resulting seq is the same as the input seq.
     /// Use Seq.windowed2i if you don't want a looped sequence.
-    let iThisNext (xs:seq<'T>): seq<int *'T*'T>  = 
+    let iThisNext (xs:seq<'T>): seq<int *'T*'T>  =
         seq{use e = xs.GetEnumerator()
             let mutable kk =  0
             if e.MoveNext() then
@@ -236,7 +236,7 @@ module Seq =
     /// Yields a Seq from (0,first, second) up to (secondLastIndex, second last, last)
     /// The length of the resulting seq is one shorter than input seq.
     /// Use Seq.iThisNext if you want a looped sequence till (lastIndex,last, first)
-    let windowed2i (xs:seq<'T>): seq<int *'T*'T> = 
+    let windowed2i (xs:seq<'T>): seq<int *'T*'T> =
         seq{use e = xs.GetEnumerator()
             let mutable kk =  0
             if e.MoveNext() then
