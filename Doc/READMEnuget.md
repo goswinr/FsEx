@@ -22,12 +22,15 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 - Pretty printing for collections
 - and more ..
 
-[See full API documentation on fuget.org](https://www.fuget.org/packages/FsEx)
+<!-- [See full API documentation on fuget.org](https://www.fuget.org/packages/FsEx) -->
 
 ### License
 [MIT](https://raw.githubusercontent.com/goswinr/FsEx/main/LICENSE.txt)
 
 ### Changelog
+`0.16.0`
+- add RequiresExplicitTypeArguments to Rarr.empty
+
 `0.15.0`
 - Printfn functions to find Fesh editor via Reflection
 - fix Rarr AsReadOnly

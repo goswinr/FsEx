@@ -2,7 +2,7 @@
 # FsEx
 
 [![FsEx on nuget.org](https://img.shields.io/nuget/v/FsEx)](https://www.nuget.org/packages/FsEx/)
-[![FsEx on fuget.org](https://www.fuget.org/packages/FsEx/badge.svg)](https://www.fuget.org/packages/FsEx)
+<!-- [![FsEx on fuget.org](https://www.fuget.org/packages/FsEx/badge.svg)](https://www.fuget.org/packages/FsEx) -->
 ![code size](https://img.shields.io/github/languages/code-size/goswinr/FsEx.svg)
 [![license](https://img.shields.io/github/license/goswinr/FsEx)](LICENSE)
 
@@ -23,12 +23,15 @@ FsEx is an FSharp extension and utility library mostly focused on collections an
 - Pretty printing for collections
 - and more ..
 
-[See full API documentation on fuget.org](https://www.fuget.org/packages/FsEx)
+<!-- [See full API documentation on fuget.org](https://www.fuget.org/packages/FsEx) -->
 
 ### License
 [MIT](https://raw.githubusercontent.com/goswinr/FsEx/main/LICENSE.txt)
 
 ### Changelog
+`0.16.0`
+- add RequiresExplicitTypeArguments to Rarr.empty
+
 `0.15.0`
 - Printfn functions to find Fesh editor via Reflection
 - fix Rarr AsReadOnly
